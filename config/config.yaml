@@ -1,0 +1,45 @@
+database:
+  host: localhost
+  port: 5434
+  user: receita_user
+  password: receita_password
+  name: receita_db
+  sslmode: disable
+  max_open_conns: 200
+  max_idle_conns: 100
+  conn_max_lifetime: 3600
+  conn_max_idle_time: 600
+
+redis:
+  host: localhost
+  port: 6380
+  password: ""
+  db: 0
+  pool_size: 10
+
+clickhouse:
+  host: localhost
+  port: 9001
+  user: receita_user
+  password: receita_password
+  database: receita_analytics
+
+server:
+  port: 8080
+  prefork: false
+  read_buffer_size: 16384
+  write_buffer_size: 4096
+
+import:
+  workers: 32
+  batch_size: 200000
+  read_buffer_size: 16777216
+  data_path: ./data
+
+cache:
+  enabled: true
+  ttl: 300
+
+logging:
+  level: info
+  format: json

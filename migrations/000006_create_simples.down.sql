@@ -1,0 +1,2 @@
+-- Drop SIMPLES table
+DROP TABLE IF EXISTS simples CASCADE;

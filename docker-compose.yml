@@ -1,0 +1,139 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: receita-postgres
+    environment:
+      POSTGRES_DB: receita_db
+      POSTGRES_USER: receita_user
+      POSTGRES_PASSWORD: receita_password
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    ports:
+      - "5434:5432"
+    command:
+      - "postgres"
+      - "-c"
+      - "max_connections=600"
+      - "-c"
+      - "shared_buffers=16GB"
+      - "-c"
+      - "effective_cache_size=24GB"
+      - "-c"
+      - "maintenance_work_mem=10GB"
+      - "-c"
+      - "checkpoint_completion_target=0.95"
+      - "-c"
+      - "checkpoint_timeout=120min"
+      - "-c"
+      - "wal_buffers=64MB"
+      - "-c"
+      - "default_statistics_target=100"
+      - "-c"
+      - "random_page_cost=1.1"
+      - "-c"
+      - "effective_io_concurrency=200"
+      - "-c"
+      - "work_mem=256MB"
+      - "-c"
+      - "min_wal_size=2GB"
+      - "-c"
+      - "max_wal_size=40GB"
+      - "-c"
+      - "max_worker_processes=16"
+      - "-c"
+      - "max_parallel_workers_per_gather=12"
+      - "-c"
+      - "max_parallel_workers=20"
+      - "-c"
+      - "max_parallel_maintenance_workers=20"
+      - "-c"
+      - "parallel_setup_cost=0"
+      - "-c"
+      - "parallel_tuple_cost=0.001"
+      - "-c"
+      - "enable_partitionwise_join=on"
+      - "-c"
+      - "enable_partitionwise_aggregate=on"
+      - "-c"
+      - "lock_timeout=30s"
+    restart: unless-stopped
+    shm_size: 4gb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U receita_user -d receita_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: receita-redis
+    command: redis-server --maxmemory 2gb --maxmemory-policy allkeys-lru
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    container_name: receita-clickhouse
+    environment:
+      CLICKHOUSE_DB: receita_analytics
+      CLICKHOUSE_USER: receita_user
+      CLICKHOUSE_PASSWORD: receita_password
+    ports:
+      - "8124:8123"
+      - "9001:9000"
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8123/ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: .
+    container_name: receita-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      clickhouse:
+        condition: service_healthy
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=receita_user
+      - DB_PASSWORD=receita_password
+      - DB_NAME=receita_db
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - CLICKHOUSE_HOST=clickhouse
+      - CLICKHOUSE_PORT=9000
+      - CLICKHOUSE_USER=receita_user
+      - CLICKHOUSE_PASSWORD=receita_password
+      - CLICKHOUSE_DB=receita_analytics
+      - GO_ENV=production
+      - DATA_PATH=/app/data
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/app/data:ro
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  clickhouse_data:
