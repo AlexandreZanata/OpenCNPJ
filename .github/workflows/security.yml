@@ -46,7 +46,6 @@ jobs:
         with:
           version: latest
           args: --timeout=5m --config=.golangci.yml
-          go-version-file: go.mod
 
   sast:
     name: SAST
