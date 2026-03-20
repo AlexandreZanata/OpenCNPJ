@@ -157,16 +157,16 @@ SELECT setval(
     true
 );
 
-CREATE INDEX idx_estabelecimentos_cnpj_completo ON estabelecimentos(cnpj_completo);
-CREATE INDEX idx_estabelecimentos_cnpj_basico ON estabelecimentos(cnpj_basico);
-CREATE INDEX idx_estabelecimentos_cnae ON estabelecimentos(cnae_fiscal_principal);
-CREATE INDEX idx_estabelecimentos_municipio ON estabelecimentos(municipio);
-CREATE INDEX idx_estabelecimentos_uf ON estabelecimentos(uf);
-CREATE INDEX idx_estabelecimentos_situacao ON estabelecimentos(situacao_cadastral);
-CREATE INDEX idx_estabelecimentos_nome_fantasia_gin ON estabelecimentos USING gin(nome_fantasia gin_trgm_ops);
-CREATE INDEX idx_estabelecimentos_cep ON estabelecimentos(cep);
-CREATE INDEX idx_estabelecimentos_cnae_uf_situacao ON estabelecimentos(cnae_fiscal_principal, uf, situacao_cadastral);
-CREATE UNIQUE INDEX idx_estabelecimentos_uuid_dedupe ON estabelecimentos(uuid_id, cnpj_basico);
+CREATE INDEX idx_estab_v8_cnpj_completo ON estabelecimentos(cnpj_completo);
+CREATE INDEX idx_estab_v8_cnpj_basico ON estabelecimentos(cnpj_basico);
+CREATE INDEX idx_estab_v8_cnae ON estabelecimentos(cnae_fiscal_principal);
+CREATE INDEX idx_estab_v8_municipio ON estabelecimentos(municipio);
+CREATE INDEX idx_estab_v8_uf ON estabelecimentos(uf);
+CREATE INDEX idx_estab_v8_situacao ON estabelecimentos(situacao_cadastral);
+CREATE INDEX idx_estab_v8_nome_fantasia_gin ON estabelecimentos USING gin(nome_fantasia gin_trgm_ops);
+CREATE INDEX idx_estab_v8_cep ON estabelecimentos(cep);
+CREATE INDEX idx_estab_v8_cnae_uf_situacao ON estabelecimentos(cnae_fiscal_principal, uf, situacao_cadastral);
+CREATE UNIQUE INDEX idx_estab_v8_uuid_dedupe ON estabelecimentos(uuid_id, cnpj_basico);
 
 CREATE TABLE socios (
     id BIGSERIAL,
@@ -212,11 +212,11 @@ SELECT setval(
     true
 );
 
-CREATE INDEX idx_socios_cnpj_basico ON socios(cnpj_basico);
-CREATE INDEX idx_socios_nome_gin ON socios USING gin(nome_socio gin_trgm_ops);
-CREATE INDEX idx_socios_cpf ON socios(cpf_cnpj_socio) WHERE cpf_cnpj_socio IS NOT NULL;
-CREATE UNIQUE INDEX idx_socios_uuid_dedupe ON socios(uuid_id, cnpj_basico);
-CREATE UNIQUE INDEX idx_socios_dedupe_natural_hash ON socios(
+CREATE INDEX idx_socios_v8_cnpj_basico ON socios(cnpj_basico);
+CREATE INDEX idx_socios_v8_nome_gin ON socios USING gin(nome_socio gin_trgm_ops);
+CREATE INDEX idx_socios_v8_cpf ON socios(cpf_cnpj_socio) WHERE cpf_cnpj_socio IS NOT NULL;
+CREATE UNIQUE INDEX idx_socios_v8_uuid_dedupe ON socios(uuid_id, cnpj_basico);
+CREATE UNIQUE INDEX idx_socios_v8_dedupe_natural_hash ON socios(
     cnpj_basico,
     COALESCE(nome_socio, ''),
     COALESCE(cpf_cnpj_socio, ''),
