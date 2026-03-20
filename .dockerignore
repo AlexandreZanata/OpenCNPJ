@@ -1,0 +1,27 @@
+.git
+.github
+.cursor
+.vscode
+agent-transcripts
+
+# Large/local runtime folders
+data
+bin
+tmp
+coverage.out
+coverage.html
+benchmark_results.txt
+
+# Docker artifacts
+*.tar
+*.log
+
+# Docs and local notes not required to build binaries
+docs
+COMANDO_IMPORTACAO.md
+COMANDOS_REIMPORTACAO.md
+
+# Local environment files
+.env
+.env.*
+
