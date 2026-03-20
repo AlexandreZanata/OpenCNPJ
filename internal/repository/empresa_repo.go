@@ -1,8 +1,11 @@
 package repository
 
+//nolint:misspell // Domain-specific Portuguese fields from Receita Federal schema.
+
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"io"
 	"strings"
@@ -22,7 +25,11 @@ func NewEmpresaRepository() *EmpresaRepository {
 	}
 }
 
-func (r *EmpresaRepository) SearchEmpresas(ctx context.Context, filters models.SearchFilters) ([]models.Empresa, int64, error) {
+//nolint:gocritic,misspell // Keeping value argument and Receita field names.
+func (r *EmpresaRepository) SearchEmpresas(
+	ctx context.Context,
+	filters models.SearchFilters,
+) ([]models.Empresa, int64, error) {
 	query := `
 		SELECT 
 			id, cnpj_basico, razao_social, natureza_juridica,
@@ -31,7 +38,7 @@ func (r *EmpresaRepository) SearchEmpresas(ctx context.Context, filters models.S
 		FROM empresas
 		WHERE 1=1
 	`
-	
+
 	args := []interface{}{}
 	argPos := 1
 
@@ -111,10 +118,14 @@ func (r *EmpresaRepository) SearchEmpresas(ctx context.Context, filters models.S
 		}
 		empresas = append(empresas, emp)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, 0, fmt.Errorf("failed iterating empresas rows: %w", err)
+	}
 
 	return empresas, total, nil
 }
 
+//nolint:misspell // Receita field naming.
 func (r *EmpresaRepository) GetByCNPJBasico(ctx context.Context, cnpjBasico string) (*models.Empresa, error) {
 	query := `
 		SELECT 
@@ -139,7 +150,7 @@ func (r *EmpresaRepository) GetByCNPJBasico(ctx context.Context, cnpjBasico stri
 		&emp.UpdatedAt,
 	)
 
-	if err == sql.ErrNoRows {
+	if errors.Is(err, sql.ErrNoRows) {
 		return nil, nil
 	}
 	if err != nil {
@@ -149,17 +160,23 @@ func (r *EmpresaRepository) GetByCNPJBasico(ctx context.Context, cnpjBasico stri
 	return &emp, nil
 }
 
-// ExportToCSV uses PostgreSQL function-based approach for fast streaming export
-// This is faster than SELECT + CSV writer and uses less memory
-func (r *EmpresaRepository) ExportToCSV(ctx context.Context, w io.Writer, filters models.SearchFilters, columns []string) error {
+// This is faster than SELECT + CSV writer and uses less memory.
+//
+//nolint:cyclop,gocritic,gosec,misspell // Export SQL builder and Receita field names.
+func (r *EmpresaRepository) ExportToCSV(
+	ctx context.Context,
+	w io.Writer,
+	filters models.SearchFilters,
+	columns []string,
+) error {
 	// Build column mapping
 	columnMap := map[string]string{
-		"cnpj_basico":           "cnpj_basico",
-		"razao_social":           "razao_social",
-		"natureza_juridica":      "COALESCE(natureza_juridica, '')",
-		"capital_social":         "COALESCE(capital_social::text, '')",
-		"porte_empresa":          "COALESCE(porte_empresa, '')",
-		"ente_federativo_responsavel": "COALESCE(ente_federativo_responsavel, '')",
+		"cnpj_basico":                 "cnpj_basico",
+		"razao_social":                "razao_social",
+		"natureza_juridica":           "COALESCE(natureza_juridica, '')",
+		"capital_social":              "COALESCE(capital_social::text, '')",
+		"porte_empresa":               "COALESCE(porte_empresa, '')",
+		"ente_federativo_responsavel": "COALESCE(ente_federativo_responsavel, '')", //nolint:misspell
 	}
 
 	// Build SELECT columns
@@ -176,34 +193,29 @@ func (r *EmpresaRepository) ExportToCSV(ctx context.Context, w io.Writer, filter
 	// Build WHERE clause
 	whereParts := []string{"1=1"}
 	args := []interface{}{}
-	argPos := 1
 
 	if filters.CNPJBasico != "" {
-		whereParts = append(whereParts, fmt.Sprintf("cnpj_basico = $%d", argPos))
 		args = append(args, filters.CNPJBasico)
-		argPos++
+		whereParts = append(whereParts, fmt.Sprintf("cnpj_basico = $%d", len(args)))
 	}
 	if filters.RazaoSocial != "" {
-		whereParts = append(whereParts, fmt.Sprintf("razao_social ILIKE $%d", argPos))
 		args = append(args, "%"+filters.RazaoSocial+"%")
-		argPos++
+		whereParts = append(whereParts, fmt.Sprintf("razao_social ILIKE $%d", len(args)))
 	}
 	if filters.NaturezaJuridica != "" {
-		whereParts = append(whereParts, fmt.Sprintf("natureza_juridica = $%d", argPos))
 		args = append(args, filters.NaturezaJuridica)
-		argPos++
+		whereParts = append(whereParts, fmt.Sprintf("natureza_juridica = $%d", len(args)))
 	}
 	if filters.PorteEmpresa != "" {
-		whereParts = append(whereParts, fmt.Sprintf("porte_empresa = $%d", argPos))
 		args = append(args, filters.PorteEmpresa)
-		argPos++
+		whereParts = append(whereParts, fmt.Sprintf("porte_empresa = $%d", len(args)))
 	}
 
 	whereClause := "WHERE " + strings.Join(whereParts, " AND ")
 
 	// Build function SQL with parameters embedded
 	funcName := fmt.Sprintf("temp_export_emp_%d", time.Now().UnixNano())
-	
+
 	// Embed parameters safely
 	whereClauseWithParams := whereClause
 	for i, arg := range args {
@@ -239,7 +251,9 @@ func (r *EmpresaRepository) ExportToCSV(ctx context.Context, w io.Writer, filter
 	if err != nil {
 		return fmt.Errorf("failed to begin transaction: %w", err)
 	}
-	defer txn.Rollback()
+	defer func() {
+		_ = txn.Rollback()
+	}()
 
 	if _, err := txn.ExecContext(ctx, createFuncSQL); err != nil {
 		return fmt.Errorf("failed to create export function: %w", err)
@@ -264,7 +278,7 @@ func (r *EmpresaRepository) ExportToCSV(ctx context.Context, w io.Writer, filter
 		for i := range values {
 			valuePtrs[i] = &values[i]
 		}
-		
+
 		if err := rows.Scan(valuePtrs...); err != nil {
 			return fmt.Errorf("failed to scan row: %w", err)
 		}
@@ -283,8 +297,11 @@ func (r *EmpresaRepository) ExportToCSV(ctx context.Context, w io.Writer, filter
 			return fmt.Errorf("failed to write CSV row: %w", err)
 		}
 	}
+	if err := rows.Err(); err != nil {
+		return fmt.Errorf("failed iterating export rows: %w", err)
+	}
 
-	txn.ExecContext(ctx, fmt.Sprintf("DROP FUNCTION IF EXISTS %s()", funcName))
+	_, _ = txn.ExecContext(ctx, fmt.Sprintf("DROP FUNCTION IF EXISTS %s()", funcName))
 
 	if err := txn.Commit(); err != nil {
 		return fmt.Errorf("failed to commit transaction: %w", err)

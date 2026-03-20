@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"busca-cnpj-2026/internal/config"
-
 	"github.com/redis/go-redis/v9"
+
+	"busca-cnpj-2026/internal/config"
 )
 
 var RedisClient *redis.Client

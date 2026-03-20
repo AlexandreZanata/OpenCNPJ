@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"busca-cnpj-2026/internal/models"
@@ -9,29 +10,38 @@ import (
 )
 
 type SearchService struct {
-	empresaRepo        *repository.EmpresaRepository
+	empresaRepo         *repository.EmpresaRepository
 	estabelecimentoRepo *repository.EstabelecimentoRepository
-	cache              *CacheService
+	cache               *CacheService
 }
+
+var (
+	errCachedTypeMismatch      = errors.New("cached value type mismatch")
+	errEstabelecimentoNotFound = errors.New("estabelecimento not found")
+)
 
 func NewSearchService() *SearchService {
 	return &SearchService{
-		empresaRepo:        repository.NewEmpresaRepository(),
+		empresaRepo:         repository.NewEmpresaRepository(),
 		estabelecimentoRepo: repository.NewEstabelecimentoRepository(),
-		cache:              NewCacheService(),
+		cache:               NewCacheService(),
 	}
 }
 
-func (s *SearchService) SearchEmpresas(ctx context.Context, filters models.SearchFilters) (*models.SearchResponse, error) {
+//nolint:gocritic // Keeping value argument to avoid broad API churn now.
+func (s *SearchService) SearchEmpresas(
+	ctx context.Context,
+	filters models.SearchFilters,
+) (*models.SearchResponse, error) {
 	cacheKey := s.cache.GenerateKey("empresas:search", map[string]interface{}{
-		"cnpj_basico":        filters.CNPJBasico,
-		"razao_social":       filters.RazaoSocial,
-		"natureza_juridica":  filters.NaturezaJuridica,
-		"porte_empresa":      filters.PorteEmpresa,
+		"cnpj_basico":       filters.CNPJBasico,
+		"razao_social":      filters.RazaoSocial,
+		"natureza_juridica": filters.NaturezaJuridica,
+		"porte_empresa":     filters.PorteEmpresa,
 		"capital_min":       filters.CapitalSocialMin,
 		"capital_max":       filters.CapitalSocialMax,
-		"limit":              filters.Limit,
-		"offset":             filters.Offset,
+		"limit":             filters.Limit,
+		"offset":            filters.Offset,
 	})
 
 	result, err := s.cache.GetOrSet(ctx, cacheKey, func() (interface{}, error) {
@@ -53,21 +63,29 @@ func (s *SearchService) SearchEmpresas(ctx context.Context, filters models.Searc
 		return nil, err
 	}
 
-	return result.(*models.SearchResponse), nil
+	searchResult, ok := result.(*models.SearchResponse)
+	if !ok {
+		return nil, errCachedTypeMismatch
+	}
+	return searchResult, nil
 }
 
-func (s *SearchService) SearchEstabelecimentos(ctx context.Context, filters models.SearchFilters) (*models.SearchResponse, error) {
+//nolint:gocritic // Keeping value argument to avoid broad API churn now.
+func (s *SearchService) SearchEstabelecimentos(
+	ctx context.Context,
+	filters models.SearchFilters,
+) (*models.SearchResponse, error) {
 	cacheKey := s.cache.GenerateKey("estabelecimentos:search", map[string]interface{}{
-		"cnpj_completo":      filters.CNPJCompleto,
-		"cnpj_basico":        filters.CNPJBasico,
-		"nome_fantasia":      filters.NomeFantasia,
-		"cnae_principal":    filters.CNAEPrincipal,
-		"uf":                 filters.UF,
-		"municipio":          filters.Municipio,
-		"situacao":           filters.SituacaoCadastral,
-		"cep":                filters.CEP,
-		"limit":              filters.Limit,
-		"offset":             filters.Offset,
+		"cnpj_completo":  filters.CNPJCompleto,
+		"cnpj_basico":    filters.CNPJBasico,
+		"nome_fantasia":  filters.NomeFantasia,
+		"cnae_principal": filters.CNAEPrincipal,
+		"uf":             filters.UF,
+		"municipio":      filters.Municipio,
+		"situacao":       filters.SituacaoCadastral,
+		"cep":            filters.CEP,
+		"limit":          filters.Limit,
+		"offset":         filters.Offset,
 	})
 
 	result, err := s.cache.GetOrSet(ctx, cacheKey, func() (interface{}, error) {
@@ -89,10 +107,17 @@ func (s *SearchService) SearchEstabelecimentos(ctx context.Context, filters mode
 		return nil, err
 	}
 
-	return result.(*models.SearchResponse), nil
+	searchResult, ok := result.(*models.SearchResponse)
+	if !ok {
+		return nil, errCachedTypeMismatch
+	}
+	return searchResult, nil
 }
 
-func (s *SearchService) GetEstabelecimentoByCNPJ(ctx context.Context, cnpj string) (*models.EstabelecimentoCompleto, error) {
+func (s *SearchService) GetEstabelecimentoByCNPJ(
+	ctx context.Context,
+	cnpj string,
+) (*models.EstabelecimentoCompleto, error) {
 	cacheKey := fmt.Sprintf("estabelecimento:cnpj:%s", cnpj)
 
 	result, err := s.cache.GetOrSet(ctx, cacheKey, func() (interface{}, error) {
@@ -104,8 +129,13 @@ func (s *SearchService) GetEstabelecimentoByCNPJ(ctx context.Context, cnpj strin
 	}
 
 	if result == nil {
-		return nil, fmt.Errorf("estabelecimento not found")
+		return nil, errEstabelecimentoNotFound
 	}
 
-	return result.(*models.EstabelecimentoCompleto), nil
+	estab, ok := result.(*models.EstabelecimentoCompleto)
+	if !ok {
+		return nil, errCachedTypeMismatch
+	}
+
+	return estab, nil
 }

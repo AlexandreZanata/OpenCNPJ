@@ -50,6 +50,9 @@ func (r *StatsRepository) StatsPerCNAE(ctx context.Context, limit int) ([]models
 		}
 		stats = append(stats, stat)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("failed iterating stats per CNAE rows: %w", err)
+	}
 
 	return stats, nil
 }
@@ -80,11 +83,18 @@ func (r *StatsRepository) StatsPerUF(ctx context.Context) ([]models.StatsRespons
 		}
 		stats = append(stats, stat)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("failed iterating stats per UF rows: %w", err)
+	}
 
 	return stats, nil
 }
 
-func (r *StatsRepository) StatsPerCNAEAndUF(ctx context.Context, cnae string, limit int) ([]models.StatsResponse, error) {
+func (r *StatsRepository) StatsPerCNAEAndUF(
+	ctx context.Context,
+	cnae string,
+	limit int,
+) ([]models.StatsResponse, error) {
 	if limit <= 0 {
 		limit = 100
 	}
@@ -115,6 +125,9 @@ func (r *StatsRepository) StatsPerCNAEAndUF(ctx context.Context, cnae string, li
 		}
 		stat.CNAE = cnae
 		stats = append(stats, stat)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("failed iterating stats rows: %w", err)
 	}
 
 	return stats, nil

@@ -5,17 +5,17 @@ import (
 	"fmt"
 	"time"
 
-	"busca-cnpj-2026/internal/config"
-
 	"github.com/ClickHouse/clickhouse-go/v2"
 	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
+
+	"busca-cnpj-2026/internal/config"
 )
 
 var ClickHouseConn driver.Conn
 
 func InitClickHouse() error {
 	ctx := context.Background()
-	
+
 	conn, err := clickhouse.Open(&clickhouse.Options{
 		Addr: []string{fmt.Sprintf("%s:%d", config.AppConfig.ClickHouse.Host, config.AppConfig.ClickHouse.Port)},
 		Auth: clickhouse.Auth{

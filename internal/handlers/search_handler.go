@@ -3,10 +3,10 @@ package handlers
 import (
 	"strconv"
 
+	"github.com/gofiber/fiber/v2"
+
 	"busca-cnpj-2026/internal/models"
 	"busca-cnpj-2026/internal/services"
-
-	"github.com/gofiber/fiber/v2"
 )
 
 type SearchHandler struct {
@@ -19,15 +19,15 @@ func NewSearchHandler() *SearchHandler {
 	}
 }
 
-// SearchEmpresas handles GET /api/v1/empresas/search
+// SearchEmpresas handles GET /api/v1/empresas/search.
 func (h *SearchHandler) SearchEmpresas(c *fiber.Ctx) error {
 	filters := models.SearchFilters{
-		CNPJBasico:        c.Query("cnpj_basico"),
-		RazaoSocial:       c.Query("razao_social"),
-		NaturezaJuridica:   c.Query("natureza_juridica"),
-		PorteEmpresa:      c.Query("porte_empresa"),
-		Limit:             100,
-		Offset:            0,
+		CNPJBasico:       c.Query("cnpj_basico"),
+		RazaoSocial:      c.Query("razao_social"),
+		NaturezaJuridica: c.Query("natureza_juridica"),
+		PorteEmpresa:     c.Query("porte_empresa"),
+		Limit:            100,
+		Offset:           0,
 	}
 
 	// Parse limit
@@ -46,13 +46,13 @@ func (h *SearchHandler) SearchEmpresas(c *fiber.Ctx) error {
 
 	// Parse capital_social filters
 	if minStr := c.Query("capital_social_min"); minStr != "" {
-		if min, err := strconv.ParseFloat(minStr, 64); err == nil {
-			filters.CapitalSocialMin = &min
+		if minValue, err := strconv.ParseFloat(minStr, 64); err == nil {
+			filters.CapitalSocialMin = &minValue
 		}
 	}
 	if maxStr := c.Query("capital_social_max"); maxStr != "" {
-		if max, err := strconv.ParseFloat(maxStr, 64); err == nil {
-			filters.CapitalSocialMax = &max
+		if maxValue, err := strconv.ParseFloat(maxStr, 64); err == nil {
+			filters.CapitalSocialMax = &maxValue
 		}
 	}
 
@@ -68,13 +68,13 @@ func (h *SearchHandler) SearchEmpresas(c *fiber.Ctx) error {
 	return c.JSON(result)
 }
 
-// SearchEstabelecimentos handles GET /api/v1/estabelecimentos/search
+// SearchEstabelecimentos handles GET /api/v1/estabelecimentos/search.
 func (h *SearchHandler) SearchEstabelecimentos(c *fiber.Ctx) error {
 	filters := models.SearchFilters{
 		CNPJCompleto:      c.Query("cnpj"),
 		CNPJBasico:        c.Query("cnpj_basico"),
 		NomeFantasia:      c.Query("nome_fantasia"),
-		CNAEPrincipal:    c.Query("cnae"),
+		CNAEPrincipal:     c.Query("cnae"),
 		UF:                c.Query("uf"),
 		Municipio:         c.Query("municipio"),
 		SituacaoCadastral: c.Query("situacao"),
@@ -109,7 +109,7 @@ func (h *SearchHandler) SearchEstabelecimentos(c *fiber.Ctx) error {
 	return c.JSON(result)
 }
 
-// GetEstabelecimentoByCNPJ handles GET /api/v1/estabelecimentos/:cnpj
+// GetEstabelecimentoByCNPJ handles GET /api/v1/estabelecimentos/:cnpj.
 func (h *SearchHandler) GetEstabelecimentoByCNPJ(c *fiber.Ctx) error {
 	cnpj := c.Params("cnpj")
 	if cnpj == "" {

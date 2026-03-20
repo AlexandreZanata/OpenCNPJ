@@ -188,9 +188,9 @@ func setDefaults() {
 	viper.SetDefault("server.read_buffer_size", 16384)
 	viper.SetDefault("server.write_buffer_size", 4096)
 
-	viper.SetDefault("import.workers", runtime.NumCPU()*2)  // Optimized: 2x CPU cores for I/O bound operations
-	viper.SetDefault("import.batch_size", 250000)            // Optimized batch size for 32GB RAM and PostgreSQL 18
-	viper.SetDefault("import.read_buffer_size", 4194304)     // 4MB buffer for faster CSV reading
+	viper.SetDefault("import.workers", runtime.NumCPU()*2) // Optimized: 2x CPU cores for I/O bound operations
+	viper.SetDefault("import.batch_size", 250000)          // Optimized batch size for 32GB RAM and PostgreSQL 18
+	viper.SetDefault("import.read_buffer_size", 4194304)   // 4MB buffer for faster CSV reading
 	viper.SetDefault("import.data_path", "./data")
 
 	viper.SetDefault("cache.enabled", true)
@@ -216,7 +216,7 @@ func setDefaults() {
 					key := strings.TrimSpace(parts[0])
 					value := strings.TrimSpace(parts[1])
 					// Remove quotes if present
-					if len(value) > 0 && (value[0] == '"' || value[0] == '\'') {
+					if value != "" && (value[0] == '"' || value[0] == '\'') {
 						value = value[1 : len(value)-1]
 					}
 					os.Setenv(key, value)

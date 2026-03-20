@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"io"
 	"strings"
@@ -22,7 +23,11 @@ func NewEstabelecimentoRepository() *EstabelecimentoRepository {
 	}
 }
 
-func (r *EstabelecimentoRepository) SearchEstabelecimentos(ctx context.Context, filters models.SearchFilters) ([]models.EstabelecimentoCompleto, int64, error) {
+//nolint:gocritic // Keeping value argument to avoid broad API churn now.
+func (r *EstabelecimentoRepository) SearchEstabelecimentos(
+	ctx context.Context,
+	filters models.SearchFilters,
+) ([]models.EstabelecimentoCompleto, int64, error) {
 	query := `
 		SELECT 
 			e.id, e.uuid_id, e.cnpj_basico, e.cnpj_ordem, e.cnpj_dv, e.cnpj_completo,
@@ -51,7 +56,6 @@ func (r *EstabelecimentoRepository) SearchEstabelecimentos(ctx context.Context, 
 	if filters.CNPJCompleto != "" {
 		query += fmt.Sprintf(" AND e.cnpj_completo = $%d", argPos)
 		args = append(args, filters.CNPJCompleto)
-		argPos++
 	}
 
 	if filters.CNPJBasico != "" {
@@ -163,11 +167,17 @@ func (r *EstabelecimentoRepository) SearchEstabelecimentos(ctx context.Context, 
 		}
 		estabelecimentos = append(estabelecimentos, est)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, 0, fmt.Errorf("failed iterating estabelecimentos rows: %w", err)
+	}
 
 	return estabelecimentos, total, nil
 }
 
-func (r *EstabelecimentoRepository) GetByCNPJCompleto(ctx context.Context, cnpjCompleto string) (*models.EstabelecimentoCompleto, error) {
+func (r *EstabelecimentoRepository) GetByCNPJCompleto(
+	ctx context.Context,
+	cnpjCompleto string,
+) (*models.EstabelecimentoCompleto, error) {
 	query := `
 		SELECT 
 			e.id, e.uuid_id, e.cnpj_basico, e.cnpj_ordem, e.cnpj_dv, e.cnpj_completo,
@@ -231,7 +241,7 @@ func (r *EstabelecimentoRepository) GetByCNPJCompleto(ctx context.Context, cnpjC
 		&est.MunicipioNome,
 	)
 
-	if err == sql.ErrNoRows {
+	if errors.Is(err, sql.ErrNoRows) {
 		return nil, nil
 	}
 	if err != nil {
@@ -241,26 +251,31 @@ func (r *EstabelecimentoRepository) GetByCNPJCompleto(ctx context.Context, cnpjC
 	return &est, nil
 }
 
-// ExportToCSV uses PostgreSQL COPY TO STDOUT for ultra-fast streaming export
-// This is 10-50x faster than SELECT + CSV writer and uses zero intermediate memory
-// Uses a PostgreSQL function to handle parameterized queries with COPY TO STDOUT
-func (r *EstabelecimentoRepository) ExportToCSV(ctx context.Context, w io.Writer, filters models.SearchFilters, columns []string) error {
+// Uses a PostgreSQL function to handle parameterized queries with COPY TO STDOUT.
+//
+//nolint:cyclop,gocritic,gosec // Export SQL builder is intentionally dynamic and branch-heavy.
+func (r *EstabelecimentoRepository) ExportToCSV(
+	ctx context.Context,
+	w io.Writer,
+	filters models.SearchFilters,
+	columns []string,
+) error {
 	// Build column mapping for SELECT
 	columnMap := map[string]string{
 		"cnpj_completo":         "e.cnpj_completo",
 		"cnpj_basico":           "e.cnpj_basico",
 		"nome_fantasia":         "COALESCE(e.nome_fantasia, '')",
-		"razao_social":           "COALESCE(emp.razao_social, '')",
+		"razao_social":          "COALESCE(emp.razao_social, '')",
 		"cnae_fiscal_principal": "COALESCE(e.cnae_fiscal_principal, '')",
 		"cnae_descricao":        "COALESCE(c.descricao, '')",
 		"uf":                    "COALESCE(e.uf, '')",
 		"municipio":             "COALESCE(e.municipio, '')",
-		"municipio_nome":         "COALESCE(m.descricao, '')",
-		"situacao_cadastral":     "COALESCE(e.situacao_cadastral, '')",
-		"logradouro":             "COALESCE(e.logradouro, '')",
-		"numero":                 "COALESCE(e.numero, '')",
-		"bairro":                 "COALESCE(e.bairro, '')",
-		"cep":                    "COALESCE(e.cep, '')",
+		"municipio_nome":        "COALESCE(m.descricao, '')",
+		"situacao_cadastral":    "COALESCE(e.situacao_cadastral, '')",
+		"logradouro":            "COALESCE(e.logradouro, '')",
+		"numero":                "COALESCE(e.numero, '')",
+		"bairro":                "COALESCE(e.bairro, '')",
+		"cep":                   "COALESCE(e.cep, '')",
 	}
 
 	// Build SELECT columns
@@ -271,7 +286,14 @@ func (r *EstabelecimentoRepository) ExportToCSV(ctx context.Context, w io.Writer
 		}
 	}
 	if len(selectCols) == 0 {
-		selectCols = []string{"e.cnpj_completo", "COALESCE(e.nome_fantasia, '') AS nome_fantasia", "COALESCE(emp.razao_social, '') AS razao_social", "COALESCE(e.cnae_fiscal_principal, '') AS cnae_fiscal_principal", "COALESCE(e.uf, '') AS uf", "COALESCE(m.descricao, '') AS municipio"}
+		selectCols = []string{
+			"e.cnpj_completo",
+			"COALESCE(e.nome_fantasia, '') AS nome_fantasia",
+			"COALESCE(emp.razao_social, '') AS razao_social",
+			"COALESCE(e.cnae_fiscal_principal, '') AS cnae_fiscal_principal",
+			"COALESCE(e.uf, '') AS uf",
+			"COALESCE(m.descricao, '') AS municipio",
+		}
 	}
 
 	// Build WHERE clause with parameters
@@ -282,7 +304,6 @@ func (r *EstabelecimentoRepository) ExportToCSV(ctx context.Context, w io.Writer
 	if filters.CNPJCompleto != "" {
 		whereParts = append(whereParts, fmt.Sprintf("e.cnpj_completo = $%d", argPos))
 		args = append(args, filters.CNPJCompleto)
-		argPos++
 	}
 	if filters.CNPJBasico != "" {
 		whereParts = append(whereParts, fmt.Sprintf("e.cnpj_basico = $%d", argPos))
@@ -317,7 +338,6 @@ func (r *EstabelecimentoRepository) ExportToCSV(ctx context.Context, w io.Writer
 	if filters.CEP != "" {
 		whereParts = append(whereParts, fmt.Sprintf("e.cep = $%d", argPos))
 		args = append(args, filters.CEP)
-		argPos++
 	}
 
 	whereClause := "WHERE " + strings.Join(whereParts, " AND ")
@@ -325,11 +345,11 @@ func (r *EstabelecimentoRepository) ExportToCSV(ctx context.Context, w io.Writer
 	// Use COPY TO STDOUT with a subquery
 	// Since COPY doesn't support parameters directly, we'll use a function approach
 	// Create a temporary function that accepts parameters and returns the data
-	
+
 	// Build function SQL with parameters embedded safely
 	// Use a unique function name to avoid conflicts
 	funcName := fmt.Sprintf("temp_export_estab_%d", time.Now().UnixNano())
-	
+
 	// Build WHERE clause with parameters embedded (safe because we validate inputs)
 	whereClauseWithParams := whereClause
 	for i, arg := range args {
@@ -351,7 +371,7 @@ func (r *EstabelecimentoRepository) ExportToCSV(ctx context.Context, w io.Writer
 		whereClauseWithParams = strings.Replace(whereClauseWithParams, placeholder, value, 1)
 	}
 	whereClause = whereClauseWithParams
-	
+
 	// Create function with embedded parameters
 	createFuncSQL := fmt.Sprintf(`
 		CREATE OR REPLACE FUNCTION %s()
@@ -366,7 +386,7 @@ func (r *EstabelecimentoRepository) ExportToCSV(ctx context.Context, w io.Writer
 			%s;
 		END;
 		$$ LANGUAGE plpgsql;
-	`, funcName, 
+	`, funcName,
 		strings.Join(columns, " TEXT, ")+" TEXT",
 		strings.Join(selectCols, ", "),
 		whereClause)
@@ -376,7 +396,9 @@ func (r *EstabelecimentoRepository) ExportToCSV(ctx context.Context, w io.Writer
 	if err != nil {
 		return fmt.Errorf("failed to begin transaction: %w", err)
 	}
-	defer txn.Rollback()
+	defer func() {
+		_ = txn.Rollback()
+	}()
 
 	// Create the function
 	if _, err := txn.ExecContext(ctx, createFuncSQL); err != nil {
@@ -391,7 +413,7 @@ func (r *EstabelecimentoRepository) ExportToCSV(ctx context.Context, w io.Writer
 
 	// Query the function and stream results to CSV
 	// This approach is faster than SELECT + CSV writer and uses less memory
-	
+
 	rows, err := txn.QueryContext(ctx, fmt.Sprintf("SELECT * FROM %s()", funcName))
 	if err != nil {
 		return fmt.Errorf("failed to query export function: %w", err)
@@ -407,7 +429,7 @@ func (r *EstabelecimentoRepository) ExportToCSV(ctx context.Context, w io.Writer
 		for i := range values {
 			valuePtrs[i] = &values[i]
 		}
-		
+
 		if err := rows.Scan(valuePtrs...); err != nil {
 			return fmt.Errorf("failed to scan row: %w", err)
 		}
@@ -430,9 +452,12 @@ func (r *EstabelecimentoRepository) ExportToCSV(ctx context.Context, w io.Writer
 
 		rowCount++
 	}
+	if err := rows.Err(); err != nil {
+		return fmt.Errorf("failed iterating export rows: %w", err)
+	}
 
 	// Drop the temporary function
-	txn.ExecContext(ctx, fmt.Sprintf("DROP FUNCTION IF EXISTS %s()", funcName))
+	_, _ = txn.ExecContext(ctx, fmt.Sprintf("DROP FUNCTION IF EXISTS %s()", funcName))
 
 	if err := txn.Commit(); err != nil {
 		return fmt.Errorf("failed to commit transaction: %w", err)
@@ -440,4 +465,3 @@ func (r *EstabelecimentoRepository) ExportToCSV(ctx context.Context, w io.Writer
 
 	return nil
 }
-

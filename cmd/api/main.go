@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,22 +11,22 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/healthcheck"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+
 	"busca-cnpj-2026/internal/config"
 	"busca-cnpj-2026/internal/database"
 	"busca-cnpj-2026/internal/handlers"
 	"busca-cnpj-2026/internal/middleware"
-
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/healthcheck"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-// fiberPrometheusAdapter adapts Fiber's context to http.ResponseWriter for Prometheus
+// fiberPrometheusAdapter adapts Fiber's context to http.ResponseWriter for Prometheus.
 type fiberPrometheusAdapter struct {
-	c        *fiber.Ctx
-	header   http.Header
-	status   int
-	written  bool
+	c       *fiber.Ctx
+	header  http.Header
+	status  int
+	written bool
 }
 
 func newFiberPrometheusAdapter(c *fiber.Ctx) *fiberPrometheusAdapter {
@@ -69,19 +70,31 @@ func main() {
 	if err := database.InitPostgres(); err != nil {
 		log.Fatalf("Failed to initialize PostgreSQL: %v", err)
 	}
-	defer database.ClosePostgres()
+	defer func() {
+		if err := database.ClosePostgres(); err != nil {
+			log.Printf("Warning: failed to close PostgreSQL: %v", err)
+		}
+	}()
 
 	if err := database.InitRedis(); err != nil {
 		log.Printf("Warning: Failed to initialize Redis: %v (continuing without cache)", err)
 	} else {
-		defer database.CloseRedis()
+		defer func() {
+			if err := database.CloseRedis(); err != nil {
+				log.Printf("Warning: failed to close Redis: %v", err)
+			}
+		}()
 	}
 
 	// Initialize ClickHouse (optional)
 	if err := database.InitClickHouse(); err != nil {
 		log.Printf("Warning: Failed to initialize ClickHouse: %v (continuing without analytics)", err)
 	} else {
-		defer database.CloseClickHouse()
+		defer func() {
+			if err := database.CloseClickHouse(); err != nil {
+				log.Printf("Warning: failed to close ClickHouse: %v", err)
+			}
+		}()
 	}
 
 	// Create Fiber app
@@ -112,10 +125,10 @@ func main() {
 
 	// Health check
 	app.Use(healthcheck.New(healthcheck.Config{
-		LivenessProbe: func(c *fiber.Ctx) bool {
+		LivenessProbe: func(_ *fiber.Ctx) bool {
 			return true
 		},
-		ReadinessProbe: func(c *fiber.Ctx) bool {
+		ReadinessProbe: func(_ *fiber.Ctx) bool {
 			ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 			defer cancel()
 			return database.DB.PingContext(ctx) == nil
@@ -133,7 +146,16 @@ func main() {
 
 	// Profiling endpoints (only in development)
 	if config.AppConfig.Logging.Level == "debug" {
-		_ = http.ListenAndServe(":6060", nil) // pprof server
+		go func() {
+			pprofServer := &http.Server{
+				Addr:              ":6060",
+				Handler:           nil,
+				ReadHeaderTimeout: 5 * time.Second,
+			}
+			if err := pprofServer.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+				log.Printf("pprof server error: %v", err)
+			}
+		}()
 	}
 
 	// Initialize handlers

@@ -1,10 +1,10 @@
 package handlers
 
 import (
+	"github.com/gofiber/fiber/v2"
+
 	"busca-cnpj-2026/internal/models"
 	"busca-cnpj-2026/internal/services"
-
-	"github.com/gofiber/fiber/v2"
 )
 
 type ExportHandler struct {
@@ -17,7 +17,7 @@ func NewExportHandler() *ExportHandler {
 	}
 }
 
-// ExportCSV handles POST /api/v1/export/csv
+// ExportCSV handles POST /api/v1/export/csv.
 func (h *ExportHandler) ExportCSV(c *fiber.Ctx) error {
 	var req models.ExportRequest
 	if err := c.BodyParser(&req); err != nil {

@@ -3,10 +3,10 @@ package handlers
 import (
 	"strconv"
 
+	"github.com/gofiber/fiber/v2"
+
 	"busca-cnpj-2026/internal/models"
 	"busca-cnpj-2026/internal/repository"
-
-	"github.com/gofiber/fiber/v2"
 )
 
 type StatsHandler struct {
@@ -19,7 +19,7 @@ func NewStatsHandler() *StatsHandler {
 	}
 }
 
-// StatsPerCNAE handles GET /api/v1/stats/cnae
+// StatsPerCNAE handles GET /api/v1/stats/cnae.
 func (h *StatsHandler) StatsPerCNAE(c *fiber.Ctx) error {
 	limit := 100
 	if limitStr := c.Query("limit"); limitStr != "" {
@@ -40,7 +40,7 @@ func (h *StatsHandler) StatsPerCNAE(c *fiber.Ctx) error {
 	return c.JSON(stats)
 }
 
-// StatsPerUF handles GET /api/v1/stats/uf
+// StatsPerUF handles GET /api/v1/stats/uf.
 func (h *StatsHandler) StatsPerUF(c *fiber.Ctx) error {
 	stats, err := h.statsRepo.StatsPerUF(c.Context())
 	if err != nil {
@@ -54,7 +54,7 @@ func (h *StatsHandler) StatsPerUF(c *fiber.Ctx) error {
 	return c.JSON(stats)
 }
 
-// StatsPerCNAEAndUF handles GET /api/v1/stats/cnae/:cnae/uf
+// StatsPerCNAEAndUF handles GET /api/v1/stats/cnae/:cnae/uf.
 func (h *StatsHandler) StatsPerCNAEAndUF(c *fiber.Ctx) error {
 	cnae := c.Params("cnae")
 	if cnae == "" {

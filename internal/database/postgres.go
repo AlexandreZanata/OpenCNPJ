@@ -3,17 +3,18 @@ package database
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"runtime"
 	"sync"
 	"time"
 
-	"busca-cnpj-2026/internal/config"
-
-	_ "github.com/lib/pq"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
+	_ "github.com/golang-migrate/migrate/v4/source/file" // Import file source driver for golang-migrate.
+	_ "github.com/lib/pq"
+
+	"busca-cnpj-2026/internal/config"
 )
 
 var DB *sql.DB
@@ -33,7 +34,7 @@ func init() {
 
 func InitPostgres() error {
 	dsn := config.GetDSN()
-	
+
 	var err error
 	DB, err = sql.Open("postgres", dsn)
 	if err != nil {
@@ -81,7 +82,7 @@ func RunMigrations() error {
 		return fmt.Errorf("failed to create migrate instance: %w", err)
 	}
 
-	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+	if err := m.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
 		return fmt.Errorf("failed to run migrations: %w", err)
 	}
 
@@ -95,7 +96,7 @@ func ClosePostgres() error {
 	return nil
 }
 
-// GetPreparedStmt returns a prepared statement from the pool
+// GetPreparedStmt returns a prepared statement from the pool.
 func (p *PreparedStmtPool) GetPreparedStmt(name, query string) (*sql.Stmt, error) {
 	p.mu.RLock()
 	stmt, exists := p.stmts[name]
@@ -113,6 +114,7 @@ func (p *PreparedStmtPool) GetPreparedStmt(name, query string) (*sql.Stmt, error
 		return stmt, nil
 	}
 
+	//nolint:sqlclosecheck // Statement is cached in the pool and closed by PreparedStmtPool.Close.
 	stmt, err := DB.Prepare(query)
 	if err != nil {
 		return nil, err
@@ -122,13 +124,15 @@ func (p *PreparedStmtPool) GetPreparedStmt(name, query string) (*sql.Stmt, error
 	return stmt, nil
 }
 
-// Close closes all prepared statements
+// Close closes all prepared statements.
 func (p *PreparedStmtPool) Close() error {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 
 	for _, stmt := range p.stmts {
-		stmt.Close()
+		if err := stmt.Close(); err != nil {
+			return err
+		}
 	}
 
 	p.stmts = make(map[string]*sql.Stmt)
