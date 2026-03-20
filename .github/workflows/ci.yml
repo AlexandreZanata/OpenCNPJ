@@ -17,8 +17,10 @@ jobs:
           cache: true
       - uses: golangci/golangci-lint-action@v6
         with:
-          version: latest
-          args: "--timeout 5m"
+          # Prebuilt binaries may lag the Go version in go.mod; compile with setup-go toolchain.
+          install-mode: goinstall
+          version: v1.64.8
+          args: "--timeout 5m --config=.golangci.yml"
 
   commitlint:
     runs-on: ubuntu-latest
