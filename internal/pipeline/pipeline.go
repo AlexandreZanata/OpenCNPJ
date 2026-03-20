@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"runtime"
 	"sync"
 
 	"busca-cnpj-2026/internal/loader"
@@ -37,7 +38,7 @@ func (p *EmpresaPipeline) Run(ctx context.Context, filePath string) error {
 	reader := parser.NewCSVReader(bufio.NewReaderSize(f, readerBuffer))
 	rawCh := make(chan []string, channelBuffer)
 	modelCh := make(chan model.Empresa, channelBuffer)
-	errCh := make(chan error, 3)
+	errCh := make(chan error, runtime.NumCPU()+2)
 
 	var wg sync.WaitGroup
 
@@ -47,21 +48,36 @@ func (p *EmpresaPipeline) Run(ctx context.Context, filePath string) error {
 		parser.ReadRawLines(ctx, reader, rawCh, errCh)
 	}()
 
+	parseWorkers := runtime.NumCPU()
+	if parseWorkers < 1 {
+		parseWorkers = 1
+	}
+	var parseWG sync.WaitGroup
+	parseWG.Add(parseWorkers)
+	for i := 0; i < parseWorkers; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			defer parseWG.Done()
+			for line := range rawCh {
+				empresa, parseErr := parser.ParseEmpresa(line, p.Lookups)
+				if parseErr != nil {
+					if p.Metrics != nil {
+						p.Metrics.AddError()
+					}
+					errCh <- parseErr
+					continue
+				}
+				modelCh <- empresa
+			}
+		}()
+	}
+
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		defer close(modelCh)
-		for line := range rawCh {
-			empresa, parseErr := parser.ParseEmpresa(line, p.Lookups)
-			if parseErr != nil {
-				if p.Metrics != nil {
-					p.Metrics.AddError()
-				}
-				errCh <- parseErr
-				continue
-			}
-			modelCh <- empresa
-		}
+		parseWG.Wait()
+		close(modelCh)
 	}()
 
 	wg.Add(1)

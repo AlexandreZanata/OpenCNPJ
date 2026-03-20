@@ -56,6 +56,13 @@ func (r *EstabelecimentoRepository) SearchEstabelecimentos(
 	if filters.CNPJCompleto != "" {
 		query += fmt.Sprintf(" AND e.cnpj_completo = $%d", argPos)
 		args = append(args, filters.CNPJCompleto)
+		argPos++
+	}
+
+	if filters.UUIDID != "" {
+		query += fmt.Sprintf(" AND e.uuid_id = $%d", argPos)
+		args = append(args, filters.UUIDID)
+		argPos++
 	}
 
 	if filters.CNPJBasico != "" {

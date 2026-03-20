@@ -58,6 +58,8 @@ type ServerConfig struct {
 
 type ImportConfig struct {
 	Workers        int
+	ParseWorkers   int
+	CopyWorkers    int
 	BatchSize      int
 	ReadBufferSize int
 	DataPath       string
@@ -129,6 +131,8 @@ func Load() error {
 		},
 		Import: ImportConfig{
 			Workers:        viper.GetInt("import.workers"),
+			ParseWorkers:   viper.GetInt("import.parse_workers"),
+			CopyWorkers:    viper.GetInt("import.copy_workers"),
 			BatchSize:      viper.GetInt("import.batch_size"),
 			ReadBufferSize: viper.GetInt("import.read_buffer_size"),
 			DataPath:       viper.GetString("import.data_path"),
@@ -146,6 +150,12 @@ func Load() error {
 	// Adjust workers based on CPU count if not explicitly set
 	if AppConfig.Import.Workers == 0 {
 		AppConfig.Import.Workers = runtime.NumCPU() * 2
+	}
+	if AppConfig.Import.ParseWorkers == 0 {
+		AppConfig.Import.ParseWorkers = runtime.NumCPU()
+	}
+	if AppConfig.Import.CopyWorkers == 0 {
+		AppConfig.Import.CopyWorkers = max(1, runtime.NumCPU()/2)
 	}
 
 	// Adjust database connection pool based on CPU count
@@ -189,6 +199,8 @@ func setDefaults() {
 	viper.SetDefault("server.write_buffer_size", 4096)
 
 	viper.SetDefault("import.workers", runtime.NumCPU()*2) // Optimized: 2x CPU cores for I/O bound operations
+	viper.SetDefault("import.parse_workers", runtime.NumCPU())
+	viper.SetDefault("import.copy_workers", max(1, runtime.NumCPU()/2))
 	viper.SetDefault("import.batch_size", 250000)          // Optimized batch size for 32GB RAM and PostgreSQL 18
 	viper.SetDefault("import.read_buffer_size", 4194304)   // 4MB buffer for faster CSV reading
 	viper.SetDefault("import.data_path", "./data")

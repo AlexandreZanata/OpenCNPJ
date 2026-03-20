@@ -2,6 +2,7 @@ package models
 
 // SearchFilters represents filters for search queries.
 type SearchFilters struct {
+	UUIDID            string
 	CNPJBasico        string
 	CNPJCompleto      string
 	RazaoSocial       string

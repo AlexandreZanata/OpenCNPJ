@@ -10,7 +10,7 @@ import (
 )
 
 type Empresa struct {
-	ID                        uuid.UUID       `json:"id" db:"id"`
+	UUIDID                    uuid.UUID       `json:"uuid_id" db:"uuid_id"`
 	CNPJBasico                string          `json:"cnpj_basico" db:"cnpj_basico"`
 	RazaoSocial               string          `json:"razao_social" db:"razao_social"`
 	NaturezaJuridica          sql.NullString  `json:"natureza_juridica" db:"natureza_juridica"`

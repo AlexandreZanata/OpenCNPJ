@@ -32,7 +32,7 @@ func (r *EmpresaRepository) SearchEmpresas(
 ) ([]models.Empresa, int64, error) {
 	query := `
 		SELECT 
-			id, cnpj_basico, razao_social, natureza_juridica,
+			uuid_id, cnpj_basico, razao_social, natureza_juridica,
 			qualificacao_responsavel, capital_social, porte_empresa,
 			ente_federativo_responsavel, created_at, updated_at
 		FROM empresas
@@ -45,6 +45,11 @@ func (r *EmpresaRepository) SearchEmpresas(
 	if filters.CNPJBasico != "" {
 		query += fmt.Sprintf(" AND cnpj_basico = $%d", argPos)
 		args = append(args, filters.CNPJBasico)
+		argPos++
+	}
+	if filters.UUIDID != "" {
+		query += fmt.Sprintf(" AND uuid_id = $%d", argPos)
+		args = append(args, filters.UUIDID)
 		argPos++
 	}
 
@@ -103,7 +108,7 @@ func (r *EmpresaRepository) SearchEmpresas(
 	for rows.Next() {
 		var emp models.Empresa
 		err := rows.Scan(
-			&emp.ID,
+			&emp.UUIDID,
 			&emp.CNPJBasico,
 			&emp.RazaoSocial,
 			&emp.NaturezaJuridica,
@@ -130,7 +135,7 @@ func (r *EmpresaRepository) SearchEmpresas(
 func (r *EmpresaRepository) GetByCNPJBasico(ctx context.Context, cnpjBasico string) (*models.Empresa, error) {
 	query := `
 		SELECT 
-			id, cnpj_basico, razao_social, natureza_juridica,
+			uuid_id, cnpj_basico, razao_social, natureza_juridica,
 			qualificacao_responsavel, capital_social, porte_empresa,
 			ente_federativo_responsavel, created_at, updated_at
 		FROM empresas
@@ -139,7 +144,7 @@ func (r *EmpresaRepository) GetByCNPJBasico(ctx context.Context, cnpjBasico stri
 
 	var emp models.Empresa
 	err := r.db.QueryRowContext(ctx, query, cnpjBasico).Scan(
-		&emp.ID,
+		&emp.UUIDID,
 		&emp.CNPJBasico,
 		&emp.RazaoSocial,
 		&emp.NaturezaJuridica,

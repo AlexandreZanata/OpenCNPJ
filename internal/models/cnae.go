@@ -1,8 +1,13 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type CNAE struct {
+	UUIDID    uuid.UUID `json:"uuid_id" db:"uuid_id"`
 	Codigo    string    `json:"codigo" db:"codigo"`
 	Descricao string    `json:"descricao" db:"descricao"`
 	Secao     string    `json:"secao" db:"secao"`

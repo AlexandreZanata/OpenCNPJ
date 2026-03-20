@@ -16,7 +16,7 @@ jobs:
       - name: Run benchmarks
         run: |
           go test ./tests/benchmark/... -bench=. -benchmem \
-            -benchtime=3s -count=3 | tee benchmark_results.txt
+            -benchtime=5s -count=1 | tee benchmark_results.txt
       - name: Upload benchmark results
         uses: actions/upload-artifact@v4
         with:
@@ -25,4 +25,10 @@ jobs:
       - name: Compare with baseline (benchstat)
         run: |
           go install golang.org/x/perf/cmd/benchstat@latest
-          benchstat benchmark_results.txt
+          cp benchmark_results.txt baseline.txt
+          benchstat baseline.txt benchmark_results.txt | tee benchstat.txt
+      - name: Upload benchstat
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchstat-${{ github.sha }}
+          path: benchstat.txt

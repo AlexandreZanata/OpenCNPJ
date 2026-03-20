@@ -22,6 +22,7 @@ func NewSearchHandler() *SearchHandler {
 // SearchEmpresas handles GET /api/v1/empresas/search.
 func (h *SearchHandler) SearchEmpresas(c *fiber.Ctx) error {
 	filters := models.SearchFilters{
+		UUIDID:           c.Query("uuid_id"),
 		CNPJBasico:       c.Query("cnpj_basico"),
 		RazaoSocial:      c.Query("razao_social"),
 		NaturezaJuridica: c.Query("natureza_juridica"),
@@ -71,6 +72,7 @@ func (h *SearchHandler) SearchEmpresas(c *fiber.Ctx) error {
 // SearchEstabelecimentos handles GET /api/v1/estabelecimentos/search.
 func (h *SearchHandler) SearchEstabelecimentos(c *fiber.Ctx) error {
 	filters := models.SearchFilters{
+		UUIDID:            c.Query("uuid_id"),
 		CNPJCompleto:      c.Query("cnpj"),
 		CNPJBasico:        c.Query("cnpj_basico"),
 		NomeFantasia:      c.Query("nome_fantasia"),
