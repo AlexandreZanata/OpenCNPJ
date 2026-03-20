@@ -12,11 +12,31 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
-          go-version: "1.23"
+          go-version-file: go.mod
+          cache: true
       - name: Run benchmarks
         run: |
           go test ./tests/benchmark/... -bench=. -benchmem \
             -benchtime=5s -count=1 | tee benchmark_results.txt
+      - name: Enforce minimum ingest benchmark thresholds
+        env:
+          # GitHub-hosted runners are slower than dev laptops; keep floor realistic.
+          MIN_PARSE_ROWS_S: "200000"
+          MIN_DECODE_ROWS_S: "50000"
+        run: |
+          set -euo pipefail
+          extract_rows_s() {
+            # Bench line: "... 3538144 rows/s ..." — value is field before "rows/s"
+            awk -v name="$1" '$0 ~ name {for (i=1; i<=NF; i++) if ($i=="rows/s") {print $(i-1); exit}}' benchmark_results.txt
+          }
+          rows_parse=$(extract_rows_s "BenchmarkParseLine_Estabelecimento")
+          rows_decode=$(extract_rows_s "BenchmarkCSVDecoderLatin1")
+          echo "Parse rows/s: ${rows_parse}"
+          echo "Decode rows/s: ${rows_decode}"
+          test -n "${rows_parse}"
+          test -n "${rows_decode}"
+          awk -v v="${rows_parse}" -v min="${MIN_PARSE_ROWS_S}" 'BEGIN {exit !((v+0) >= min+0)}'
+          awk -v v="${rows_decode}" -v min="${MIN_DECODE_ROWS_S}" 'BEGIN {exit !((v+0) >= min+0)}'
       - name: Upload benchmark results
         uses: actions/upload-artifact@v4
         with:

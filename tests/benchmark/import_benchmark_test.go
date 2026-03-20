@@ -25,7 +25,8 @@ func BenchmarkParseLine_Estabelecimento(b *testing.B) {
 
 func BenchmarkCSVDecoderLatin1(b *testing.B) {
 	row := "\"12345678\";\"RAZAO SOCIAL LTDA\";\"2062\";\"49\";\"1000,00\";\"01\";\"\"\n"
-	payload := strings.Repeat(row, 30_000)
+	const rowsPerIter = 30_000
+	payload := strings.Repeat(row, rowsPerIter)
 
 	b.ReportAllocs()
 	b.ResetTimer()
@@ -37,4 +38,6 @@ func BenchmarkCSVDecoderLatin1(b *testing.B) {
 			}
 		}
 	}
+	// Total CSV rows decoded per outer iteration (for CI threshold parsing).
+	b.ReportMetric(float64(rowsPerIter*int64(b.N))/b.Elapsed().Seconds(), "rows/s")
 }
