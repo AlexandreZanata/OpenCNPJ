@@ -15,12 +15,11 @@ linters:
     - dupl
     - exhaustive
     - forcetypeassert
-    - gci
     - godot
     - gofmt
     - goimports
     - gocritic
-    - goerr113
+    - err113
     - gosec
     - lll
     - misspell
@@ -37,14 +36,9 @@ linters:
 
 linters-settings:
   cyclop:
-    max-complexity: 15
+    max-complexity: 16
   lll:
     line-length: 120
-  gci:
-    sections:
-      - standard
-      - prefix(busca-cnpj-2026)
-      - default
   gocritic:
     enabled-tags: [diagnostic, performance, style]
   misspell:

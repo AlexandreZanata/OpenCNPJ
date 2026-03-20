@@ -58,6 +58,14 @@ services:
       - "enable_partitionwise_aggregate=on"
       - "-c"
       - "lock_timeout=30s"
+      - "-c"
+      - "full_page_writes=off"
+      - "-c"
+      - "wal_level=minimal"
+      - "-c"
+      - "max_wal_senders=0"
+      - "-c"
+      - "autovacuum=off"
     restart: unless-stopped
     shm_size: 4gb
     healthcheck:

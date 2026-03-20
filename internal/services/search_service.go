@@ -34,7 +34,7 @@ func (s *SearchService) SearchEmpresas(
 	filters models.SearchFilters,
 ) (*models.SearchResponse, error) {
 	cacheKey := s.cache.GenerateKey("empresas:search", map[string]interface{}{
-		"uuid_id":          filters.UUIDID,
+		"uuid_id":           filters.UUIDID,
 		"cnpj_basico":       filters.CNPJBasico,
 		"razao_social":      filters.RazaoSocial,
 		"natureza_juridica": filters.NaturezaJuridica,
