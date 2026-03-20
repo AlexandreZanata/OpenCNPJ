@@ -89,6 +89,7 @@ func (r *EmpresaRepository) SearchEmpresas(
 	if filters.Limit <= 0 {
 		filters.Limit = 100
 	}
+	// #nosec G202 -- placeholders are generated from internal counters, not user input.
 	query += fmt.Sprintf(" ORDER BY razao_social LIMIT $%d OFFSET $%d", argPos, argPos+1)
 	args = append(args, filters.Limit, filters.Offset)
 
@@ -232,6 +233,7 @@ func (r *EmpresaRepository) ExportToCSV(
 	}
 	whereClause = whereClauseWithParams
 
+	// #nosec G201 -- dynamic SQL is built from controlled column whitelist and escaped parameters.
 	createFuncSQL := fmt.Sprintf(`
 		CREATE OR REPLACE FUNCTION %s()
 		RETURNS TABLE(%s) AS $$

@@ -219,7 +219,9 @@ func setDefaults() {
 					if value != "" && (value[0] == '"' || value[0] == '\'') {
 						value = value[1 : len(value)-1]
 					}
-					os.Setenv(key, value)
+					if setErr := os.Setenv(key, value); setErr != nil {
+						continue
+					}
 				}
 			}
 		}

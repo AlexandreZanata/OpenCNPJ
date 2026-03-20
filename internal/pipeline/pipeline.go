@@ -27,6 +27,7 @@ type EmpresaPipeline struct {
 }
 
 func (p *EmpresaPipeline) Run(ctx context.Context, filePath string) error {
+	// #nosec G304 -- filePath comes from a trusted ingestion manifest.
 	f, err := os.Open(filePath)
 	if err != nil {
 		return fmt.Errorf("open file: %w", err)
