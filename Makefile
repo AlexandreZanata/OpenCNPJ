@@ -21,6 +21,12 @@ download:
 list-months:
 	$(GO) run ./cmd/downloader --list
 
+migrate:
+	$(GO) run ./cmd/migrate
+
+import-sample:
+	bash scripts/import_sample.sh
+
 test:
 	$(GO) test ./... -short -race -count=1
 

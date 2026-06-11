@@ -46,3 +46,27 @@ type Estabelecimento struct {
 	SituacaoEspecial     string `db:"situacao_especial" json:"situacao_especial"`
 	DataSituacaoEspecial *Date  `db:"data_situacao_especial" json:"data_situacao_especial"`
 }
+
+type Socio struct {
+	CNPJBasico                string `db:"cnpj_basico" json:"cnpj_basico"`
+	IdentificadorSocio        string `db:"identificador_socio" json:"identificador_socio"`
+	NomeSocio                 string `db:"nome_socio" json:"nome_socio"`
+	CPFCNPJSocio              string `db:"cpf_cnpj_socio" json:"cpf_cnpj_socio"`
+	QualificacaoSocio         string `db:"qualificacao_socio" json:"qualificacao_socio"`
+	DataEntradaSociedade      *Date  `db:"data_entrada_sociedade" json:"data_entrada_sociedade"`
+	Pais                      string `db:"pais" json:"pais"`
+	RepresentanteLegal        string `db:"representante_legal" json:"representante_legal"`
+	NomeRepresentante         string `db:"nome_representante" json:"nome_representante"`
+	QualificacaoRepresentante string `db:"qualificacao_representante" json:"qualificacao_representante"`
+	FaixaEtaria               string `db:"faixa_etaria" json:"faixa_etaria"`
+}
+
+type Simples struct {
+	CNPJBasico          string `db:"cnpj_basico" json:"cnpj_basico"`
+	OpcaoSimples        string `db:"opcao_simples" json:"opcao_simples"`
+	DataOpcaoSimples    *Date  `db:"data_opcao_simples" json:"data_opcao_simples"`
+	DataExclusaoSimples *Date  `db:"data_exclusao_simples" json:"data_exclusao_simples"`
+	OpcaoMEI            string `db:"opcao_mei" json:"opcao_mei"`
+	DataOpcaoMEI        *Date  `db:"data_opcao_mei" json:"data_opcao_mei"`
+	DataExclusaoMEI     *Date  `db:"data_exclusao_mei" json:"data_exclusao_mei"`
+}

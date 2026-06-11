@@ -6,19 +6,23 @@ import (
 )
 
 type LookupStore struct {
-	mu         sync.RWMutex
-	naturezas  map[string]struct{}
-	municipios map[string]struct{}
-	paises     map[string]struct{}
-	cnaes      map[string]struct{}
+	mu            sync.RWMutex
+	naturezas     map[string]struct{}
+	municipios    map[string]struct{}
+	paises        map[string]struct{}
+	cnaes         map[string]struct{}
+	qualificacoes map[string]struct{}
+	motivos       map[string]struct{}
 }
 
 func NewLookupStore() *LookupStore {
 	return &LookupStore{
-		naturezas:  make(map[string]struct{}),
-		municipios: make(map[string]struct{}),
-		paises:     make(map[string]struct{}),
-		cnaes:      make(map[string]struct{}),
+		naturezas:     make(map[string]struct{}),
+		municipios:    make(map[string]struct{}),
+		paises:        make(map[string]struct{}),
+		cnaes:         make(map[string]struct{}),
+		qualificacoes: make(map[string]struct{}),
+		motivos:       make(map[string]struct{}),
 	}
 }
 
@@ -79,5 +83,35 @@ func (s *LookupStore) ExistsCNAE(v string) bool {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	_, ok := s.cnaes[v]
+	return ok
+}
+
+func (s *LookupStore) LoadQualificacoes(_ context.Context, values []string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	for _, v := range values {
+		s.qualificacoes[v] = struct{}{}
+	}
+}
+
+func (s *LookupStore) ExistsQualificacao(v string) bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	_, ok := s.qualificacoes[v]
+	return ok
+}
+
+func (s *LookupStore) LoadMotivos(_ context.Context, values []string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	for _, v := range values {
+		s.motivos[v] = struct{}{}
+	}
+}
+
+func (s *LookupStore) ExistsMotivo(v string) bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	_, ok := s.motivos[v]
 	return ok
 }
