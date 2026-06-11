@@ -46,6 +46,7 @@ Thumbs.db
 
 # Dados importados (vários GB)
 data/
+!data/.gitkeep
 
 # Build artifacts
 *.tar.gz

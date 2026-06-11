@@ -1,11 +1,25 @@
-.PHONY: build test test-integration bench lint vet migrate import seed coverage
+.PHONY: build build-downloader test test-integration bench lint vet migrate import seed coverage setup download list-months
 
 GO      = go
 BINARY  = bin/importer
+DOWNLOADER = bin/downloader
 GOFLAGS = -ldflags="-s -w"
+DATA_DIR ?= ./data
 
 build:
 	$(GO) build $(GOFLAGS) -o $(BINARY) ./cmd/importer/
+
+build-downloader:
+	$(GO) build $(GOFLAGS) -o $(DOWNLOADER) ./cmd/downloader/
+
+setup:
+	bash scripts/setup_project.sh
+
+download:
+	bash scripts/download_data.sh
+
+list-months:
+	$(GO) run ./cmd/downloader --list
 
 test:
 	$(GO) test ./... -short -race -count=1

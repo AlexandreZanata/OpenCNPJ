@@ -1,0 +1,26 @@
+---
+description: Workflow — commit text, cave mode, delivery gates
+alwaysApply: true
+---
+
+# Workflow
+
+## After every code edit (mandatory)
+
+1. Propose a **commit message only** — do **not** run `git commit`.
+2. Format: `type(scope): subject` per `docs/COMMIT_CONVENTION.md` and `.commitlintrc.yml`.
+3. **Max 72 characters** for the subject line.
+4. Allowed types: feat, fix, perf, refactor, test, bench, docs, ci, chore, build, revert.
+
+## Cave mode (default)
+
+- After the commit message, add **at most 100 characters** of explanation.
+- Expand only if the user explicitly asks to explain.
+
+## Delivery gate
+
+Do not consider work done until:
+
+- `go test ./... -short` passes (or targeted packages for the change).
+- `go vet ./...` is clean.
+- No syntax or linter errors in touched files.

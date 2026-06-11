@@ -1,0 +1,30 @@
+---
+description: Code quality — English, line limits, types, complexity
+alwaysApply: true
+---
+
+# Code Quality
+
+## Language
+
+- All **new or modified** code, comments, identifiers, docs, and commit subjects: **English**.
+
+## File size (agent-created code only)
+
+- Max **200 lines** per file. Split into smaller packages/files when exceeded.
+
+## Typing
+
+- **Go**: no bare `interface{}` / `any` unless unavoidable; prefer concrete types, structs, and small interfaces.
+- **No** untyped or generic escape hatches where a proper type exists.
+
+## Cyclomatic complexity
+
+- Target **< 5** per function; hard limit **< 10**.
+- If complexity > 5: split into helpers with clear names.
+- Prefer early return, small helpers, strategy maps — avoid deep `if/else` nesting.
+- Before finishing, note any function still above 5 and why.
+
+## Lint alignment
+
+Match spirit of: `complexity: 5`, `max-depth: 3`, `max-lines-per-function: 50` when adding JS/TS tooling; for Go use `gocyclo` / `gocognit` via golangci-lint.

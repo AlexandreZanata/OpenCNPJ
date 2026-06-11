@@ -1,0 +1,27 @@
+---
+description: Unit tests and technical debt registry (DVT)
+alwaysApply: true
+---
+
+# Testing & DVT
+
+## Unit tests (mandatory)
+
+- Every **created or modified** code file must have a matching `*_test.go` (or equivalent) validating the change.
+- Tests must reflect real behavior, not trivial assertions.
+- Run tests before marking work complete.
+
+## Technical debt registry
+
+For each **new feature or capability**, add an entry to `docs/DVT.md`:
+
+```markdown
+## DVT-XX: Short title
+- **Scope**: package/path
+- **Added**: YYYY-MM-DD
+- **Needs**: integration/e2e test description for production parity
+- **Status**: open
+```
+
+- Increment IDs sequentially: DVT-01, DVT-02, …
+- One DVT per distinct new functionality.

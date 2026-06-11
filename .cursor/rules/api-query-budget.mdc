@@ -1,0 +1,21 @@
+---
+description: Per-route SQL query counter and >10 query documentation
+globs: internal/handlers/**/*.go,internal/services/**/*.go,internal/repository/**/*.go,cmd/api/**/*.go
+alwaysApply: false
+---
+
+# API Query Budget
+
+## Mandatory query counter
+
+- Every HTTP route must track SQL queries per request (use `internal/metrics` or a shared middleware/helper).
+- Expose count in logs and/or Prometheus for observability.
+
+## High-query routes
+
+- If a single request executes **> 10 queries**, document it in `docs/HIGH_QUERY_ROUTES.md`:
+  - route, method, typical query count, reason, follow-up to reduce.
+
+## Goal
+
+Prevent N+1 patterns and memory pressure in production; flag routes for later optimization.
