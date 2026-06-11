@@ -27,6 +27,9 @@ migrate:
 import-sample:
 	bash scripts/import_sample.sh
 
+benchmark-10pct:
+	bash scripts/benchmark_import_10pct.sh
+
 test:
 	$(GO) test ./... -short -race -count=1
 

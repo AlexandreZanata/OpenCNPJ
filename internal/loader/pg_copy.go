@@ -35,8 +35,15 @@ func NewPoolConfig(databaseURL string) (*pgxpool.Config, error) {
 	return cfg, nil
 }
 
-func NewPGCopier(ctx context.Context, databaseURL string) (*PGCopier, error) {
-	cfg, err := NewPoolConfig(databaseURL)
+func NewPGCopier(ctx context.Context, databaseURL string, tuned ...bool) (*PGCopier, error) {
+	useTune := len(tuned) > 0 && tuned[0]
+	var cfg *pgxpool.Config
+	var err error
+	if useTune {
+		cfg, err = NewImportPoolConfig(databaseURL, true)
+	} else {
+		cfg, err = NewPoolConfig(databaseURL)
+	}
 	if err != nil {
 		return nil, err
 	}
