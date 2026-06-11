@@ -30,6 +30,9 @@ import-sample:
 benchmark-10pct:
 	bash scripts/benchmark_import_10pct.sh
 
+benchmark-20pct:
+	SAMPLE_PERCENT=20 TARGET_SEC=360 bash scripts/benchmark_import_sample.sh
+
 test:
 	$(GO) test ./... -short -race -count=1
 
