@@ -44,6 +44,42 @@ export async function apiGet<T>(path: string, params?: Record<string, string | n
   return response.json() as Promise<T>
 }
 
+export type ProgressCallback = (percent: number | null) => void
+
+async function readBlobWithProgress(
+  response: Response,
+  onProgress?: ProgressCallback,
+): Promise<Blob> {
+  const total = Number(response.headers.get('Content-Length')) || 0
+  const body = response.body
+  if (!body) {
+    onProgress?.(100)
+    return response.blob()
+  }
+
+  const reader = body.getReader()
+  const chunks: Uint8Array[] = []
+  let received = 0
+
+  onProgress?.(total > 0 ? 0 : null)
+
+  for (;;) {
+    const { done, value } = await reader.read()
+    if (done) {
+      break
+    }
+    chunks.push(value)
+    received += value.length
+    if (total > 0) {
+      onProgress?.(Math.min(99, Math.round((received / total) * 100)))
+    }
+  }
+
+  onProgress?.(100)
+  const type = response.headers.get('Content-Type') ?? 'application/octet-stream'
+  return new Blob(chunks as BlobPart[], { type })
+}
+
 export async function apiPostBlob(path: string, body: unknown): Promise<Blob> {
   const url = buildUrl(path)
   const response = await fetch(url, {
@@ -55,6 +91,23 @@ export async function apiPostBlob(path: string, body: unknown): Promise<Blob> {
     throw await parseError(response)
   }
   return response.blob()
+}
+
+export async function apiPostBlobWithProgress(
+  path: string,
+  body: unknown,
+  onProgress?: ProgressCallback,
+): Promise<Blob> {
+  const url = buildUrl(path)
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'text/csv' },
+    body: JSON.stringify(body),
+  })
+  if (!response.ok) {
+    throw await parseError(response)
+  }
+  return readBlobWithProgress(response, onProgress)
 }
 
 export async function checkHealth(): Promise<boolean> {

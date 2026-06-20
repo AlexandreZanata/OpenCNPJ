@@ -78,7 +78,8 @@ func exportBadRequest(c *fiber.Ctx, err error) error {
 func exportFailed(c *fiber.Ctx, err error) error {
 	code := fiber.StatusInternalServerError
 	if strings.Contains(err.Error(), "unknown category") ||
-		strings.Contains(err.Error(), "filter is required") {
+		strings.Contains(err.Error(), "filter is required") ||
+		strings.Contains(err.Error(), "invalid date") {
 		code = fiber.StatusBadRequest
 	}
 	return c.Status(code).JSON(models.ErrorResponse{

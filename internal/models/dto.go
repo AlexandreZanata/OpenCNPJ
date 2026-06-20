@@ -38,7 +38,10 @@ type PhoneExportRequest struct {
 	Municipio     string `json:"municipio"`
 	MunicipioNome string `json:"municipio_nome"`
 	NomeFantasia  string `json:"nome_fantasia"`
+	CreatedFrom   string `json:"created_from"` // YYYY-MM-DD, maps to data_inicio_atividade
+	CreatedTo     string `json:"created_to"`   // YYYY-MM-DD
 	OnlyActive    *bool  `json:"only_active"`
+	ExportAll     *bool  `json:"export_all"`
 	Limit         int    `json:"limit"`
 	Format        string `json:"format"` // csv, txt
 }

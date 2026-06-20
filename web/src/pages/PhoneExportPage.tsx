@@ -12,6 +12,7 @@ import { SearchCombobox } from '../components/search/SearchCombobox'
 import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
 import { Input } from '../components/ui/Input'
+import { ProgressBar } from '../components/ui/ProgressBar'
 
 type SectorSelection = { type: 'preset' | 'cnae'; code: string; label: string } | null
 
@@ -20,9 +21,13 @@ export function PhoneExportPage() {
   const [uf, setUf] = useState<LookupItem | null>(null)
   const [city, setCity] = useState<LookupItem | null>(null)
   const [nomeFantasia, setNomeFantasia] = useState<LookupItem | null>(null)
+  const [createdFrom, setCreatedFrom] = useState('')
+  const [createdTo, setCreatedTo] = useState('')
+  const [exportAll, setExportAll] = useState(false)
   const [limit, setLimit] = useState(5000)
   const [onlyActive, setOnlyActive] = useState(true)
   const [loading, setLoading] = useState<'csv' | 'txt' | null>(null)
+  const [progress, setProgress] = useState<number | null>(null)
   const [error, setError] = useState('')
 
   const querySectors = useCallback((q: string) => lookupSectors(q, 20), [])
@@ -36,23 +41,21 @@ export function PhoneExportPage() {
     [uf?.code],
   )
 
-  const payload = useMemo<PhoneExportRequest>(() => {
-    const body: PhoneExportRequest = {
-      category: sector?.type === 'preset' ? sector.code : '',
-      cnae: sector?.type === 'cnae' ? sector.code : undefined,
-      uf: uf?.code || undefined,
-      municipio: city?.code || undefined,
-      nome_fantasia: nomeFantasia?.code || undefined,
-      only_active: onlyActive,
-      limit,
-      format: 'csv',
-    }
-    return body
-  }, [sector, uf, city, nomeFantasia, onlyActive, limit])
+  const payload = useMemo<PhoneExportRequest>(() => ({
+    category: sector?.type === 'preset' ? sector.code : '',
+    cnae: sector?.type === 'cnae' ? sector.code : undefined,
+    uf: uf?.code || undefined,
+    municipio: city?.code || undefined,
+    nome_fantasia: nomeFantasia?.code || undefined,
+    created_from: createdFrom || undefined,
+    created_to: createdTo || undefined,
+    only_active: onlyActive,
+    export_all: exportAll,
+    limit: exportAll ? undefined : limit,
+    format: 'csv',
+  }), [sector, uf, city, nomeFantasia, createdFrom, createdTo, onlyActive, exportAll, limit])
 
-  const canExport = Boolean(
-    sector?.code || payload.cnae || payload.nome_fantasia,
-  )
+  const canExport = Boolean(sector?.code || payload.cnae || payload.nome_fantasia)
 
   const runExport = async (format: 'csv' | 'txt') => {
     if (!canExport) {
@@ -60,13 +63,15 @@ export function PhoneExportPage() {
       return
     }
     setLoading(format)
+    setProgress(null)
     setError('')
     try {
-      await exportPhones({ ...payload, format })
+      await exportPhones({ ...payload, format }, setProgress)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Export failed')
     } finally {
       setLoading(null)
+      setProgress(null)
     }
   }
 
@@ -130,13 +135,42 @@ export function PhoneExportPage() {
             onSelect={setNomeFantasia}
           />
           <Input
-            label="Max rows"
-            type="number"
-            min={100}
-            max={50000}
-            value={limit}
-            onChange={(e) => setLimit(Number(e.target.value) || 5000)}
+            label="Activity start date (from)"
+            type="date"
+            value={createdFrom}
+            onChange={(e) => setCreatedFrom(e.target.value)}
+            hint="Receita Federal registration date (data_inicio_atividade)"
           />
+          <Input
+            label="Activity start date (to)"
+            type="date"
+            value={createdTo}
+            onChange={(e) => setCreatedTo(e.target.value)}
+          />
+          <div className="md:col-span-2">
+            <div className="flex flex-wrap items-end gap-4">
+              <div className="min-w-[160px] flex-1">
+                <Input
+                  label="Max rows"
+                  type="number"
+                  min={100}
+                  max={50000}
+                  value={exportAll ? '' : limit}
+                  disabled={exportAll}
+                  placeholder={exportAll ? 'No limit' : undefined}
+                  onChange={(e) => setLimit(Number(e.target.value) || 5000)}
+                />
+              </div>
+              <label className="mb-2 flex items-center gap-2 text-sm text-slate-300">
+                <input
+                  type="checkbox"
+                  checked={exportAll}
+                  onChange={(e) => setExportAll(e.target.checked)}
+                />
+                Export all matching rows
+              </label>
+            </div>
+          </div>
         </div>
         <label className="mt-4 flex items-center gap-2 text-sm text-slate-300">
           <input type="checkbox" checked={onlyActive} onChange={(e) => setOnlyActive(e.target.checked)} />
@@ -148,6 +182,14 @@ export function PhoneExportPage() {
         <p className="mb-4 text-sm text-slate-400">
           CSV: full aggregated data. TXT: one phone per line for dialers.
         </p>
+        {loading && (
+          <div className="mb-4">
+            <ProgressBar
+              percent={progress}
+              label={progress === null ? 'Generating export…' : 'Downloading export…'}
+            />
+          </div>
+        )}
         <div className="flex flex-wrap gap-3">
           <Button onClick={() => runExport('csv')} disabled={loading !== null || !canExport}>
             <Download className="h-4 w-4" />

@@ -13,6 +13,7 @@ Sequential IDs for new features that still need production-grade automated tests
 | DVT-07 | Pre-aggregated analytics stats tables | open |
 | DVT-08 | Category phone export (CSV/TXT) | open |
 | DVT-09 | Smart lookup typeahead for export filters | open |
+| DVT-10 | Phone export date filter and export-all | open |
 
 ## DVT-01: CNPJ open-data downloader (WebDAV)
 
@@ -75,4 +76,11 @@ Sequential IDs for new features that still need production-grade automated tests
 - **Scope**: `internal/repository/lookup_repo.go`, `internal/services/lookup_service.go`, `internal/handlers/lookup_handler.go`, `web/src/components/search/SearchCombobox.tsx`
 - **Added**: 2026-06-20
 - **Needs**: integration test for `/lookup/*` endpoints with live DB; e2e typeahead on Phone Export page
+- **Status**: open
+
+## DVT-10: Phone export date filter and export-all
+
+- **Scope**: `internal/repository/phone_export_filters.go`, `web/src/pages/PhoneExportPage.tsx`, `web/src/components/ui/ProgressBar.tsx`
+- **Added**: 2026-06-20
+- **Needs**: integration test export with date range; verify export_all omits LIMIT on large filter sets
 - **Status**: open

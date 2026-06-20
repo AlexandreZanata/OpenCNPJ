@@ -78,11 +78,17 @@ func buildPhoneExportQuery(req models.PhoneExportRequest) (string, []any, error)
 		args = append(args, "%"+req.NomeFantasia+"%")
 		argPos++
 	}
+	var err error
+	whereParts, args, argPos, err = appendPhoneDateFilters(whereParts, args, argPos, req)
+	if err != nil {
+		return "", nil, err
+	}
 	if req.Category == "" && req.CNAEPrincipal == "" && req.NomeFantasia == "" {
 		return "", nil, fmt.Errorf("category, cnae, or nome_fantasia filter is required")
 	}
 
-	limit := normalizePhoneLimit(req.Limit)
+	limitClause, limitArgs, _ := buildPhoneLimitClause(req, argPos)
+	args = append(args, limitArgs...)
 
 	selectList := strings.Join([]string{
 		"e.cnpj_completo", "COALESCE(emp.razao_social, '')", "COALESCE(e.nome_fantasia, '')",
@@ -93,10 +99,9 @@ func buildPhoneExportQuery(req models.PhoneExportRequest) (string, []any, error)
 
 	// #nosec G202 -- placeholders are generated from internal counters, not user input.
 	query := fmt.Sprintf(
-		"SELECT %s %s WHERE %s ORDER BY e.uf, m.descricao, emp.razao_social LIMIT $%d",
-		selectList, phoneFromClause, strings.Join(whereParts, " AND "), argPos,
+		"SELECT %s %s WHERE %s%s%s",
+		selectList, phoneFromClause, joinPhoneWhere(whereParts), phoneExportOrderBy(), limitClause,
 	)
-	args = append(args, limit)
 	return query, args, nil
 }
 

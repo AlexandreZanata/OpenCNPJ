@@ -20,3 +20,16 @@ body {
 #root {
   min-height: 100vh;
 }
+
+@keyframes progress-slide {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(400%);
+  }
+}
+
+.progress-indeterminate {
+  animation: progress-slide 1.2s ease-in-out infinite;
+}

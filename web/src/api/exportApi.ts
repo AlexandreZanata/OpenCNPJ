@@ -1,4 +1,4 @@
-import { apiGet, apiPostBlob } from './client'
+import { apiGet, apiPostBlob, apiPostBlobWithProgress, type ProgressCallback } from './client'
 import type { ExportCategory, ExportRequest, PhoneExportRequest } from './types'
 
 export async function downloadBlob(blob: Blob, filename: string): Promise<void> {
@@ -15,10 +15,13 @@ export async function exportCsv(request: ExportRequest): Promise<void> {
   await downloadBlob(blob, `export-${Date.now()}.csv`)
 }
 
-export async function exportPhones(request: PhoneExportRequest): Promise<void> {
-  const blob = await apiPostBlob('/export/phones', request)
+export async function exportPhones(
+  request: PhoneExportRequest,
+  onProgress?: ProgressCallback,
+): Promise<void> {
+  const blob = await apiPostBlobWithProgress('/export/phones', request, onProgress)
   const ext = request.format === 'txt' ? 'txt' : 'csv'
-  const label = request.category || 'phones'
+  const label = request.category || request.cnae || 'phones'
   await downloadBlob(blob, `${label}-${Date.now()}.${ext}`)
 }
 
@@ -26,4 +29,4 @@ export function getExportCategories(): Promise<ExportCategory[]> {
   return apiGet<ExportCategory[]>('/export/categories')
 }
 
-export type { PhoneExportRequest, ExportCategory }
+export type { PhoneExportRequest, ExportCategory, ProgressCallback }

@@ -88,7 +88,10 @@ export interface PhoneExportRequest {
   municipio?: string
   municipio_nome?: string
   nome_fantasia?: string
+  created_from?: string
+  created_to?: string
   only_active?: boolean
+  export_all?: boolean
   limit?: number
   format: 'csv' | 'txt'
 }
