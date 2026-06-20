@@ -29,6 +29,7 @@ go.work
 # IDE
 .idea/
 .vscode/
+.cursor/rules/_task-active.mdc
 *.swp
 *.swo
 *~
@@ -51,3 +52,6 @@ data/
 # Build artifacts
 *.tar.gz
 *.zip
+
+# Optional local agent overrides
+.local/

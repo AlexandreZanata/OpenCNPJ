@@ -1,0 +1,35 @@
+---
+description: BUSCA-CNPJ-2026 — harness + Go project integration
+alwaysApply: true
+---
+
+# BUSCA-CNPJ-2026 + Agent Harness
+
+## Stack
+
+Go 1.21+, PostgreSQL, Redis, Docker. API prefix `/api/v1/`.
+
+## Rule sources (load order)
+
+1. **Project:** `workflow.mdc`, `code-quality.mdc`, `testing-and-dvt.mdc`, `api-query-budget.mdc`
+2. **Harness:** `agent-core-principles.mdc`, `english-only.mdc`, `context-discipline.mdc`, `token-economy.mdc`
+3. **On demand:** `./agent-harness/resolve-rules.sh <keywords>`
+
+Rules directory: `./agent-harness/rules-path.sh` → `agent-rules/`
+
+## Domain
+
+- Glossary: `docs/GLOSSARY.md` — terms `Empresa`, `Estabelecimento`, `CNPJ`, etc.
+- Architecture: `docs/ARCHITECTURE.md`
+- Security: `docs/SECURITY.md` + `agent-rules/03-security/`
+
+## Go-specific MUST
+
+- Parameterized SQL only — no string-concat queries
+- `SearchFilters` allow-list — no mass assignment
+- Paginate list endpoints; respect `api-query-budget.mdc`
+- Run `go test` + `go vet` before delivery (see `workflow.mdc`)
+
+## Entry point
+
+Read `AGENTS.md` at session start.

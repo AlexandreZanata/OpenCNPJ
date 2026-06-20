@@ -126,6 +126,21 @@ GET /api/v1/stats/cnae/0111301/uf?limit=10
 - Health check: `GET /health`
 - Profiling (dev): `GET /debug/pprof/*`
 
+## Agent Harness (AI-assisted development)
+
+This project uses the [Agent Harness](https://github.com/AlexandreZanata/GoodPraticesForLLMSandAgents) for coding agents.
+
+```bash
+pip install -r agent-harness/requirements.txt
+./agent-harness/resolve-rules.sh api performance security
+```
+
+- **Agents:** read [AGENTS.md](AGENTS.md) first
+- **Domain glossary:** [docs/GLOSSARY.md](docs/GLOSSARY.md)
+- **Rules:** `agent-rules/` (symlink to `.agent-harness/rules`)
+
+Update harness: `git submodule update --remote .agent-harness`
+
 ## Licença
 
 MIT
