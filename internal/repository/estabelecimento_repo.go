@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"strings"
-	"time"
 
 	"busca-cnpj-2026/internal/database"
 	"busca-cnpj-2026/internal/models"
@@ -107,20 +106,28 @@ func (r *EstabelecimentoRepository) SearchEstabelecimentos(
 		argPos++
 	}
 
-	// Count query
-	countQuery := "SELECT COUNT(*) FROM (" + query + ") AS count_query"
-	var total int64
-	if err := r.db.QueryRowContext(ctx, countQuery, args...).Scan(&total); err != nil {
-		return nil, 0, fmt.Errorf("failed to count estabelecimentos: %w", err)
-	}
-
-	// Add pagination
+	// Count query — skip for fuzzy text searches (ILIKE on 70M+ rows).
+	skipCount := hasFuzzyTextFilter(filters)
 	if filters.Limit <= 0 {
 		filters.Limit = 100
 	}
+	queryLimit := filters.Limit
+	if skipCount {
+		queryLimit = filters.Limit + 1
+	}
+
+	var total int64
+	if !skipCount {
+		countQuery := "SELECT COUNT(*) FROM (" + query + ") AS count_query"
+		if err := r.db.QueryRowContext(ctx, countQuery, args...).Scan(&total); err != nil {
+			return nil, 0, fmt.Errorf("failed to count estabelecimentos: %w", err)
+		}
+	}
+
+	// Add pagination
 	// #nosec G202 -- placeholders are generated from internal counters, not user input.
 	query += fmt.Sprintf(" ORDER BY e.nome_fantasia LIMIT $%d OFFSET $%d", argPos, argPos+1)
-	args = append(args, filters.Limit, filters.Offset)
+	args = append(args, queryLimit, filters.Offset)
 
 	rows, err := r.db.QueryContext(ctx, query, args...)
 	if err != nil {
@@ -177,6 +184,13 @@ func (r *EstabelecimentoRepository) SearchEstabelecimentos(
 	}
 	if err := rows.Err(); err != nil {
 		return nil, 0, fmt.Errorf("failed iterating estabelecimentos rows: %w", err)
+	}
+
+	if skipCount {
+		total = fuzzySearchTotal(filters.Offset, filters.Limit, int64(len(estabelecimentos)))
+		if int64(len(estabelecimentos)) > int64(filters.Limit) {
+			estabelecimentos = estabelecimentos[:filters.Limit]
+		}
 	}
 
 	return estabelecimentos, total, nil
@@ -259,16 +273,15 @@ func (r *EstabelecimentoRepository) GetByCNPJCompleto(
 	return &est, nil
 }
 
-// Uses a PostgreSQL function to handle parameterized queries with COPY TO STDOUT.
+// ExportToCSV streams estabelecimento rows as semicolon-delimited CSV via parameterized query.
 //
-//nolint:cyclop,gocritic,gosec // Export SQL builder is intentionally dynamic and branch-heavy.
+//nolint:gocritic // Export SQL builder uses controlled column whitelist.
 func (r *EstabelecimentoRepository) ExportToCSV(
 	ctx context.Context,
 	w io.Writer,
 	filters models.SearchFilters,
 	columns []string,
 ) error {
-	// Build column mapping for SELECT
 	columnMap := map[string]string{
 		"cnpj_completo":         "e.cnpj_completo",
 		"cnpj_basico":           "e.cnpj_basico",
@@ -286,25 +299,26 @@ func (r *EstabelecimentoRepository) ExportToCSV(
 		"cep":                   "COALESCE(e.cep, '')",
 	}
 
-	// Build SELECT columns
-	selectCols := make([]string, 0, len(columns))
-	for _, col := range columns {
-		if sqlCol, ok := columnMap[col]; ok {
-			selectCols = append(selectCols, sqlCol+" AS "+col)
-		}
-	}
-	if len(selectCols) == 0 {
-		selectCols = []string{
-			"e.cnpj_completo",
-			"COALESCE(e.nome_fantasia, '') AS nome_fantasia",
-			"COALESCE(emp.razao_social, '') AS razao_social",
-			"COALESCE(e.cnae_fiscal_principal, '') AS cnae_fiscal_principal",
-			"COALESCE(e.uf, '') AS uf",
-			"COALESCE(m.descricao, '') AS municipio",
+	exportCols := columns
+	if len(exportCols) == 0 {
+		exportCols = []string{
+			"cnpj_completo", "nome_fantasia", "razao_social",
+			"cnae_fiscal_principal", "uf", "municipio",
 		}
 	}
 
-	// Build WHERE clause with parameters
+	selectCols := make([]string, 0, len(exportCols))
+	for _, col := range exportCols {
+		sqlCol, ok := columnMap[col]
+		if !ok {
+			continue
+		}
+		selectCols = append(selectCols, textSelectExpr(sqlCol, col))
+	}
+	if len(selectCols) == 0 {
+		return fmt.Errorf("no valid export columns selected")
+	}
+
 	whereParts := []string{"1=1"}
 	args := []interface{}{}
 	argPos := 1
@@ -312,6 +326,7 @@ func (r *EstabelecimentoRepository) ExportToCSV(
 	if filters.CNPJCompleto != "" {
 		whereParts = append(whereParts, fmt.Sprintf("e.cnpj_completo = $%d", argPos))
 		args = append(args, filters.CNPJCompleto)
+		argPos++
 	}
 	if filters.CNPJBasico != "" {
 		whereParts = append(whereParts, fmt.Sprintf("e.cnpj_basico = $%d", argPos))
@@ -346,131 +361,29 @@ func (r *EstabelecimentoRepository) ExportToCSV(
 	if filters.CEP != "" {
 		whereParts = append(whereParts, fmt.Sprintf("e.cep = $%d", argPos))
 		args = append(args, filters.CEP)
+		argPos++
 	}
 
-	whereClause := "WHERE " + strings.Join(whereParts, " AND ")
-
-	// Use COPY TO STDOUT with a subquery
-	// Since COPY doesn't support parameters directly, we'll use a function approach
-	// Create a temporary function that accepts parameters and returns the data
-
-	// Build function SQL with parameters embedded safely
-	// Use a unique function name to avoid conflicts
-	funcName := fmt.Sprintf("temp_export_estab_%d", time.Now().UnixNano())
-
-	// Build WHERE clause with parameters embedded (safe because we validate inputs)
-	whereClauseWithParams := whereClause
-	for i, arg := range args {
-		var value string
-		switch v := arg.(type) {
-		case string:
-			// Escape single quotes and wrap in quotes
-			escaped := strings.ReplaceAll(v, "'", "''")
-			value = fmt.Sprintf("'%s'", escaped)
-		case int, int64:
-			value = fmt.Sprintf("%d", v)
-		case float64:
-			value = fmt.Sprintf("%f", v)
-		default:
-			value = fmt.Sprintf("'%v'", v)
-		}
-		// Replace placeholder in whereClause
-		placeholder := fmt.Sprintf("$%d", i+1)
-		whereClauseWithParams = strings.Replace(whereClauseWithParams, placeholder, value, 1)
+	limit := filters.Limit
+	if limit <= 0 {
+		limit = 10000
 	}
-	whereClause = whereClauseWithParams
 
-	// Create function with embedded parameters
-	// #nosec G201 -- dynamic SQL is built from controlled column whitelist and escaped parameters.
-	createFuncSQL := fmt.Sprintf(`
-		CREATE OR REPLACE FUNCTION %s()
-		RETURNS TABLE(%s) AS $$
-		BEGIN
-			RETURN QUERY
-			SELECT %s
-			FROM estabelecimentos e
-			INNER JOIN empresas emp ON e.cnpj_basico = emp.cnpj_basico
-			LEFT JOIN cnaes c ON e.cnae_fiscal_principal = c.codigo
-			LEFT JOIN municipios m ON e.municipio = m.codigo
-			%s;
-		END;
-		$$ LANGUAGE plpgsql;
-	`, funcName,
-		strings.Join(columns, " TEXT, ")+" TEXT",
+	fromClause := `
+		FROM estabelecimentos e
+		INNER JOIN empresas emp ON e.cnpj_basico = emp.cnpj_basico
+		LEFT JOIN cnaes c ON e.cnae_fiscal_principal = c.codigo
+		LEFT JOIN municipios m ON e.municipio = m.codigo`
+
+	// #nosec G202 -- placeholders are generated from internal counters, not user input.
+	query := fmt.Sprintf(
+		"SELECT %s %s WHERE %s ORDER BY e.nome_fantasia LIMIT $%d",
 		strings.Join(selectCols, ", "),
-		whereClause)
+		fromClause,
+		strings.Join(whereParts, " AND "),
+		argPos,
+	)
+	args = append(args, limit)
 
-	// Execute function creation
-	txn, err := r.db.BeginTx(ctx, nil)
-	if err != nil {
-		return fmt.Errorf("failed to begin transaction: %w", err)
-	}
-	defer func() {
-		_ = txn.Rollback()
-	}()
-
-	// Create the function
-	if _, err := txn.ExecContext(ctx, createFuncSQL); err != nil {
-		return fmt.Errorf("failed to create export function: %w", err)
-	}
-
-	// Write CSV header
-	header := strings.Join(columns, ";") + "\n"
-	if _, err := w.Write([]byte(header)); err != nil {
-		return fmt.Errorf("failed to write CSV header: %w", err)
-	}
-
-	// Query the function and stream results to CSV
-	// This approach is faster than SELECT + CSV writer and uses less memory
-
-	rows, err := txn.QueryContext(ctx, fmt.Sprintf("SELECT * FROM %s()", funcName))
-	if err != nil {
-		return fmt.Errorf("failed to query export function: %w", err)
-	}
-	defer rows.Close()
-
-	// Stream results to CSV
-	rowCount := 0
-	for rows.Next() {
-		// Read row values
-		values := make([]interface{}, len(columns))
-		valuePtrs := make([]interface{}, len(columns))
-		for i := range values {
-			valuePtrs[i] = &values[i]
-		}
-
-		if err := rows.Scan(valuePtrs...); err != nil {
-			return fmt.Errorf("failed to scan row: %w", err)
-		}
-
-		// Convert to CSV row
-		csvRow := make([]string, len(columns))
-		for i, val := range values {
-			if val == nil {
-				csvRow[i] = ""
-			} else {
-				csvRow[i] = fmt.Sprintf("%v", val)
-			}
-		}
-
-		// Write CSV row
-		rowStr := strings.Join(csvRow, ";") + "\n"
-		if _, err := w.Write([]byte(rowStr)); err != nil {
-			return fmt.Errorf("failed to write CSV row: %w", err)
-		}
-
-		rowCount++
-	}
-	if err := rows.Err(); err != nil {
-		return fmt.Errorf("failed iterating export rows: %w", err)
-	}
-
-	// Drop the temporary function
-	_, _ = txn.ExecContext(ctx, fmt.Sprintf("DROP FUNCTION IF EXISTS %s()", funcName))
-
-	if err := txn.Commit(); err != nil {
-		return fmt.Errorf("failed to commit transaction: %w", err)
-	}
-
-	return nil
+	return streamCSV(ctx, r.db, w, query, args, exportCols)
 }

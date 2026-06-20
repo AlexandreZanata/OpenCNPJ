@@ -24,7 +24,6 @@ func NewExportService() *ExportService {
 //
 //nolint:gocritic // Keeping value argument to avoid broad API churn now.
 func (s *ExportService) ExportCSV(ctx context.Context, w io.Writer, req models.ExportRequest) error {
-	// Set default columns if not provided
 	if len(req.SelectedColumns) == 0 {
 		req.SelectedColumns = []string{
 			"cnpj_completo",
@@ -36,13 +35,29 @@ func (s *ExportService) ExportCSV(ctx context.Context, w io.Writer, req models.E
 		}
 	}
 
-	// Determine which repository to use based on filters
-	if req.Filters.CNPJCompleto != "" || req.Filters.NomeFantasia != "" || req.Filters.CNAEPrincipal != "" {
-		// Export estabelecimentos using COPY TO STDOUT
+	if exportUsesEstabelecimentos(req.Filters, req.SelectedColumns) {
 		return s.exportEstabelecimentosCSV(ctx, w, req)
 	}
-	// Export empresas using COPY TO STDOUT
 	return s.exportEmpresasCSV(ctx, w, req)
+}
+
+func exportUsesEstabelecimentos(filters models.SearchFilters, columns []string) bool {
+	if filters.CNPJCompleto != "" || filters.NomeFantasia != "" || filters.CNAEPrincipal != "" ||
+		filters.UF != "" || filters.Municipio != "" || filters.SituacaoCadastral != "" || filters.CEP != "" {
+		return true
+	}
+
+	estabColumns := map[string]struct{}{
+		"cnpj_completo": {}, "nome_fantasia": {}, "cnae_fiscal_principal": {},
+		"cnae_descricao": {}, "uf": {}, "municipio": {}, "municipio_nome": {},
+		"situacao_cadastral": {}, "logradouro": {}, "numero": {}, "bairro": {}, "cep": {},
+	}
+	for _, col := range columns {
+		if _, ok := estabColumns[col]; ok {
+			return true
+		}
+	}
+	return false
 }
 
 // exportEstabelecimentosCSV uses COPY TO STDOUT for ultra-fast streaming export.

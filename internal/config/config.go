@@ -50,10 +50,12 @@ type ClickHouseConfig struct {
 }
 
 type ServerConfig struct {
-	Port            int
-	Prefork         bool
-	ReadBufferSize  int
-	WriteBufferSize int
+	Port                    int
+	Prefork                 bool
+	ReadBufferSize          int
+	WriteBufferSize         int
+	RateLimitMax            int
+	RateLimitWindowSeconds  int
 }
 
 type ImportConfig struct {
@@ -124,10 +126,12 @@ func Load() error {
 			Database: viper.GetString("clickhouse.database"),
 		},
 		Server: ServerConfig{
-			Port:            viper.GetInt("server.port"),
-			Prefork:         viper.GetBool("server.prefork"),
-			ReadBufferSize:  viper.GetInt("server.read_buffer_size"),
-			WriteBufferSize: viper.GetInt("server.write_buffer_size"),
+			Port:                   viper.GetInt("server.port"),
+			Prefork:                viper.GetBool("server.prefork"),
+			ReadBufferSize:         viper.GetInt("server.read_buffer_size"),
+			WriteBufferSize:        viper.GetInt("server.write_buffer_size"),
+			RateLimitMax:           viper.GetInt("server.rate_limit_max"),
+			RateLimitWindowSeconds: viper.GetInt("server.rate_limit_window_seconds"),
 		},
 		Import: ImportConfig{
 			Workers:        viper.GetInt("import.workers"),
@@ -197,6 +201,8 @@ func setDefaults() {
 	viper.SetDefault("server.prefork", false)
 	viper.SetDefault("server.read_buffer_size", 16384)
 	viper.SetDefault("server.write_buffer_size", 4096)
+	viper.SetDefault("server.rate_limit_max", 6000)
+	viper.SetDefault("server.rate_limit_window_seconds", 60)
 
 	viper.SetDefault("import.workers", runtime.NumCPU()*2) // Optimized: 2x CPU cores for I/O bound operations
 	viper.SetDefault("import.parse_workers", runtime.NumCPU())

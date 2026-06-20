@@ -29,6 +29,8 @@ server:
   prefork: false
   read_buffer_size: 16384
   write_buffer_size: 4096
+  rate_limit_max: 6000
+  rate_limit_window_seconds: 60
 
 import:
   workers: 16
