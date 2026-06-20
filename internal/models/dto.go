@@ -43,6 +43,15 @@ type PhoneExportRequest struct {
 	Format        string `json:"format"` // csv, txt
 }
 
+// LookupItem is a typeahead result for reference or fuzzy lookups.
+type LookupItem struct {
+	Type        string `json:"type"`
+	Code        string `json:"code"`
+	Label       string `json:"label"`
+	Description string `json:"description,omitempty"`
+	UF          string `json:"uf,omitempty"`
+}
+
 // ExportCategory describes a preset business segment for phone export.
 type ExportCategory struct {
 	Key         string   `json:"key"`

@@ -93,6 +93,14 @@ export interface PhoneExportRequest {
   format: 'csv' | 'txt'
 }
 
+export interface LookupItem {
+  type: string
+  code: string
+  label: string
+  description?: string
+  uf?: string
+}
+
 export interface ExportCategory {
   key: string
   label: string

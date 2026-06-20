@@ -163,6 +163,8 @@ func main() {
 	exportHandler := handlers.NewExportHandler()
 	statsHandler := handlers.NewStatsHandler()
 
+	lookupHandler := handlers.NewLookupHandler()
+
 	// Routes
 	v1 := app.Group("/api/v1")
 
@@ -175,6 +177,12 @@ func main() {
 	v1.Post("/export/csv", exportHandler.ExportCSV)
 	v1.Post("/export/phones", exportHandler.ExportPhones)
 	v1.Get("/export/categories", exportHandler.ListExportCategories)
+
+	v1.Get("/lookup/sectors", lookupHandler.SearchSectors)
+	v1.Get("/lookup/cnae", lookupHandler.SearchCNAE)
+	v1.Get("/lookup/municipio", lookupHandler.SearchMunicipios)
+	v1.Get("/lookup/nome-fantasia", lookupHandler.SearchNomeFantasia)
+	v1.Get("/lookup/uf", lookupHandler.SearchUF)
 
 	// Stats routes
 	v1.Get("/stats/cnae", statsHandler.StatsPerCNAE)
