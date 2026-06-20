@@ -58,9 +58,6 @@ lint:
 vet:
 	$(GO) vet ./...
 
-migrate:
-	psql $(DATABASE_URL) -f scripts/setup_db.sh
-
 seed:
 	bash scripts/seed_test_fixtures.sh
 

@@ -60,7 +60,9 @@ cd /data/dev/projects/webstorm/BUSCA-CNPJ-2026
 
 **Domain glossary:** `docs/GLOSSARY.md`  
 **Security (Go):** `docs/SECURITY.md` + `agent-rules/03-security/`  
-**Architecture:** `docs/ARCHITECTURE.md`
+**Architecture:** `docs/ARCHITECTURE.md`  
+**Import pipeline:** `docs/IMPORT.md`  
+**Docs index:** `README.md`
 
 ---
 

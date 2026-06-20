@@ -1,28 +1,40 @@
 # Performance
 
-## PostgreSQL (bulk import)
+## Import (PostgreSQL COPY)
+
+Session tuning (`--tune`):
 
 - `synchronous_commit=off`
-- `work_mem=256MB`
-- `maintenance_work_mem=1GB`
-- Desabilitar triggers/FKs durante COPY.
-- Dropar indices nao essenciais antes da carga e recriar depois.
+- `session_replication_role=replica`
+- Elevated `work_mem` / `maintenance_work_mem`
+
+Pipeline:
+
+1. Drop secondary indexes (`scripts/drop_all_import_indexes.sh`)
+2. Parallel COPY (`go run ./cmd/importer`)
+3. Rebuild indexes + `ANALYZE`
+
+**Measured (100% dataset, 2026-06-20):** ~286k rows/s ingest, ~13 min COPY + ~5 min indexes.
+
+See [IMPORT.md](IMPORT.md) and [benchmarks/COMPARISON.md](benchmarks/COMPARISON.md).
 
 ## Go runtime
 
-- `GOMAXPROCS` = numero de vCPUs.
-- `GOGC=200` em cargas de importacao longas.
-- Buffer de leitura CSV em 4 MB.
+- `GOMAXPROCS` = CPU count
+- CSV read buffer: 4 MB
+- `GOGC=200` for long imports (optional)
 
-## Metas
+## API targets
 
-- Parsing puro: >= 500.000 linhas/s.
-- COPY local: >= 150.000 linhas/s.
-- Carga completa (~50M): <= 20 minutos em 8 vCPU / 32 GB / NVMe.
+| Route | Target |
+|-------|--------|
+| CNPJ lookup | < 10 ms |
+| Filtered search (cached) | < 100 ms |
+| Analytics summary | < 100 ms (pre-aggregated) |
+| Phone export (50k rows) | streaming, no full memory load |
 
-## Checklist pre-importacao
+## Pre-import checklist
 
-- Indices secundarios dropados.
-- Triggers desabilitados nas tabelas alvo.
-- Sessao de importacao com autovacuum desabilitado.
-- Espaco em disco e WAL monitorados.
+- [ ] Secondary indexes dropped
+- [ ] Sufficient disk for WAL + indexes (~2× table size headroom)
+- [ ] System guard enabled for parallel workers on low-RAM hosts

@@ -16,11 +16,6 @@ benchmark_results.txt
 *.tar
 *.log
 
-# Docs and local notes not required to build binaries
-docs
-COMANDO_IMPORTACAO.md
-COMANDOS_REIMPORTACAO.md
-
 # Local environment files
 .env
 .env.*

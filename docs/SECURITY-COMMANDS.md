@@ -1,4 +1,4 @@
-# Comandos da camada de segurança
+# Security Tooling Commands
 
 Referência completa de todos os comandos usados no pipeline de segurança (CI e local).
 
