@@ -1,0 +1,70 @@
+---
+description: Daily Agent Harness workflow — resolve rules and task-scoped Cursor rules
+alwaysApply: true
+---
+
+# Daily Harness Usage (BUSCA-CNPJ-2026)
+
+Project root: `/data/dev/projects/webstorm/BUSCA-CNPJ-2026`
+
+## One-time setup
+
+```bash
+cd /data/dev/projects/webstorm/BUSCA-CNPJ-2026
+pip install -r agent-harness/requirements.txt
+```
+
+## Start of every non-trivial task
+
+```bash
+cd /data/dev/projects/webstorm/BUSCA-CNPJ-2026
+./agent-harness/rules-path.sh
+./agent-harness/resolve-rules.sh <keywords from task>
+```
+
+**Keyword examples:**
+
+| Task | Command |
+|------|---------|
+| API / handlers | `./agent-harness/resolve-rules.sh api performance security` |
+| Import / DB | `./agent-harness/resolve-rules.sh query migration performance` |
+| Security review | `./agent-harness/resolve-rules.sh owasp security injection` |
+| Bug fix | `./agent-harness/resolve-rules.sh bugfix regression error` |
+
+Read only the listed files under `agent-rules/` — not the entire tree.
+
+## Cursor: temporary task rule (optional)
+
+Generate at task start:
+
+```bash
+./agent-harness/generate-task-rules.sh api export
+# or: api performance security, domain layer, etc.
+```
+
+Creates `.cursor/rules/_task-active.mdc` (`alwaysApply: false`).
+
+**Cleanup when task is done (MANDATORY):**
+
+```bash
+./agent-harness/generate-task-rules.sh --clean
+# or: rm .cursor/rules/_task-active.mdc
+```
+
+## Agent session checklist
+
+1. Open project in Cursor — rules in `.cursor/rules/` load automatically.
+2. Read `AGENTS.md` if context is empty.
+3. Run `resolve-rules.sh` for the task keywords.
+4. Optionally run `generate-task-rules.sh`.
+5. State which rule files you loaded.
+6. On task end: `--clean` temporary task rule.
+
+## Paths
+
+| Path | Purpose |
+|------|---------|
+| `agent-rules/` | Harness rule library |
+| `agent-harness/` | Scripts (`resolve-rules`, `generate-task-rules`) |
+| `.agent-harness/` | Git submodule (update: `git submodule update --remote .agent-harness`) |
+| `docs/GLOSSARY.md` | Domain terms |

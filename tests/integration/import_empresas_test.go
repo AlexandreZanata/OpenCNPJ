@@ -16,7 +16,7 @@ func TestIntegration_ImportEmpresas(t *testing.T) {
 	ctx := context.Background()
 	pgC, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
 		ContainerRequest: testcontainers.ContainerRequest{
-			Image:        "postgres:18.1",
+			Image:        "postgres:18.4-alpine",
 			ExposedPorts: []string{"5432/tcp"},
 			Env: map[string]string{
 				"POSTGRES_PASSWORD": "test",

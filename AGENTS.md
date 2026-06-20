@@ -41,10 +41,13 @@ pip install -r agent-harness/requirements.txt   # once
 
 ## Conditional load (by task)
 
+See **`.cursor/rules/daily-harness-usage.mdc`** for full daily workflow.
+
 ```bash
+cd /data/dev/projects/webstorm/BUSCA-CNPJ-2026
 ./agent-harness/resolve-rules.sh <keywords>
-./agent-harness/generate-task-rules.sh api auth   # optional Cursor task file
-./agent-harness/generate-task-rules.sh --clean    # when task done
+./agent-harness/generate-task-rules.sh api export   # optional
+./agent-harness/generate-task-rules.sh --clean       # when task done
 ```
 
 | Task | Keywords |

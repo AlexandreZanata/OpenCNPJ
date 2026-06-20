@@ -33,6 +33,15 @@ benchmark-10pct:
 benchmark-20pct:
 	SAMPLE_PERCENT=20 TARGET_SEC=360 bash scripts/benchmark_import_sample.sh
 
+benchmark-all-approaches:
+	bash scripts/benchmark_all_approaches.sh
+
+guard-status:
+	bash scripts/system_guard.sh status
+
+guard-watch:
+	@echo "usage: bash scripts/run_with_guard.sh <command>"
+
 test:
 	$(GO) test ./... -short -race -count=1
 

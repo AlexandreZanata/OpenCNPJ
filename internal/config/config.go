@@ -201,7 +201,7 @@ func setDefaults() {
 	viper.SetDefault("import.workers", runtime.NumCPU()*2) // Optimized: 2x CPU cores for I/O bound operations
 	viper.SetDefault("import.parse_workers", runtime.NumCPU())
 	viper.SetDefault("import.copy_workers", max(1, runtime.NumCPU()/2))
-	viper.SetDefault("import.batch_size", 250000)        // Optimized batch size for 32GB RAM and PostgreSQL 18
+	viper.SetDefault("import.batch_size", 250000)        // Optimized batch size for 32GB RAM and PostgreSQL 18.4
 	viper.SetDefault("import.read_buffer_size", 4194304) // 4MB buffer for faster CSV reading
 	viper.SetDefault("import.data_path", "./data")
 

@@ -1,0 +1,15 @@
+[Unit]
+Description=BUSCA-CNPJ system guard for workload %i
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/WebstormProjects/BUSCA-CNPJ-2026
+Environment=GUARD_ROOT=%h/WebstormProjects/BUSCA-CNPJ-2026
+ExecStart=%h/WebstormProjects/BUSCA-CNPJ-2026/scripts/system_guard.sh daemon --pgid %i
+Restart=no
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

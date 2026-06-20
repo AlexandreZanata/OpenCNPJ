@@ -14,7 +14,7 @@ API de alta performance em Go para processamento, indexação e consulta de dado
 
 - Go 1.21+
 - Docker e Docker Compose
-- PostgreSQL 15+
+- PostgreSQL 18.4+ (Docker: `postgres:18.4-alpine`)
 - Redis 7+
 - ClickHouse (opcional)
 
@@ -128,11 +128,18 @@ GET /api/v1/stats/cnae/0111301/uf?limit=10
 
 ## Agent Harness (AI-assisted development)
 
-This project uses the [Agent Harness](https://github.com/AlexandreZanata/GoodPraticesForLLMSandAgents) for coding agents.
+Open this project in **Cursor** — rules in `.cursor/rules/` load automatically.
+
+See **[.cursor/README.md](.cursor/README.md)** for daily commands.
 
 ```bash
+cd /data/dev/projects/webstorm/BUSCA-CNPJ-2026
 pip install -r agent-harness/requirements.txt
+
 ./agent-harness/resolve-rules.sh api performance security
+
+./agent-harness/generate-task-rules.sh api export
+./agent-harness/generate-task-rules.sh --clean   # when done
 ```
 
 - **Agents:** read [AGENTS.md](AGENTS.md) first

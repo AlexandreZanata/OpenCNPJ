@@ -1,19 +1,19 @@
 #!/bin/bash
 
-# Script para recriar PostgreSQL 18 e aplicar migrations
+# Script para recriar PostgreSQL 18.4 e aplicar migrations
 
 set -e
 
 echo "🛑 Parando containers..."
 docker compose down postgres
 
-echo "🗑️  Removendo volume do PostgreSQL (para forçar recriação com PostgreSQL 18)..."
+echo "🗑️  Removendo volume do PostgreSQL (para forçar recriação com PostgreSQL 18.4)..."
 docker volume rm busca-cnpj-2026_postgres_data 2>/dev/null || echo "Volume não existe ou já foi removido"
 
-echo "🚀 Subindo PostgreSQL 18..."
+echo "🚀 Subindo PostgreSQL 18.4..."
 docker compose up -d postgres
 
-echo "⏳ Aguardando PostgreSQL 18 estar pronto..."
+echo "⏳ Aguardando PostgreSQL 18.4 estar pronto..."
 sleep 5
 
 # Aguardar até o PostgreSQL estar realmente pronto
@@ -22,7 +22,7 @@ until docker compose exec -T postgres pg_isready -U receita_user -d receita_db >
     sleep 2
 done
 
-echo "✅ PostgreSQL 18 está pronto!"
+echo "✅ PostgreSQL 18.4 está pronto!"
 echo ""
 echo "📊 Verificando versão do PostgreSQL:"
 docker compose exec -T postgres psql -U receita_user -d receita_db -c "SELECT version();"

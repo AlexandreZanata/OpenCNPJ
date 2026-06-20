@@ -11,11 +11,15 @@ Go 1.21+, PostgreSQL, Redis, Docker. API prefix `/api/v1/`.
 
 ## Rule sources (load order)
 
-1. **Project:** `workflow.mdc`, `code-quality.mdc`, `testing-and-dvt.mdc`, `api-query-budget.mdc`
-2. **Harness:** `agent-core-principles.mdc`, `english-only.mdc`, `context-discipline.mdc`, `token-economy.mdc`
-3. **On demand:** `./agent-harness/resolve-rules.sh <keywords>`
+1. **Daily workflow:** `daily-harness-usage.mdc` — run `resolve-rules.sh` / `generate-task-rules.sh`
+2. **Project:** `workflow.mdc`, `code-quality.mdc`, `testing-and-dvt.mdc`, `api-query-budget.mdc`
+3. **Harness:** `agent-core-principles.mdc`, `english-only.mdc`, `context-discipline.mdc`, `token-economy.mdc`
+4. **On demand:** `./agent-harness/resolve-rules.sh <keywords>`
+5. **Task file (optional):** `_task-active.mdc` — remove with `generate-task-rules.sh --clean`
 
 Rules directory: `./agent-harness/rules-path.sh` → `agent-rules/`
+
+See `.cursor/README.md` for full command reference.
 
 ## Domain
 

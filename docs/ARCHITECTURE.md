@@ -13,7 +13,7 @@
 [Batcher] --> acumula N=5000 registros
         |
         v
-[COPY goroutine pool (M=DB_CONNS)] --> PostgreSQL 18.1
+[COPY goroutine pool (M=DB_CONNS)] --> PostgreSQL 18.4
         |
         v
 [Metrics collector] --> rows/s, MB/s, erros, tempo total
