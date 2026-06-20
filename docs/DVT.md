@@ -9,6 +9,7 @@ Sequential IDs for new features that still need production-grade automated tests
 | DVT-03 | Typed Redis cache for search responses | open |
 | DVT-04 | CSV export streaming without temp PL/pgSQL functions | open |
 | DVT-05 | Fuzzy search pagination without full COUNT | open |
+| DVT-06 | Enterprise web portal (React) | open |
 
 ## DVT-01: CNPJ open-data downloader (WebDAV)
 
@@ -43,4 +44,11 @@ Sequential IDs for new features that still need production-grade automated tests
 - **Scope**: `internal/repository/csv_export.go` (search helpers), `internal/repository/*_repo.go`
 - **Added**: 2026-06-20
 - **Needs**: benchmark nome_fantasia/razao_social ILIKE on 71M rows with pg_trgm indexes
+- **Status**: open
+
+## DVT-06: Enterprise web portal (React)
+
+- **Scope**: `web/`
+- **Added**: 2026-06-20
+- **Needs**: e2e tests (Playwright); auth/RBAC when API adds authentication
 - **Status**: open

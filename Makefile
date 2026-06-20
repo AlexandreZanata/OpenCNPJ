@@ -1,4 +1,4 @@
-.PHONY: build build-downloader test test-integration bench lint vet migrate import seed coverage setup download list-months
+.PHONY: build build-downloader test test-integration bench lint vet migrate import seed coverage setup download list-months web-dev web-build web-test
 
 GO      = go
 BINARY  = bin/importer
@@ -70,3 +70,12 @@ import:
 coverage:
 	$(GO) test ./... -short -coverprofile=coverage.out
 	$(GO) tool cover -html=coverage.out -o coverage.html
+
+web-dev:
+	cd web && pnpm dev
+
+web-build:
+	cd web && pnpm install --frozen-lockfile && pnpm build
+
+web-test:
+	cd web && pnpm install --frozen-lockfile && pnpm test
