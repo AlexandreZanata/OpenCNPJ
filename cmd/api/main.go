@@ -178,6 +178,7 @@ func main() {
 	v1.Get("/stats/cnae", statsHandler.StatsPerCNAE)
 	v1.Get("/stats/uf", statsHandler.StatsPerUF)
 	v1.Get("/stats/cnae/:cnae/uf", statsHandler.StatsPerCNAEAndUF)
+	v1.Get("/analytics/summary", statsHandler.AnalyticsSummary)
 
 	// Root endpoint
 	app.Get("/", func(c *fiber.Ctx) error {

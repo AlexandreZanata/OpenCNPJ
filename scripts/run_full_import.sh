@@ -122,6 +122,9 @@ TOTAL_WALL=$(python3 -c "print(round($IMPORT_WALL + $INDEX_SEC, 2))")
   echo ""
   echo "Monitor log: $PROGRESS"
   echo "Full log:    $LOG"
+  echo ""
+  echo "Refreshing analytics aggregates…"
+  bash scripts/refresh_stats_aggregates.sh || true
   echo "============================================================"
 } | tee "$REPORT"
 

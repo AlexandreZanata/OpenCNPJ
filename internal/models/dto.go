@@ -39,9 +39,24 @@ type ExportRequest struct {
 
 // StatsResponse represents statistics response.
 type StatsResponse struct {
-	CNAE  string `json:"cnae"`
-	UF    string `json:"uf"`
+	CNAE  string `json:"cnae,omitempty"`
+	UF    string `json:"uf,omitempty"`
 	Count int64  `json:"count"`
+}
+
+// CNAEUFBreakdown groups UF counts for one CNAE.
+type CNAEUFBreakdown struct {
+	CNAE string          `json:"cnae"`
+	ByUF []StatsResponse `json:"by_uf"`
+}
+
+// AnalyticsSummaryResponse bundles pre-aggregated analytics for the portal.
+type AnalyticsSummaryResponse struct {
+	Source      string          `json:"source"`
+	RefreshedAt string          `json:"refreshed_at,omitempty"`
+	ByUF        []StatsResponse `json:"by_uf"`
+	TopCNAE     []StatsResponse `json:"top_cnae"`
+	TopCNAEUF   CNAEUFBreakdown `json:"top_cnae_uf"`
 }
 
 // ErrorResponse represents API error response.

@@ -1,56 +1,53 @@
 package handlers
 
 import (
+	"errors"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 
 	"busca-cnpj-2026/internal/models"
 	"busca-cnpj-2026/internal/repository"
+	"busca-cnpj-2026/internal/services"
 )
 
 type StatsHandler struct {
-	statsRepo *repository.StatsRepository
+	statsService *services.StatsService
 }
 
 func NewStatsHandler() *StatsHandler {
 	return &StatsHandler{
-		statsRepo: repository.NewStatsRepository(),
+		statsService: services.NewStatsService(),
 	}
+}
+
+func parseStatsLimit(raw string, fallback int) int {
+	if raw == "" {
+		return fallback
+	}
+	limit, err := strconv.Atoi(raw)
+	if err != nil || limit <= 0 || limit > 1000 {
+		return fallback
+	}
+	return limit
 }
 
 // StatsPerCNAE handles GET /api/v1/stats/cnae.
 func (h *StatsHandler) StatsPerCNAE(c *fiber.Ctx) error {
-	limit := 100
-	if limitStr := c.Query("limit"); limitStr != "" {
-		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 && l <= 1000 {
-			limit = l
-		}
-	}
-
-	stats, err := h.statsRepo.StatsPerCNAE(c.Context(), limit)
+	limit := parseStatsLimit(c.Query("limit"), 100)
+	stats, err := h.statsService.StatsPerCNAE(c.Context(), limit)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(models.ErrorResponse{
-			Error:   "stats_failed",
-			Message: err.Error(),
-			Code:    fiber.StatusInternalServerError,
-		})
+		return statsError(c, err)
 	}
-
 	return c.JSON(stats)
 }
 
 // StatsPerUF handles GET /api/v1/stats/uf.
 func (h *StatsHandler) StatsPerUF(c *fiber.Ctx) error {
-	stats, err := h.statsRepo.StatsPerUF(c.Context())
+	stats, err := h.statsService.StatsPerUF(c.Context())
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(models.ErrorResponse{
-			Error:   "stats_failed",
-			Message: err.Error(),
-			Code:    fiber.StatusInternalServerError,
-		})
+		return statsError(c, err)
 	}
-
 	return c.JSON(stats)
 }
 
@@ -65,21 +62,34 @@ func (h *StatsHandler) StatsPerCNAEAndUF(c *fiber.Ctx) error {
 		})
 	}
 
-	limit := 100
-	if limitStr := c.Query("limit"); limitStr != "" {
-		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 && l <= 1000 {
-			limit = l
-		}
-	}
-
-	stats, err := h.statsRepo.StatsPerCNAEAndUF(c.Context(), cnae, limit)
+	limit := parseStatsLimit(c.Query("limit"), 100)
+	stats, err := h.statsService.StatsPerCNAEAndUF(c.Context(), cnae, limit)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(models.ErrorResponse{
-			Error:   "stats_failed",
-			Message: err.Error(),
-			Code:    fiber.StatusInternalServerError,
-		})
+		return statsError(c, err)
 	}
-
 	return c.JSON(stats)
+}
+
+// AnalyticsSummary handles GET /api/v1/analytics/summary.
+func (h *StatsHandler) AnalyticsSummary(c *fiber.Ctx) error {
+	cnaeLimit := parseStatsLimit(c.Query("cnae_limit"), 15)
+	cnaeUFLimit := parseStatsLimit(c.Query("cnae_uf_limit"), 10)
+
+	summary, err := h.statsService.AnalyticsSummary(c.Context(), cnaeLimit, cnaeUFLimit)
+	if err != nil {
+		return statsError(c, err)
+	}
+	return c.JSON(summary)
+}
+
+func statsError(c *fiber.Ctx, err error) error {
+	code := fiber.StatusInternalServerError
+	if errors.Is(err, repository.ErrStatsNotReady) {
+		code = fiber.StatusServiceUnavailable
+	}
+	return c.Status(code).JSON(models.ErrorResponse{
+		Error:   "stats_failed",
+		Message: err.Error(),
+		Code:    code,
+	})
 }

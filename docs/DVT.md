@@ -10,6 +10,7 @@ Sequential IDs for new features that still need production-grade automated tests
 | DVT-04 | CSV export streaming without temp PL/pgSQL functions | open |
 | DVT-05 | Fuzzy search pagination without full COUNT | open |
 | DVT-06 | Enterprise web portal (React) | open |
+| DVT-07 | Pre-aggregated analytics stats tables | open |
 
 ## DVT-01: CNPJ open-data downloader (WebDAV)
 
@@ -51,4 +52,11 @@ Sequential IDs for new features that still need production-grade automated tests
 - **Scope**: `web/`
 - **Added**: 2026-06-20
 - **Needs**: e2e tests (Playwright); auth/RBAC when API adds authentication
+- **Status**: open
+
+## DVT-07: Pre-aggregated analytics stats tables
+
+- **Scope**: `migrations/000009_*`, `internal/repository/stats_repo.go`, `scripts/refresh_stats_aggregates.sh`
+- **Added**: 2026-06-20
+- **Needs**: integration test verifying refresh + `/analytics/summary` under 100ms; CI job after import
 - **Status**: open

@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { statsPerCnae, statsPerUf } from '../api/statsApi'
+import { getAnalyticsSummary } from '../api/statsApi'
 import { CnpjSearchBar } from '../components/search/CnpjSearchBar'
 import { Card } from '../components/ui/Card'
 import { ErrorState } from '../components/ui/ErrorState'
@@ -7,10 +7,13 @@ import { LoadingState } from '../components/ui/LoadingState'
 import { formatNumber } from '../utils/format'
 
 export function DashboardPage() {
-  const ufStats = useQuery({ queryKey: ['stats', 'uf'], queryFn: statsPerUf, staleTime: 300_000 })
-  const cnaeStats = useQuery({ queryKey: ['stats', 'cnae', 5], queryFn: () => statsPerCnae(5), staleTime: 300_000 })
+  const analytics = useQuery({
+    queryKey: ['analytics', 'summary', 5],
+    queryFn: () => getAnalyticsSummary(5, 5),
+    staleTime: 600_000,
+  })
 
-  const totalEstab = ufStats.data?.reduce((sum, row) => sum + row.count, 0) ?? 0
+  const totalEstab = analytics.data?.by_uf.reduce((sum, row) => sum + row.count, 0) ?? 0
 
   return (
     <div className="space-y-6">
@@ -23,35 +26,34 @@ export function DashboardPage() {
         <CnpjSearchBar />
       </Card>
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card title="Estabelecimentos">
-          {ufStats.isLoading ? (
-            <LoadingState label="Loading totals…" />
-          ) : ufStats.error ? (
-            <ErrorState message={(ufStats.error as Error).message} />
-          ) : (
-            <p className="text-3xl font-bold text-brand-500">{formatNumber(totalEstab)}</p>
-          )}
-        </Card>
-        <Card title="States (UF)">
-          <p className="text-3xl font-bold text-white">{ufStats.data?.length ?? '—'}</p>
-        </Card>
-        <Card title="Top CNAE tracked">
-          <p className="text-3xl font-bold text-white">{cnaeStats.data?.[0]?.cnae ?? '—'}</p>
-        </Card>
-      </div>
+      {analytics.isLoading && <LoadingState label="Loading statistics…" />}
+      {analytics.error && <ErrorState message={(analytics.error as Error).message} />}
 
-      {cnaeStats.data && (
-        <Card title="Top CNAE by Estabelecimento count">
-          <ul className="space-y-2 text-sm">
-            {cnaeStats.data.map((row) => (
-              <li key={row.cnae} className="flex justify-between border-b border-border/50 py-2">
-                <span className="font-mono text-slate-300">{row.cnae}</span>
-                <span className="text-slate-400">{formatNumber(row.count)}</span>
-              </li>
-            ))}
-          </ul>
-        </Card>
+      {analytics.data && (
+        <>
+          <div className="grid gap-4 md:grid-cols-3">
+            <Card title="Estabelecimentos">
+              <p className="text-3xl font-bold text-brand-500">{formatNumber(totalEstab)}</p>
+            </Card>
+            <Card title="States (UF)">
+              <p className="text-3xl font-bold text-white">{analytics.data.by_uf.length}</p>
+            </Card>
+            <Card title="Top CNAE">
+              <p className="font-mono text-3xl font-bold text-white">{analytics.data.top_cnae[0]?.cnae ?? '—'}</p>
+            </Card>
+          </div>
+
+          <Card title="Top CNAE by Estabelecimento count">
+            <ul className="space-y-2 text-sm">
+              {analytics.data.top_cnae.map((row) => (
+                <li key={row.cnae} className="flex justify-between border-b border-border/50 py-2">
+                  <span className="font-mono text-slate-300">{row.cnae}</span>
+                  <span className="text-slate-400">{formatNumber(row.count)}</span>
+                </li>
+              ))}
+            </ul>
+          </Card>
+        </>
       )}
     </div>
   )
