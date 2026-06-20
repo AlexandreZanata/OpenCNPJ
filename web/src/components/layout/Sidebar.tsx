@@ -1,11 +1,12 @@
 import { NavLink } from 'react-router-dom'
-import { BarChart3, Building2, LayoutDashboard, MapPin, Search } from 'lucide-react'
+import { BarChart3, Building2, LayoutDashboard, MapPin, Phone, Search } from 'lucide-react'
 
 const links = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/cnpj', label: 'CNPJ Lookup', icon: Search },
   { to: '/empresas', label: 'Empresa Search', icon: Building2 },
   { to: '/estabelecimentos', label: 'Estabelecimento Search', icon: MapPin },
+  { to: '/export/phones', label: 'Phone Export', icon: Phone },
   { to: '/analytics', label: 'Analytics', icon: BarChart3 },
 ]
 

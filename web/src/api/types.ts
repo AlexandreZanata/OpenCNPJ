@@ -80,3 +80,22 @@ export interface ExportRequest {
   selected_columns: string[]
   format: 'csv'
 }
+
+export interface PhoneExportRequest {
+  category: string
+  cnae?: string
+  uf?: string
+  municipio?: string
+  municipio_nome?: string
+  nome_fantasia?: string
+  only_active?: boolean
+  limit?: number
+  format: 'csv' | 'txt'
+}
+
+export interface ExportCategory {
+  key: string
+  label: string
+  description: string
+  cnae_codes: string[]
+}

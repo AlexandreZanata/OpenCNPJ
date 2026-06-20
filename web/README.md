@@ -50,6 +50,7 @@ Open http://localhost:5173
 | `/cnpj/:cnpj` | Estabelecimento detail by 14-digit CNPJ |
 | `/empresas` | Empresa search (CNPJ básico, razão social) |
 | `/estabelecimentos` | Estabelecimento search + filters |
+| `/export/phones` | Category phone export (CSV / TXT) |
 | `/analytics` | CNAE / UF statistics |
 
 ## Architecture

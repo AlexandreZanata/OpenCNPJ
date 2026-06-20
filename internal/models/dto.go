@@ -30,6 +30,27 @@ type SearchResponse struct {
 	HasMore bool        `json:"has_more"`
 }
 
+// PhoneExportRequest exports establishment phone contacts by category and filters.
+type PhoneExportRequest struct {
+	Category      string `json:"category"`
+	CNAEPrincipal string `json:"cnae"`
+	UF            string `json:"uf"`
+	Municipio     string `json:"municipio"`
+	MunicipioNome string `json:"municipio_nome"`
+	NomeFantasia  string `json:"nome_fantasia"`
+	OnlyActive    *bool  `json:"only_active"`
+	Limit         int    `json:"limit"`
+	Format        string `json:"format"` // csv, txt
+}
+
+// ExportCategory describes a preset business segment for phone export.
+type ExportCategory struct {
+	Key         string   `json:"key"`
+	Label       string   `json:"label"`
+	Description string   `json:"description"`
+	CNAECodes   []string `json:"cnae_codes"`
+}
+
 // ExportRequest represents CSV export request.
 type ExportRequest struct {
 	Filters         SearchFilters `json:"filters"`

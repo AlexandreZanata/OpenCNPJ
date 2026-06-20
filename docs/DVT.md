@@ -11,6 +11,7 @@ Sequential IDs for new features that still need production-grade automated tests
 | DVT-05 | Fuzzy search pagination without full COUNT | open |
 | DVT-06 | Enterprise web portal (React) | open |
 | DVT-07 | Pre-aggregated analytics stats tables | open |
+| DVT-08 | Category phone export (CSV/TXT) | open |
 
 ## DVT-01: CNPJ open-data downloader (WebDAV)
 
@@ -59,4 +60,11 @@ Sequential IDs for new features that still need production-grade automated tests
 - **Scope**: `migrations/000009_*`, `internal/repository/stats_repo.go`, `scripts/refresh_stats_aggregates.sh`
 - **Added**: 2026-06-20
 - **Needs**: integration test verifying refresh + `/analytics/summary` under 100ms; CI job after import
+- **Status**: open
+
+## DVT-08: Category phone export (CSV/TXT)
+
+- **Scope**: `internal/exportcategory`, `internal/repository/phone_export.go`, `web/src/pages/PhoneExportPage.tsx`
+- **Added**: 2026-06-20
+- **Needs**: integration test export advocacia+SP; verify phone dedup and LGPD masking policy
 - **Status**: open

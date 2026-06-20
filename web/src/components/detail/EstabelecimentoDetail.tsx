@@ -19,7 +19,7 @@ function Field({ label, value }: { label: string; value: string }) {
 
 export function EstabelecimentoDetail({ data }: EstabelecimentoDetailProps) {
   const situacao = unwrapString(data.situacao_cadastral)
-  const active = situacao === '2'
+  const active = situacao === '2' || situacao === '02'
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">

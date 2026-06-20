@@ -173,6 +173,8 @@ func main() {
 
 	// Export routes
 	v1.Post("/export/csv", exportHandler.ExportCSV)
+	v1.Post("/export/phones", exportHandler.ExportPhones)
+	v1.Get("/export/categories", exportHandler.ListExportCategories)
 
 	// Stats routes
 	v1.Get("/stats/cnae", statsHandler.StatsPerCNAE)

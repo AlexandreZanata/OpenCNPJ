@@ -4,6 +4,7 @@ import (
 	"context"
 	"io"
 
+	"busca-cnpj-2026/internal/exportcategory"
 	"busca-cnpj-2026/internal/models"
 	"busca-cnpj-2026/internal/repository"
 )
@@ -73,7 +74,25 @@ func (s *ExportService) exportEstabelecimentosCSV(ctx context.Context, w io.Writ
 //
 //nolint:gocritic // Keeping value argument to avoid broad API churn now.
 func (s *ExportService) exportEmpresasCSV(ctx context.Context, w io.Writer, req models.ExportRequest) error {
-	// Use COPY TO STDOUT for maximum performance
-	// This streams directly from PostgreSQL without loading data into memory
 	return s.empresaRepo.ExportToCSV(ctx, w, req.Filters, req.SelectedColumns)
+}
+
+// ExportPhones streams filtered establishment phone contacts.
+func (s *ExportService) ExportPhones(ctx context.Context, w io.Writer, req models.PhoneExportRequest) error {
+	return s.estabelecimentoRepo.ExportPhones(ctx, w, req)
+}
+
+// ListExportCategories returns preset business categories for phone export.
+func (s *ExportService) ListExportCategories() []models.ExportCategory {
+	items := exportcategory.List()
+	out := make([]models.ExportCategory, 0, len(items))
+	for _, item := range items {
+		out = append(out, models.ExportCategory{
+			Key:         item.Key,
+			Label:       item.Label,
+			Description: item.Description,
+			CNAECodes:   item.CNAECodes,
+		})
+	}
+	return out
 }
