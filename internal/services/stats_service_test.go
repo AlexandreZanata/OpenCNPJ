@@ -15,7 +15,7 @@ func TestStatsServiceCacheKeyFormat(t *testing.T) {
 	}
 
 	key := "stats:analytics:15:10"
-	_, err := GetOrSetJSON(svc.cache, context.Background(), key, func() (*struct{ OK bool }, error) {
+	_, err := GetOrSetJSON(context.Background(), svc.cache, key, func() (*struct{ OK bool }, error) {
 		return &struct{ OK bool }{OK: true}, nil
 	})
 	if err != nil {

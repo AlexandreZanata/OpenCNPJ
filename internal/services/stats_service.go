@@ -21,14 +21,14 @@ func NewStatsService() *StatsService {
 }
 
 func (s *StatsService) StatsPerUF(ctx context.Context) ([]models.StatsResponse, error) {
-	return GetOrSetJSON(s.cache, ctx, "stats:uf", func() ([]models.StatsResponse, error) {
+	return GetOrSetJSON(ctx, s.cache, "stats:uf", func() ([]models.StatsResponse, error) {
 		return s.repo.StatsPerUF(ctx)
 	})
 }
 
 func (s *StatsService) StatsPerCNAE(ctx context.Context, limit int) ([]models.StatsResponse, error) {
 	key := fmt.Sprintf("stats:cnae:%d", limit)
-	return GetOrSetJSON(s.cache, ctx, key, func() ([]models.StatsResponse, error) {
+	return GetOrSetJSON(ctx, s.cache, key, func() ([]models.StatsResponse, error) {
 		return s.repo.StatsPerCNAE(ctx, limit)
 	})
 }
@@ -39,7 +39,7 @@ func (s *StatsService) StatsPerCNAEAndUF(
 	limit int,
 ) ([]models.StatsResponse, error) {
 	key := fmt.Sprintf("stats:cnae:%s:uf:%d", cnae, limit)
-	return GetOrSetJSON(s.cache, ctx, key, func() ([]models.StatsResponse, error) {
+	return GetOrSetJSON(ctx, s.cache, key, func() ([]models.StatsResponse, error) {
 		return s.repo.StatsPerCNAEAndUF(ctx, cnae, limit)
 	})
 }
@@ -50,7 +50,7 @@ func (s *StatsService) AnalyticsSummary(
 	cnaeUFLimit int,
 ) (*models.AnalyticsSummaryResponse, error) {
 	key := fmt.Sprintf("stats:analytics:%d:%d", cnaeLimit, cnaeUFLimit)
-	return GetOrSetJSON(s.cache, ctx, key, func() (*models.AnalyticsSummaryResponse, error) {
+	return GetOrSetJSON(ctx, s.cache, key, func() (*models.AnalyticsSummaryResponse, error) {
 		return s.repo.AnalyticsSummary(ctx, cnaeLimit, cnaeUFLimit)
 	})
 }

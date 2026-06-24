@@ -41,7 +41,7 @@ func (s *SearchService) SearchEmpresas(
 		"offset":            filters.Offset,
 	})
 
-	return GetOrSetJSON(s.cache, ctx, cacheKey, func() (*models.SearchResponse, error) {
+	return GetOrSetJSON(ctx, s.cache, cacheKey, func() (*models.SearchResponse, error) {
 		empresas, total, err := s.empresaRepo.SearchEmpresas(ctx, filters)
 		if err != nil {
 			return nil, err
@@ -76,7 +76,7 @@ func (s *SearchService) SearchEstabelecimentos(
 		"offset":         filters.Offset,
 	})
 
-	return GetOrSetJSON(s.cache, ctx, cacheKey, func() (*models.SearchResponse, error) {
+	return GetOrSetJSON(ctx, s.cache, cacheKey, func() (*models.SearchResponse, error) {
 		estabelecimentos, total, err := s.estabelecimentoRepo.SearchEstabelecimentos(ctx, filters)
 		if err != nil {
 			return nil, err
@@ -98,7 +98,7 @@ func (s *SearchService) GetEstabelecimentoByCNPJ(
 ) (*models.EstabelecimentoCompleto, error) {
 	cacheKey := "estabelecimento:cnpj:" + cnpj
 
-	result, err := GetOrSetJSON(s.cache, ctx, cacheKey, func() (*models.EstabelecimentoCompleto, error) {
+	result, err := GetOrSetJSON(ctx, s.cache, cacheKey, func() (*models.EstabelecimentoCompleto, error) {
 		return s.estabelecimentoRepo.GetByCNPJCompleto(ctx, cnpj)
 	})
 	if err != nil {

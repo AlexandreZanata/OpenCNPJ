@@ -59,7 +59,7 @@ func (c *Client) ListMonthDirectories(ctx context.Context) ([]string, error) {
 		}
 	}
 	if len(dirs) == 0 {
-		return nil, fmt.Errorf("no monthly directories found in Receita Federal repository")
+		return nil, ErrNoMonthlyDirs
 	}
 
 	sort.Strings(dirs)
@@ -72,9 +72,10 @@ func (c *Client) ListZipFiles(ctx context.Context, month string) ([]string, erro
 		return nil, err
 	}
 
-	seen := make(map[string]struct{})
-	var files []string
-	for _, href := range parseHrefs(body) {
+	hrefs := parseHrefs(body)
+	seen := make(map[string]struct{}, len(hrefs))
+	files := make([]string, 0, len(hrefs))
+	for _, href := range hrefs {
 		name := extractZipName(href)
 		if name == "" {
 			continue
@@ -86,16 +87,15 @@ func (c *Client) ListZipFiles(ctx context.Context, month string) ([]string, erro
 		files = append(files, name)
 	}
 	if len(files) == 0 {
-		return nil, fmt.Errorf("no .zip files found in %s", month)
+		return nil, fmt.Errorf("%w: %s", ErrNoZipFiles, month)
 	}
-
 	sort.Strings(files)
 	return files, nil
 }
 
 func (c *Client) Download(ctx context.Context, month, filename string) (io.ReadCloser, int64, error) {
 	url := fmt.Sprintf("%s/%s/%s", c.baseURL, month, filename)
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, http.NoBody)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -107,7 +107,7 @@ func (c *Client) Download(ctx context.Context, month, filename string) (io.ReadC
 	}
 	if resp.StatusCode != http.StatusOK {
 		resp.Body.Close()
-		return nil, 0, fmt.Errorf("download %s: status %s", filename, resp.Status)
+		return nil, 0, fmt.Errorf("download %s: %w: %s", filename, ErrUnexpectedHTTPStatus, resp.Status)
 	}
 
 	return resp.Body, resp.ContentLength, nil
@@ -119,7 +119,7 @@ func (c *Client) propfind(ctx context.Context, path string) ([]byte, error) {
 		url = fmt.Sprintf("%s/%s/", c.baseURL, strings.Trim(path, "/"))
 	}
 
-	req, err := http.NewRequestWithContext(ctx, "PROPFIND", url, nil)
+	req, err := http.NewRequestWithContext(ctx, "PROPFIND", url, http.NoBody)
 	if err != nil {
 		return nil, err
 	}
@@ -137,7 +137,7 @@ func (c *Client) propfind(ctx context.Context, path string) ([]byte, error) {
 		return nil, err
 	}
 	if resp.StatusCode != http.StatusMultiStatus && resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("propfind %s: status %s", path, resp.Status)
+		return nil, fmt.Errorf("propfind %s: %w: %s", path, ErrUnexpectedHTTPStatus, resp.Status)
 	}
 	return body, nil
 }

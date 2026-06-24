@@ -211,7 +211,7 @@ func (r *EmpresaRepository) ExportToCSV(
 		selectCols = append(selectCols, textSelectExpr(sqlCol, col))
 	}
 	if len(selectCols) == 0 {
-		return fmt.Errorf("no valid export columns selected")
+		return ErrNoValidExportColumns
 	}
 
 	whereParts := []string{"1=1"}

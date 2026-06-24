@@ -9,7 +9,7 @@ func SearchPresets(query string, limit int) []Category {
 	}
 	q := strings.ToLower(strings.TrimSpace(query))
 	if q == "" {
-		return List()[:min(len(catalog), limit)]
+		return List()[:minInt(len(catalog), limit)]
 	}
 
 	matches := make([]Category, 0, limit)
@@ -47,7 +47,7 @@ func matchesPreset(item Category, query string) bool {
 	return false
 }
 
-func min(a, b int) int {
+func minInt(a, b int) int {
 	if a < b {
 		return a
 	}

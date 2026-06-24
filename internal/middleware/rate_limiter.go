@@ -10,9 +10,9 @@ import (
 )
 
 func RateLimiter() fiber.Handler {
-	max := config.AppConfig.Server.RateLimitMax
-	if max <= 0 {
-		max = 6000
+	rateMax := config.AppConfig.Server.RateLimitMax
+	if rateMax <= 0 {
+		rateMax = 6000
 	}
 	window := config.AppConfig.Server.RateLimitWindowSeconds
 	if window <= 0 {
@@ -20,7 +20,7 @@ func RateLimiter() fiber.Handler {
 	}
 
 	return limiter.New(limiter.Config{
-		Max:        max,
+		Max:        rateMax,
 		Expiration: time.Duration(window) * time.Second,
 		KeyGenerator: func(c *fiber.Ctx) string {
 			return c.IP()

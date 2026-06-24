@@ -10,8 +10,8 @@ import (
 
 // GetOrSetJSON retrieves a typed value from cache or executes fn and stores the result.
 func GetOrSetJSON[T any](
-	s *CacheService,
 	ctx context.Context,
+	s *CacheService,
 	key string,
 	fn func() (T, error),
 ) (T, error) {

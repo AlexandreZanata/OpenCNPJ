@@ -49,7 +49,7 @@ func buildPhoneExportQuery(req models.PhoneExportRequest) (string, []any, error)
 	if req.Category != "" {
 		category, ok := exportcategory.Find(req.Category)
 		if !ok {
-			return "", nil, fmt.Errorf("unknown category: %s", req.Category)
+			return "", nil, fmt.Errorf("%w: %s", ErrUnknownCategory, req.Category)
 		}
 		whereParts = append(whereParts, exportcategory.MatchSQL(category, &argPos, &args))
 	}
@@ -84,7 +84,7 @@ func buildPhoneExportQuery(req models.PhoneExportRequest) (string, []any, error)
 		return "", nil, err
 	}
 	if req.Category == "" && req.CNAEPrincipal == "" && req.NomeFantasia == "" {
-		return "", nil, fmt.Errorf("category, cnae, or nome_fantasia filter is required")
+		return "", nil, ErrPhoneFilterRequired
 	}
 
 	limitClause, limitArgs, _ := buildPhoneLimitClause(req, argPos)

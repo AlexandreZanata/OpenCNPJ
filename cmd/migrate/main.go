@@ -8,15 +8,22 @@ import (
 )
 
 func main() {
+	if err := run(); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func run() error {
 	if err := config.Load(); err != nil {
-		log.Fatalf("config: %v", err)
+		return err
 	}
 	if err := database.InitPostgres(); err != nil {
-		log.Fatalf("postgres: %v", err)
+		return err
 	}
-	defer database.ClosePostgres()
+	defer func() { _ = database.ClosePostgres() }()
 	if err := database.RunMigrations(); err != nil {
-		log.Fatalf("migrate: %v", err)
+		return err
 	}
 	log.Println("migrations applied")
+	return nil
 }

@@ -1,0 +1,20 @@
+export default {
+  extends: ['@commitlint/config-conventional'],
+  rules: {
+    'type-enum': [
+      2,
+      'always',
+      ['feat', 'fix', 'perf', 'refactor', 'test', 'bench', 'docs', 'ci', 'chore', 'build', 'revert'],
+    ],
+    'scope-enum': [
+      2,
+      'always',
+      [
+        'parser', 'loader', 'pipeline', 'model', 'config', 'metrics', 'ci', 'docs', 'bench',
+        'migration', 'fixtures', 'importer', 'downloader', 'oss', 'api', 'web', 'export', 'security',
+      ],
+    ],
+    'subject-max-length': [2, 'always', 72],
+    'body-max-line-length': [2, 'always', 100],
+  },
+};

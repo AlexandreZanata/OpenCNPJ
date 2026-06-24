@@ -12,7 +12,7 @@ func TestGetOrSetJSONCacheDisabled(t *testing.T) {
 	config.AppConfig = &config.Config{Cache: config.CacheConfig{Enabled: false}}
 	svc := NewCacheService()
 
-	got, err := GetOrSetJSON(svc, context.Background(), "key", func() (*models.SearchResponse, error) {
+	got, err := GetOrSetJSON(context.Background(), svc, "key", func() (*models.SearchResponse, error) {
 		return &models.SearchResponse{Total: 42, Limit: 10}, nil
 	})
 	if err != nil {
@@ -30,7 +30,7 @@ func TestGetOrSetJSONPreservesStructShape(t *testing.T) {
 	original := &models.EstabelecimentoCompleto{
 		Estabelecimento: models.Estabelecimento{CNPJCompleto: "12345678000199"},
 	}
-	got, err := GetOrSetJSON(svc, context.Background(), "cnpj-key", func() (*models.EstabelecimentoCompleto, error) {
+	got, err := GetOrSetJSON(context.Background(), svc, "cnpj-key", func() (*models.EstabelecimentoCompleto, error) {
 		return original, nil
 	})
 	if err != nil {

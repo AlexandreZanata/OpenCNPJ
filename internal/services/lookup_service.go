@@ -53,14 +53,14 @@ func NewLookupService() *LookupService {
 
 func (s *LookupService) SearchSectors(ctx context.Context, query string, limit int) ([]models.LookupItem, error) {
 	key := fmt.Sprintf("lookup:sectors:%s:%d", query, limit)
-	return GetOrSetJSON(s.cache, ctx, key, func() ([]models.LookupItem, error) {
+	return GetOrSetJSON(ctx, s.cache, key, func() ([]models.LookupItem, error) {
 		return s.repo.SearchSectors(ctx, query, limit)
 	})
 }
 
 func (s *LookupService) SearchCNAE(ctx context.Context, query string, limit int) ([]models.LookupItem, error) {
 	key := fmt.Sprintf("lookup:cnae:%s:%d", query, limit)
-	return GetOrSetJSON(s.cache, ctx, key, func() ([]models.LookupItem, error) {
+	return GetOrSetJSON(ctx, s.cache, key, func() ([]models.LookupItem, error) {
 		return s.repo.SearchCNAE(ctx, query, limit)
 	})
 }
@@ -71,7 +71,7 @@ func (s *LookupService) SearchMunicipios(
 	limit int,
 ) ([]models.LookupItem, error) {
 	key := fmt.Sprintf("lookup:municipio:%s:%s:%d", uf, query, limit)
-	return GetOrSetJSON(s.cache, ctx, key, func() ([]models.LookupItem, error) {
+	return GetOrSetJSON(ctx, s.cache, key, func() ([]models.LookupItem, error) {
 		return s.repo.SearchMunicipios(ctx, query, uf, limit)
 	})
 }
@@ -85,7 +85,7 @@ func (s *LookupService) SearchNomeFantasia(
 		return nil, nil
 	}
 	key := fmt.Sprintf("lookup:nome:%s:%s:%d", uf, query, limit)
-	return GetOrSetJSON(s.cache, ctx, key, func() ([]models.LookupItem, error) {
+	return GetOrSetJSON(ctx, s.cache, key, func() ([]models.LookupItem, error) {
 		return s.repo.SearchNomeFantasia(ctx, query, uf, limit)
 	})
 }

@@ -62,11 +62,11 @@ func formatProgressLine(fileIndex, fileTotal int, filename string, written, tota
 	)
 }
 
-func trimFilename(name string, max int) string {
-	if len(name) <= max {
+func trimFilename(name string, maxLen int) string {
+	if len(name) <= maxLen {
 		return name
 	}
-	return "…" + name[len(name)-max+1:]
+	return "…" + name[len(name)-maxLen+1:]
 }
 
 func humanBytes(n int64) string {
@@ -83,7 +83,7 @@ func humanBytes(n int64) string {
 }
 
 type countingWriter struct {
-	w      io.Writer
+	w       io.Writer
 	written int64
 	onWrite func(written int64)
 }

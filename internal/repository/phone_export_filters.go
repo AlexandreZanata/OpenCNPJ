@@ -39,11 +39,11 @@ func appendPhoneDateFilters(
 
 func parseExportDate(value string) (time.Time, error) {
 	if !exportDatePattern.MatchString(value) {
-		return time.Time{}, fmt.Errorf("invalid date %q: use YYYY-MM-DD", value)
+		return time.Time{}, fmt.Errorf("%w: %q", ErrInvalidExportDate, value)
 	}
 	parsed, err := time.Parse("2006-01-02", value)
 	if err != nil {
-		return time.Time{}, fmt.Errorf("invalid date %q: use YYYY-MM-DD", value)
+		return time.Time{}, fmt.Errorf("%w: %q", ErrInvalidExportDate, value)
 	}
 	return parsed, nil
 }

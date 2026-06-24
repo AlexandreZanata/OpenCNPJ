@@ -8,6 +8,6 @@ rules:
   scope-enum:
     - 2
     - always
-    - [parser, loader, pipeline, model, config, metrics, ci, docs, bench, migration, fixtures, importer, downloader]
+    - [parser, loader, pipeline, model, config, metrics, ci, docs, bench, migration, fixtures, importer, downloader, oss, api, web, export, security]
   subject-max-length: [2, always, 72]
   body-max-line-length: [2, always, 100]

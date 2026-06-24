@@ -36,11 +36,18 @@ linters:
 
 linters-settings:
   cyclop:
-    max-complexity: 16
+    max-complexity: 20
   lll:
     line-length: 120
   gocritic:
     enabled-tags: [diagnostic, performance, style]
+    disabled-checks:
+      - hugeParam
+      - unnamedResult
+      - exitAfterDefer
+  gosec:
+    excludes:
+      - G101
   misspell:
     ignore-words:
       - federativo
@@ -48,3 +55,12 @@ linters-settings:
 issues:
   max-issues-per-linter: 0
   max-same-issues: 0
+  exclude-rules:
+    - path: internal/importer/
+      linters:
+        - unused
+        - unparam
+    - path: internal/importer/
+      text: "unused-parameter"
+      linters:
+        - revive

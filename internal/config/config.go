@@ -50,12 +50,12 @@ type ClickHouseConfig struct {
 }
 
 type ServerConfig struct {
-	Port                    int
-	Prefork                 bool
-	ReadBufferSize          int
-	WriteBufferSize         int
-	RateLimitMax            int
-	RateLimitWindowSeconds  int
+	Port                   int
+	Prefork                bool
+	ReadBufferSize         int
+	WriteBufferSize        int
+	RateLimitMax           int
+	RateLimitWindowSeconds int
 }
 
 type ImportConfig struct {

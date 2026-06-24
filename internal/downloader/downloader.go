@@ -13,6 +13,8 @@ import (
 	"time"
 )
 
+const maxZipMemberBytes = 512 << 20 // 512 MiB per CSV inside RFB archives
+
 var cnpjFileMarkers = []string{
 	"CNAECSV", "MOTICSV", "MUNICCSV", "NATJUCSV", "PAISCSV", "QUALSCSV",
 	"EMPRECSV", "ESTABELE", "SOCIOCSV", "SIMPLES",
@@ -72,7 +74,7 @@ func NewDownloader(client *Client, opts Options) *Downloader {
 // ResolveMonth picks the target folder: explicit month, current month if published, or latest.
 func ResolveMonth(available []string, requested string, now time.Time) (string, bool, error) {
 	if len(available) == 0 {
-		return "", false, fmt.Errorf("empty month list")
+		return "", false, ErrEmptyMonthList
 	}
 
 	if requested != "" {
@@ -81,7 +83,7 @@ func ResolveMonth(available []string, requested string, now time.Time) (string, 
 				return m, false, nil
 			}
 		}
-		return "", false, fmt.Errorf("month %s not available (latest: %s)", requested, available[len(available)-1])
+		return "", false, fmt.Errorf("%w: %s (latest: %s)", ErrMonthNotAvailable, requested, available[len(available)-1])
 	}
 
 	current := now.Format("2006-01")
@@ -97,7 +99,7 @@ func ResolveMonth(available []string, requested string, now time.Time) (string, 
 
 func (d *Downloader) Run(ctx context.Context) (*Result, error) {
 	if err := os.MkdirAll(d.opts.OutputDir, 0o755); err != nil {
-		return nil, fmt.Errorf("create output directory: %w", err)
+		return nil, fmt.Errorf("%w: %w", ErrCreateOutputDir, err)
 	}
 
 	months, err := d.client.ListMonthDirectories(ctx)
@@ -120,7 +122,9 @@ func (d *Downloader) Run(ctx context.Context) (*Result, error) {
 	}
 
 	reference, data := splitFiles(files)
-	ordered := append(reference, data...)
+	ordered := make([]string, 0, len(reference)+len(data))
+	ordered = append(ordered, reference...)
+	ordered = append(ordered, data...)
 
 	result := &Result{Month: month, FilesTotal: len(ordered)}
 	for i, filename := range ordered {
@@ -156,7 +160,9 @@ func splitFiles(files []string) (reference, data []string) {
 	return reference, data
 }
 
-func (d *Downloader) processFile(ctx context.Context, month, filename string, fileIndex, fileTotal int) (csvCount int, skipped bool, err error) {
+func (d *Downloader) processFile(
+	ctx context.Context, month, filename string, fileIndex, fileTotal int,
+) (csvCount int, skipped bool, err error) {
 	zipPath := filepath.Join(d.opts.OutputDir, filename)
 	if d.isDone(month, filename) {
 		if d.opts.OnProgress != nil {
@@ -203,10 +209,12 @@ func (d *Downloader) markDone(month, filename string) error {
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 		return err
 	}
-	return os.WriteFile(path, []byte(month), 0o644)
+	return os.WriteFile(path, []byte(month), 0o600)
 }
 
-func (d *Downloader) downloadWithRetry(ctx context.Context, month, filename, dest string, fileIndex, fileTotal int) error {
+func (d *Downloader) downloadWithRetry(
+	ctx context.Context, month, filename, dest string, fileIndex, fileTotal int,
+) error {
 	var lastErr error
 	for attempt := 1; attempt <= d.opts.RetryAttempts; attempt++ {
 		lastErr = d.downloadFile(ctx, month, filename, dest, fileIndex, fileTotal)
@@ -278,7 +286,7 @@ func (d *Downloader) downloadFile(ctx context.Context, month, filename, dest str
 func extractCNPJCSVs(zipPath, outputDir string) (int, error) {
 	r, err := zip.OpenReader(zipPath)
 	if err != nil {
-		return 0, fmt.Errorf("open zip: %w", err)
+		return 0, fmt.Errorf("%w: %w", ErrOpenZip, err)
 	}
 	defer r.Close()
 
@@ -323,7 +331,7 @@ func extractZipMember(f *zip.File, dest string) error {
 		return err
 	}
 
-	if _, err := io.Copy(out, rc); err != nil {
+	if _, err := io.Copy(out, io.LimitReader(rc, maxZipMemberBytes)); err != nil {
 		_ = out.Close()
 		_ = os.Remove(tmp)
 		return err
