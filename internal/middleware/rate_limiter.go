@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"os"
 	"time"
 
 	"busca-cnpj-2026/internal/config"
@@ -10,6 +11,11 @@ import (
 )
 
 func RateLimiter() fiber.Handler {
+	if os.Getenv("BENCHMARK_MODE") == "true" {
+		return func(c *fiber.Ctx) error {
+			return c.Next()
+		}
+	}
 	rateMax := config.AppConfig.Server.RateLimitMax
 	if rateMax <= 0 {
 		rateMax = 6000

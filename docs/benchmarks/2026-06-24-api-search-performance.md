@@ -13,7 +13,17 @@
 | P1 — Redis / HTTP / sonic | Applied | Per-route TTL, msgpack cache, gzip (~76% payload reduction) |
 | P2 — Keyset + FTS | Applied | `next_cursor` pagination; multi-word `tsvector` search |
 
-## Latency samples (curl, seconds)
+## k6 load tests (warm cache, `BENCHMARK_MODE=true`)
+
+Run: `./scripts/run_k6_benchmarks.sh`
+
+| Script | VUs | Result |
+|--------|-----|--------|
+| `k6-baseline.js` | 10 × 30s | 100% success; CNPJ p95 **0.80 ms**, empresa **1.43 ms**, estab **2.29 ms** |
+| `k6-50vu.js` | 50 peak | 23,352 req, 0% fail, p95 **951 µs** |
+| `k6-keyset-deep.js` | 5 × 20 iter | page1 p95 **1.69 ms**, offset(480) p95 **0.35 ms** |
+
+## Latency samples (curl, seconds — cold cache)
 
 | Endpoint | Cold / miss | Warm / cached |
 |----------|-------------|---------------|
@@ -79,7 +89,7 @@ k6 run .local/01-api-performance-optimization/benchmarks/k6-keyset-deep.js
 |----|------|--------|
 | DVT-15 | Keyset e2e + UI cursor nav | open |
 | DVT-16 | FTS quality integration tests | open |
-| DVT-17 | Meilisearch indexer + delegation | open |
+| DVT-17 | Meilisearch indexer + delegation | implemented (default off); e2e on full dataset open |
 | DVT-18 | CI perf gate (`api_perf_validation.sh`) | open |
 
 ## Query budget

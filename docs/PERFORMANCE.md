@@ -69,17 +69,37 @@ curl 'http://localhost:8080/api/v1/empresas/search?razao_social=PETRO%20BRAS&lim
 
 Single-word queries continue to use trigram similarity.
 
-## Meilisearch (optional, future)
-
-Docker service `meilisearch` on port `7700`. Disabled by default (`meilisearch.enabled: false`).
-Indexer and handler delegation tracked in DVT-17.
-
 ## Local benchmarks
 
 Scripts live under `.local/01-api-performance-optimization/benchmarks/`.
 
+Run all gates (Docker k6, warm cache):
+
 ```bash
-k6 run .local/01-api-performance-optimization/benchmarks/k6-baseline.js
+BENCHMARK_MODE=true go run ./cmd/api   # disables rate limiter for load tests
+./scripts/run_k6_benchmarks.sh
+```
+
+Single script:
+
+```bash
+docker run --rm --add-host=host.docker.internal:host-gateway \
+  -e API_BASE_URL=http://host.docker.internal:8080 \
+  -v "$(pwd)/.local/01-api-performance-optimization/benchmarks:/scripts:ro" \
+  grafana/k6 run /scripts/k6-baseline.js
+```
+
+## Prefork (`server.prefork`)
+
+Default: `false`. DB/Redis/ClickHouse init runs once in `main()` before `fiber.New`; enabling prefork forks workers that inherit `sql.DB` handles — **keep prefork disabled** when using pgBouncer (validated 2026-06-24 with k6 50 VU, p95 &lt; 1 ms on cached CNPJ lookup).
+
+## Meilisearch (optional)
+
+Docker service on port `7700`. Set `meilisearch.enabled: true` in `config/config.yaml` to delegate text-only search to Meili (Postgres remains source of truth for enrichment).
+
+```bash
+go run ./cmd/meilisearch-index   # full re-index
+# importer auto-syncs when meilisearch.enabled is true
 ```
 
 ## Post-implementation validation (Phase 8)

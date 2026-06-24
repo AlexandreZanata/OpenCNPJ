@@ -62,6 +62,12 @@ func (s *SearchService) SearchEmpresas(
 	})
 
 	return GetOrSetJSON(ctx, s.cache, cacheKey, func() (*models.SearchResponse, error) {
+		if resp, ok, err := s.searchEmpresasMeili(ctx, newMeiliClient(), filters); ok || err != nil {
+			if err != nil {
+				return nil, err
+			}
+			return resp, nil
+		}
 		empresas, meta, err := s.empresaRepo.SearchEmpresas(ctx, filters)
 		if err != nil {
 			return nil, err
@@ -100,6 +106,12 @@ func (s *SearchService) SearchEstabelecimentos(
 	})
 
 	return GetOrSetJSON(ctx, s.cache, cacheKey, func() (*models.SearchResponse, error) {
+		if resp, ok, err := s.searchEstabelecimentosMeili(ctx, newMeiliClient(), filters); ok || err != nil {
+			if err != nil {
+				return nil, err
+			}
+			return resp, nil
+		}
 		estabelecimentos, meta, err := s.estabelecimentoRepo.SearchEstabelecimentos(ctx, filters)
 		if err != nil {
 			return nil, err

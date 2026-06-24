@@ -11,8 +11,10 @@ import (
 	"time"
 
 	"busca-cnpj-2026/internal/config"
+	"busca-cnpj-2026/internal/database"
 	"busca-cnpj-2026/internal/importer"
 	"busca-cnpj-2026/internal/loader"
+	"busca-cnpj-2026/internal/meilisearch"
 	"busca-cnpj-2026/internal/metrics"
 )
 
@@ -78,5 +80,21 @@ func run() error {
 	if _, runErr := runner.Run(ctx); runErr != nil {
 		return fmt.Errorf("import: %w", runErr)
 	}
+	if config.AppConfig.Meilisearch.Enabled {
+		if err := syncMeilisearchAfterImport(ctx, logger); err != nil {
+			return fmt.Errorf("meilisearch sync: %w", err)
+		}
+	}
 	return nil
+}
+
+func syncMeilisearchAfterImport(ctx context.Context, logger *log.Logger) error {
+	if err := database.InitPostgresForMigrate(); err != nil {
+		return err
+	}
+	defer database.ClosePostgres()
+	cfg := config.AppConfig.Meilisearch
+	client := meilisearch.NewClient(cfg.Host, cfg.Port, cfg.APIKey)
+	idx := meilisearch.NewIndexer(client, database.DB, logger)
+	return idx.SyncAll(ctx, 5000)
 }

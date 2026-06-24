@@ -19,7 +19,7 @@ Sequential IDs for new features that still need production-grade automated tests
 | DVT-14 | Redis msgpack cache serialization | open |
 | DVT-15 | Keyset cursor pagination for search | open |
 | DVT-16 | PostgreSQL FTS for multi-word search | open |
-| DVT-17 | Meilisearch indexer and search delegation | open |
+| DVT-17 | Meilisearch indexer and search delegation | partial |
 | DVT-18 | CI automated API perf validation gate | open |
 
 ## DVT-01: CNPJ open-data downloader (WebDAV)
@@ -136,10 +136,10 @@ Sequential IDs for new features that still need production-grade automated tests
 
 ## DVT-17: Meilisearch indexer and search delegation
 
-- **Scope**: `docker-compose.yml`, `internal/config/config.go`, future `cmd/meili-indexer`
+- **Scope**: `internal/meilisearch/`, `cmd/meilisearch-index`, `internal/services/search_meili.go`, `cmd/importer`
 - **Added**: 2026-06-24
-- **Needs**: indexer worker syncing empresas/estabelecimentos; handler fallback to Postgres; e2e fuzzy search <50ms
-- **Status**: open
+- **Needs**: e2e test with Meilisearch testcontainer; full-dataset index benchmark; handler integration test with `meilisearch.enabled: true`
+- **Status**: partial (code complete, disabled by default)
 
 ## DVT-18: CI automated API perf validation gate
 
