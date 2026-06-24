@@ -67,7 +67,7 @@ func (h *LookupHandler) lookupJSON(
 func parseLookupLimit(c *fiber.Ctx) int {
 	limit := 15
 	if raw := c.Query("limit"); raw != "" {
-		if parsed, err := strconv.Atoi(raw); err == nil && parsed > 0 && parsed <= 50 {
+		if parsed, err := strconv.Atoi(raw); err == nil && parsed > 0 && parsed <= 100 {
 			limit = parsed
 		}
 	}

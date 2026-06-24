@@ -47,7 +47,10 @@ type Estabelecimento struct {
 // EstabelecimentoCompleto includes related data.
 type EstabelecimentoCompleto struct {
 	Estabelecimento
-	RazaoSocial   sql.NullString `json:"razao_social" db:"razao_social"`
-	CNAEDescricao sql.NullString `json:"cnae_descricao" db:"cnae_descricao"`
-	MunicipioNome sql.NullString `json:"municipio_nome" db:"municipio_nome"`
+	RazaoSocial     sql.NullString `json:"razao_social" db:"razao_social"`
+	CapitalSocial   NullFloat64    `json:"capital_social" db:"capital_social"`
+	CNAEDescricao   sql.NullString `json:"cnae_descricao" db:"cnae_descricao"`
+	MunicipioNome   sql.NullString `json:"municipio_nome" db:"municipio_nome"`
+	MotivoDescricao sql.NullString `json:"motivo_descricao" db:"motivo_descricao"`
+	PaisDescricao   sql.NullString `json:"pais_descricao" db:"pais_descricao"`
 }

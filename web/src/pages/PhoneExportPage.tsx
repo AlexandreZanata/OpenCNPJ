@@ -35,7 +35,7 @@ export function PhoneExportPage() {
 
   const resolvedUf = useMemo(() => resolveBrazilianUF(uf, ufQuery), [uf, ufQuery])
 
-  const querySectors = useCallback((q: string) => lookupSectors(q, 20), [])
+  const querySectors = useCallback((q: string) => lookupSectors(q, 50), [])
   const queryUF = useCallback((q: string) => lookupUF(q), [])
   const queryCity = useCallback(
     (q: string) => lookupMunicipio(q, resolvedUf ?? '', 20),
@@ -107,9 +107,9 @@ export function PhoneExportPage() {
         <div className="grid gap-4 md:grid-cols-2">
           <SearchCombobox
             label="Category / CNAE"
-            placeholder="advocacia, 6911701, restaurante…"
+            placeholder="mercado, advocacia, 4712100…"
             value={sector?.label ?? ''}
-            hint="Search presets or CNAE catalog by code or description"
+            hint="Full CNAE catalog by code or description; presets are shortcuts only"
             minChars={0}
             onQuery={querySectors}
             onSelect={(item) => {

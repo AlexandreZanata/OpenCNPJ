@@ -2,19 +2,18 @@ import { useQuery } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { searchEstabelecimentos } from '../api/estabelecimentoApi'
-import type { Estabelecimento } from '../api/types'
+import { EmpresaFullPanel, SimplesPanel, SocioList } from '../components/detail/EmpresaAggregateCard'
+import { EstabelecimentoFullPanel } from '../components/detail/EstabelecimentoFullPanel'
+import { RecordActions } from '../components/detail/RecordActions'
 import { ExportPanel } from '../components/export/ExportPanel'
 import { Card } from '../components/ui/Card'
-import { DataTable, type Column } from '../components/ui/DataTable'
 import { ErrorState } from '../components/ui/ErrorState'
 import { Input } from '../components/ui/Input'
 import { LoadingState } from '../components/ui/LoadingState'
 import { Pagination } from '../components/ui/Pagination'
 import { useDebounce } from '../hooks/useDebounce'
-import { formatCnpj } from '../utils/cnpj'
-import { unwrapString } from '../utils/format'
 
-const PAGE_SIZE = 20
+const PAGE_SIZE = 5
 const UF_OPTIONS = ['', 'AC', 'AL', 'AM', 'AP', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MG', 'MS', 'MT', 'PA', 'PB', 'PE', 'PI', 'PR', 'RJ', 'RN', 'RO', 'RR', 'RS', 'SC', 'SE', 'SP', 'TO']
 
 export function EstabelecimentoSearchPage() {
@@ -49,27 +48,13 @@ export function EstabelecimentoSearchPage() {
     staleTime: 120_000,
   })
 
-  const columns: Column<Estabelecimento>[] = [
-    {
-      key: 'cnpj',
-      header: 'CNPJ',
-      render: (row) => (
-        <Link className="font-mono text-brand-400 hover:underline" to={`/cnpj/${row.cnpj_completo}`}>
-          {formatCnpj(row.cnpj_completo)}
-        </Link>
-      ),
-    },
-    { key: 'razao', header: 'Razão Social', render: (row) => unwrapString(row.razao_social) },
-    { key: 'fantasia', header: 'Nome Fantasia', render: (row) => unwrapString(row.nome_fantasia) || '—' },
-    { key: 'uf', header: 'UF', render: (row) => unwrapString(row.uf) },
-    { key: 'cnae', header: 'CNAE', render: (row) => unwrapString(row.cnae_fiscal_principal) },
-  ]
-
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-white">Estabelecimento Search</h1>
-        <p className="text-slate-400">Search branches by CNPJ, name, UF, or CNAE. Combine filters to narrow results.</p>
+        <p className="text-slate-400">
+          Full branch data plus parent empresa, sócios, and Simples/MEI for each result.
+        </p>
       </div>
 
       <Card title="Filters">
@@ -99,16 +84,35 @@ export function EstabelecimentoSearchPage() {
 
       {query.data && (
         <>
-          <Card title="Results">
-            <DataTable columns={columns} rows={query.data.data ?? []} />
-            <Pagination
-              offset={query.data.offset}
-              limit={query.data.limit}
-              total={query.data.total}
-              hasMore={query.data.has_more}
-              onPageChange={setOffset}
-            />
-          </Card>
+          <Pagination
+            offset={query.data.offset}
+            limit={query.data.limit}
+            total={query.data.total}
+            hasMore={query.data.has_more}
+            onPageChange={setOffset}
+          />
+          <div className="space-y-8">
+            {(query.data.data ?? []).map((item) => (
+              <div key={item.cnpj_completo} className="space-y-4 rounded-xl border border-border/80 bg-surface-muted/30 p-4">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <Link className="font-mono text-brand-400 hover:underline" to={`/cnpj/${item.cnpj_completo}`}>
+                    Open CNPJ lookup
+                  </Link>
+                  <RecordActions data={item} filename={`estabelecimento-${item.cnpj_completo}`} />
+                </div>
+                <EstabelecimentoFullPanel data={item} />
+                <Card title="Empresa (parent)">
+                  <EmpresaFullPanel data={item.empresa} />
+                </Card>
+                <Card title={`Sócios (${item.socios.length})`}>
+                  <SocioList socios={item.socios} />
+                </Card>
+                <Card title="Simples Nacional / MEI">
+                  <SimplesPanel data={item.simples} />
+                </Card>
+              </div>
+            ))}
+          </div>
           <ExportPanel
             filters={{ uf, cnae, nome_fantasia: debouncedNome, cnpj_basico: cnpjBasico }}
             columns={['cnpj_completo', 'nome_fantasia', 'razao_social', 'uf', 'cnae_fiscal_principal']}

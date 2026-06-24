@@ -1,6 +1,6 @@
 import { apiGet } from './client'
-import type { Empresa, EmpresaSearchParams, SearchResponse } from './types'
+import type { EmpresaAggregate, EmpresaSearchParams, SearchResponse } from './types'
 
-export function searchEmpresas(params: EmpresaSearchParams): Promise<SearchResponse<Empresa>> {
-  return apiGet<SearchResponse<Empresa>>('/empresas/search', params as Record<string, string | number | undefined>)
+export function searchEmpresas(params: EmpresaSearchParams): Promise<SearchResponse<EmpresaAggregate>> {
+  return apiGet<SearchResponse<EmpresaAggregate>>('/empresas/search', params as Record<string, string | number | undefined>)
 }

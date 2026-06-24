@@ -2,18 +2,16 @@ import { useQuery } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { searchEmpresas } from '../api/empresaApi'
-import type { Empresa } from '../api/types'
+import { EmpresaAggregateCard } from '../components/detail/EmpresaAggregateCard'
 import { ExportPanel } from '../components/export/ExportPanel'
 import { Card } from '../components/ui/Card'
-import { DataTable, type Column } from '../components/ui/DataTable'
 import { ErrorState } from '../components/ui/ErrorState'
 import { Input } from '../components/ui/Input'
 import { LoadingState } from '../components/ui/LoadingState'
 import { Pagination } from '../components/ui/Pagination'
 import { useDebounce } from '../hooks/useDebounce'
-import { formatCurrency, unwrapFloat, unwrapString } from '../utils/format'
 
-const PAGE_SIZE = 20
+const PAGE_SIZE = 5
 
 export function EmpresaSearchPage() {
   const [cnpjBasico, setCnpjBasico] = useState('')
@@ -38,18 +36,13 @@ export function EmpresaSearchPage() {
     staleTime: 120_000,
   })
 
-  const columns: Column<Empresa>[] = [
-    { key: 'cnpj', header: 'CNPJ Básico', render: (row) => row.cnpj_basico },
-    { key: 'razao', header: 'Razão Social', render: (row) => row.razao_social },
-    { key: 'porte', header: 'Porte', render: (row) => unwrapString(row.porte_empresa) || '—' },
-    { key: 'capital', header: 'Capital Social', render: (row) => formatCurrency(unwrapFloat(row.capital_social)) },
-  ]
-
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-white">Empresa Search</h1>
-        <p className="text-slate-400">Search legal entities (8-digit CNPJ root). Fuzzy name search may take longer on cold cache.</p>
+        <p className="text-slate-400">
+          Full empresa record: legal data, all branches (estabelecimentos), partners (sócios), and Simples/MEI.
+        </p>
       </div>
 
       <Card title="Filters">
@@ -68,16 +61,18 @@ export function EmpresaSearchPage() {
 
       {query.data && (
         <>
-          <Card title="Results">
-            <DataTable columns={columns} rows={query.data.data ?? []} />
-            <Pagination
-              offset={query.data.offset}
-              limit={query.data.limit}
-              total={query.data.total}
-              hasMore={query.data.has_more}
-              onPageChange={setOffset}
-            />
-          </Card>
+          <Pagination
+            offset={query.data.offset}
+            limit={query.data.limit}
+            total={query.data.total}
+            hasMore={query.data.has_more}
+            onPageChange={setOffset}
+          />
+          <div className="space-y-8">
+            {(query.data.data ?? []).map((item) => (
+              <EmpresaAggregateCard key={item.cnpj_basico} data={item} />
+            ))}
+          </div>
           <ExportPanel
             filters={{ cnpj_basico: cnpjBasico, razao_social: debouncedRazao }}
             columns={['cnpj_basico', 'razao_social', 'porte_empresa', 'capital_social']}

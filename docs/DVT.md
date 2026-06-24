@@ -92,3 +92,10 @@ Sequential IDs for new features that still need production-grade automated tests
 - **Added**: 2026-06-24
 - **Needs**: e2e test with mocked HTTP Content-Length; CI smoke for hardware_profile.sh
 - **Status**: open
+
+## DVT-12: Full empresa aggregate in search endpoints
+
+- **Scope**: `internal/models/aggregate.go`, `internal/repository/aggregate_build.go`, `internal/services/search_service.go`, `web/src/pages/EmpresaSearchPage.tsx`, `web/src/pages/EstabelecimentoSearchPage.tsx`
+- **Added**: 2026-06-24
+- **Needs**: integration test `/empresas/search` and `/estabelecimentos/search` return empresa + branches + sócios + simples; e2e UI renders all fields
+- **Status**: open

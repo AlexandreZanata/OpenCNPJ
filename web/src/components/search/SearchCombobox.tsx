@@ -95,7 +95,7 @@ export function SearchCombobox({
       {open && (
         <ul
           id={listId}
-          className="absolute top-full z-20 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border border-border bg-slate-900 shadow-xl"
+          className="absolute top-full z-20 mt-1 max-h-80 w-full overflow-y-auto rounded-lg border border-border bg-slate-900 shadow-xl"
         >
           {loading && <li className="px-3 py-2 text-slate-500">Searching…</li>}
           {!loading && items.length === 0 && debounced.length >= minChars && (

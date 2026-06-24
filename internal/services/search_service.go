@@ -29,7 +29,7 @@ func (s *SearchService) SearchEmpresas(
 	ctx context.Context,
 	filters models.SearchFilters,
 ) (*models.SearchResponse, error) {
-	cacheKey := s.cache.GenerateKey("empresas:search:v2", map[string]interface{}{
+	cacheKey := s.cache.GenerateKey("empresas:search:v4", map[string]interface{}{
 		"uuid_id":           filters.UUIDID,
 		"cnpj_basico":       filters.CNPJBasico,
 		"razao_social":      filters.RazaoSocial,
@@ -46,9 +46,18 @@ func (s *SearchService) SearchEmpresas(
 		if err != nil {
 			return nil, err
 		}
+		basicos := make([]string, 0, len(empresas))
+		for _, emp := range empresas {
+			basicos = append(basicos, emp.CNPJBasico)
+		}
+		full, estabs, socios, simples, err := s.loadRelatedByBasicos(ctx, basicos)
+		if err != nil {
+			return nil, err
+		}
+		aggregates := repository.BuildEmpresaAggregates(empresas, full, estabs, socios, simples)
 
 		return &models.SearchResponse{
-			Data:    empresas,
+			Data:    aggregates,
 			Total:   total,
 			Limit:   filters.Limit,
 			Offset:  filters.Offset,
@@ -62,7 +71,7 @@ func (s *SearchService) SearchEstabelecimentos(
 	ctx context.Context,
 	filters models.SearchFilters,
 ) (*models.SearchResponse, error) {
-	cacheKey := s.cache.GenerateKey("estabelecimentos:search:v2", map[string]interface{}{
+	cacheKey := s.cache.GenerateKey("estabelecimentos:search:v4", map[string]interface{}{
 		"uuid_id":        filters.UUIDID,
 		"cnpj_completo":  filters.CNPJCompleto,
 		"cnpj_basico":    filters.CNPJBasico,
@@ -81,9 +90,18 @@ func (s *SearchService) SearchEstabelecimentos(
 		if err != nil {
 			return nil, err
 		}
+		basicos := make([]string, 0, len(estabelecimentos))
+		for _, est := range estabelecimentos {
+			basicos = append(basicos, est.CNPJBasico)
+		}
+		full, _, socios, simples, err := s.loadRelatedByBasicos(ctx, basicos)
+		if err != nil {
+			return nil, err
+		}
+		results := repository.BuildEstabelecimentoSearchResults(estabelecimentos, full, socios, simples)
 
 		return &models.SearchResponse{
-			Data:    estabelecimentos,
+			Data:    results,
 			Total:   total,
 			Limit:   filters.Limit,
 			Offset:  filters.Offset,
@@ -95,11 +113,31 @@ func (s *SearchService) SearchEstabelecimentos(
 func (s *SearchService) GetEstabelecimentoByCNPJ(
 	ctx context.Context,
 	cnpj string,
-) (*models.EstabelecimentoCompleto, error) {
-	cacheKey := "estabelecimento:cnpj:" + cnpj
+) (*models.EstabelecimentoSearchResult, error) {
+	cacheKey := "estabelecimento:cnpj:v2:" + cnpj
 
-	result, err := GetOrSetJSON(ctx, s.cache, cacheKey, func() (*models.EstabelecimentoCompleto, error) {
-		return s.estabelecimentoRepo.GetByCNPJCompleto(ctx, cnpj)
+	result, err := GetOrSetJSON(ctx, s.cache, cacheKey, func() (*models.EstabelecimentoSearchResult, error) {
+		est, err := s.estabelecimentoRepo.GetByCNPJCompleto(ctx, cnpj)
+		if err != nil {
+			return nil, err
+		}
+		if est == nil {
+			return nil, nil
+		}
+		full, _, socios, simples, err := s.loadRelatedByBasicos(ctx, []string{est.CNPJBasico})
+		if err != nil {
+			return nil, err
+		}
+		results := repository.BuildEstabelecimentoSearchResults(
+			[]models.EstabelecimentoCompleto{*est},
+			full,
+			socios,
+			simples,
+		)
+		if len(results) == 0 {
+			return nil, nil
+		}
+		return &results[0], nil
 	})
 	if err != nil {
 		return nil, err
