@@ -16,9 +16,9 @@ type Config struct {
 	ClickHouse  ClickHouseConfig
 	Meilisearch MeilisearchConfig
 	Server      ServerConfig
-	Import     ImportConfig
-	Cache      CacheConfig
-	Logging    LoggingConfig
+	Import      ImportConfig
+	Cache       CacheConfig
+	Logging     LoggingConfig
 }
 
 type DatabaseConfig struct {
@@ -77,12 +77,12 @@ type ImportConfig struct {
 }
 
 type CacheConfig struct {
-	Enabled       bool
-	TTL           int
-	TTLCNPJ       int
-	TTLSearch     int
-	TTLAnalytics  int
-	TTLLookup     int
+	Enabled      bool
+	TTL          int
+	TTLCNPJ      int
+	TTLSearch    int
+	TTLAnalytics int
+	TTLLookup    int
 }
 
 type LoggingConfig struct {

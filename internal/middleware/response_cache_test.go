@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"io"
+	"net/http"
 	"net/http/httptest"
 	"testing"
 
@@ -14,11 +16,12 @@ func TestResponseCacheSetsHeadersOnGET(t *testing.T) {
 		return c.SendString(`{"status":"ok"}`)
 	})
 
-	req := httptest.NewRequest(fiber.MethodGet, "/ok", nil)
+	req := httptest.NewRequest(fiber.MethodGet, "/ok", http.NoBody)
 	resp, err := app.Test(req)
 	if err != nil {
 		t.Fatalf("app.Test: %v", err)
 	}
+	defer resp.Body.Close()
 	if resp.StatusCode != fiber.StatusOK {
 		t.Fatalf("status = %d", resp.StatusCode)
 	}
@@ -28,6 +31,7 @@ func TestResponseCacheSetsHeadersOnGET(t *testing.T) {
 	if resp.Header.Get("ETag") == "" {
 		t.Fatal("expected ETag header")
 	}
+	_, _ = io.Copy(io.Discard, resp.Body)
 }
 
 func TestResponseCacheSkipsPOST(t *testing.T) {
@@ -37,12 +41,14 @@ func TestResponseCacheSkipsPOST(t *testing.T) {
 		return c.SendStatus(fiber.StatusCreated)
 	})
 
-	req := httptest.NewRequest(fiber.MethodPost, "/ok", nil)
+	req := httptest.NewRequest(fiber.MethodPost, "/ok", http.NoBody)
 	resp, err := app.Test(req)
 	if err != nil {
 		t.Fatalf("app.Test: %v", err)
 	}
+	defer resp.Body.Close()
 	if resp.Header.Get("Cache-Control") != "" {
 		t.Fatal("POST should not set Cache-Control")
 	}
+	_, _ = io.Copy(io.Discard, resp.Body)
 }

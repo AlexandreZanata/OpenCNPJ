@@ -110,8 +110,8 @@ func (s *SearchService) searchEstabelecimentosMeili(
 		return nil, false, err
 	}
 	basicos := make([]string, 0, len(estabelecimentos))
-	for _, est := range estabelecimentos {
-		basicos = append(basicos, est.CNPJBasico)
+	for i := range estabelecimentos {
+		basicos = append(basicos, estabelecimentos[i].CNPJBasico)
 	}
 	full, _, socios, simples, err := s.loadRelatedByBasicos(ctx, basicos)
 	if err != nil {

@@ -3,7 +3,7 @@ package models
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
+	"errors"
 )
 
 // NullFloat64 scans sql.NullFloat64 and marshals as JSON number or null.
@@ -11,9 +11,11 @@ type NullFloat64 struct {
 	sql.NullFloat64
 }
 
+var errNullFloat64NilReceiver = errors.New("NullFloat64: nil receiver")
+
 func (n *NullFloat64) Scan(value any) error {
 	if n == nil {
-		return fmt.Errorf("NullFloat64: nil receiver")
+		return errNullFloat64NilReceiver
 	}
 	return n.NullFloat64.Scan(value)
 }

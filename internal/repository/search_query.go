@@ -58,22 +58,24 @@ func ftsNomeFantasiaOrder(argPos int) string {
 
 func razaoSocialScoreSelect(argPos int, mode textSearchMode) string {
 	switch mode {
+	case textSearchNone:
+		return ""
 	case textSearchTrigram:
 		return fmt.Sprintf(", similarity(razao_social, $%d) AS _search_score", argPos)
 	case textSearchFTS:
 		return fmt.Sprintf(", ts_rank(busca, plainto_tsquery('portuguese', $%d)) AS _search_score", argPos)
-	default:
-		return ""
 	}
+	return ""
 }
 
 func nomeFantasiaScoreSelect(argPos int, mode textSearchMode) string {
 	switch mode {
+	case textSearchNone:
+		return ""
 	case textSearchTrigram:
 		return fmt.Sprintf(", similarity(e.nome_fantasia, $%d) AS _search_score", argPos)
 	case textSearchFTS:
 		return fmt.Sprintf(", ts_rank(e.busca, plainto_tsquery('portuguese', $%d)) AS _search_score", argPos)
-	default:
-		return ""
 	}
+	return ""
 }

@@ -18,6 +18,7 @@ func parseSearchFilters(cursor string, offset int) (string, int, error) {
 	return cursor, 0, nil
 }
 
+// applyPaginationToResponse is kept for handler tests documenting cursor response shape.
 func applyPaginationToResponse(resp *models.SearchResponse, nextCursor string) {
 	if nextCursor != "" {
 		resp.NextCursor = &nextCursor

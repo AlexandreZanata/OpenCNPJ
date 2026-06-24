@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -31,13 +32,16 @@ func TestRateLimiterBenchmarkModeBypass(t *testing.T) {
 	app.Use(handler)
 	app.Get("/", func(c *fiber.Ctx) error { return c.SendStatus(fiber.StatusOK) })
 	for i := 0; i < 20; i++ {
-		resp, err := app.Test(httptest.NewRequest(http.MethodGet, "/", nil))
+		resp, err := app.Test(httptest.NewRequest(http.MethodGet, "/", http.NoBody))
 		if err != nil {
 			t.Fatal(err)
 		}
 		if resp.StatusCode != fiber.StatusOK {
+			resp.Body.Close()
 			t.Fatalf("status %d at iter %d", resp.StatusCode, i)
 		}
+		_, _ = io.Copy(io.Discard, resp.Body)
+		resp.Body.Close()
 	}
 }
 

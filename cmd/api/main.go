@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
+	//nolint:gosec // pprof gated by ENABLE_PPROF or debug logging.
 	_ "net/http/pprof"
 	"os"
 	"os/signal"
@@ -179,8 +181,8 @@ func main() {
 
 	// Search routes (5s timeout on heavy fuzzy queries)
 	const searchTimeout = 5 * time.Second
-	v1.Get("/empresas/search", timeout.New(searchHandler.SearchEmpresas, searchTimeout))
-	v1.Get("/estabelecimentos/search", timeout.New(searchHandler.SearchEstabelecimentos, searchTimeout))
+	v1.Get("/empresas/search", timeout.NewWithContext(searchHandler.SearchEmpresas, searchTimeout))
+	v1.Get("/estabelecimentos/search", timeout.NewWithContext(searchHandler.SearchEstabelecimentos, searchTimeout))
 	v1.Get("/estabelecimentos/:cnpj", searchHandler.GetEstabelecimentoByCNPJ)
 
 	// Export routes

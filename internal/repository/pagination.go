@@ -18,12 +18,12 @@ func parseSearchCursor(cursor string) (map[string]string, error) {
 		}
 		kv := strings.SplitN(segment, ":", 2)
 		if len(kv) != 2 || kv[0] == "" || kv[1] == "" {
-			return nil, fmt.Errorf("invalid cursor segment %q", segment)
+			return nil, fmt.Errorf("%w: %q", ErrInvalidCursorSegment, segment)
 		}
 		parts[kv[0]] = kv[1]
 	}
 	if len(parts) == 0 {
-		return nil, fmt.Errorf("empty cursor")
+		return nil, ErrEmptyCursor
 	}
 	return parts, nil
 }
@@ -59,11 +59,11 @@ func empresaKeysetClause(
 	if useTextScore && textPos > 0 {
 		scoreStr, ok := parts["score"]
 		if !ok {
-			return "", fmt.Errorf("cursor missing score")
+			return "", ErrCursorMissingScore
 		}
 		cnpj, ok := parts["cnpj"]
 		if !ok {
-			return "", fmt.Errorf("cursor missing cnpj")
+			return "", ErrCursorMissingCNPJ
 		}
 		score, err := strconv.ParseFloat(scoreStr, 64)
 		if err != nil {
@@ -80,7 +80,7 @@ func empresaKeysetClause(
 
 	cnpj, ok := parts["cnpj"]
 	if !ok {
-		return "", fmt.Errorf("cursor missing cnpj")
+		return "", ErrCursorMissingCNPJ
 	}
 	clause := fmt.Sprintf(" AND cnpj_basico > $%d", *argPos)
 	*args = append(*args, cnpj)
@@ -103,11 +103,11 @@ func estabelecimentoKeysetClause(
 	if useTextScore && textPos > 0 {
 		scoreStr, ok := parts["score"]
 		if !ok {
-			return "", fmt.Errorf("cursor missing score")
+			return "", ErrCursorMissingScore
 		}
 		idStr, ok := parts["id"]
 		if !ok {
-			return "", fmt.Errorf("cursor missing id")
+			return "", ErrCursorMissingID
 		}
 		score, err := strconv.ParseFloat(scoreStr, 64)
 		if err != nil {
@@ -128,7 +128,7 @@ func estabelecimentoKeysetClause(
 
 	idStr, ok := parts["id"]
 	if !ok {
-		return "", fmt.Errorf("cursor missing id")
+		return "", ErrCursorMissingID
 	}
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
@@ -147,11 +147,11 @@ func empresaFTSKeysetClause(cursor string, textPos int, argPos *int, args *[]int
 	}
 	scoreStr, ok := parts["score"]
 	if !ok {
-		return "", fmt.Errorf("cursor missing score")
+		return "", ErrCursorMissingScore
 	}
 	cnpj, ok := parts["cnpj"]
 	if !ok {
-		return "", fmt.Errorf("cursor missing cnpj")
+		return "", ErrCursorMissingCNPJ
 	}
 	score, err := strconv.ParseFloat(scoreStr, 64)
 	if err != nil {
@@ -173,11 +173,11 @@ func estabelecimentoFTSKeysetClause(cursor string, textPos int, argPos *int, arg
 	}
 	scoreStr, ok := parts["score"]
 	if !ok {
-		return "", fmt.Errorf("cursor missing score")
+		return "", ErrCursorMissingScore
 	}
 	idStr, ok := parts["id"]
 	if !ok {
-		return "", fmt.Errorf("cursor missing id")
+		return "", ErrCursorMissingID
 	}
 	score, err := strconv.ParseFloat(scoreStr, 64)
 	if err != nil {

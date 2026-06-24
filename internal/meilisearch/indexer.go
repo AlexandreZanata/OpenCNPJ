@@ -36,16 +36,7 @@ func (idx *Indexer) SyncAll(ctx context.Context, batchSize int) error {
 func (idx *Indexer) syncEmpresas(ctx context.Context, batchSize int) error {
 	offset := 0
 	for {
-		rows, err := idx.db.QueryContext(ctx, `
-			SELECT cnpj_basico, razao_social
-			FROM empresas
-			ORDER BY cnpj_basico
-			LIMIT $1 OFFSET $2`, batchSize, offset)
-		if err != nil {
-			return fmt.Errorf("query empresas: %w", err)
-		}
-		docs, err := scanEmpresaDocs(rows)
-		rows.Close()
+		docs, err := idx.fetchEmpresaDocs(ctx, batchSize, offset)
 		if err != nil {
 			return err
 		}
@@ -64,17 +55,7 @@ func (idx *Indexer) syncEmpresas(ctx context.Context, batchSize int) error {
 func (idx *Indexer) syncEstabelecimentos(ctx context.Context, batchSize int) error {
 	offset := 0
 	for {
-		rows, err := idx.db.QueryContext(ctx, `
-			SELECT id::text, cnpj_completo, COALESCE(nome_fantasia, ''), situacao_cadastral
-			FROM estabelecimentos
-			WHERE situacao_cadastral = '02'
-			ORDER BY id
-			LIMIT $1 OFFSET $2`, batchSize, offset)
-		if err != nil {
-			return fmt.Errorf("query estabelecimentos: %w", err)
-		}
-		docs, err := scanEstabDocs(rows)
-		rows.Close()
+		docs, err := idx.fetchEstabDocs(ctx, batchSize, offset)
 		if err != nil {
 			return err
 		}
@@ -88,6 +69,33 @@ func (idx *Indexer) syncEstabelecimentos(ctx context.Context, batchSize int) err
 		offset += batchSize
 	}
 	return nil
+}
+
+func (idx *Indexer) fetchEmpresaDocs(ctx context.Context, batchSize, offset int) ([]map[string]interface{}, error) {
+	rows, err := idx.db.QueryContext(ctx, `
+		SELECT cnpj_basico, razao_social
+		FROM empresas
+		ORDER BY cnpj_basico
+		LIMIT $1 OFFSET $2`, batchSize, offset)
+	if err != nil {
+		return nil, fmt.Errorf("query empresas: %w", err)
+	}
+	defer rows.Close()
+	return scanEmpresaDocs(rows)
+}
+
+func (idx *Indexer) fetchEstabDocs(ctx context.Context, batchSize, offset int) ([]map[string]interface{}, error) {
+	rows, err := idx.db.QueryContext(ctx, `
+		SELECT id::text, cnpj_completo, COALESCE(nome_fantasia, ''), situacao_cadastral
+		FROM estabelecimentos
+		WHERE situacao_cadastral = '02'
+		ORDER BY id
+		LIMIT $1 OFFSET $2`, batchSize, offset)
+	if err != nil {
+		return nil, fmt.Errorf("query estabelecimentos: %w", err)
+	}
+	defer rows.Close()
+	return scanEstabDocs(rows)
 }
 
 func scanEmpresaDocs(rows *sql.Rows) ([]map[string]interface{}, error) {

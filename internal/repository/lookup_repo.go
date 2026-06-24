@@ -73,6 +73,7 @@ func (r *LookupRepository) SearchCNAE(ctx context.Context, query string, limit i
 	args = append(args, limit)
 
 	foldedDesc := accentFoldExpr("descricao")
+	// #nosec G201 -- SQL placeholders are integers from argPos, not user input.
 	sql := fmt.Sprintf(`
 		SELECT codigo, descricao
 		FROM cnaes

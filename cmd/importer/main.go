@@ -89,10 +89,14 @@ func run() error {
 }
 
 func syncMeilisearchAfterImport(ctx context.Context, logger *log.Logger) error {
-	if err := database.InitPostgresForMigrate(); err != nil {
+	if err := database.InitPostgresForMigrate(); err != nil { //nolint:contextcheck // migrate DSN bootstrap
 		return err
 	}
-	defer database.ClosePostgres()
+	defer func() {
+		if err := database.ClosePostgres(); err != nil {
+			logger.Printf("Warning: failed to close PostgreSQL: %v", err)
+		}
+	}()
 	cfg := config.AppConfig.Meilisearch
 	client := meilisearch.NewClient(cfg.Host, cfg.Port, cfg.APIKey)
 	idx := meilisearch.NewIndexer(client, database.DB, logger)

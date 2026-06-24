@@ -24,7 +24,7 @@ func NewEmpresaRepository() *EmpresaRepository {
 	}
 }
 
-//nolint:gocritic,misspell // Keeping value argument and Receita field names.
+//nolint:gocritic,misspell,cyclop // value arg; Receita fields; explicit SQL filter matrix.
 func (r *EmpresaRepository) SearchEmpresas(
 	ctx context.Context,
 	filters models.SearchFilters,
@@ -35,6 +35,7 @@ func (r *EmpresaRepository) SearchEmpresas(
 			qualificacao_responsavel, capital_social, porte_empresa,
 			ente_federativo_responsavel, created_at, updated_at`
 
+	// #nosec G202 -- static SQL fragments; placeholders use internal arg counters.
 	query := baseSelect + `
 		FROM empresas
 		WHERE 1=1
@@ -62,8 +63,9 @@ func (r *EmpresaRepository) SearchEmpresas(
 		switch razaoMode {
 		case textSearchFTS:
 			query += ftsRazaoSocialWhere(argPos)
-		default:
+		case textSearchTrigram:
 			query += fuzzyRazaoSocialWhere(argPos)
+		case textSearchNone:
 		}
 		args = append(args, filters.RazaoSocial)
 		argPos++
@@ -111,7 +113,7 @@ func (r *EmpresaRepository) SearchEmpresas(
 			clause, err = empresaFTSKeysetClause(filters.Cursor, razaoSocialPos, &argPos, &args)
 		case textSearchTrigram:
 			clause, err = empresaKeysetClause(filters.Cursor, razaoSocialPos, true, &argPos, &args)
-		default:
+		case textSearchNone:
 			clause, err = empresaKeysetClause(filters.Cursor, 0, false, &argPos, &args)
 		}
 		if err != nil {
@@ -208,7 +210,7 @@ func (r *EmpresaRepository) SearchEmpresas(
 		switch razaoMode {
 		case textSearchFTS, textSearchTrigram:
 			meta.NextCursor = buildScoreCNPJCursor(lastScore, last.CNPJBasico)
-		default:
+		case textSearchNone:
 			meta.NextCursor = buildCNPJCursor(last.CNPJBasico)
 		}
 	}

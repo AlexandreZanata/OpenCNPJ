@@ -24,7 +24,11 @@ func main() {
 	if err := database.InitPostgresForMigrate(); err != nil {
 		log.Fatal(err)
 	}
-	defer database.ClosePostgres()
+	defer func() {
+		if err := database.ClosePostgres(); err != nil {
+			log.Printf("Warning: failed to close PostgreSQL: %v", err)
+		}
+	}()
 
 	cfg := config.AppConfig.Meilisearch
 	client := meilisearch.NewClient(cfg.Host, cfg.Port, cfg.APIKey)

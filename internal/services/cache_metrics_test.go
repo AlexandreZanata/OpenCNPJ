@@ -11,7 +11,7 @@ func TestCacheKeyPrefix(t *testing.T) {
 	}
 }
 
-func TestRecordCacheMetricsNoPanic(t *testing.T) {
+func TestRecordCacheMetricsNoPanic(_ *testing.T) {
 	recordCacheHit("empresas:search:v4:deadbeef")
 	recordCacheMiss("estabelecimentos:search:v4:cafebabe")
 }

@@ -6,7 +6,8 @@ func GroupEstabelecimentosByBasico(
 	items []models.EstabelecimentoCompleto,
 ) map[string][]models.EstabelecimentoCompleto {
 	out := make(map[string][]models.EstabelecimentoCompleto)
-	for _, item := range items {
+	for i := range items {
+		item := items[i]
 		out[item.CNPJBasico] = append(out[item.CNPJBasico], item)
 	}
 	return out
@@ -14,7 +15,8 @@ func GroupEstabelecimentosByBasico(
 
 func GroupSociosByBasico(items []models.Socio) map[string][]models.Socio {
 	out := make(map[string][]models.Socio)
-	for _, item := range items {
+	for i := range items {
+		item := items[i]
 		out[item.CNPJBasico] = append(out[item.CNPJBasico], item)
 	}
 	return out
@@ -28,7 +30,8 @@ func BuildEmpresaAggregates(
 	simples map[string]models.Simples,
 ) []models.EmpresaAggregate {
 	out := make([]models.EmpresaAggregate, 0, len(empresas))
-	for _, emp := range empresas {
+	for i := range empresas {
+		emp := empresas[i]
 		fullEmp, ok := full[emp.CNPJBasico]
 		if !ok {
 			fullEmp = models.EmpresaFull{Empresa: emp}
@@ -59,7 +62,8 @@ func BuildEstabelecimentoSearchResults(
 	simples map[string]models.Simples,
 ) []models.EstabelecimentoSearchResult {
 	out := make([]models.EstabelecimentoSearchResult, 0, len(rows))
-	for _, row := range rows {
+	for i := range rows {
+		row := rows[i]
 		emp, ok := full[row.CNPJBasico]
 		if !ok {
 			emp = models.EmpresaFull{

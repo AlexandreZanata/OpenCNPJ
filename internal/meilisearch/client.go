@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -15,6 +16,8 @@ const (
 	IndexEmpresas         = "empresas"
 	IndexEstabelecimentos = "estabelecimentos"
 )
+
+var errMeilisearchHTTP = errors.New("meilisearch request failed")
 
 type Client struct {
 	baseURL    string
@@ -84,8 +87,7 @@ func (c *Client) Search(ctx context.Context, uid, query string, limit, offset in
 	for _, hit := range out.Hits {
 		id, _ := hit["id"].(string)
 		if id == "" {
-			switch v := hit["id"].(type) {
-			case float64:
+			if v, ok := hit["id"].(float64); ok {
 				id = fmt.Sprintf("%.0f", v)
 			}
 		}
@@ -96,7 +98,7 @@ func (c *Client) Search(ctx context.Context, uid, query string, limit, offset in
 	return hits, nil
 }
 
-func (c *Client) post(ctx context.Context, path string, body interface{}, out interface{}) error {
+func (c *Client) post(ctx context.Context, path string, body, out interface{}) error {
 	payload, err := json.Marshal(body)
 	if err != nil {
 		return fmt.Errorf("marshal: %w", err)
@@ -119,7 +121,7 @@ func (c *Client) post(ctx context.Context, path string, body interface{}, out in
 		return fmt.Errorf("read: %w", err)
 	}
 	if resp.StatusCode >= 300 {
-		return fmt.Errorf("meilisearch %s: %s", resp.Status, string(data))
+		return fmt.Errorf("%w: %s %s", errMeilisearchHTTP, resp.Status, string(data))
 	}
 	if out != nil && len(data) > 0 {
 		if err := json.Unmarshal(data, out); err != nil {

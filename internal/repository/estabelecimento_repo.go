@@ -22,12 +22,13 @@ func NewEstabelecimentoRepository() *EstabelecimentoRepository {
 	}
 }
 
-//nolint:gocritic // Keeping value argument to avoid broad API churn now.
+//nolint:gocritic,cyclop // value arg; explicit SQL filter matrix.
 func (r *EstabelecimentoRepository) SearchEstabelecimentos(
 	ctx context.Context,
 	filters models.SearchFilters,
 ) ([]models.EstabelecimentoCompleto, PageMeta, error) {
 	selectClause := "SELECT " + estabelecimentoCompletoSelect
+	// #nosec G202 -- static SQL fragments; placeholders use internal arg counters.
 	query := selectClause + estabelecimentoCompletoFrom + `
 		WHERE 1=1
 	`
@@ -61,8 +62,9 @@ func (r *EstabelecimentoRepository) SearchEstabelecimentos(
 		switch nomeMode {
 		case textSearchFTS:
 			query += ftsNomeFantasiaWhere(argPos)
-		default:
+		case textSearchTrigram:
 			query += fuzzyNomeFantasiaWhere(argPos)
+		case textSearchNone:
 		}
 		args = append(args, filters.NomeFantasia)
 		argPos++
@@ -116,7 +118,7 @@ func (r *EstabelecimentoRepository) SearchEstabelecimentos(
 			clause, err = estabelecimentoFTSKeysetClause(filters.Cursor, nomeFantasiaPos, &argPos, &args)
 		case textSearchTrigram:
 			clause, err = estabelecimentoKeysetClause(filters.Cursor, nomeFantasiaPos, true, &argPos, &args)
-		default:
+		case textSearchNone:
 			clause, err = estabelecimentoKeysetClause(filters.Cursor, 0, false, &argPos, &args)
 		}
 		if err != nil {
@@ -139,6 +141,7 @@ func (r *EstabelecimentoRepository) SearchEstabelecimentos(
 		orderBy = ftsNomeFantasiaOrder(nomeFantasiaPos)
 	case textSearchTrigram:
 		orderBy = fuzzyNomeFantasiaOrder(nomeFantasiaPos)
+	case textSearchNone:
 	}
 
 	scoreSelect := nomeFantasiaScoreSelect(nomeFantasiaPos, nomeMode)
@@ -198,7 +201,7 @@ func (r *EstabelecimentoRepository) SearchEstabelecimentos(
 		switch nomeMode {
 		case textSearchFTS, textSearchTrigram:
 			meta.NextCursor = buildScoreIDCursor(lastScore, last.ID)
-		default:
+		case textSearchNone:
 			meta.NextCursor = buildIDCursor(last.ID)
 		}
 	}
