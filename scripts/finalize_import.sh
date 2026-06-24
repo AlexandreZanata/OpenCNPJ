@@ -78,6 +78,11 @@ exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_estabelecimentos_situacao 
 exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_estabelecimentos_nome_fantasia_gin ON estabelecimentos USING gin(nome_fantasia gin_trgm_ops);" || echo "    (index already exists or error)"
 exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_estabelecimentos_cep ON estabelecimentos(cep);" || echo "    (index already exists or error)"
 exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_estabelecimentos_cnae_uf_situacao ON estabelecimentos(cnae_fiscal_principal, uf, situacao_cadastral);" || echo "    (index already exists or error)"
+exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_estabelecimentos_municipio_uf ON estabelecimentos(municipio, uf) WHERE municipio IS NOT NULL AND uf IS NOT NULL;" || echo "    (index already exists or error)"
+
+echo ""
+echo "   Backfilling municipios.uf (city → state for fast lookup)..."
+bash scripts/backfill_municipios_uf.sh || echo "    (backfill skipped or failed)"
 
 # Indexes for socios
 echo "   Recreating socios indexes..."

@@ -54,7 +54,7 @@ export function PhoneExportPage() {
   const payload = useMemo<PhoneExportRequest>(() => ({
     category: sector?.type === 'preset' ? sector.code : '',
     cnae: sector?.type === 'cnae' ? sector.code : undefined,
-    uf: resolvedUf,
+    uf: resolvedUf ?? city?.uf ?? undefined,
     municipio: resolvedCityCode || undefined,
     municipio_nome: resolvedCityName,
     nome_fantasia: nomeFantasia?.code || undefined,
@@ -71,6 +71,7 @@ export function PhoneExportPage() {
     payload.cnae ||
     payload.nome_fantasia ||
     resolvedUf ||
+    city?.uf ||
     resolvedCityCode ||
     resolvedCityName,
   )

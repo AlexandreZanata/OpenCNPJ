@@ -70,7 +70,7 @@ func (s *LookupService) SearchMunicipios(
 	query, uf string,
 	limit int,
 ) ([]models.LookupItem, error) {
-	key := fmt.Sprintf("lookup:municipio:%s:%s:%d", uf, query, limit)
+	key := fmt.Sprintf("lookup:municipio:v2:%s:%s:%d", uf, query, limit)
 	return GetOrSetJSON(ctx, s.cache, key, func() ([]models.LookupItem, error) {
 		return s.repo.SearchMunicipios(ctx, query, uf, limit)
 	})
