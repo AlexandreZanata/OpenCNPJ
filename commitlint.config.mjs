@@ -10,7 +10,7 @@ export default {
       2,
       'always',
       [
-        'parser', 'loader', 'pipeline', 'model', 'config', 'metrics', 'ci', 'docs', 'bench',
+        'parser', 'loader', 'pipeline', 'model', 'config', 'metrics', 'ci', 'docs', 'bench', 'benchmarks',
         'migration', 'fixtures', 'importer', 'downloader', 'oss', 'api', 'web', 'export', 'security',
         'git', 'docker', 'scripts', 'workflow', 'deps', 'repository', 'handlers', 'services', 'middleware',
       ],

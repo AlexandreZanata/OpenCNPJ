@@ -34,11 +34,11 @@ Format:
 | `docker` | `docker-compose.yml`, Dockerfiles |
 | `scripts` | `scripts/` shell tooling |
 | `deps` | `go.mod`, `package.json` dependencies |
-| `bench` | Benchmarks |
+| `bench`, `benchmarks` | Benchmarks (`docs/benchmarks/`, TSV results) |
 
 Full list (must match `commitlint.config.mjs`):
 
-`parser`, `loader`, `pipeline`, `model`, `config`, `metrics`, `ci`, `docs`, `bench`,
+`parser`, `loader`, `pipeline`, `model`, `config`, `metrics`, `ci`, `docs`, `bench`, `benchmarks`,
 `migration`, `fixtures`, `importer`, `downloader`, `oss`, `api`, `web`, `export`, `security`,
 `git`, `docker`, `scripts`, `workflow`, `deps`, `repository`, `handlers`, `services`, `middleware`
 
