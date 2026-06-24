@@ -13,11 +13,19 @@ dist/
 # Test binary
 *.test
 
-# Output of the go coverage tool
+# Go coverage / profiling
 *.out
+coverage.html
+cpu.prof
+mem.prof
 
 # Dependency directories
 vendor/
+node_modules/
+
+# Node lockfiles at repo root (CI uses commitlint action; web/ has its own lockfile)
+/package-lock.json
+/npm-shrinkwrap.json
 
 # Go workspace file
 go.work
@@ -45,13 +53,21 @@ Thumbs.db
 *.db
 *.sqlite
 
-# Dados importados (vários GB)
+# Imported CNPJ data (multi-GB)
 data/
 !data/.gitkeep
 
-# Build artifacts
+# Archives (downloaded RFB zips live under data/)
 *.tar.gz
 *.zip
+
+# Security scan artifacts
+gosec-results.sarif
+go.list
+
+# Import / benchmark runtime state
+data/system_guard.state
+data/system_guard.log
 
 # Optional local agent overrides
 .local/
