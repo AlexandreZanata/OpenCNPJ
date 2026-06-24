@@ -45,7 +45,7 @@ func run() error {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	copier, err := loader.NewPGCopier(ctx, config.GetDSN(), *tune)
+	copier, err := loader.NewPGCopier(ctx, config.GetMigrateDSN(), *tune)
 	if err != nil {
 		return fmt.Errorf("pg copier: %w", err)
 	}

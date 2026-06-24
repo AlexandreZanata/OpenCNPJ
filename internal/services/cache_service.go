@@ -43,9 +43,12 @@ func (s *CacheService) GetOrSet(ctx context.Context, key string, fn func() (inte
 		// Cache hit - deserialize
 		var result interface{}
 		if err := json.Unmarshal([]byte(val), &result); err == nil {
+			recordCacheHit(key)
 			return result, nil
 		}
 	}
+
+	recordCacheMiss(key)
 
 	// Cache miss - execute function
 	result, err := fn()

@@ -15,6 +15,7 @@ Sequential IDs for new features that still need production-grade automated tests
 | DVT-09 | Smart lookup typeahead for export filters | open |
 | DVT-10 | Phone export date filter and export-all | open |
 | DVT-11 | Download progress bar + one-command pipeline scripts | open |
+| DVT-13 | Redis cache hit/miss Prometheus metrics | open |
 
 ## DVT-01: CNPJ open-data downloader (WebDAV)
 
@@ -98,4 +99,11 @@ Sequential IDs for new features that still need production-grade automated tests
 - **Scope**: `internal/models/aggregate.go`, `internal/repository/aggregate_build.go`, `internal/services/search_service.go`, `web/src/pages/EmpresaSearchPage.tsx`, `web/src/pages/EstabelecimentoSearchPage.tsx`
 - **Added**: 2026-06-24
 - **Needs**: integration test `/empresas/search` and `/estabelecimentos/search` return empresa + branches + sócios + simples; e2e UI renders all fields
+- **Status**: open
+
+## DVT-13: Redis cache hit/miss Prometheus metrics
+
+- **Scope**: `internal/services/cache_metrics.go`, `internal/services/cache_service.go`, `internal/services/cache_typed.go`
+- **Added**: 2026-06-24
+- **Needs**: integration test with Redis testcontainer verifying hit/miss counters increment per key prefix under load
 - **Status**: open

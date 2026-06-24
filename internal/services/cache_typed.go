@@ -24,10 +24,13 @@ func GetOrSetJSON[T any](
 	if err == nil {
 		var result T
 		if unmarshalErr := json.Unmarshal([]byte(val), &result); unmarshalErr == nil {
+			recordCacheHit(key)
 			return result, nil
 		}
 		_ = s.Delete(ctx, key)
 	}
+
+	recordCacheMiss(key)
 
 	result, err := fn()
 	if err != nil {

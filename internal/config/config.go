@@ -23,6 +23,7 @@ type Config struct {
 type DatabaseConfig struct {
 	Host            string
 	Port            int
+	MigratePort     int
 	User            string
 	Password        string
 	Name            string
@@ -102,6 +103,7 @@ func Load() error {
 		Database: DatabaseConfig{
 			Host:            viper.GetString("database.host"),
 			Port:            viper.GetInt("database.port"),
+			MigratePort:     viper.GetInt("database.migrate_port"),
 			User:            viper.GetString("database.user"),
 			Password:        viper.GetString("database.password"),
 			Name:            viper.GetString("database.name"),
@@ -175,15 +177,16 @@ func Load() error {
 
 func setDefaults() {
 	viper.SetDefault("database.host", "localhost")
-	viper.SetDefault("database.port", 5432)
+	viper.SetDefault("database.port", 6432)
+	viper.SetDefault("database.migrate_port", 5434)
 	viper.SetDefault("database.user", "receita_user")
 	viper.SetDefault("database.password", "receita_password")
 	viper.SetDefault("database.name", "receita_db")
 	viper.SetDefault("database.sslmode", "disable")
-	viper.SetDefault("database.max_open_conns", runtime.NumCPU()*4)
-	viper.SetDefault("database.max_idle_conns", runtime.NumCPU()*2)
+	viper.SetDefault("database.max_open_conns", 20)
+	viper.SetDefault("database.max_idle_conns", 5)
 	viper.SetDefault("database.conn_max_lifetime", 3600)
-	viper.SetDefault("database.conn_max_idle_time", 600)
+	viper.SetDefault("database.conn_max_idle_time", 30)
 
 	viper.SetDefault("redis.host", "localhost")
 	viper.SetDefault("redis.port", 6379)
@@ -247,9 +250,21 @@ func setDefaults() {
 }
 
 func GetDSN() string {
+	return buildDSN(AppConfig.Database.Port)
+}
+
+func GetMigrateDSN() string {
+	port := AppConfig.Database.Port
+	if AppConfig.Database.MigratePort > 0 {
+		port = AppConfig.Database.MigratePort
+	}
+	return buildDSN(port)
+}
+
+func buildDSN(port int) string {
 	return fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
 		AppConfig.Database.Host,
-		AppConfig.Database.Port,
+		port,
 		AppConfig.Database.User,
 		AppConfig.Database.Password,
 		AppConfig.Database.Name,

@@ -1,14 +1,15 @@
 database:
   host: localhost
-  port: 5434
+  port: 6432
+  migrate_port: 5434
   user: receita_user
   password: receita_password
   name: receita_db
   sslmode: disable
-  max_open_conns: 200
-  max_idle_conns: 100
+  max_open_conns: 20
+  max_idle_conns: 5
   conn_max_lifetime: 3600
-  conn_max_idle_time: 600
+  conn_max_idle_time: 30
 
 redis:
   host: localhost

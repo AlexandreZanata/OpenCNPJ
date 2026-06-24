@@ -33,8 +33,14 @@ func init() {
 }
 
 func InitPostgres() error {
-	dsn := config.GetDSN()
+	return initPostgresWithDSN(config.GetDSN())
+}
 
+func InitPostgresForMigrate() error {
+	return initPostgresWithDSN(config.GetMigrateDSN())
+}
+
+func initPostgresWithDSN(dsn string) error {
 	var err error
 	DB, err = sql.Open("postgres", dsn)
 	if err != nil {

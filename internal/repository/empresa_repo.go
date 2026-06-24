@@ -52,9 +52,11 @@ func (r *EmpresaRepository) SearchEmpresas(
 		argPos++
 	}
 
+	razaoSocialPos := 0
 	if filters.RazaoSocial != "" {
-		query += fmt.Sprintf(" AND razao_social ILIKE $%d", argPos)
-		args = append(args, "%"+filters.RazaoSocial+"%")
+		query += fuzzyRazaoSocialWhere(argPos)
+		args = append(args, filters.RazaoSocial)
+		razaoSocialPos = argPos
 		argPos++
 	}
 
@@ -100,9 +102,14 @@ func (r *EmpresaRepository) SearchEmpresas(
 		}
 	}
 
+	orderBy := "razao_social"
+	if razaoSocialPos > 0 {
+		orderBy = fuzzyRazaoSocialOrder(razaoSocialPos)
+	}
+
 	// Add pagination
 	// #nosec G202 -- placeholders are generated from internal counters, not user input.
-	query += fmt.Sprintf(" ORDER BY razao_social LIMIT $%d OFFSET $%d", argPos, argPos+1)
+	query += fmt.Sprintf(" ORDER BY %s LIMIT $%d OFFSET $%d", orderBy, argPos, argPos+1)
 	args = append(args, queryLimit, filters.Offset)
 
 	rows, err := r.db.QueryContext(ctx, query, args...)

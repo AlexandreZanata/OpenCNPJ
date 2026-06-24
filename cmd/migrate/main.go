@@ -17,7 +17,7 @@ func run() error {
 	if err := config.Load(); err != nil {
 		return err
 	}
-	if err := database.InitPostgres(); err != nil {
+	if err := database.InitPostgresForMigrate(); err != nil {
 		return err
 	}
 	defer func() { _ = database.ClosePostgres() }()

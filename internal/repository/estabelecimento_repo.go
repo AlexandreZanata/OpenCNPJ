@@ -53,9 +53,11 @@ func (r *EstabelecimentoRepository) SearchEstabelecimentos(
 		argPos++
 	}
 
+	nomeFantasiaPos := 0
 	if filters.NomeFantasia != "" {
-		query += fmt.Sprintf(" AND e.nome_fantasia ILIKE $%d", argPos)
-		args = append(args, "%"+filters.NomeFantasia+"%")
+		query += fuzzyNomeFantasiaWhere(argPos)
+		args = append(args, filters.NomeFantasia)
+		nomeFantasiaPos = argPos
 		argPos++
 	}
 
@@ -107,9 +109,14 @@ func (r *EstabelecimentoRepository) SearchEstabelecimentos(
 		}
 	}
 
+	orderBy := "e.nome_fantasia"
+	if nomeFantasiaPos > 0 {
+		orderBy = fuzzyNomeFantasiaOrder(nomeFantasiaPos)
+	}
+
 	// Add pagination
 	// #nosec G202 -- placeholders are generated from internal counters, not user input.
-	query += fmt.Sprintf(" ORDER BY e.nome_fantasia LIMIT $%d OFFSET $%d", argPos, argPos+1)
+	query += fmt.Sprintf(" ORDER BY %s LIMIT $%d OFFSET $%d", orderBy, argPos, argPos+1)
 	args = append(args, queryLimit, filters.Offset)
 
 	rows, err := r.db.QueryContext(ctx, query, args...)

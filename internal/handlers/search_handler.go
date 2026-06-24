@@ -21,6 +21,14 @@ func NewSearchHandler() *SearchHandler {
 
 // SearchEmpresas handles GET /api/v1/empresas/search.
 func (h *SearchHandler) SearchEmpresas(c *fiber.Ctx) error {
+	if err := validateFuzzySearchTerm("razao_social", c.Query("razao_social")); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(models.ErrorResponse{
+			Error:   "invalid_search_term",
+			Message: err.Error(),
+			Code:    fiber.StatusBadRequest,
+		})
+	}
+
 	filters := models.SearchFilters{
 		UUIDID:           c.Query("uuid_id"),
 		CNPJBasico:       c.Query("cnpj_basico"),
@@ -71,6 +79,14 @@ func (h *SearchHandler) SearchEmpresas(c *fiber.Ctx) error {
 
 // SearchEstabelecimentos handles GET /api/v1/estabelecimentos/search.
 func (h *SearchHandler) SearchEstabelecimentos(c *fiber.Ctx) error {
+	if err := validateFuzzySearchTerm("nome_fantasia", c.Query("nome_fantasia")); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(models.ErrorResponse{
+			Error:   "invalid_search_term",
+			Message: err.Error(),
+			Code:    fiber.StatusBadRequest,
+		})
+	}
+
 	filters := models.SearchFilters{
 		UUIDID:            c.Query("uuid_id"),
 		CNPJCompleto:      c.Query("cnpj"),
