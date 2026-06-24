@@ -29,7 +29,7 @@ func (s *SearchService) SearchEmpresas(
 	ctx context.Context,
 	filters models.SearchFilters,
 ) (*models.SearchResponse, error) {
-	cacheKey := s.cache.GenerateKey("empresas:search", map[string]interface{}{
+	cacheKey := s.cache.GenerateKey("empresas:search:v2", map[string]interface{}{
 		"uuid_id":           filters.UUIDID,
 		"cnpj_basico":       filters.CNPJBasico,
 		"razao_social":      filters.RazaoSocial,
@@ -62,7 +62,7 @@ func (s *SearchService) SearchEstabelecimentos(
 	ctx context.Context,
 	filters models.SearchFilters,
 ) (*models.SearchResponse, error) {
-	cacheKey := s.cache.GenerateKey("estabelecimentos:search", map[string]interface{}{
+	cacheKey := s.cache.GenerateKey("estabelecimentos:search:v2", map[string]interface{}{
 		"uuid_id":        filters.UUIDID,
 		"cnpj_completo":  filters.CNPJCompleto,
 		"cnpj_basico":    filters.CNPJBasico,

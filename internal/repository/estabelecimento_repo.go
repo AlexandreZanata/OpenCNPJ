@@ -135,7 +135,7 @@ func (r *EstabelecimentoRepository) SearchEstabelecimentos(
 	}
 	defer rows.Close()
 
-	var estabelecimentos []models.EstabelecimentoCompleto
+	var estabelecimentos = make([]models.EstabelecimentoCompleto, 0)
 	for rows.Next() {
 		var est models.EstabelecimentoCompleto
 		err := rows.Scan(

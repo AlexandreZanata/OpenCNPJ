@@ -111,7 +111,7 @@ func (r *EmpresaRepository) SearchEmpresas(
 	}
 	defer rows.Close()
 
-	var empresas []models.Empresa
+	var empresas = make([]models.Empresa, 0)
 	for rows.Next() {
 		var emp models.Empresa
 		err := rows.Scan(

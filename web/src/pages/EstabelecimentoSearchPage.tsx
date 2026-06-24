@@ -100,7 +100,7 @@ export function EstabelecimentoSearchPage() {
       {query.data && (
         <>
           <Card title="Results">
-            <DataTable columns={columns} rows={query.data.data} />
+            <DataTable columns={columns} rows={query.data.data ?? []} />
             <Pagination
               offset={query.data.offset}
               limit={query.data.limit}

@@ -69,7 +69,7 @@ export function EmpresaSearchPage() {
       {query.data && (
         <>
           <Card title="Results">
-            <DataTable columns={columns} rows={query.data.data} />
+            <DataTable columns={columns} rows={query.data.data ?? []} />
             <Pagination
               offset={query.data.offset}
               limit={query.data.limit}
@@ -85,7 +85,7 @@ export function EmpresaSearchPage() {
         </>
       )}
 
-      {query.data?.data[0] && (
+      {query.data?.data?.[0] && (
         <p className="text-sm text-slate-500">
           Tip: open branches via{' '}
           <Link className="text-brand-500 hover:underline" to={`/estabelecimentos?cnpj_basico=${query.data.data[0].cnpj_basico}`}>
