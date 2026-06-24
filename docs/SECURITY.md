@@ -11,7 +11,7 @@ This document describes security tooling, how to interpret results, severity pol
 | **gosec** | SAST | Hardcoded credentials, SQL injection, file permissions, weak crypto | PR, push, weekly |
 | **staticcheck** | SAST | Bugs, deprecated APIs, performance, code correctness | PR, push, weekly |
 | **govulncheck** | Dependency CVE | CVEs in Go modules (direct and indirect) | PR, push, weekly |
-| **nancy** | Dependency CVE | Vulnerabilities via Sonatype OSS Index | PR, push, weekly |
+| **nancy** | Dependency CVE | Sonatype OSS Index (optional local; requires API token) | Local only |
 
 - **SAST** (Static Application Security Testing): static analysis of source code.
 - **Dependency CVE**: scans `go.mod` / `go.sum` against known vulnerability databases.

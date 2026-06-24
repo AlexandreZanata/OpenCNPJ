@@ -88,12 +88,12 @@ govulncheck ./...
 govulncheck -show verbose ./...
 ```
 
-### 3.5 nancy (dependencies — Sonatype OSS Index)
+### 3.5 nancy (dependencies — Sonatype OSS Index, optional)
 
-Pipe module list JSON to nancy:
+OSS Index requires a free Sonatype account and API token. Not run in CI (use `govulncheck` there).
 
 ```bash
-go list -json -m all | nancy sleuth
+go list -json -m all | nancy sleuth --username "$OSS_INDEX_USERNAME" --token "$OSS_INDEX_TOKEN"
 ```
 
 **Alternative using a file (if pipe is unsupported):**
@@ -112,8 +112,7 @@ Workflow `.github/workflows/security.yml` runs the same commands in these jobs.
 ### Job: lint
 
 - **Checkout:** `actions/checkout@v4`
-- **Go:** `actions/setup-go@v5` with `go-version-file: go.mod`
-- **Cache:** `actions/cache@v4` (key: `go.sum`)
+- **Go:** `actions/setup-go@v5` with `go-version-file: go.mod` and `cache: true`
 - **Lint:** `golangci-lint run --timeout=5m --config=.golangci.yml` (via `golangci/golangci-lint-action@v6`)
 
 ### Job: sast (depends on lint)
@@ -134,10 +133,6 @@ Workflow `.github/workflows/security.yml` runs the same commands in these jobs.
   `go install golang.org/x/vuln/cmd/govulncheck@latest`
 - **Run govulncheck:**  
   `govulncheck ./...`
-- **Install nancy:**  
-  `go install github.com/sonatype-nexus-community/nancy@latest`
-- **Run nancy:**  
-  `go list -json -m all | nancy sleuth`
 
 ---
 
@@ -152,14 +147,10 @@ staticcheck ./... && \
 govulncheck ./...
 ```
 
-Include nancy (as in CI):
+Optional nancy (requires OSS Index credentials):
 
 ```bash
-golangci-lint run --timeout=5m --config=.golangci.yml ./... && \
-gosec ./... && \
-staticcheck ./... && \
-govulncheck ./... && \
-go list -json -m all | nancy sleuth
+go list -json -m all | nancy sleuth --username "$OSS_INDEX_USERNAME" --token "$OSS_INDEX_TOKEN"
 ```
 
 ---
@@ -199,7 +190,7 @@ golangci-lint run --timeout 5m
 gosec ./...
 staticcheck ./...
 govulncheck ./...
-go list -json -m all | nancy sleuth
+# Optional: go list -json -m all | nancy sleuth --username "$OSS_INDEX_USERNAME" --token "$OSS_INDEX_TOKEN"
 
 # 5) Integration tests
 go test ./tests/integration/... -v -timeout 15m
