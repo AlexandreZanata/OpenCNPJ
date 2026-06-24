@@ -14,6 +14,7 @@ Sequential IDs for new features that still need production-grade automated tests
 | DVT-08 | Category phone export (CSV/TXT) | open |
 | DVT-09 | Smart lookup typeahead for export filters | open |
 | DVT-10 | Phone export date filter and export-all | open |
+| DVT-11 | Download progress bar + one-command pipeline scripts | open |
 
 ## DVT-01: CNPJ open-data downloader (WebDAV)
 
@@ -83,4 +84,11 @@ Sequential IDs for new features that still need production-grade automated tests
 - **Scope**: `internal/repository/phone_export_filters.go`, `web/src/pages/PhoneExportPage.tsx`, `web/src/components/ui/ProgressBar.tsx`
 - **Added**: 2026-06-20
 - **Needs**: integration test export with date range; verify export_all omits LIMIT on large filter sets
+- **Status**: open
+
+## DVT-11: Download progress bar + one-command pipeline scripts
+
+- **Scope**: `internal/downloader/progress.go`, `scripts/download_latest.sh`, `scripts/download_and_import.sh`, `scripts/lib/hardware_profile.sh`
+- **Added**: 2026-06-24
+- **Needs**: e2e test with mocked HTTP Content-Length; CI smoke for hardware_profile.sh
 - **Status**: open

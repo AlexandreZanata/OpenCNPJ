@@ -13,6 +13,10 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Dual licensing: MIT OR Apache-2.0
 - Contributor Covenant Code of Conduct
 - Security policy and tooling reference (English)
+- Download progress bar (`[file/total] percentage`) in terminal
+- `make download`, `make import-full`, `make download-and-import` one-command workflows
+- Hardware auto-tuning (`scripts/lib/hardware_profile.sh`)
+- docs/QUICKSTART.md, docs/HARDWARE.md, docs/benchmarks/HARDWARE-RTX4060-32GB.md
 
 ### Changed
 

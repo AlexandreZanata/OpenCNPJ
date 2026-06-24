@@ -35,6 +35,7 @@ type Options struct {
 	KeepZIP       bool
 	RetryAttempts int
 	RetryDelay    time.Duration
+	OnProgress    ProgressFunc
 }
 
 // Result summarizes a completed download run.
@@ -122,8 +123,8 @@ func (d *Downloader) Run(ctx context.Context) (*Result, error) {
 	ordered := append(reference, data...)
 
 	result := &Result{Month: month, FilesTotal: len(ordered)}
-	for _, filename := range ordered {
-		csvCount, skipped, err := d.processFile(ctx, month, filename)
+	for i, filename := range ordered {
+		csvCount, skipped, err := d.processFile(ctx, month, filename, i+1, len(ordered))
 		if err != nil {
 			return result, fmt.Errorf("%s: %w", filename, err)
 		}
@@ -155,15 +156,18 @@ func splitFiles(files []string) (reference, data []string) {
 	return reference, data
 }
 
-func (d *Downloader) processFile(ctx context.Context, month, filename string) (csvCount int, skipped bool, err error) {
+func (d *Downloader) processFile(ctx context.Context, month, filename string, fileIndex, fileTotal int) (csvCount int, skipped bool, err error) {
 	zipPath := filepath.Join(d.opts.OutputDir, filename)
 	if d.isDone(month, filename) {
+		if d.opts.OnProgress != nil {
+			d.opts.OnProgress(fileIndex, fileTotal, filename, 1, 1)
+		}
 		log.Printf("  [skip] %s (already downloaded)", filename)
 		return 0, true, nil
 	}
 
 	log.Printf("  [download] %s", filename)
-	if err := d.downloadWithRetry(ctx, month, filename, zipPath); err != nil {
+	if err := d.downloadWithRetry(ctx, month, filename, zipPath, fileIndex, fileTotal); err != nil {
 		return 0, false, err
 	}
 
@@ -202,10 +206,10 @@ func (d *Downloader) markDone(month, filename string) error {
 	return os.WriteFile(path, []byte(month), 0o644)
 }
 
-func (d *Downloader) downloadWithRetry(ctx context.Context, month, filename, dest string) error {
+func (d *Downloader) downloadWithRetry(ctx context.Context, month, filename, dest string, fileIndex, fileTotal int) error {
 	var lastErr error
 	for attempt := 1; attempt <= d.opts.RetryAttempts; attempt++ {
-		lastErr = d.downloadFile(ctx, month, filename, dest)
+		lastErr = d.downloadFile(ctx, month, filename, dest, fileIndex, fileTotal)
 		if lastErr == nil {
 			return nil
 		}
@@ -221,8 +225,8 @@ func (d *Downloader) downloadWithRetry(ctx context.Context, month, filename, des
 	return lastErr
 }
 
-func (d *Downloader) downloadFile(ctx context.Context, month, filename, dest string) error {
-	body, _, err := d.client.Download(ctx, month, filename)
+func (d *Downloader) downloadFile(ctx context.Context, month, filename, dest string, fileIndex, fileTotal int) error {
+	body, contentLength, err := d.client.Download(ctx, month, filename)
 	if err != nil {
 		return err
 	}
@@ -234,7 +238,16 @@ func (d *Downloader) downloadFile(ctx context.Context, month, filename, dest str
 		return err
 	}
 
-	written, copyErr := io.Copy(f, body)
+	cw := &countingWriter{
+		w: f,
+		onWrite: func(written int64) {
+			if d.opts.OnProgress != nil {
+				d.opts.OnProgress(fileIndex, fileTotal, filename, written, contentLength)
+			}
+		},
+	}
+
+	written, copyErr := io.Copy(cw, body)
 	closeErr := f.Close()
 	if copyErr != nil {
 		_ = os.Remove(tmp)
@@ -243,6 +256,14 @@ func (d *Downloader) downloadFile(ctx context.Context, month, filename, dest str
 	if closeErr != nil {
 		_ = os.Remove(tmp)
 		return closeErr
+	}
+
+	if d.opts.OnProgress != nil {
+		total := contentLength
+		if total <= 0 {
+			total = written
+		}
+		d.opts.OnProgress(fileIndex, fileTotal, filename, written, total)
 	}
 
 	if err := os.Rename(tmp, dest); err != nil {

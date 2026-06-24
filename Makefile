@@ -1,4 +1,4 @@
-.PHONY: build build-downloader test test-integration bench lint vet migrate import seed coverage setup download list-months web-dev web-build web-test
+.PHONY: build build-downloader test test-integration bench lint vet migrate import seed coverage setup download download-latest download-and-import import-full list-months web-dev web-build web-test
 
 GO      = go
 BINARY  = bin/importer
@@ -16,7 +16,16 @@ setup:
 	bash scripts/setup_project.sh
 
 download:
-	bash scripts/download_data.sh
+	bash scripts/download_latest.sh
+
+download-latest:
+	bash scripts/download_latest.sh
+
+download-and-import:
+	bash scripts/download_and_import.sh
+
+import-full:
+	bash scripts/run_full_import.sh
 
 list-months:
 	$(GO) run ./cmd/downloader --list

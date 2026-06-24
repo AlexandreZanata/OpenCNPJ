@@ -30,7 +30,8 @@ cd web && pnpm dev        # UI  → :5173
 
 | Doc | Purpose |
 |-----|---------|
-| [docs/README.md](docs/README.md) | **Documentation index** |
+| [docs/QUICKSTART.md](docs/QUICKSTART.md) | **Download + import in one command** |
+| [docs/README.md](docs/README.md) | Documentation index |
 | [docs/OPEN_SOURCE.md](docs/OPEN_SOURCE.md) | Open-source scope and principles |
 | [docs/LICENSING.md](docs/LICENSING.md) | MIT OR Apache-2.0 dual license |
 | [CONTRIBUTING.md](docs/CONTRIBUTING.md) | How to contribute |

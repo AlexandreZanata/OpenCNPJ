@@ -2,11 +2,24 @@
 
 Import Receita Federal CSV files from a local `data/` directory into PostgreSQL.
 
+**Quick start:** see [QUICKSTART.md](QUICKSTART.md) for single-command download and import.
+
 ## Prerequisites
 
 - Docker PostgreSQL running (`docker compose up -d postgres`)
-- CSV files downloaded to `./data` (see `make download`)
+- CSV files in `./data` — `make download` fetches the latest month
 - Migrations applied: `go run ./cmd/migrate`
+
+## One-command workflows
+
+| Command | What it does |
+|---------|--------------|
+| `make download` | Latest RFB data + terminal progress % |
+| `make import-full` | 100% import + live rows/s logs + report |
+| `make download-and-import` | Download → migrate → import (full pipeline) |
+
+Hardware auto-tuning: [HARDWARE.md](HARDWARE.md)  
+Benchmark (32 GB / RTX 4060): [benchmarks/HARDWARE-RTX4060-32GB.md](benchmarks/HARDWARE-RTX4060-32GB.md)
 
 ## Full import (100%)
 

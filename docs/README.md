@@ -6,7 +6,8 @@ Enterprise documentation for the OpenCNPJ platform.
 
 | Document | Audience | Description |
 |----------|----------|-------------|
-| [README.md](../README.md) | All | Quick start, stack, API overview |
+| [QUICKSTART.md](QUICKSTART.md) | All | **One-command download + import** |
+| [README.md](../README.md) | All | Project overview |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Contributors | Local setup, PR workflow |
 | [COMMIT_CONVENTION.md](COMMIT_CONVENTION.md) | Contributors | Commit message format |
 | [AGENTS.md](../AGENTS.md) | AI agents | Harness workflow entry point |
@@ -26,9 +27,11 @@ Enterprise documentation for the OpenCNPJ platform.
 | Document | Description |
 |----------|-------------|
 | [IMPORT.md](IMPORT.md) | Full and sample data import |
+| [HARDWARE.md](HARDWARE.md) | RAM/CPU/disk tuning by machine |
 | [PERFORMANCE.md](PERFORMANCE.md) | Import tuning and API latency targets |
 | [benchmarks/README.md](benchmarks/README.md) | Benchmark suite overview |
 | [benchmarks/COMPARISON.md](benchmarks/COMPARISON.md) | Approach comparison results |
+| [benchmarks/HARDWARE-RTX4060-32GB.md](benchmarks/HARDWARE-RTX4060-32GB.md) | Import speed (32 GB RAM / RTX 4060) |
 
 ## Security and quality
 

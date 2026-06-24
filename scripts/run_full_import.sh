@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
-# Full 100% import with monitoring and performance report.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
+
+# shellcheck disable=SC1091
+source "$ROOT/scripts/lib/hardware_profile.sh"
+hardware_apply_env
 
 DATA="${DATA_PATH:-./data}"
 WORKERS="${IMPORT_WORKERS:-8}"
@@ -12,6 +15,7 @@ LOG="/tmp/full_import_100pct.log"
 PROGRESS="/tmp/import_progress.log"
 REPORT="/tmp/full_import_performance_report.txt"
 MONITOR_PID=""
+INTERVAL_SEC="${IMPORT_MONITOR_INTERVAL:-5}"
 
 cleanup() {
   if [[ -n "${MONITOR_PID:-}" ]] && kill -0 "$MONITOR_PID" 2>/dev/null; then
@@ -21,6 +25,9 @@ cleanup() {
 trap cleanup EXIT
 
 echo "==> Full import started at $(date -Iseconds)"
+echo "    workers=$WORKERS batch_size=$BATCH monitor_interval=${INTERVAL_SEC}s"
+echo "    live metrics: rows/s printed every 10s by the importer"
+echo ""
 
 docker compose up -d postgres
 for _ in $(seq 1 60); do
@@ -36,9 +43,10 @@ docker compose exec -T postgres psql -U receita_user -d receita_db \
   -c "TRUNCATE simples, socios, estabelecimentos, empresas CASCADE;"
 
 rm -f "$PROGRESS" "$REPORT"
-INTERVAL_SEC=10 LOG_FILE="$PROGRESS" bash scripts/monitor_import_progress.sh &
+INTERVAL_SEC="$INTERVAL_SEC" LOG_FILE="$PROGRESS" bash scripts/monitor_import_progress.sh &
 MONITOR_PID=$!
-echo "==> Monitor PID $MONITOR_PID -> $PROGRESS"
+echo "==> Row-count monitor PID $MONITOR_PID (every ${INTERVAL_SEC}s) -> $PROGRESS"
+echo ""
 
 IMPORT_START=$(date +%s.%N)
 GOMAXPROCS="$(nproc)" GUARD_ENABLED=true go run ./cmd/importer \

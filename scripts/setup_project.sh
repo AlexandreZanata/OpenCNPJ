@@ -31,11 +31,12 @@ else
   echo "    docker not found — skip this step or install Docker"
 fi
 
-echo ""
 echo "Next steps:"
-echo "  1. Download data from Receita Federal:"
-echo "       go run ./cmd/downloader"
-echo "  2. Import into the database (when cmd/importer is available):"
-echo "       go run ./cmd/importer --data-path=./data"
-echo "  3. Start the API:"
+echo "  1. Download latest CNPJ data (with progress bar):"
+echo "       make download"
+echo "  2. Full import with performance logs:"
+echo "       make import-full"
+echo "  3. Or both in one command:"
+echo "       make download-and-import"
+echo "  4. Start the API:"
 echo "       go run ./cmd/api"
