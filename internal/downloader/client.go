@@ -12,7 +12,8 @@ import (
 )
 
 const (
-	DefaultBaseURL    = "https://arquivos.receitafederal.gov.br/public.php/webdav"
+	DefaultBaseURL = "https://arquivos.receitafederal.gov.br/public.php/webdav"
+	// #nosec G101 -- public read-only Nextcloud share token; not a secret credential.
 	DefaultShareToken = "YggdBLfdninEJX9"
 )
 
@@ -106,7 +107,7 @@ func (c *Client) Download(ctx context.Context, month, filename string) (io.ReadC
 		return nil, 0, fmt.Errorf("download %s: %w", filename, err)
 	}
 	if resp.StatusCode != http.StatusOK {
-		resp.Body.Close()
+		_ = resp.Body.Close()
 		return nil, 0, fmt.Errorf("download %s: %w: %s", filename, ErrUnexpectedHTTPStatus, resp.Status)
 	}
 

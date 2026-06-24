@@ -13,10 +13,3 @@ func nullIfEmpty(value string) any {
 	}
 	return value
 }
-
-func dateValue(d interface{ Value() (any, error) }) (any, error) {
-	if d == nil {
-		return nil, nil
-	}
-	return d.Value()
-}

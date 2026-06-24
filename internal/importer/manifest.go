@@ -1,7 +1,6 @@
 package importer
 
 import (
-	"bufio"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -124,21 +123,4 @@ func estimateLines(path string) (int64, error) {
 	}
 	ratio := float64(info.Size()) / float64(n)
 	return int64(float64(newlines) * ratio), nil
-}
-
-func countLinesQuick(path string) (int64, error) {
-	// #nosec G304 -- path comes from trusted dataset manifest.
-	file, err := os.Open(path)
-	if err != nil {
-		return 0, err
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	scanner.Buffer(make([]byte, 1024*1024), 1024*1024)
-	var lines int64
-	for scanner.Scan() {
-		lines++
-	}
-	return lines, scanner.Err()
 }

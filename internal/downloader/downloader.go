@@ -98,7 +98,7 @@ func ResolveMonth(available []string, requested string, now time.Time) (string, 
 }
 
 func (d *Downloader) Run(ctx context.Context) (*Result, error) {
-	if err := os.MkdirAll(d.opts.OutputDir, 0o755); err != nil {
+	if err := os.MkdirAll(d.opts.OutputDir, 0o750); err != nil {
 		return nil, fmt.Errorf("%w: %w", ErrCreateOutputDir, err)
 	}
 
@@ -206,7 +206,7 @@ func (d *Downloader) isDone(month, filename string) bool {
 
 func (d *Downloader) markDone(month, filename string) error {
 	path := d.markerPath(month, filename)
-	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(path), 0o750); err != nil {
 		return err
 	}
 	return os.WriteFile(path, []byte(month), 0o600)
@@ -241,6 +241,7 @@ func (d *Downloader) downloadFile(ctx context.Context, month, filename, dest str
 	defer body.Close()
 
 	tmp := dest + ".part"
+	// #nosec G304 -- dest is under the configured output directory.
 	f, err := os.Create(tmp)
 	if err != nil {
 		return err
@@ -321,11 +322,12 @@ func extractZipMember(f *zip.File, dest string) error {
 	}
 	defer rc.Close()
 
-	if err := os.MkdirAll(filepath.Dir(dest), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(dest), 0o750); err != nil {
 		return err
 	}
 
 	tmp := dest + ".part"
+	// #nosec G304 -- dest is under the configured output directory.
 	out, err := os.Create(tmp)
 	if err != nil {
 		return err
