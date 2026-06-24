@@ -10,7 +10,13 @@ alwaysApply: true
 1. Propose a **commit message only** — do **not** run `git commit`.
 2. Format: `type(scope): subject` per `docs/COMMIT_CONVENTION.md` and `.commitlintrc.yml`.
 3. **Max 72 characters** for the subject line.
-4. Allowed types: feat, fix, perf, refactor, test, bench, docs, ci, chore, build, revert.
+4. Allowed **types**: feat, fix, perf, refactor, test, bench, docs, ci, chore, build, revert.
+5. Allowed **scopes** (CI enforces `scope-enum` — use only these):
+   `parser`, `loader`, `pipeline`, `model`, `config`, `metrics`, `ci`, `docs`, `bench`,
+   `migration`, `fixtures`, `importer`, `downloader`, `oss`, `api`, `web`, `export`, `security`,
+   `git`, `docker`, `scripts`, `workflow`, `deps`, `repository`, `handlers`, `services`, `middleware`
+6. Scope examples: `.gitignore` → `git`; `docker-compose.yml` → `docker`; `.github/workflows` → `workflow` or `ci`.
+7. NEVER invent scopes (e.g. `chore(git)` is valid; `chore(repo)` is NOT — use `git` or `repository`).
 
 ## Cave mode (default)
 

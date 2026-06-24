@@ -12,6 +12,7 @@ export default {
       [
         'parser', 'loader', 'pipeline', 'model', 'config', 'metrics', 'ci', 'docs', 'bench',
         'migration', 'fixtures', 'importer', 'downloader', 'oss', 'api', 'web', 'export', 'security',
+        'git', 'docker', 'scripts', 'workflow', 'deps', 'repository', 'handlers', 'services', 'middleware',
       ],
     ],
     'subject-max-length': [2, 'always', 72],
