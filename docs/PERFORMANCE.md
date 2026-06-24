@@ -81,3 +81,16 @@ Scripts live under `.local/01-api-performance-optimization/benchmarks/`.
 ```bash
 k6 run .local/01-api-performance-optimization/benchmarks/k6-baseline.js
 ```
+
+## Post-implementation validation (Phase 8)
+
+Run after P0–P2 changes:
+
+```bash
+./scripts/api_perf_validation.sh http://localhost:8080
+go test ./... -short && go vet ./...
+```
+
+Report: `docs/benchmarks/2026-06-24-api-search-performance.md`
+
+Redis hit-rate helper: `internal/perfvalidation` (40% gate for steady load).

@@ -20,6 +20,7 @@ Sequential IDs for new features that still need production-grade automated tests
 | DVT-15 | Keyset cursor pagination for search | open |
 | DVT-16 | PostgreSQL FTS for multi-word search | open |
 | DVT-17 | Meilisearch indexer and search delegation | open |
+| DVT-18 | CI automated API perf validation gate | open |
 
 ## DVT-01: CNPJ open-data downloader (WebDAV)
 
@@ -138,4 +139,11 @@ Sequential IDs for new features that still need production-grade automated tests
 - **Scope**: `docker-compose.yml`, `internal/config/config.go`, future `cmd/meili-indexer`
 - **Added**: 2026-06-24
 - **Needs**: indexer worker syncing empresas/estabelecimentos; handler fallback to Postgres; e2e fuzzy search <50ms
+- **Status**: open
+
+## DVT-18: CI automated API perf validation gate
+
+- **Scope**: `scripts/api_perf_validation.sh`, `internal/perfvalidation/stats.go`
+- **Added**: 2026-06-24
+- **Needs**: GitHub Actions job running validation script against docker-compose stack on PR
 - **Status**: open

@@ -43,3 +43,18 @@ make bench
 ```
 
 Targets: parse ≥ 200k rows/s, CSV decode ≥ 50k rows/s on GitHub runners.
+
+## API search performance (P0–P2)
+
+Validation report: [2026-06-24-api-search-performance.md](2026-06-24-api-search-performance.md)
+
+```bash
+# Automated gate (Phase 8)
+./scripts/api_perf_validation.sh http://localhost:8080
+
+# k6 (requires k6 installed)
+k6 run .local/01-api-performance-optimization/benchmarks/k6-baseline.js
+k6 run .local/01-api-performance-optimization/benchmarks/k6-keyset-deep.js
+```
+
+See also [docs/PERFORMANCE.md](../PERFORMANCE.md).
