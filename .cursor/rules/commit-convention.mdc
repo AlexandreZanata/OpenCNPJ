@@ -1,0 +1,71 @@
+---
+description: Commit message format — must match CI commitlint (scope-enum)
+alwaysApply: true
+---
+
+# Commit convention (CI-enforced)
+
+Source of truth: `commitlint.config.mjs`, `.commitlintrc.yml`, `docs/COMMIT_CONVENTION.md`.
+
+## Format
+
+```
+type(scope): subject
+```
+
+- Subject max **72** characters; imperative mood (`add`, not `added`).
+- Body lines max **100** characters.
+- Propose commit message only — **do not** run `git commit` unless the user asks.
+
+## Allowed types (`type-enum`)
+
+`feat`, `fix`, `perf`, `refactor`, `test`, `bench`, `docs`, `ci`, `chore`, `build`, `revert`
+
+## Allowed scopes (`scope-enum`)
+
+MUST use one of these — **CI fails on unknown scopes**:
+
+`parser`, `loader`, `pipeline`, `model`, `config`, `metrics`, `ci`, `docs`, `bench`, `benchmarks`,
+`migration`, `fixtures`, `importer`, `downloader`, `oss`, `api`, `web`, `export`, `security`,
+`git`, `docker`, `scripts`, `workflow`, `deps`, `repository`, `handlers`, `services`, `middleware`, `commitlint`
+
+## Scope picker
+
+| Scope | Use for |
+|-------|---------|
+| `parser`, `loader`, `pipeline`, `importer` | Import pipeline |
+| `downloader` | RFB download |
+| `model`, `repository`, `handlers`, `services`, `middleware` | Go packages |
+| `api`, `web`, `export` | HTTP API / frontend |
+| `config`, `metrics` | Config / observability |
+| `migration`, `fixtures` | SQL migrations / test data |
+| `docs`, `oss`, `security` | Documentation |
+| `bench`, `benchmarks` | Benchmarks (`docs/benchmarks/`, TSV) |
+| `ci`, `workflow`, `commitlint` | GitHub Actions, commitlint config |
+| `git` | `.gitignore`, hooks, repo hygiene |
+| `docker` | `docker-compose.yml`, Dockerfiles |
+| `scripts` | `scripts/` shell tooling |
+| `deps` | `go.mod`, `package.json` |
+
+## Mapping examples
+
+| Change | Scope |
+|--------|-------|
+| `.gitignore` | `git` |
+| `docker-compose.yml` | `docker` |
+| `.github/workflows/` | `workflow` or `ci` |
+| `docs/benchmarks/` | `benchmarks` |
+| `commitlint.config.mjs` | `ci` |
+
+## Valid examples
+
+- `feat(parser): add Latin-1 to UTF-8 conversion in CSV reader`
+- `fix(importer): dedupe duplicate CNPJ rows during COPY`
+- `docs(benchmarks): add 2026-06-24 full import report`
+- `ci(commitlint): add benchmarks scope to scope-enum`
+- `chore(git): ignore node_modules and scan artifacts`
+
+## Forbidden
+
+- Invented scopes (`repo`, `benchmark`, `workflows`) — use table above.
+- Mixed-language subjects or scopes.

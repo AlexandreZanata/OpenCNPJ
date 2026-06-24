@@ -27,6 +27,7 @@ pip install -r agent-harness/requirements.txt   # once
 | `daily-harness-usage.mdc` | Harness workflow (always on) |
 | `busca-cnpj-harness.mdc` | Go project + harness integration |
 | `workflow.mdc` | Commits, tests, delivery gate |
+| `commit-convention.mdc` | Commit types/scopes (CI commitlint) |
 | `code-quality.mdc` | Go code standards |
 | `testing-and-dvt.mdc` | Tests and DVT |
 | `api-query-budget.mdc` | API query limits |

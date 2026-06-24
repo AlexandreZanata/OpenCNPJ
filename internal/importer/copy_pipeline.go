@@ -72,52 +72,86 @@ func ImportFile(
 			collector.AddBytes(metrics.CSVRecordBytes(line))
 		}
 
-		parseStart := time.Now()
-		row, mapErr := job.MapRow(line, lookups)
-		if timings != nil {
-			timings.ParseNs.Add(time.Since(parseStart).Nanoseconds())
+		row, ok, err := mapImportRow(job, line, lookups, collector, timings)
+		if err != nil {
+			return imported, err
 		}
-		if mapErr != nil {
-			if collector != nil {
-				collector.AddError()
-			}
+		if !ok {
 			continue
 		}
-		if dedupe != nil {
-			if key, use := dedupeKey(job.Table, row); use && dedupe.Seen(key) {
-				continue
-			}
+		if skipDedupe(job.Table, row, dedupe) {
+			continue
 		}
 
 		rows, flush := batcher.Add(row)
-		if flush {
-			copyStart := time.Now()
-			if _, copyErr := copier.CopyRows(ctx, "public", job.Table, job.Columns, rows); copyErr != nil {
-				return imported, fmt.Errorf("copy %s: %w", job.Table, copyErr)
-			}
-			if timings != nil {
-				timings.CopyNs.Add(time.Since(copyStart).Nanoseconds())
-			}
-			if collector != nil {
-				collector.AddRows(int64(len(rows)))
-			}
-			imported += int64(len(rows))
+		if !flush {
+			continue
 		}
+		n, copyErr := copyImportBatch(ctx, job, copier, rows, timings, collector)
+		if copyErr != nil {
+			return imported, copyErr
+		}
+		imported += n
 	}
 
 	if tail := batcher.Flush(); len(tail) > 0 {
-		copyStart := time.Now()
-		if _, copyErr := copier.CopyRows(ctx, "public", job.Table, job.Columns, tail); copyErr != nil {
+		n, copyErr := copyImportBatch(ctx, job, copier, tail, timings, collector)
+		if copyErr != nil {
 			return imported, fmt.Errorf("copy %s flush: %w", job.Table, copyErr)
 		}
-		if timings != nil {
-			timings.CopyNs.Add(time.Since(copyStart).Nanoseconds())
-		}
-		if collector != nil {
-			collector.AddRows(int64(len(tail)))
-		}
-		imported += int64(len(tail))
+		imported += n
 	}
 
 	return imported, nil
+}
+
+func mapImportRow(
+	job FileJob,
+	line []string,
+	lookups *parser.LookupStore,
+	collector *metrics.Collector,
+	timings *Timings,
+) ([]any, bool, error) {
+	parseStart := time.Now()
+	row, mapErr := job.MapRow(line, lookups)
+	if timings != nil {
+		timings.ParseNs.Add(time.Since(parseStart).Nanoseconds())
+	}
+	if mapErr != nil {
+		if collector != nil {
+			collector.AddError()
+		}
+		return nil, false, nil
+	}
+	return row, true, nil
+}
+
+func skipDedupe(table string, row []any, dedupe *DedupeSet) bool {
+	if dedupe == nil {
+		return false
+	}
+	key, use := dedupeKey(table, row)
+	return use && dedupe.Seen(key)
+}
+
+func copyImportBatch(
+	ctx context.Context,
+	job FileJob,
+	copier loader.BatchInserter,
+	rows [][]any,
+	timings *Timings,
+	collector *metrics.Collector,
+) (int64, error) {
+	copyStart := time.Now()
+	if _, copyErr := copier.CopyRows(ctx, "public", job.Table, job.Columns, rows); copyErr != nil {
+		return 0, fmt.Errorf("copy %s: %w", job.Table, copyErr)
+	}
+	if timings != nil {
+		timings.CopyNs.Add(time.Since(copyStart).Nanoseconds())
+	}
+	n := int64(len(rows))
+	if collector != nil {
+		collector.AddRows(n)
+	}
+	return n, nil
 }

@@ -1,6 +1,6 @@
 module busca-cnpj-2026
 
-go 1.25.8
+go 1.25.11
 
 require (
 	github.com/ClickHouse/clickhouse-go/v2 v2.43.0

@@ -26,3 +26,14 @@ func TestDedupeKeySocios(t *testing.T) {
 		t.Fatalf("dedupeKey socios = (%q, %v)", key, ok)
 	}
 }
+
+func TestDedupeKeyRejectsShortRow(t *testing.T) {
+	_, ok := dedupeKey("estabelecimentos", []any{"1"})
+	if ok {
+		t.Fatal("expected false for short estabelecimentos row")
+	}
+	_, ok = dedupeKey("socios", []any{"1", "2"})
+	if ok {
+		t.Fatal("expected false for short socios row")
+	}
+}

@@ -28,10 +28,19 @@ func (d *DedupeSet) Seen(key string) bool {
 func dedupeKey(table string, row []any) (string, bool) {
 	switch table {
 	case "empresas", "simples":
+		if len(row) < 1 {
+			return "", false
+		}
 		return stringKey(row, 0), true
 	case "estabelecimentos":
+		if len(row) < 3 {
+			return "", false
+		}
 		return fmt.Sprintf("%v|%v|%v", row[0], row[1], row[2]), true
 	case "socios":
+		if len(row) < 6 {
+			return "", false
+		}
 		return fmt.Sprintf("%v|%v|%v|%v|%v", row[0], row[2], row[3], row[4], row[5]), true
 	default:
 		return "", false
@@ -39,6 +48,9 @@ func dedupeKey(table string, row []any) (string, bool) {
 }
 
 func stringKey(row []any, idx int) string {
+	if idx < 0 || idx >= len(row) {
+		return ""
+	}
 	if s, ok := row[idx].(string); ok {
 		return s
 	}
