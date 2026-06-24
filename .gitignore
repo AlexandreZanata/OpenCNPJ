@@ -1,7 +1,7 @@
-# Binaries
-importer
-main
-monitor
+# Binaries (root only — do not match cmd/importer/)
+/importer
+/main
+/monitor
 *.exe
 *.exe~
 *.dll

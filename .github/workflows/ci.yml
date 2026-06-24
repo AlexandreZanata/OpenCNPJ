@@ -70,5 +70,5 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
-      - name: Build importer binary
-        run: go build -v -ldflags="-s -w" ./cmd/importer/
+      - name: Build all cmd binaries
+        run: go build -v -ldflags="-s -w" ./cmd/...
