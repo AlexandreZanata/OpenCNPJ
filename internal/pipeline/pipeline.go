@@ -60,6 +60,9 @@ func (p *EmpresaPipeline) Run(ctx context.Context, filePath string) error {
 			defer wg.Done()
 			defer parseWG.Done()
 			for line := range rawCh {
+				if p.Metrics != nil {
+					p.Metrics.AddBytes(metrics.CSVRecordBytes(line))
+				}
 				empresa, parseErr := parser.ParseEmpresa(line, p.Lookups)
 				if parseErr != nil {
 					if p.Metrics != nil {

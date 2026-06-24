@@ -14,11 +14,10 @@ import (
 )
 
 type Collector struct {
-	dataset   string
-	startedAt time.Time
-	totalRows atomic.Int64
-	totalMB   atomic.Uint64
-	totalErrs atomic.Int64
+	dataset    string
+	totalRows  atomic.Int64
+	totalBytes atomic.Uint64
+	totalErrs  atomic.Int64
 }
 
 var rowsCounter = prometheus.NewCounterVec(
@@ -34,10 +33,7 @@ func init() {
 }
 
 func NewCollector(dataset string) *Collector {
-	return &Collector{
-		dataset:   dataset,
-		startedAt: time.Now().UTC(),
-	}
+	return &Collector{dataset: dataset}
 }
 
 func (c *Collector) AddRows(n int64) {
@@ -46,7 +42,7 @@ func (c *Collector) AddRows(n int64) {
 }
 
 func (c *Collector) AddBytes(n uint64) {
-	c.totalMB.Add(n)
+	c.totalBytes.Add(n)
 }
 
 func (c *Collector) AddError() {
@@ -58,6 +54,7 @@ func (c *Collector) StartReporter(ctx context.Context, every time.Duration, logg
 	defer ticker.Stop()
 
 	var previousRows int64
+	var previousBytes uint64
 	previousTick := time.Now()
 
 	for {
@@ -66,20 +63,17 @@ func (c *Collector) StartReporter(ctx context.Context, every time.Duration, logg
 			return
 		case now := <-ticker.C:
 			totalRows := c.totalRows.Load()
-			totalBytes := c.totalMB.Load()
+			totalBytes := c.totalBytes.Load()
 			totalErrs := c.totalErrs.Load()
 
 			deltaRows := totalRows - previousRows
+			deltaBytes := totalBytes - previousBytes
 			secs := now.Sub(previousTick).Seconds()
 			var rowsPerSec float64
+			var mbPerSec float64
 			if secs > 0 {
 				rowsPerSec = float64(deltaRows) / secs
-			}
-
-			totalSecs := now.Sub(c.startedAt).Seconds()
-			var mbPerSec float64
-			if totalSecs > 0 {
-				mbPerSec = (float64(totalBytes) / (1024.0 * 1024.0)) / totalSecs
+				mbPerSec = (float64(deltaBytes) / (1024.0 * 1024.0)) / secs
 			}
 
 			logger.Printf(
@@ -93,6 +87,7 @@ func (c *Collector) StartReporter(ctx context.Context, every time.Duration, logg
 			)
 
 			previousRows = totalRows
+			previousBytes = totalBytes
 			previousTick = now
 		}
 	}
