@@ -110,7 +110,7 @@ services:
   redis:
     image: redis:7-alpine
     container_name: receita-redis
-    command: redis-server --maxmemory 2gb --maxmemory-policy allkeys-lru
+    command: redis-server --maxmemory 2gb --maxmemory-policy allkeys-lru --save "" --appendonly no
     ports:
       - "6380:6379"
     volumes:

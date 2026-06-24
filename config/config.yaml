@@ -43,6 +43,10 @@ import:
 cache:
   enabled: true
   ttl: 300
+  ttl_cnpj: 86400
+  ttl_search: 300
+  ttl_analytics: 3600
+  ttl_lookup: 900
 
 logging:
   level: info

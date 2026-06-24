@@ -2,7 +2,6 @@ package services
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	"busca-cnpj-2026/internal/database"
@@ -23,7 +22,7 @@ func GetOrSetJSON[T any](
 	val, err := database.RedisClient.Get(ctx, key).Result()
 	if err == nil {
 		var result T
-		if unmarshalErr := json.Unmarshal([]byte(val), &result); unmarshalErr == nil {
+		if unmarshalErr := unmarshalCacheValue([]byte(val), &result); unmarshalErr == nil {
 			recordCacheHit(key)
 			return result, nil
 		}

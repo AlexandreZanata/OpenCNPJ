@@ -1,40 +1,54 @@
-# Performance
+# API Performance
 
-## Import (PostgreSQL COPY)
+Operational notes for profiling and validating API performance improvements.
 
-Session tuning (`--tune`):
+## pprof (CPU / heap)
 
-- `synchronous_commit=off`
-- `session_replication_role=replica`
-- Elevated `work_mem` / `maintenance_work_mem`
+Enable the profiling server:
 
-Pipeline:
+```bash
+ENABLE_PPROF=true go run ./cmd/api
+```
 
-1. Drop secondary indexes (`scripts/drop_all_import_indexes.sh`)
-2. Parallel COPY (`go run ./cmd/importer`)
-3. Rebuild indexes + `ANALYZE`
+Default listen address: `:6060`.
 
-**Measured (100% dataset, 2026-06-20):** ~286k rows/s ingest, ~13 min COPY + ~5 min indexes.
+```bash
+# CPU profile (30s)
+go tool pprof http://localhost:6060/debug/pprof/profile?seconds=30
 
-See [IMPORT.md](IMPORT.md) and [benchmarks/COMPARISON.md](benchmarks/COMPARISON.md).
+# Heap allocations
+go tool pprof http://localhost:6060/debug/pprof/heap
 
-## Go runtime
+# Goroutines
+go tool pprof http://localhost:6060/debug/pprof/goroutine
+```
 
-- `GOMAXPROCS` = CPU count
-- CSV read buffer: 4 MB
-- `GOGC=200` for long imports (optional)
+## Response compression
 
-## API targets
+Search endpoints return gzip when the client sends `Accept-Encoding: gzip`:
 
-| Route | Target |
-|-------|--------|
-| CNPJ lookup | < 10 ms |
-| Filtered search (cached) | < 100 ms |
-| Analytics summary | < 100 ms (pre-aggregated) |
-| Phone export (50k rows) | streaming, no full memory load |
+```bash
+curl -s -H 'Accept-Encoding: gzip' -D - \
+  'http://localhost:8080/api/v1/empresas/search?razao_social=PETROBRAS&limit=5' -o /dev/null
+```
 
-## Pre-import checklist
+Expect `Content-Encoding: gzip` on large JSON payloads.
 
-- [ ] Secondary indexes dropped
-- [ ] Sufficient disk for WAL + indexes (~2× table size headroom)
-- [ ] System guard enabled for parallel workers on low-RAM hosts
+## Cache TTL map
+
+| Key prefix | Default TTL | Config override |
+|------------|-------------|-----------------|
+| `estabelecimento:cnpj` | 24h | `cache.ttl_cnpj` |
+| `empresas:search` / `estabelecimentos:search` | 5m | `cache.ttl_search` |
+| `stats:` | 1h | `cache.ttl_analytics` |
+| `lookup:` | 15m | `cache.ttl_lookup` |
+
+Cache values are stored as msgpack (legacy JSON keys remain readable).
+
+## Local benchmarks
+
+Scripts live under `.local/01-api-performance-optimization/benchmarks/`.
+
+```bash
+k6 run .local/01-api-performance-optimization/benchmarks/k6-baseline.js
+```

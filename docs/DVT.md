@@ -16,6 +16,7 @@ Sequential IDs for new features that still need production-grade automated tests
 | DVT-10 | Phone export date filter and export-all | open |
 | DVT-11 | Download progress bar + one-command pipeline scripts | open |
 | DVT-13 | Redis cache hit/miss Prometheus metrics | open |
+| DVT-14 | Redis msgpack cache serialization | open |
 
 ## DVT-01: CNPJ open-data downloader (WebDAV)
 
@@ -106,4 +107,11 @@ Sequential IDs for new features that still need production-grade automated tests
 - **Scope**: `internal/services/cache_metrics.go`, `internal/services/cache_service.go`, `internal/services/cache_typed.go`
 - **Added**: 2026-06-24
 - **Needs**: integration test with Redis testcontainer verifying hit/miss counters increment per key prefix under load
+- **Status**: open
+
+## DVT-14: Redis msgpack cache serialization
+
+- **Scope**: `internal/services/cache_serialize.go`, `internal/services/cache_service.go`
+- **Added**: 2026-06-24
+- **Needs**: integration test verifying msgpack round-trip and legacy JSON cache key compatibility after deploy
 - **Status**: open

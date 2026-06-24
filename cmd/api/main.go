@@ -6,13 +6,17 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	_ "net/http/pprof"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/healthcheck"
+	"github.com/gofiber/fiber/v2/middleware/timeout"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"busca-cnpj-2026/internal/config"
@@ -102,6 +106,8 @@ func main() {
 		Prefork:         config.AppConfig.Server.Prefork,
 		ReadBufferSize:  config.AppConfig.Server.ReadBufferSize,
 		WriteBufferSize: config.AppConfig.Server.WriteBufferSize,
+		JSONEncoder:     sonic.Marshal,
+		JSONDecoder:     sonic.Unmarshal,
 		ErrorHandler: func(c *fiber.Ctx, err error) error {
 			code := fiber.StatusInternalServerError
 			if e, ok := err.(*fiber.Error); ok {
@@ -116,12 +122,14 @@ func main() {
 	})
 
 	// Middleware
+	app.Use(compress.New(compress.Config{Level: compress.LevelBestSpeed}))
 	app.Use(middleware.Logger())
 	app.Use(middleware.RequestID())
 	app.Use(middleware.Recovery())
 	app.Use(middleware.CORS())
 	app.Use(middleware.RateLimiter())
 	app.Use(middleware.Metrics())
+	app.Use(middleware.ResponseCache())
 
 	// Health check
 	app.Use(healthcheck.New(healthcheck.Config{
@@ -144,8 +152,8 @@ func main() {
 		return nil
 	})
 
-	// Profiling endpoints (only in development)
-	if config.AppConfig.Logging.Level == "debug" {
+	// Profiling endpoints (staging or debug)
+	if os.Getenv("ENABLE_PPROF") == "true" || config.AppConfig.Logging.Level == "debug" {
 		go func() {
 			pprofServer := &http.Server{
 				Addr:              ":6060",
@@ -156,6 +164,7 @@ func main() {
 				log.Printf("pprof server error: %v", err)
 			}
 		}()
+		log.Println("pprof enabled on :6060")
 	}
 
 	// Initialize handlers
@@ -168,9 +177,10 @@ func main() {
 	// Routes
 	v1 := app.Group("/api/v1")
 
-	// Search routes
-	v1.Get("/empresas/search", searchHandler.SearchEmpresas)
-	v1.Get("/estabelecimentos/search", searchHandler.SearchEstabelecimentos)
+	// Search routes (5s timeout on heavy fuzzy queries)
+	const searchTimeout = 5 * time.Second
+	v1.Get("/empresas/search", timeout.New(searchHandler.SearchEmpresas, searchTimeout))
+	v1.Get("/estabelecimentos/search", timeout.New(searchHandler.SearchEstabelecimentos, searchTimeout))
 	v1.Get("/estabelecimentos/:cnpj", searchHandler.GetEstabelecimentoByCNPJ)
 
 	// Export routes

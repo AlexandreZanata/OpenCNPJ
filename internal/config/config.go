@@ -69,8 +69,12 @@ type ImportConfig struct {
 }
 
 type CacheConfig struct {
-	Enabled bool
-	TTL     int
+	Enabled       bool
+	TTL           int
+	TTLCNPJ       int
+	TTLSearch     int
+	TTLAnalytics  int
+	TTLLookup     int
 }
 
 type LoggingConfig struct {
@@ -144,8 +148,12 @@ func Load() error {
 			DataPath:       viper.GetString("import.data_path"),
 		},
 		Cache: CacheConfig{
-			Enabled: viper.GetBool("cache.enabled"),
-			TTL:     viper.GetInt("cache.ttl"),
+			Enabled:      viper.GetBool("cache.enabled"),
+			TTL:          viper.GetInt("cache.ttl"),
+			TTLCNPJ:      viper.GetInt("cache.ttl_cnpj"),
+			TTLSearch:    viper.GetInt("cache.ttl_search"),
+			TTLAnalytics: viper.GetInt("cache.ttl_analytics"),
+			TTLLookup:    viper.GetInt("cache.ttl_lookup"),
 		},
 		Logging: LoggingConfig{
 			Level:  viper.GetString("logging.level"),
@@ -216,6 +224,10 @@ func setDefaults() {
 
 	viper.SetDefault("cache.enabled", true)
 	viper.SetDefault("cache.ttl", 300)
+	viper.SetDefault("cache.ttl_cnpj", 86400)
+	viper.SetDefault("cache.ttl_search", 300)
+	viper.SetDefault("cache.ttl_analytics", 3600)
+	viper.SetDefault("cache.ttl_lookup", 900)
 
 	viper.SetDefault("logging.level", "info")
 	viper.SetDefault("logging.format", "json")
