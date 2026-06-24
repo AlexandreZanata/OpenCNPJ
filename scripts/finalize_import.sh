@@ -1,45 +1,45 @@
 #!/bin/bash
 
-# Script de finalização após importação
-# Recria índices, executa VACUUM ANALYZE e reabilita autovacuum
+# Post-import finalization script.
+# Recreates indexes, runs VACUUM ANALYZE, and re-enables autovacuum.
 
 set -e
 
 echo "=========================================="
-echo "Finalizando importação - Otimizando banco"
+echo "Finalizing import - optimizing database"
 echo "=========================================="
 
-# Verificar se o container está rodando
+# Verify the container is running
 if ! docker ps | grep -q receita-postgres; then
-    echo "ERRO: Container receita-postgres não está rodando!"
+    echo "ERROR: receita-postgres container is not running!"
     exit 1
 fi
 
-# Configurar variáveis
+# Configure variables
 DB_HOST="${DB_HOST:-localhost}"
 DB_PORT="${DB_PORT:-5434}"
 DB_USER="${DB_USER:-receita_user}"
 DB_NAME="${DB_NAME:-receita_db}"
 
 echo ""
-echo "Conectando ao PostgreSQL..."
+echo "Connecting to PostgreSQL..."
 echo "Host: $DB_HOST:$DB_PORT"
 echo "Database: $DB_NAME"
 echo "User: $DB_USER"
 
-# Função para executar SQL
+# Execute SQL
 exec_sql() {
     docker exec -i receita-postgres psql -U "$DB_USER" -d "$DB_NAME" -c "$1"
 }
 
-# Função para executar SQL e capturar output
+# Execute SQL and capture output
 exec_sql_output() {
     docker exec -i receita-postgres psql -U "$DB_USER" -d "$DB_NAME" -t -A -c "$1"
 }
 
-# 1. Verificar estatísticas antes
+# 1. Check statistics before finalization
 echo ""
-echo "1. Estatísticas antes da finalização:"
+echo "1. Statistics before finalization:"
 exec_sql "
 SELECT 
     schemaname,
@@ -51,92 +51,92 @@ WHERE tablename IN ('empresas', 'estabelecimentos', 'socios', 'simples', 'cnaes'
 ORDER BY tablename;
 "
 
-# 2. Recriar índices em paralelo (CONCURRENTLY para não bloquear)
+# 2. Recreate indexes in parallel (CONCURRENTLY to avoid blocking)
 echo ""
-echo "2. Recriando índices em paralelo (CONCURRENTLY)..."
-echo "   Isso pode levar vários minutos dependendo do tamanho dos dados..."
-echo "   Usando script dedicado: recreate_indexes_after_import.sh"
+echo "2. Recreating indexes in parallel (CONCURRENTLY)..."
+echo "   This may take several minutes depending on data size..."
+echo "   Using dedicated script: recreate_indexes_after_import.sh"
 echo ""
-echo "   Se preferir, execute manualmente:"
+echo "   To run manually instead:"
 echo "   ./scripts/recreate_indexes_after_import.sh"
 echo ""
-echo "   Continuando com VACUUM ANALYZE..."
+echo "   Continuing with VACUUM ANALYZE..."
 
-# Índices para empresas
-echo "   Recriando índices de empresas..."
-exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_empresas_razao_social_gin ON empresas USING gin(razao_social gin_trgm_ops);" || echo "    (índice já existe ou erro)"
-exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_empresas_natureza_juridica ON empresas(natureza_juridica);" || echo "    (índice já existe ou erro)"
+# Indexes for empresas
+echo "   Recreating empresa indexes..."
+exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_empresas_razao_social_gin ON empresas USING gin(razao_social gin_trgm_ops);" || echo "    (index already exists or error)"
+exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_empresas_natureza_juridica ON empresas(natureza_juridica);" || echo "    (index already exists or error)"
 
-# Índices para estabelecimentos
-echo "   Recriando índices de estabelecimentos..."
-exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_estabelecimentos_cnpj_completo ON estabelecimentos(cnpj_completo);" || echo "    (índice já existe ou erro)"
-exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_estabelecimentos_cnpj_basico ON estabelecimentos(cnpj_basico);" || echo "    (índice já existe ou erro)"
-exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_estabelecimentos_cnae ON estabelecimentos(cnae_fiscal_principal);" || echo "    (índice já existe ou erro)"
-exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_estabelecimentos_municipio ON estabelecimentos(municipio);" || echo "    (índice já existe ou erro)"
-exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_estabelecimentos_uf ON estabelecimentos(uf);" || echo "    (índice já existe ou erro)"
-exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_estabelecimentos_situacao ON estabelecimentos(situacao_cadastral);" || echo "    (índice já existe ou erro)"
-exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_estabelecimentos_nome_fantasia_gin ON estabelecimentos USING gin(nome_fantasia gin_trgm_ops);" || echo "    (índice já existe ou erro)"
-exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_estabelecimentos_cep ON estabelecimentos(cep);" || echo "    (índice já existe ou erro)"
-exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_estabelecimentos_cnae_uf_situacao ON estabelecimentos(cnae_fiscal_principal, uf, situacao_cadastral);" || echo "    (índice já existe ou erro)"
+# Indexes for estabelecimentos
+echo "   Recreating estabelecimento indexes..."
+exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_estabelecimentos_cnpj_completo ON estabelecimentos(cnpj_completo);" || echo "    (index already exists or error)"
+exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_estabelecimentos_cnpj_basico ON estabelecimentos(cnpj_basico);" || echo "    (index already exists or error)"
+exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_estabelecimentos_cnae ON estabelecimentos(cnae_fiscal_principal);" || echo "    (index already exists or error)"
+exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_estabelecimentos_municipio ON estabelecimentos(municipio);" || echo "    (index already exists or error)"
+exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_estabelecimentos_uf ON estabelecimentos(uf);" || echo "    (index already exists or error)"
+exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_estabelecimentos_situacao ON estabelecimentos(situacao_cadastral);" || echo "    (index already exists or error)"
+exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_estabelecimentos_nome_fantasia_gin ON estabelecimentos USING gin(nome_fantasia gin_trgm_ops);" || echo "    (index already exists or error)"
+exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_estabelecimentos_cep ON estabelecimentos(cep);" || echo "    (index already exists or error)"
+exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_estabelecimentos_cnae_uf_situacao ON estabelecimentos(cnae_fiscal_principal, uf, situacao_cadastral);" || echo "    (index already exists or error)"
 
-# Índices para socios
-echo "   Recriando índices de socios..."
-exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_socios_cnpj_basico ON socios(cnpj_basico);" || echo "    (índice já existe ou erro)"
-exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_socios_nome_socio_gin ON socios USING gin(nome_socio gin_trgm_ops);" || echo "    (índice já existe ou erro)"
+# Indexes for socios
+echo "   Recreating socios indexes..."
+exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_socios_cnpj_basico ON socios(cnpj_basico);" || echo "    (index already exists or error)"
+exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_socios_nome_socio_gin ON socios USING gin(nome_socio gin_trgm_ops);" || echo "    (index already exists or error)"
 
-# Índices para simples
-echo "   Recriando índices de simples..."
-exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_simples_cnpj_basico ON simples(cnpj_basico);" || echo "    (índice já existe ou erro)"
+# Indexes for simples
+echo "   Recreating simples indexes..."
+exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_simples_cnpj_basico ON simples(cnpj_basico);" || echo "    (index already exists or error)"
 
-echo "   Índices recriados!"
+echo "   Indexes recreated!"
 
-# 3. Executar ANALYZE nas tabelas (coleta estatísticas sem VACUUM)
-# ANALYZE é mais rápido e suficiente para atualizar estatísticas do planner
+# 3. Run ANALYZE on tables (collect statistics without VACUUM)
+# ANALYZE is faster and sufficient to refresh planner statistics
 echo ""
-echo "3. Executando ANALYZE para atualizar estatísticas..."
-echo "   (ANALYZE é mais rápido que VACUUM ANALYZE e suficiente para estatísticas)"
+echo "3. Running ANALYZE to refresh statistics..."
+echo "   (ANALYZE is faster than VACUUM ANALYZE and sufficient for statistics)"
 
-# Executar ANALYZE em paralelo usando background jobs quando possível
+# Run ANALYZE in parallel using background jobs when possible
 for table in empresas estabelecimentos socios simples cnaes motivos municipios naturezas paises qualificacoes; do
-    echo "   Analisando tabela: $table"
-    exec_sql "ANALYZE $table;" || echo "    (tabela $table pode não existir)"
+    echo "   Analyzing table: $table"
+    exec_sql "ANALYZE $table;" || echo "    (table $table may not exist)"
 done
 
-# 4. Executar VACUUM ANALYZE apenas nas tabelas grandes (isso pode levar vários minutos)
+# 4. Run VACUUM ANALYZE only on large tables (may take several minutes)
 echo ""
-echo "4. Executando VACUUM ANALYZE nas tabelas grandes..."
-echo "   Isso otimiza o banco e remove espaço morto (pode levar vários minutos)"
-echo "   Tabelas pequenas (referência) não precisam de VACUUM"
+echo "4. Running VACUUM ANALYZE on large tables..."
+echo "   This optimizes the database and reclaims dead space (may take several minutes)"
+echo "   Small reference tables do not need VACUUM"
 
 for table in empresas estabelecimentos socios simples; do
-    echo "   VACUUM ANALYZE em: $table (isso pode levar alguns minutos)..."
-    exec_sql "VACUUM ANALYZE $table;" || echo "    (erro ao fazer VACUUM em $table)"
-    echo "   ✅ VACUUM ANALYZE concluído para: $table"
+    echo "   VACUUM ANALYZE on: $table (this may take a few minutes)..."
+    exec_sql "VACUUM ANALYZE $table;" || echo "    (error running VACUUM on $table)"
+    echo "   ✅ VACUUM ANALYZE completed for: $table"
 done
 
-# 5. Reabilitar autovacuum
+# 5. Re-enable autovacuum
 echo ""
-echo "5. Reabilitando autovacuum..."
-exec_sql "ALTER SYSTEM SET autovacuum = on;" || echo "  (autovacuum já habilitado ou não configurável via ALTER SYSTEM)"
+echo "5. Re-enabling autovacuum..."
+exec_sql "ALTER SYSTEM SET autovacuum = on;" || echo "  (autovacuum already enabled or not configurable via ALTER SYSTEM)"
 exec_sql "SELECT pg_reload_conf();" || true
 
-# Reabilitar autovacuum por tabela
+# Re-enable autovacuum per table
 for table in empresas estabelecimentos socios simples; do
-    echo "  Reabilitando autovacuum para tabela: $table"
-    exec_sql "ALTER TABLE $table SET (autovacuum_enabled = true);" || echo "    (tabela $table pode não existir)"
+    echo "  Re-enabling autovacuum for table: $table"
+    exec_sql "ALTER TABLE $table SET (autovacuum_enabled = true);" || echo "    (table $table may not exist)"
 done
 
-# 6. Restaurar configurações PostgreSQL padrão
+# 6. Restore default PostgreSQL session settings
 echo ""
-echo "6. Restaurando configurações de sessão padrão..."
+echo "6. Restoring default session settings..."
 exec_sql "SET synchronous_commit = on;" || true
 exec_sql "SET work_mem = '20MB';" || true
 exec_sql "SET statement_timeout = DEFAULT;" || true
 exec_sql "SET lock_timeout = DEFAULT;" || true
 
-# 7. Verificar estatísticas finais
+# 7. Check final statistics
 echo ""
-echo "7. Estatísticas finais:"
+echo "7. Final statistics:"
 exec_sql "
 SELECT 
     schemaname,
@@ -155,9 +155,9 @@ WHERE tablename IN ('empresas', 'estabelecimentos', 'socios', 'simples', 'cnaes'
 ORDER BY tablename;
 "
 
-# 8. Verificar índices criados
+# 8. Verify created indexes
 echo ""
-echo "8. Índices criados:"
+echo "8. Created indexes:"
 exec_sql "
 SELECT 
     schemaname,
@@ -172,8 +172,8 @@ ORDER BY tablename, indexname;
 
 echo ""
 echo "=========================================="
-echo "Finalização concluída!"
+echo "Finalization complete!"
 echo "=========================================="
 echo ""
-echo "O banco de dados está otimizado e pronto para uso."
+echo "The database is optimized and ready for use."
 echo ""

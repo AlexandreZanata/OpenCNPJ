@@ -83,7 +83,7 @@ func (c *Collector) StartReporter(ctx context.Context, every time.Duration, logg
 			}
 
 			logger.Printf(
-				"[%s] %s | %d rows | %.0f rows/s | %.1f MB/s | %d erros",
+				"[%s] %s | %d rows | %.0f rows/s | %.1f MB/s | %d errors",
 				now.Format("2006-01-02 15:04:05"),
 				c.dataset,
 				totalRows,

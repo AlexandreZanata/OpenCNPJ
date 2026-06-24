@@ -1,10 +1,11 @@
 # Commit Convention
 
-Formato:
+Format:
 
 `type(scope): subject`
 
-Tipos permitidos:
+## Allowed types
+
 - feat
 - fix
 - perf
@@ -17,7 +18,17 @@ Tipos permitidos:
 - build
 - revert
 
-Exemplos:
+## Rules
+
+- Subject max **72 characters**
+- Use imperative mood (`add`, not `added`)
+- Scope is optional but recommended (`parser`, `api`, `web`)
+
+## Examples
+
 - `feat(parser): add Latin-1 to UTF-8 conversion in CSV reader`
 - `perf(loader): replace batch insert with COPY FROM STDIN`
 - `test(parser): cover date null edge case`
+- `docs(security): translate policy to English`
+
+Enforced locally via `.commitlintrc.yml` and in CI when configured.

@@ -1,10 +1,10 @@
--- Create SÓCIOS table with partitioning
+-- Create SOCIOS table with partitioning
 CREATE TABLE socios (
     id BIGSERIAL,
     cnpj_basico VARCHAR(8) NOT NULL REFERENCES empresas(cnpj_basico),
     identificador_socio VARCHAR(1),
     nome_socio VARCHAR(255) NOT NULL,
-    cpf_cnpj_socio VARCHAR(14), -- Parcialmente mascarado
+    cpf_cnpj_socio VARCHAR(14), -- partially masked by RFB
     qualificacao_socio VARCHAR(2) REFERENCES qualificacoes(codigo),
     data_entrada_sociedade DATE,
     pais VARCHAR(3) REFERENCES paises(codigo),

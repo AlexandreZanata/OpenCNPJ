@@ -1,5 +1,7 @@
 # Contributing
 
+Thank you for contributing to OpenCNPJ. This project follows enterprise open-source practices: English code and docs, tests for changes, and conventional commits.
+
 ## Local setup
 
 ```bash

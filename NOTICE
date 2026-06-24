@@ -1,0 +1,17 @@
+OpenCNPJ Platform
+Copyright 2026 OpenCNPJ Contributors
+
+This product includes software developed by third parties under their respective
+licenses. See go.mod and web/package.json for the full dependency list.
+
+Major runtime components:
+
+- Go standard library — BSD-style license
+- github.com/gofiber/fiber/v2 — MIT
+- github.com/jackc/pgx/v5 — MIT
+- github.com/redis/go-redis/v9 — BSD-2-Clause
+- github.com/prometheus/client_golang — Apache-2.0
+- React — MIT (web/)
+
+Receita Federal CNPJ open data is public government data. This NOTICE does not
+assert copyright over RFB datasets.

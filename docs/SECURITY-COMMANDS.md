@@ -1,36 +1,36 @@
 # Security Tooling Commands
 
-Referência completa de todos os comandos usados no pipeline de segurança (CI e local).
+Complete reference for security pipeline commands (CI and local).
 
 ---
 
-## 1. Executar a stack completa localmente
+## 1. Run the full stack locally
 
-Roda em sequência: golangci-lint → gosec → staticcheck → govulncheck.  
-Instala as ferramentas automaticamente se não estiverem no PATH.
+Runs in sequence: golangci-lint → gosec → staticcheck → govulncheck.  
+Installs tools automatically if not in `PATH`.
 
 ```bash
 ./scripts/security-check.sh
 ```
 
-**Requisito:** estar na raiz do projeto (onde está o `go.mod`).  
-**Saída:** exit 0 se tudo passou, exit 1 se algum check falhou.
+**Requirement:** run from project root (where `go.mod` lives).  
+**Exit code:** 0 if all passed, 1 if any check failed.
 
 ---
 
-## 2. Instalação das ferramentas (Go)
+## 2. Tool installation (Go)
 
-Cada comando instala a ferramenta em `$(go env GOPATH)/bin`. Garanta que esse diretório está no `PATH`.
+Each command installs to `$(go env GOPATH)/bin`. Ensure that directory is in `PATH`.
 
-| Ferramenta        | Comando de instalação |
-|-------------------|------------------------|
-| golangci-lint     | `go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest` |
-| gosec             | `go install github.com/securego/gosec/v2/cmd/gosec@latest` |
-| staticcheck       | `go install honnef.co/go/tools/cmd/staticcheck@latest` |
-| govulncheck       | `go install golang.org/x/vuln/cmd/govulncheck@latest` |
-| nancy             | `go install github.com/sonatype-nexus-community/nancy@latest` |
+| Tool | Install command |
+|------|-----------------|
+| golangci-lint | `go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest` |
+| gosec | `go install github.com/securego/gosec/v2/cmd/gosec@latest` |
+| staticcheck | `go install honnef.co/go/tools/cmd/staticcheck@latest` |
+| govulncheck | `go install golang.org/x/vuln/cmd/govulncheck@latest` |
+| nancy | `go install github.com/sonatype-nexus-community/nancy@latest` |
 
-**Exemplo — adicionar GOPATH/bin ao PATH e instalar tudo:**
+**Example — add GOPATH/bin to PATH and install all:**
 
 ```bash
 export PATH="${PATH}:$(go env GOPATH)/bin"
@@ -44,13 +44,13 @@ go install github.com/sonatype-nexus-community/nancy@latest
 
 ---
 
-## 3. Comandos de análise (rodar manualmente)
+## 3. Analysis commands (manual)
 
-Execute na **raiz do projeto** (onde estão `go.mod` e `.golangci.yml`).
+Run from **project root** (where `go.mod` and `.golangci.yml` live).
 
 ### 3.1 golangci-lint
 
-Lint com gosec, staticcheck, errcheck, govet, ineffassign, unused (config em `.golangci.yml`).
+Lint with gosec, staticcheck, errcheck, govet, ineffassign, unused (config in `.golangci.yml`).
 
 ```bash
 golangci-lint run --timeout=5m --config=.golangci.yml ./...
@@ -58,13 +58,13 @@ golangci-lint run --timeout=5m --config=.golangci.yml ./...
 
 ### 3.2 gosec (SAST)
 
-**Somente saída no terminal:**
+**Terminal output only:**
 
 ```bash
 gosec ./...
 ```
 
-**Gerar SARIF (para upload no GitHub Security):**
+**Generate SARIF (for GitHub Security upload):**
 
 ```bash
 gosec -fmt sarif -out gosec-results.sarif ./...
@@ -76,27 +76,27 @@ gosec -fmt sarif -out gosec-results.sarif ./...
 staticcheck ./...
 ```
 
-### 3.4 govulncheck (dependências)
+### 3.4 govulncheck (dependencies)
 
 ```bash
 govulncheck ./...
 ```
 
-**Modo verboso (mais detalhes):**
+**Verbose mode:**
 
 ```bash
 govulncheck -show verbose ./...
 ```
 
-### 3.5 nancy (dependências — Sonatype OSS Index)
+### 3.5 nancy (dependencies — Sonatype OSS Index)
 
-Lista de módulos em JSON piped para o nancy:
+Pipe module list JSON to nancy:
 
 ```bash
 go list -json -m all | nancy sleuth
 ```
 
-**Alternativa usando arquivo (se o pipe não for suportado):**
+**Alternative using a file (if pipe is unsupported):**
 
 ```bash
 go list -json -m all > go.list
@@ -105,45 +105,45 @@ nancy sleuth -p go.list
 
 ---
 
-## 4. Comandos que rodam no CI (GitHub Actions)
+## 4. CI commands (GitHub Actions)
 
-O workflow `.github/workflows/security.yml` executa os mesmos comandos nos seguintes jobs.
+Workflow `.github/workflows/security.yml` runs the same commands in these jobs.
 
 ### Job: lint
 
 - **Checkout:** `actions/checkout@v4`
-- **Go:** `actions/setup-go@v5` com `go-version-file: go.mod`
-- **Cache:** `actions/cache@v4` (chave: `go.sum`)
+- **Go:** `actions/setup-go@v5` with `go-version-file: go.mod`
+- **Cache:** `actions/cache@v4` (key: `go.sum`)
 - **Lint:** `golangci-lint run --timeout=5m --config=.golangci.yml` (via `golangci/golangci-lint-action@v6`)
 
-### Job: sast (depende de lint)
+### Job: sast (depends on lint)
 
-- **Instalar gosec:**  
+- **Install gosec:**  
   `go install github.com/securego/gosec/v2/cmd/gosec@latest`
-- **Instalar staticcheck:**  
+- **Install staticcheck:**  
   `go install honnef.co/go/tools/cmd/staticcheck@latest`
-- **Rodar gosec (SARIF):**  
+- **Run gosec (SARIF):**  
   `gosec -fmt sarif -out gosec-results.sarif ./...`
-- **Rodar staticcheck:**  
+- **Run staticcheck:**  
   `staticcheck ./...`
-- **Upload SARIF:** ação `github/codeql-action/upload-sarif@v3` com `sarif_file: gosec-results.sarif` e `if: always()`
+- **Upload SARIF:** `github/codeql-action/upload-sarif@v3` with `sarif_file: gosec-results.sarif` and `if: always()`
 
-### Job: dependency-scan (depende de sast)
+### Job: dependency-scan (depends on sast)
 
-- **Instalar govulncheck:**  
+- **Install govulncheck:**  
   `go install golang.org/x/vuln/cmd/govulncheck@latest`
-- **Rodar govulncheck:**  
+- **Run govulncheck:**  
   `govulncheck ./...`
-- **Instalar nancy:**  
+- **Install nancy:**  
   `go install github.com/sonatype-nexus-community/nancy@latest`
-- **Rodar nancy:**  
+- **Run nancy:**  
   `go list -json -m all | nancy sleuth`
 
 ---
 
-## 5. Resumo em uma linha (local)
+## 5. One-liner summary (local)
 
-Para quem já tem as ferramentas instaladas e só quer repetir os 4 checks na ordem do script:
+If tools are already installed, repeat the four checks in script order:
 
 ```bash
 golangci-lint run --timeout=5m --config=.golangci.yml ./... && \
@@ -152,7 +152,7 @@ staticcheck ./... && \
 govulncheck ./...
 ```
 
-Para incluir nancy (como no CI):
+Include nancy (as in CI):
 
 ```bash
 golangci-lint run --timeout=5m --config=.golangci.yml ./... && \
@@ -164,51 +164,51 @@ go list -json -m all | nancy sleuth
 
 ---
 
-## 6. Arquivos de configuração relacionados
+## 6. Related configuration files
 
-| Arquivo            | Uso |
-|--------------------|-----|
-| `.golangci.yml`    | Config do golangci-lint (linters, gosec severity/confidence, timeout 5m). |
-| `.github/workflows/security.yml` | Pipeline Security no GitHub Actions. |
-| `scripts/security-check.sh`      | Script local que instala (se necessário) e roda os 4 checks. |
+| File | Purpose |
+|------|---------|
+| `.golangci.yml` | golangci-lint config (linters, gosec severity/confidence, 5m timeout) |
+| `.github/workflows/security.yml` | Security pipeline on GitHub Actions |
+| `scripts/security-check.sh` | Local script: install (if needed) and run four checks |
 
-Ver também: [SECURITY.md](SECURITY.md) para política de severidade, supressões e como reportar vulnerabilidades.
+See also: [SECURITY.md](SECURITY.md) for severity policy, suppressions, and vulnerability reporting.
 
 ---
 
-## 7. Qualidade de código (pacote completo)
+## 7. Full code quality sequence
 
-Sequência recomendada para validar qualidade localmente, na mesma ordem da CI:
+Recommended local validation order (matches CI):
 
 ```bash
-# 0) Dependências e organização
+# 0) Dependencies
 go mod tidy
 
-# 1) Formatação e imports
+# 1) Formatting and imports
 gofmt -w .
 goimports -w .
 
-# 2) Build e checks básicos
+# 2) Build and basic checks
 go vet ./...
 go test ./... -short -race -count=1
 
-# 3) Lint completo
+# 3) Full lint
 golangci-lint run --timeout 5m
 
-# 4) Segurança e análise estática
+# 4) Security and static analysis
 gosec ./...
 staticcheck ./...
 govulncheck ./...
 go list -json -m all | nancy sleuth
 
-# 5) Testes de integração
+# 5) Integration tests
 go test ./tests/integration/... -v -timeout 15m
 
 # 6) Benchmarks
 go test ./tests/benchmark/... -bench=. -benchmem -benchtime=5s -count=3
 ```
 
-Atalhos por `Makefile`:
+Makefile shortcuts:
 
 ```bash
 make build
@@ -219,7 +219,7 @@ make bench
 make coverage
 ```
 
-Validação de commit convencional (local):
+Conventional commit validation (local):
 
 ```bash
 npm install --save-dev @commitlint/cli @commitlint/config-conventional

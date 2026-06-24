@@ -36,8 +36,8 @@ CREATE TABLE qualificacoes (
 CREATE TABLE cnaes (
     codigo VARCHAR(7) PRIMARY KEY,
     descricao VARCHAR(255) NOT NULL,
-    secao VARCHAR(1),  -- Derivado do código (primeiro dígito)
-    divisao VARCHAR(2), -- Derivado (2 primeiros dígitos)
+    secao VARCHAR(1),  -- Derived from code (first digit)
+    divisao VARCHAR(2), -- Derived (first two digits)
     created_at TIMESTAMP DEFAULT NOW()
 );
 

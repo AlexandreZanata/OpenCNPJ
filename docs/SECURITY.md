@@ -1,94 +1,107 @@
-# Política de Segurança
+# Security Policy
 
-Este documento descreve as ferramentas de segurança do projeto, como interpretar resultados, políticas de severidade e como reportar vulnerabilidades.
-
----
-
-## 1. Ferramentas e o que cada uma detecta
-
-| Ferramenta      | Tipo            | O que encontra                                                                 | Quando roda        |
-|-----------------|-----------------|-------------------------------------------------------------------------------|--------------------|
-| **gosec**       | SAST            | Credenciais hardcoded, SQL injection, permissões de arquivo, criptografia fraca | PR, push, semanal  |
-| **staticcheck** | SAST            | Bugs, API deprecada, performance, correção de código                         | PR, push, semanal  |
-| **govulncheck** | Dependency CVE  | CVEs em módulos Go (diretos e indiretos)                                      | PR, push, semanal  |
-| **nancy**       | Dependency CVE  | Vulnerabilidades no Sonatype OSS Index                                        | PR, push, semanal  |
-
-- **SAST** (Static Application Security Testing): análise estática do código-fonte.
-- **Dependency CVE**: varredura de dependências conhecidas (go.mod / go.sum) contra bases de vulnerabilidades.
+This document describes security tooling, how to interpret results, severity policies, and how to report vulnerabilities.
 
 ---
 
-## 2. Como interpretar resultados no GitHub
+## 1. Tools and what each detects
 
-1. Acesse o repositório no GitHub.
-2. Abra a aba **Security**.
-3. No menu lateral, clique em **Code scanning alerts** (ou **Vulnerability alerts** para dependências).
-4. Os alertas do gosec aparecem em Code scanning (upload SARIF). Cada achado tem:
+| Tool | Type | Finds | When it runs |
+|------|------|-------|--------------|
+| **gosec** | SAST | Hardcoded credentials, SQL injection, file permissions, weak crypto | PR, push, weekly |
+| **staticcheck** | SAST | Bugs, deprecated APIs, performance, code correctness | PR, push, weekly |
+| **govulncheck** | Dependency CVE | CVEs in Go modules (direct and indirect) | PR, push, weekly |
+| **nancy** | Dependency CVE | Vulnerabilities via Sonatype OSS Index | PR, push, weekly |
+
+- **SAST** (Static Application Security Testing): static analysis of source code.
+- **Dependency CVE**: scans `go.mod` / `go.sum` against known vulnerability databases.
+
+---
+
+## 2. How to interpret results on GitHub
+
+1. Open the repository on GitHub.
+2. Go to the **Security** tab.
+3. In the sidebar, click **Code scanning alerts** (or **Dependabot alerts** for dependencies).
+4. gosec alerts appear under Code scanning (SARIF upload). Each finding includes:
    - **Severity**: Critical, High, Medium, Low.
-   - **Regra**: ex.: G201 (SQL injection), G304 (path traversal).
+   - **Rule**: e.g. G201 (SQL injection), G304 (path traversal).
 
-**Significado das severidades:**
+**Severity meaning:**
 
-- **Critical** / **High**: vulnerabilidades que devem ser corrigidas antes do merge.
-- **Medium**: bloqueia por padrão; pode ser suprimido com justificativa documentada.
-- **Low**: aviso; não bloqueia o merge, mas deve ser revisado.
+- **Critical** / **High**: must be fixed before merge.
+- **Medium**: blocks by default; may be suppressed with documented justification.
+- **Low**: advisory only; does not block merge but should be reviewed.
 
-Ao receber uma falha: corrigir o código ou a dependência, ou (apenas para Medium) suprimir com comentário obrigatório (veja seção 4).
-
----
-
-## 3. Política de severidade — quando o PR é bloqueado
-
-| Severidade | Efeito                                                                 |
-|------------|------------------------------------------------------------------------|
-| **CRITICAL** | Bloqueia merge obrigatoriamente.                                       |
-| **HIGH**     | Bloqueia merge obrigatoriamente.                                      |
-| **MEDIUM**   | Bloqueia por padrão; pode ser suprimido com justificativa no código.  |
-| **LOW**      | Aviso apenas; não bloqueia merge.                                     |
-
-O pipeline de segurança (workflow **Security**) falha se qualquer job (lint, SAST ou dependency-scan) falhar. Falha no pipeline impede merge até correção ou supressão justificada (apenas para MEDIUM).
+On failure: fix the code or dependency, or (Medium only) suppress with a mandatory comment (see section 4).
 
 ---
 
-## 4. Como suprimir um falso positivo
+## 3. Severity policy — when PRs are blocked
 
-Toda supressão deve ter um comentário explicando o motivo. Supressões sem comentário são rejeitadas em code review.
+| Severity | Effect |
+|----------|--------|
+| **CRITICAL** | Merge blocked. |
+| **HIGH** | Merge blocked. |
+| **MEDIUM** | Blocked by default; suppressible with in-code justification. |
+| **LOW** | Advisory only; merge allowed. |
 
-**gosec** — use `#nosec` com o código da regra e motivo:
+The **Security** workflow fails if any job (lint, SAST, or dependency-scan) fails. A failed pipeline blocks merge until fixed or justified (Medium only).
+
+---
+
+## 4. Suppressing false positives
+
+Every suppression must include a comment explaining why. Suppressions without comments are rejected in code review.
+
+**gosec** — use `#nosec` with rule code and reason:
 
 ```go
-// #nosec G201 -- falso positivo: input sanitizado em L42
+// #nosec G201 -- false positive: input sanitized at L42
 query := fmt.Sprintf("SELECT * FROM users WHERE id = %s", sanitizedID)
 ```
 
 **staticcheck** (via golangci-lint) — use `//nolint`:
 
 ```go
-//nolint:staticcheck -- motivo breve (ex.: API legada, migração em andamento)
-usoDeAPIDeprecada()
+//nolint:staticcheck -- brief reason (e.g. legacy API, migration in progress)
+deprecatedAPICall()
 ```
 
-Regra: **todo comentário de supressão deve explicar o porquê**. Sem comentário = rejeição no code review.
+**Rule:** every suppression comment must explain **why**. No comment = rejection in code review.
 
 ---
 
-## 5. Como reportar uma vulnerabilidade
+## 5. Reporting a vulnerability
 
-- **Não abra uma issue pública** para vulnerabilidades de segurança.
-- Envie um e-mail para: **security@example.com**  
-  *(Substitua pelo e-mail real do projeto ou da organização.)*
-- Prazo de resposta esperado: **48 horas úteis**.
+- **Do not open a public issue** for security vulnerabilities.
+- Email: **security@example.com**  
+  *(Replace with the project or organization contact.)*
+- Expected response time: **48 business hours**.
 
 ---
 
-## 6. Scan semanal automático
+## 6. Weekly automated scan
 
-- O workflow **Security** roda automaticamente **toda segunda-feira às 8h UTC** no branch `main` (agendamento no GitHub Actions).
-- Os resultados são enviados para a aba **Security** do repositório (Code scanning e dependências).
-- O time pode ser notificado pelas notificações do GitHub (configuráveis em Settings → Notifications).
+- The **Security** workflow runs automatically every **Monday at 08:00 UTC** on `main`.
+- Results appear in the repository **Security** tab (Code scanning and dependencies).
+- Configure GitHub notifications under Settings → Notifications.
 
-Para rodar os mesmos checks localmente antes do push:
+Run the same checks locally before push:
 
 ```bash
 ./scripts/security-check.sh
 ```
+
+See [SECURITY-COMMANDS.md](SECURITY-COMMANDS.md) for full command reference.
+
+---
+
+## 7. Data protection (LGPD)
+
+CNPJ data may include masked CPF and partner names. Production deployments must:
+
+- Enforce authentication and authorization before exposing search/export APIs
+- Rate-limit public endpoints
+- Log access without storing full CPF in plain text
+- Follow LGPD/GDPR requirements for your jurisdiction

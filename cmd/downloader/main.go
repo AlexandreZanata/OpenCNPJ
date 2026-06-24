@@ -15,19 +15,19 @@ import (
 
 func main() {
 	var (
-		outputDir     = flag.String("output", envOr("DATA_PATH", "./data"), "Diretório de saída dos CSVs")
-		month         = flag.String("month", os.Getenv("DOWNLOAD_MONTH"), "Mês no formato YYYY-MM (padrão: mês atual ou mais recente)")
-		baseURL       = flag.String("base-url", envOr("RFB_WEBDAV_URL", downloader.DefaultBaseURL), "URL WebDAV da Receita Federal")
-		shareToken    = flag.String("share-token", envOr("RFB_SHARE_TOKEN", downloader.DefaultShareToken), "Token do compartilhamento público")
-		workers       = flag.Int("workers", 4, "Downloads paralelos (reservado)")
-		keepZIP       = flag.Bool("keep-zip", false, "Manter arquivos ZIP após extração")
-		retryAttempts = flag.Int("retry", 3, "Tentativas de download por arquivo")
-		timeoutMin    = flag.Int("timeout", 30, "Timeout HTTP em minutos")
-		listOnly      = flag.Bool("list", false, "Apenas listar meses disponíveis")
+		outputDir     = flag.String("output", envOr("DATA_PATH", "./data"), "Output directory for CSV files")
+		month         = flag.String("month", os.Getenv("DOWNLOAD_MONTH"), "Month as YYYY-MM (default: current or latest available)")
+		baseURL       = flag.String("base-url", envOr("RFB_WEBDAV_URL", downloader.DefaultBaseURL), "Receita Federal WebDAV URL")
+		shareToken    = flag.String("share-token", envOr("RFB_SHARE_TOKEN", downloader.DefaultShareToken), "Public share token")
+		workers       = flag.Int("workers", 4, "Parallel downloads (reserved)")
+		keepZIP       = flag.Bool("keep-zip", false, "Keep ZIP files after extraction")
+		retryAttempts = flag.Int("retry", 3, "Download retry attempts per file")
+		timeoutMin    = flag.Int("timeout", 30, "HTTP timeout in minutes")
+		listOnly      = flag.Bool("list", false, "List available months only")
 	)
 	flag.Parse()
 
-	_ = workers // reservado para downloads paralelos futuros
+	_ = workers // reserved for future parallel downloads
 
 	client := downloader.NewClient(*baseURL, *shareToken, time.Duration(*timeoutMin)*time.Minute)
 
@@ -37,9 +37,9 @@ func main() {
 	if *listOnly {
 		months, err := client.ListMonthDirectories(ctx)
 		if err != nil {
-			log.Fatalf("erro ao listar meses: %v", err)
+			log.Fatalf("list months failed: %v", err)
 		}
-		fmt.Println("Meses disponíveis na Receita Federal:")
+		fmt.Println("Available months on Receita Federal:")
 		for _, m := range months {
 			fmt.Println(" ", m)
 		}
@@ -56,10 +56,10 @@ func main() {
 
 	result, err := dl.Run(ctx)
 	if err != nil {
-		log.Fatalf("download falhou: %v", err)
+		log.Fatalf("download failed: %v", err)
 	}
 
-	fmt.Printf("\nDownload concluído: mês=%s baixados=%d ignorados=%d csvs=%d\n",
+	fmt.Printf("\nDownload complete: month=%s downloaded=%d skipped=%d csvs=%d\n",
 		result.Month, result.FilesDownload, result.FilesSkipped, result.CSVExtracted)
 }
 

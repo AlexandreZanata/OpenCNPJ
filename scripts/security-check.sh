@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Roda a stack de segurança localmente antes do push: golangci-lint, gosec, staticcheck, govulncheck.
-# Uso: ./scripts/security-check.sh
+# Run the security stack locally before push: golangci-lint, gosec, staticcheck, govulncheck.
+# Usage: ./scripts/security-check.sh
 
 GREEN='\033[0;32m'
 RED='\033[0;31m'
@@ -12,28 +12,28 @@ NC='\033[0m'
 PASSED=0
 FAILED=0
 
-# Garantir que GOPATH/bin está no PATH para ferramentas instaladas via go install
+# Ensure GOPATH/bin is on PATH for tools installed via go install
 export PATH="${PATH}:$(go env GOPATH)/bin"
 
 run_check() {
   local name="$1"
   local cmd="$2"
-  echo -e "${YELLOW}▶ Rodando: ${name}${NC}"
+  echo -e "${YELLOW}▶ Running: ${name}${NC}"
   if eval "$cmd"; then
-    echo -e "${GREEN}✓ ${name} passou${NC}"
+    echo -e "${GREEN}✓ ${name} passed${NC}"
     PASSED=$((PASSED + 1))
   else
-    echo -e "${RED}✗ ${name} falhou${NC}"
+    echo -e "${RED}✗ ${name} failed${NC}"
     FAILED=$((FAILED + 1))
   fi
 }
 
-# Verificar/instalar ferramentas
+# Verify/install tools
 ensure_tool() {
   local name="$1"
   local install_cmd="$2"
   if ! command -v "$name" &>/dev/null; then
-    echo -e "${YELLOW}Instalando ${name}...${NC}"
+    echo -e "${YELLOW}Installing ${name}...${NC}"
     eval "$install_cmd"
   fi
 }
@@ -53,9 +53,9 @@ run_check "staticcheck" "staticcheck ./..."
 run_check "govulncheck" "govulncheck ./..."
 
 echo ""
-echo "========== Resumo =========="
-echo -e "Passaram: ${GREEN}${PASSED}${NC}"
-echo -e "Falharam: ${RED}${FAILED}${NC}"
+echo "========== Summary =========="
+echo -e "Passed: ${GREEN}${PASSED}${NC}"
+echo -e "Failed: ${RED}${FAILED}${NC}"
 echo ""
 
 if [ "$FAILED" -gt 0 ]; then

@@ -71,7 +71,7 @@ func NewDownloader(client *Client, opts Options) *Downloader {
 // ResolveMonth picks the target folder: explicit month, current month if published, or latest.
 func ResolveMonth(available []string, requested string, now time.Time) (string, bool, error) {
 	if len(available) == 0 {
-		return "", false, fmt.Errorf("lista de meses vazia")
+		return "", false, fmt.Errorf("empty month list")
 	}
 
 	if requested != "" {
@@ -80,7 +80,7 @@ func ResolveMonth(available []string, requested string, now time.Time) (string, 
 				return m, false, nil
 			}
 		}
-		return "", false, fmt.Errorf("mês %s não disponível (último: %s)", requested, available[len(available)-1])
+		return "", false, fmt.Errorf("month %s not available (latest: %s)", requested, available[len(available)-1])
 	}
 
 	current := now.Format("2006-01")
@@ -96,7 +96,7 @@ func ResolveMonth(available []string, requested string, now time.Time) (string, 
 
 func (d *Downloader) Run(ctx context.Context) (*Result, error) {
 	if err := os.MkdirAll(d.opts.OutputDir, 0o755); err != nil {
-		return nil, fmt.Errorf("criar diretório de saída: %w", err)
+		return nil, fmt.Errorf("create output directory: %w", err)
 	}
 
 	months, err := d.client.ListMonthDirectories(ctx)
@@ -109,9 +109,9 @@ func (d *Downloader) Run(ctx context.Context) (*Result, error) {
 		return nil, err
 	}
 	if usedFallback {
-		log.Printf("aviso: dados de %s ainda não publicados; usando %s", time.Now().Format("2006-01"), month)
+		log.Printf("warning: %s data not yet published; using %s", time.Now().Format("2006-01"), month)
 	}
-	log.Printf("baixando dados de %s para %s", month, d.opts.OutputDir)
+	log.Printf("downloading %s data to %s", month, d.opts.OutputDir)
 
 	files, err := d.client.ListZipFiles(ctx, month)
 	if err != nil {
@@ -136,7 +136,7 @@ func (d *Downloader) Run(ctx context.Context) (*Result, error) {
 	}
 
 	log.Printf(
-		"concluído: %d arquivos baixados, %d ignorados (já existentes), %d CSVs extraídos",
+		"done: %d files downloaded, %d skipped (already present), %d CSVs extracted",
 		result.FilesDownload, result.FilesSkipped, result.CSVExtracted,
 	)
 	return result, nil
@@ -158,7 +158,7 @@ func splitFiles(files []string) (reference, data []string) {
 func (d *Downloader) processFile(ctx context.Context, month, filename string) (csvCount int, skipped bool, err error) {
 	zipPath := filepath.Join(d.opts.OutputDir, filename)
 	if d.isDone(month, filename) {
-		log.Printf("  [skip] %s (já baixado)", filename)
+		log.Printf("  [skip] %s (already downloaded)", filename)
 		return 0, true, nil
 	}
 
@@ -174,12 +174,12 @@ func (d *Downloader) processFile(ctx context.Context, month, filename string) (c
 
 	if !d.opts.KeepZIP {
 		if removeErr := os.Remove(zipPath); removeErr != nil {
-			log.Printf("  aviso: não foi possível remover %s: %v", zipPath, removeErr)
+			log.Printf("  warning: could not remove %s: %v", zipPath, removeErr)
 		}
 	}
 
 	if err := d.markDone(month, filename); err != nil {
-		log.Printf("  aviso: não foi possível gravar marcador de %s: %v", filename, err)
+		log.Printf("  warning: could not write marker for %s: %v", filename, err)
 	}
 
 	return count, false, nil
@@ -210,7 +210,7 @@ func (d *Downloader) downloadWithRetry(ctx context.Context, month, filename, des
 			return nil
 		}
 		if attempt < d.opts.RetryAttempts {
-			log.Printf("  tentativa %d/%d falhou: %v; aguardando %s", attempt, d.opts.RetryAttempts, lastErr, d.opts.RetryDelay)
+			log.Printf("  attempt %d/%d failed: %v; waiting %s", attempt, d.opts.RetryAttempts, lastErr, d.opts.RetryDelay)
 			select {
 			case <-ctx.Done():
 				return ctx.Err()
@@ -257,7 +257,7 @@ func (d *Downloader) downloadFile(ctx context.Context, month, filename, dest str
 func extractCNPJCSVs(zipPath, outputDir string) (int, error) {
 	r, err := zip.OpenReader(zipPath)
 	if err != nil {
-		return 0, fmt.Errorf("abrir zip: %w", err)
+		return 0, fmt.Errorf("open zip: %w", err)
 	}
 	defer r.Close()
 

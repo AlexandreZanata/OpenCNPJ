@@ -1,5 +1,5 @@
 # Security pipeline: lint → SAST (gosec + staticcheck) → dependency-scan (govulncheck + nancy)
-# Falha em qualquer job bloqueia merge. SARIF enviado para GitHub Security tab.
+# Any job failure blocks merge. SARIF uploaded to GitHub Security tab.
 
 name: Security
 
@@ -9,7 +9,7 @@ on:
   pull_request:
     branches: [main]
   schedule:
-    - cron: '0 8 * * 1'   # toda segunda-feira às 8h UTC
+    - cron: '0 8 * * 1'   # every Monday at 08:00 UTC
   workflow_dispatch:
 
 permissions:

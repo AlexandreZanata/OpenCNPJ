@@ -59,7 +59,7 @@ func (c *Client) ListMonthDirectories(ctx context.Context) ([]string, error) {
 		}
 	}
 	if len(dirs) == 0 {
-		return nil, fmt.Errorf("nenhum diretório mensal encontrado no repositório da Receita Federal")
+		return nil, fmt.Errorf("no monthly directories found in Receita Federal repository")
 	}
 
 	sort.Strings(dirs)
@@ -86,7 +86,7 @@ func (c *Client) ListZipFiles(ctx context.Context, month string) ([]string, erro
 		files = append(files, name)
 	}
 	if len(files) == 0 {
-		return nil, fmt.Errorf("nenhum arquivo .zip encontrado em %s", month)
+		return nil, fmt.Errorf("no .zip files found in %s", month)
 	}
 
 	sort.Strings(files)

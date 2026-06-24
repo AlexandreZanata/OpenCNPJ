@@ -16,6 +16,6 @@ if [[ -n "$MONTH" ]]; then
 fi
 CMD+=("${EXTRA_ARGS[@]}")
 
-echo "==> Baixando dados públicos CNPJ da Receita Federal"
-echo "    destino: $OUTPUT"
+echo "==> Downloading public CNPJ data from Receita Federal"
+echo "    destination: $OUTPUT"
 exec "${CMD[@]}"

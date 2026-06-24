@@ -3,7 +3,7 @@
 > Go API for Receita Federal open data (CNPJ search, import, export).
 > **Read this first** in every agent session.
 
-**Language:** 100% English for new code, comments, commits, and agent output. Legacy docs in `docs/` may be Portuguese — do not mix languages in new artifacts.
+**Language:** 100% English for code, comments, docs, commits, and agent output.
 
 ---
 
@@ -74,6 +74,12 @@ From `.cursor/rules/workflow.mdc`:
 - `go vet ./...`
 - Propose commit message only — **do not** run `git commit` unless user asks
 - Format: `type(scope): subject` max 72 chars — see `docs/COMMIT_CONVENTION.md`
+
+---
+
+## License
+
+Licensed under **MIT OR Apache-2.0**, at your option. See [docs/LICENSING.md](docs/LICENSING.md).
 
 ---
 

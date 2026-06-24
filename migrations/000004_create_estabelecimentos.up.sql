@@ -14,7 +14,7 @@ CREATE TABLE estabelecimentos (
     pais VARCHAR(3) REFERENCES paises(codigo),
     data_inicio_atividade DATE,
     cnae_fiscal_principal VARCHAR(7) REFERENCES cnaes(codigo),
-    cnae_fiscal_secundaria TEXT, -- CSV de códigos separados por vírgula
+    cnae_fiscal_secundaria TEXT, -- comma-separated CNAE codes from CSV
     tipo_logradouro VARCHAR(50),
     logradouro VARCHAR(255),
     numero VARCHAR(20),
