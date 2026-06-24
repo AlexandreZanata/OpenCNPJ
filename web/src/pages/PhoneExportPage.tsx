@@ -13,12 +13,14 @@ import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
 import { Input } from '../components/ui/Input'
 import { ProgressBar } from '../components/ui/ProgressBar'
+import { resolveBrazilianUF } from '../utils/uf'
 
 type SectorSelection = { type: 'preset' | 'cnae'; code: string; label: string } | null
 
 export function PhoneExportPage() {
   const [sector, setSector] = useState<SectorSelection>(null)
   const [uf, setUf] = useState<LookupItem | null>(null)
+  const [ufQuery, setUfQuery] = useState('')
   const [city, setCity] = useState<LookupItem | null>(null)
   const [cityQuery, setCityQuery] = useState('')
   const [nomeFantasia, setNomeFantasia] = useState<LookupItem | null>(null)
@@ -31,23 +33,30 @@ export function PhoneExportPage() {
   const [progress, setProgress] = useState<number | null>(null)
   const [error, setError] = useState('')
 
+  const resolvedUf = useMemo(() => resolveBrazilianUF(uf, ufQuery), [uf, ufQuery])
+
   const querySectors = useCallback((q: string) => lookupSectors(q, 20), [])
   const queryUF = useCallback((q: string) => lookupUF(q), [])
   const queryCity = useCallback(
-    (q: string) => lookupMunicipio(q, uf?.code ?? '', 20),
-    [uf?.code],
+    (q: string) => lookupMunicipio(q, resolvedUf ?? '', 20),
+    [resolvedUf],
   )
   const queryNome = useCallback(
-    (q: string) => lookupNomeFantasia(q, uf?.code ?? '', 15),
-    [uf?.code],
+    (q: string) => lookupNomeFantasia(q, resolvedUf ?? '', 15),
+    [resolvedUf],
   )
+
+  const resolvedCityCode = city?.code
+  const resolvedCityName = city?.code
+    ? undefined
+    : (cityQuery.trim().length >= 2 ? cityQuery.trim() : undefined)
 
   const payload = useMemo<PhoneExportRequest>(() => ({
     category: sector?.type === 'preset' ? sector.code : '',
     cnae: sector?.type === 'cnae' ? sector.code : undefined,
-    uf: uf?.code || undefined,
-    municipio: city?.code || undefined,
-    municipio_nome: city?.code ? undefined : (cityQuery.trim().length >= 2 ? cityQuery.trim() : undefined),
+    uf: resolvedUf,
+    municipio: resolvedCityCode || undefined,
+    municipio_nome: resolvedCityName,
     nome_fantasia: nomeFantasia?.code || undefined,
     created_from: createdFrom || undefined,
     created_to: createdTo || undefined,
@@ -55,15 +64,15 @@ export function PhoneExportPage() {
     export_all: exportAll,
     limit: exportAll ? undefined : limit,
     format: 'csv',
-  }), [sector, uf, city, cityQuery, nomeFantasia, createdFrom, createdTo, onlyActive, exportAll, limit])
+  }), [sector, resolvedUf, resolvedCityCode, resolvedCityName, nomeFantasia, createdFrom, createdTo, onlyActive, exportAll, limit])
 
   const canExport = Boolean(
     sector?.code ||
     payload.cnae ||
     payload.nome_fantasia ||
-    payload.uf ||
-    payload.municipio ||
-    payload.municipio_nome,
+    resolvedUf ||
+    resolvedCityCode ||
+    resolvedCityName,
   )
 
   const runExport = async (format: 'csv' | 'txt') => {
@@ -117,11 +126,13 @@ export function PhoneExportPage() {
           <SearchCombobox
             label="UF"
             placeholder="SP, São Paulo, Paraná…"
-            value={uf?.label ?? ''}
+            value={uf?.label ?? ufQuery}
             minChars={0}
             onQuery={queryUF}
+            onInputChange={setUfQuery}
             onSelect={(item) => {
               setUf(item)
+              setUfQuery(item?.label ?? '')
               setCity(null)
               setCityQuery('')
             }}
