@@ -1,9 +1,10 @@
-# Import Benchmark — RTX 4060 / 32 GB RAM
+# Import Benchmark — RTX 4060 / 31 GB RAM (i7-13620H)
 
 Measured import performance for the reference workstation profile below.
 
-**Date:** 2026-06-20 (full dataset)  
-**Status:** baseline from project benchmarks; re-run with `make import-full` to refresh.
+**Latest run:** [2026-06-24 full import](2026-06-24-full-import-i7-13620H-31GB.md) — **SUCCESS**  
+**Date:** 2026-06-24  
+**Status:** verified on hardware (clean `make import-full`)
 
 ---
 
@@ -11,10 +12,10 @@ Measured import performance for the reference workstation profile below.
 
 | Component | Specification |
 |-----------|---------------|
-| GPU | NVIDIA GeForce RTX 4060 (8 GB VRAM) |
-| RAM | 32 GB DDR |
-| Storage | NVMe SSD (recommended) |
-| CPU | Multi-core (GOMAXPROCS = core count) |
+| CPU | Intel Core i7-13620H, 16 threads |
+| GPU | NVIDIA GeForce RTX 4060 Laptop GPU (8 GB VRAM) |
+| RAM | 31 GB |
+| Storage | NVMe SSD |
 
 > GPU is **not utilized** by the import pipeline. Performance is dominated by PostgreSQL COPY, parser throughput, and disk I/O.
 
@@ -35,23 +36,24 @@ Measured import performance for the reference workstation profile below.
 
 ---
 
-## Results — 100% full import
+## Results — 100% full import (measured 2026-06-24)
 
 | Phase | Wall time | Throughput |
 |-------|-----------|------------|
-| COPY ingest | **~13 min** (~780 s) | **~286,000 rows/s** |
-| Index rebuild + ANALYZE | **~5 min** (~300 s) | — |
-| **Total (import + indexes)** | **~18 min** (~1,080 s) | **~199,000 rows/s effective** |
+| COPY ingest | **21 min 38 s** (1,297.7 s) | **167,551 rows/s** |
+| Index rebuild + ANALYZE | **5 min 31 s** (331 s) | — |
+| Stats aggregates | 1 min 13 s (73 s) | — |
+| **Total (import + indexes)** | **27 min 9 s** (1,628.7 s) | **167,420 rows/s effective** |
 
-### Row counts (approximate)
+### Row counts (measured)
 
 | Table | Rows |
 |-------|------|
-| empresas | ~63M |
-| estabelecimentos | ~71M |
-| socios | ~26M |
-| simples | ~46M |
-| **Total** | **~206M+** |
+| empresas | 68,629,147 |
+| estabelecimentos | 71,757,702 |
+| socios | 27,838,421 |
+| simples | 49,034,553 |
+| **Total** | **217,259,823** |
 
 ### 10% sample benchmark (same hardware class)
 

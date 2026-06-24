@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"sort"
 	"strings"
 )
 
@@ -45,25 +44,25 @@ func DiscoverDataset(dir string) (Dataset, error) {
 		case strings.Contains(name, "SOCIOCSV"):
 			ds.Socios = append(ds.Socios, path)
 		case strings.Contains(name, "SIMPLES"):
-			ds.Simples = path
+			ds.Simples = pickLatestPath(ds.Simples, path)
 		case strings.Contains(name, "CNAECSV"):
-			ds.CNAEs = path
+			ds.CNAEs = pickLatestPath(ds.CNAEs, path)
 		case strings.Contains(name, "MOTICSV"):
-			ds.Motivos = path
+			ds.Motivos = pickLatestPath(ds.Motivos, path)
 		case strings.Contains(name, "MUNICCSV"):
-			ds.Municipios = path
+			ds.Municipios = pickLatestPath(ds.Municipios, path)
 		case strings.Contains(name, "NATJUCSV"):
-			ds.Naturezas = path
+			ds.Naturezas = pickLatestPath(ds.Naturezas, path)
 		case strings.Contains(name, "PAISCSV"):
-			ds.Paises = path
+			ds.Paises = pickLatestPath(ds.Paises, path)
 		case strings.Contains(name, "QUALSCSV"):
-			ds.Qualificacoes = path
+			ds.Qualificacoes = pickLatestPath(ds.Qualificacoes, path)
 		}
 	}
 
-	sort.Strings(ds.Empresas)
-	sort.Strings(ds.Estabelecimentos)
-	sort.Strings(ds.Socios)
+	ds.Empresas = pickLatestByPartition(ds.Empresas)
+	ds.Estabelecimentos = pickLatestByPartition(ds.Estabelecimentos)
+	ds.Socios = pickLatestByPartition(ds.Socios)
 
 	if len(ds.Empresas) == 0 {
 		return ds, fmt.Errorf("%w: %s", ErrNoEmpresasFiles, dir)

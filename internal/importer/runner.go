@@ -160,7 +160,7 @@ func (r *Runner) importStages(ctx context.Context, ds Dataset, timings *Timings)
 			Limit: limit, MapRow: func(line []string, _ *parser.LookupStore) ([]any, error) {
 				return simplesRow(line)
 			}, Label: "simples",
-		}, r.Opts.BatchSize, r.Copier, nil, r.Metrics, timings)
+		}, r.Opts.BatchSize, r.Copier, nil, r.Metrics, timings, NewDedupeSet())
 		if err != nil {
 			return total, fmt.Errorf("simples: %w", err)
 		}
@@ -182,6 +182,7 @@ func (r *Runner) importGroup(
 	errCh := make(chan error, len(files))
 	var total int64
 	var mu sync.Mutex
+	dedupe := NewDedupeSet()
 
 	for _, path := range files {
 		wg.Add(1)
@@ -199,7 +200,7 @@ func (r *Runner) importGroup(
 			job.Path = filePath
 			job.Limit = limit
 
-			n, importErr := ImportFile(ctx, job, r.Opts.BatchSize, r.Copier, nil, r.Metrics, timings)
+			n, importErr := ImportFile(ctx, job, r.Opts.BatchSize, r.Copier, nil, r.Metrics, timings, dedupe)
 			if importErr != nil {
 				errCh <- fmt.Errorf("%s %s: %w", template.Label, filePath, importErr)
 				return

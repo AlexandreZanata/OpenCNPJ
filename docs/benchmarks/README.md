@@ -26,6 +26,15 @@ make benchmark-all-approaches
 
 Raw TSV: `data/benchmark_comparison.tsv`
 
+## Full import (100%)
+
+```bash
+make import-full
+cat /tmp/full_import_performance_report.txt
+```
+
+Latest measured run: [2026-06-24-full-import-i7-13620H-31GB.md](2026-06-24-full-import-i7-13620H-31GB.md)
+
 ## Parser micro-benchmarks (CI)
 
 ```bash

@@ -40,6 +40,7 @@ func ImportFile(
 	lookups *parser.LookupStore,
 	collector *metrics.Collector,
 	timings *Timings,
+	dedupe *DedupeSet,
 ) (int64, error) {
 	// #nosec G304 -- path comes from trusted dataset manifest.
 	file, err := os.Open(job.Path)
@@ -81,6 +82,11 @@ func ImportFile(
 				collector.AddError()
 			}
 			continue
+		}
+		if dedupe != nil {
+			if key, use := dedupeKey(job.Table, row); use && dedupe.Seen(key) {
+				continue
+			}
 		}
 
 		rows, flush := batcher.Add(row)

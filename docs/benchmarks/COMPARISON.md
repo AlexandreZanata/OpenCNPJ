@@ -1,4 +1,19 @@
-# Benchmark Comparison — 5 Import Approaches
+# Benchmark Comparison — Import Approaches
+
+## Full 100% import (production path)
+
+**Run:** 2026-06-24 — [detailed report](2026-06-24-full-import-i7-13620H-31GB.md)
+
+| Phase | Wall (s) | Rows | RPS |
+|-------|----------|------|-----|
+| COPY ingest | 1,297.69 | 217,259,823 | 167,551 |
+| + indexes | 1,628.69 | 217,259,823 | 167,420 |
+
+Hardware: i7-13620H / 31 GB RAM / RTX 4060 Laptop / NVMe. Workers=8, batch=100k.
+
+---
+
+## Sample benchmarks (approach comparison)
 
 Generated: 2026-06-11T15:02:33
 

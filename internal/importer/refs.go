@@ -29,7 +29,7 @@ func ImportReferences(ctx context.Context, ds Dataset, copier loader.BatchInsert
 		}
 		if _, err := ImportFile(ctx, FileJob{
 			Path: job.path, Table: job.table, Columns: job.columns, MapRow: job.mapper, Label: job.table,
-		}, 1000, copier, nil, nil, nil); err != nil {
+		}, 1000, copier, nil, nil, nil, nil); err != nil {
 			return fmt.Errorf("import %s: %w", job.table, err)
 		}
 	}

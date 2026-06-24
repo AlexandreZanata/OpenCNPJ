@@ -3,7 +3,6 @@ package importer
 import (
 	"os"
 	"path/filepath"
-	"sort"
 	"strings"
 )
 
@@ -36,17 +35,17 @@ func DiscoverDataFiles(dir string) (DataFiles, error) {
 		path := filepath.Join(dir, e.Name())
 		switch {
 		case strings.Contains(name, "CNAECSV"):
-			out.CNAEs = path
+			out.CNAEs = pickLatestPath(out.CNAEs, path)
 		case strings.Contains(name, "MOTICSV"):
-			out.Motivos = path
+			out.Motivos = pickLatestPath(out.Motivos, path)
 		case strings.Contains(name, "MUNICCSV"):
-			out.Municipios = path
+			out.Municipios = pickLatestPath(out.Municipios, path)
 		case strings.Contains(name, "NATJUCSV"):
-			out.Naturezas = path
+			out.Naturezas = pickLatestPath(out.Naturezas, path)
 		case strings.Contains(name, "PAISCSV"):
-			out.Paises = path
+			out.Paises = pickLatestPath(out.Paises, path)
 		case strings.Contains(name, "QUALSCSV"):
-			out.Qualificacoes = path
+			out.Qualificacoes = pickLatestPath(out.Qualificacoes, path)
 		case strings.Contains(name, "EMPRECSV"):
 			out.Empresas = append(out.Empresas, path)
 		case strings.Contains(name, "ESTABELE"):
@@ -54,12 +53,12 @@ func DiscoverDataFiles(dir string) (DataFiles, error) {
 		case strings.Contains(name, "SOCIOCSV"):
 			out.Socios = append(out.Socios, path)
 		case strings.Contains(name, "SIMPLES"):
-			out.Simples = path
+			out.Simples = pickLatestPath(out.Simples, path)
 		}
 	}
 
-	sort.Strings(out.Empresas)
-	sort.Strings(out.Estabelec)
-	sort.Strings(out.Socios)
+	out.Empresas = pickLatestByPartition(out.Empresas)
+	out.Estabelec = pickLatestByPartition(out.Estabelec)
+	out.Socios = pickLatestByPartition(out.Socios)
 	return out, nil
 }
