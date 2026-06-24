@@ -46,12 +46,23 @@ func (h *SearchHandler) SearchEmpresas(c *fiber.Ctx) error {
 		}
 	}
 
-	// Parse offset
+	// Parse offset (deprecated — prefer cursor)
 	if offsetStr := c.Query("offset"); offsetStr != "" {
 		if offset, err := strconv.Atoi(offsetStr); err == nil && offset >= 0 {
 			filters.Offset = offset
 		}
 	}
+
+	cursor, offset, err := parseSearchFilters(c.Query("cursor"), filters.Offset)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(models.ErrorResponse{
+			Error:   "invalid_pagination",
+			Message: err.Error(),
+			Code:    fiber.StatusBadRequest,
+		})
+	}
+	filters.Cursor = cursor
+	filters.Offset = offset
 
 	// Parse capital_social filters
 	if minStr := c.Query("capital_social_min"); minStr != "" {
@@ -108,12 +119,23 @@ func (h *SearchHandler) SearchEstabelecimentos(c *fiber.Ctx) error {
 		}
 	}
 
-	// Parse offset
+	// Parse offset (deprecated — prefer cursor)
 	if offsetStr := c.Query("offset"); offsetStr != "" {
 		if offset, err := strconv.Atoi(offsetStr); err == nil && offset >= 0 {
 			filters.Offset = offset
 		}
 	}
+
+	cursor, offset, err := parseSearchFilters(c.Query("cursor"), filters.Offset)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(models.ErrorResponse{
+			Error:   "invalid_pagination",
+			Message: err.Error(),
+			Code:    fiber.StatusBadRequest,
+		})
+	}
+	filters.Cursor = cursor
+	filters.Offset = offset
 
 	result, err := h.searchService.SearchEstabelecimentos(c.Context(), filters)
 	if err != nil {

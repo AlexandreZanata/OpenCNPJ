@@ -45,6 +45,35 @@ Expect `Content-Encoding: gzip` on large JSON payloads.
 
 Cache values are stored as msgpack (legacy JSON keys remain readable).
 
+## Keyset pagination
+
+Search endpoints accept optional `cursor` (cannot combine with `offset`):
+
+```bash
+# First page
+curl 'http://localhost:8080/api/v1/empresas/search?razao_social=PETROBRAS&limit=5'
+
+# Next page (use next_cursor from prior response)
+curl 'http://localhost:8080/api/v1/empresas/search?razao_social=PETROBRAS&limit=5&cursor=score:0.45000000|cnpj:12345678'
+```
+
+Response fields: `has_more`, `next_cursor` (omitted on last page). `offset` remains supported but deprecated.
+
+## Full-text search (multi-word)
+
+Queries with spaces use PostgreSQL `tsvector` + `portuguese` config instead of `pg_trgm`:
+
+```bash
+curl 'http://localhost:8080/api/v1/empresas/search?razao_social=PETRO%20BRAS&limit=5'
+```
+
+Single-word queries continue to use trigram similarity.
+
+## Meilisearch (optional, future)
+
+Docker service `meilisearch` on port `7700`. Disabled by default (`meilisearch.enabled: false`).
+Indexer and handler delegation tracked in DVT-17.
+
 ## Local benchmarks
 
 Scripts live under `.local/01-api-performance-optimization/benchmarks/`.

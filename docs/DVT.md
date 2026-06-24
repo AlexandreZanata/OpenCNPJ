@@ -17,6 +17,9 @@ Sequential IDs for new features that still need production-grade automated tests
 | DVT-11 | Download progress bar + one-command pipeline scripts | open |
 | DVT-13 | Redis cache hit/miss Prometheus metrics | open |
 | DVT-14 | Redis msgpack cache serialization | open |
+| DVT-15 | Keyset cursor pagination for search | open |
+| DVT-16 | PostgreSQL FTS for multi-word search | open |
+| DVT-17 | Meilisearch indexer and search delegation | open |
 
 ## DVT-01: CNPJ open-data downloader (WebDAV)
 
@@ -114,4 +117,25 @@ Sequential IDs for new features that still need production-grade automated tests
 - **Scope**: `internal/services/cache_serialize.go`, `internal/services/cache_service.go`
 - **Added**: 2026-06-24
 - **Needs**: integration test verifying msgpack round-trip and legacy JSON cache key compatibility after deploy
+- **Status**: open
+
+## DVT-15: Keyset cursor pagination for search
+
+- **Scope**: `internal/repository/pagination.go`, `internal/handlers/search_pagination.go`, `internal/models/dto.go`
+- **Added**: 2026-06-24
+- **Needs**: integration test deep-page cursor vs offset latency; e2e UI cursor navigation
+- **Status**: open
+
+## DVT-16: PostgreSQL FTS for multi-word search
+
+- **Scope**: `migrations/000012_fts_search_columns.up.sql`, `internal/repository/search_query.go`
+- **Added**: 2026-06-24
+- **Needs**: integration test multi-word `razao_social` / `nome_fantasia` ranking quality vs trigram
+- **Status**: open
+
+## DVT-17: Meilisearch indexer and search delegation
+
+- **Scope**: `docker-compose.yml`, `internal/config/config.go`, future `cmd/meili-indexer`
+- **Added**: 2026-06-24
+- **Needs**: indexer worker syncing empresas/estabelecimentos; handler fallback to Postgres; e2e fuzzy search <50ms
 - **Status**: open

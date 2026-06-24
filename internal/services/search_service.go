@@ -24,12 +24,31 @@ func NewSearchService() *SearchService {
 	}
 }
 
+func buildSearchResponse(
+	data interface{},
+	meta repository.PageMeta,
+	limit, offset int,
+) *models.SearchResponse {
+	resp := &models.SearchResponse{
+		Data:    data,
+		Total:   meta.Total,
+		Limit:   limit,
+		Offset:  offset,
+		HasMore: meta.HasMore,
+	}
+	if meta.NextCursor != "" {
+		cursor := meta.NextCursor
+		resp.NextCursor = &cursor
+	}
+	return resp
+}
+
 //nolint:gocritic // Keeping value argument to avoid broad API churn now.
 func (s *SearchService) SearchEmpresas(
 	ctx context.Context,
 	filters models.SearchFilters,
 ) (*models.SearchResponse, error) {
-	cacheKey := s.cache.GenerateKey("empresas:search:v4", map[string]interface{}{
+	cacheKey := s.cache.GenerateKey("empresas:search:v5", map[string]interface{}{
 		"uuid_id":           filters.UUIDID,
 		"cnpj_basico":       filters.CNPJBasico,
 		"razao_social":      filters.RazaoSocial,
@@ -39,10 +58,11 @@ func (s *SearchService) SearchEmpresas(
 		"capital_max":       filters.CapitalSocialMax,
 		"limit":             filters.Limit,
 		"offset":            filters.Offset,
+		"cursor":            filters.Cursor,
 	})
 
 	return GetOrSetJSON(ctx, s.cache, cacheKey, func() (*models.SearchResponse, error) {
-		empresas, total, err := s.empresaRepo.SearchEmpresas(ctx, filters)
+		empresas, meta, err := s.empresaRepo.SearchEmpresas(ctx, filters)
 		if err != nil {
 			return nil, err
 		}
@@ -55,14 +75,7 @@ func (s *SearchService) SearchEmpresas(
 			return nil, err
 		}
 		aggregates := repository.BuildEmpresaAggregates(empresas, full, estabs, socios, simples)
-
-		return &models.SearchResponse{
-			Data:    aggregates,
-			Total:   total,
-			Limit:   filters.Limit,
-			Offset:  filters.Offset,
-			HasMore: filters.Offset+filters.Limit < int(total),
-		}, nil
+		return buildSearchResponse(aggregates, meta, filters.Limit, filters.Offset), nil
 	})
 }
 
@@ -71,7 +84,7 @@ func (s *SearchService) SearchEstabelecimentos(
 	ctx context.Context,
 	filters models.SearchFilters,
 ) (*models.SearchResponse, error) {
-	cacheKey := s.cache.GenerateKey("estabelecimentos:search:v4", map[string]interface{}{
+	cacheKey := s.cache.GenerateKey("estabelecimentos:search:v5", map[string]interface{}{
 		"uuid_id":        filters.UUIDID,
 		"cnpj_completo":  filters.CNPJCompleto,
 		"cnpj_basico":    filters.CNPJBasico,
@@ -83,10 +96,11 @@ func (s *SearchService) SearchEstabelecimentos(
 		"cep":            filters.CEP,
 		"limit":          filters.Limit,
 		"offset":         filters.Offset,
+		"cursor":         filters.Cursor,
 	})
 
 	return GetOrSetJSON(ctx, s.cache, cacheKey, func() (*models.SearchResponse, error) {
-		estabelecimentos, total, err := s.estabelecimentoRepo.SearchEstabelecimentos(ctx, filters)
+		estabelecimentos, meta, err := s.estabelecimentoRepo.SearchEstabelecimentos(ctx, filters)
 		if err != nil {
 			return nil, err
 		}
@@ -99,14 +113,7 @@ func (s *SearchService) SearchEstabelecimentos(
 			return nil, err
 		}
 		results := repository.BuildEstabelecimentoSearchResults(estabelecimentos, full, socios, simples)
-
-		return &models.SearchResponse{
-			Data:    results,
-			Total:   total,
-			Limit:   filters.Limit,
-			Offset:  filters.Offset,
-			HasMore: filters.Offset+filters.Limit < int(total),
-		}, nil
+		return buildSearchResponse(results, meta, filters.Limit, filters.Offset), nil
 	})
 }
 

@@ -28,12 +28,14 @@ func NewEmpresaRepository() *EmpresaRepository {
 func (r *EmpresaRepository) SearchEmpresas(
 	ctx context.Context,
 	filters models.SearchFilters,
-) ([]models.Empresa, int64, error) {
-	query := `
+) ([]models.Empresa, PageMeta, error) {
+	baseSelect := `
 		SELECT 
 			uuid_id, cnpj_basico, razao_social, natureza_juridica,
 			qualificacao_responsavel, capital_social, porte_empresa,
-			ente_federativo_responsavel, created_at, updated_at
+			ente_federativo_responsavel, created_at, updated_at`
+
+	query := baseSelect + `
 		FROM empresas
 		WHERE 1=1
 	`
@@ -52,11 +54,18 @@ func (r *EmpresaRepository) SearchEmpresas(
 		argPos++
 	}
 
+	razaoMode := textSearchNone
 	razaoSocialPos := 0
 	if filters.RazaoSocial != "" {
-		query += fuzzyRazaoSocialWhere(argPos)
-		args = append(args, filters.RazaoSocial)
+		razaoMode = detectTextSearchMode(filters.RazaoSocial)
 		razaoSocialPos = argPos
+		switch razaoMode {
+		case textSearchFTS:
+			query += ftsRazaoSocialWhere(argPos)
+		default:
+			query += fuzzyRazaoSocialWhere(argPos)
+		}
+		args = append(args, filters.RazaoSocial)
 		argPos++
 	}
 
@@ -84,44 +93,78 @@ func (r *EmpresaRepository) SearchEmpresas(
 		argPos++
 	}
 
-	// Count query — skip for fuzzy text searches (ILIKE on 70M+ rows).
+	keyset := useKeysetPagination(filters.Cursor, filters.Offset)
 	skipCount := hasFuzzyTextFilter(filters)
 	if filters.Limit <= 0 {
 		filters.Limit = 100
 	}
 	queryLimit := filters.Limit
-	if skipCount {
+	if skipCount || keyset {
 		queryLimit = filters.Limit + 1
 	}
 
+	if keyset {
+		var clause string
+		var err error
+		switch razaoMode {
+		case textSearchFTS:
+			clause, err = empresaFTSKeysetClause(filters.Cursor, razaoSocialPos, &argPos, &args)
+		case textSearchTrigram:
+			clause, err = empresaKeysetClause(filters.Cursor, razaoSocialPos, true, &argPos, &args)
+		default:
+			clause, err = empresaKeysetClause(filters.Cursor, 0, false, &argPos, &args)
+		}
+		if err != nil {
+			return nil, PageMeta{}, fmt.Errorf("invalid cursor: %w", err)
+		}
+		query += clause
+	}
+
 	var total int64
-	if !skipCount {
-		countQuery := "SELECT COUNT(*) FROM (" + query + ") AS count_query"
+	if !skipCount && !keyset {
+		countQuery := "SELECT COUNT(*) FROM (" + strings.Replace(query, baseSelect, "SELECT 1", 1) + ") AS count_query"
 		if err := r.db.QueryRowContext(ctx, countQuery, args...).Scan(&total); err != nil {
-			return nil, 0, fmt.Errorf("failed to count empresas: %w", err)
+			return nil, PageMeta{}, fmt.Errorf("failed to count empresas: %w", err)
 		}
 	}
 
-	orderBy := "razao_social"
-	if razaoSocialPos > 0 {
+	orderBy := "cnpj_basico ASC"
+	switch razaoMode {
+	case textSearchFTS:
+		orderBy = ftsRazaoSocialOrder(razaoSocialPos)
+	case textSearchTrigram:
 		orderBy = fuzzyRazaoSocialOrder(razaoSocialPos)
+	case textSearchNone:
+		if filters.RazaoSocial == "" {
+			orderBy = "cnpj_basico ASC"
+		}
 	}
 
-	// Add pagination
+	scoreSelect := razaoSocialScoreSelect(razaoSocialPos, razaoMode)
+	query = strings.Replace(query, baseSelect, baseSelect+scoreSelect, 1)
+
 	// #nosec G202 -- placeholders are generated from internal counters, not user input.
-	query += fmt.Sprintf(" ORDER BY %s LIMIT $%d OFFSET $%d", orderBy, argPos, argPos+1)
-	args = append(args, queryLimit, filters.Offset)
+	if keyset {
+		query += fmt.Sprintf(" ORDER BY %s LIMIT $%d", orderBy, argPos)
+		args = append(args, queryLimit)
+	} else {
+		query += fmt.Sprintf(" ORDER BY %s LIMIT $%d OFFSET $%d", orderBy, argPos, argPos+1)
+		args = append(args, queryLimit, filters.Offset)
+	}
 
 	rows, err := r.db.QueryContext(ctx, query, args...)
 	if err != nil {
-		return nil, 0, fmt.Errorf("failed to query empresas: %w", err)
+		return nil, PageMeta{}, fmt.Errorf("failed to query empresas: %w", err)
 	}
 	defer rows.Close()
 
+	trackScore := razaoMode != textSearchNone
 	var empresas = make([]models.Empresa, 0)
+	var lastScore float64
 	for rows.Next() {
 		var emp models.Empresa
-		err := rows.Scan(
+		var score float64
+		scanArgs := []interface{}{
 			&emp.UUIDID,
 			&emp.CNPJBasico,
 			&emp.RazaoSocial,
@@ -132,24 +175,45 @@ func (r *EmpresaRepository) SearchEmpresas(
 			&emp.EnteFederativoResponsavel,
 			&emp.CreatedAt,
 			&emp.UpdatedAt,
-		)
-		if err != nil {
-			return nil, 0, fmt.Errorf("failed to scan empresa: %w", err)
 		}
+		if trackScore {
+			scanArgs = append(scanArgs, &score)
+		}
+		if err := rows.Scan(scanArgs...); err != nil {
+			return nil, PageMeta{}, fmt.Errorf("failed to scan empresa: %w", err)
+		}
+		lastScore = score
 		empresas = append(empresas, emp)
 	}
 	if err := rows.Err(); err != nil {
-		return nil, 0, fmt.Errorf("failed iterating empresas rows: %w", err)
+		return nil, PageMeta{}, fmt.Errorf("failed iterating empresas rows: %w", err)
 	}
 
-	if skipCount {
-		total = fuzzySearchTotal(filters.Offset, filters.Limit, int64(len(empresas)))
-		if int64(len(empresas)) > int64(filters.Limit) {
+	meta := PageMeta{Total: total}
+	fetched := int64(len(empresas))
+	if skipCount || keyset {
+		meta.HasMore = fetched > int64(filters.Limit)
+		if meta.HasMore {
 			empresas = empresas[:filters.Limit]
+		}
+		if skipCount {
+			meta.Total = fuzzySearchTotal(filters.Offset, filters.Limit, fetched)
+		}
+	} else {
+		meta.HasMore = filters.Offset+filters.Limit < int(total)
+	}
+
+	if meta.HasMore && len(empresas) > 0 {
+		last := empresas[len(empresas)-1]
+		switch razaoMode {
+		case textSearchFTS, textSearchTrigram:
+			meta.NextCursor = buildScoreCNPJCursor(lastScore, last.CNPJBasico)
+		default:
+			meta.NextCursor = buildCNPJCursor(last.CNPJBasico)
 		}
 	}
 
-	return empresas, total, nil
+	return empresas, meta, nil
 }
 
 //nolint:misspell // Receita field naming.

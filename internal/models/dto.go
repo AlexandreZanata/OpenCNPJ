@@ -19,15 +19,17 @@ type SearchFilters struct {
 	CapitalSocialMax  *float64
 	Limit             int
 	Offset            int
+	Cursor            string
 }
 
 // SearchResponse represents paginated search response.
 type SearchResponse struct {
-	Data    interface{} `json:"data"`
-	Total   int64       `json:"total"`
-	Limit   int         `json:"limit"`
-	Offset  int         `json:"offset"`
-	HasMore bool        `json:"has_more"`
+	Data       interface{} `json:"data"`
+	Total      int64       `json:"total"`
+	Limit      int         `json:"limit"`
+	Offset     int         `json:"offset"`
+	HasMore    bool        `json:"has_more"`
+	NextCursor *string     `json:"next_cursor,omitempty"`
 }
 
 // PhoneExportRequest exports establishment phone contacts by category and filters.

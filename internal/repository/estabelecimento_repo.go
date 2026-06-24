@@ -26,9 +26,9 @@ func NewEstabelecimentoRepository() *EstabelecimentoRepository {
 func (r *EstabelecimentoRepository) SearchEstabelecimentos(
 	ctx context.Context,
 	filters models.SearchFilters,
-) ([]models.EstabelecimentoCompleto, int64, error) {
-	query := `
-		SELECT ` + estabelecimentoCompletoSelect + estabelecimentoCompletoFrom + `
+) ([]models.EstabelecimentoCompleto, PageMeta, error) {
+	selectClause := "SELECT " + estabelecimentoCompletoSelect
+	query := selectClause + estabelecimentoCompletoFrom + `
 		WHERE 1=1
 	`
 
@@ -53,11 +53,18 @@ func (r *EstabelecimentoRepository) SearchEstabelecimentos(
 		argPos++
 	}
 
+	nomeMode := textSearchNone
 	nomeFantasiaPos := 0
 	if filters.NomeFantasia != "" {
-		query += fuzzyNomeFantasiaWhere(argPos)
-		args = append(args, filters.NomeFantasia)
+		nomeMode = detectTextSearchMode(filters.NomeFantasia)
 		nomeFantasiaPos = argPos
+		switch nomeMode {
+		case textSearchFTS:
+			query += ftsNomeFantasiaWhere(argPos)
+		default:
+			query += fuzzyNomeFantasiaWhere(argPos)
+		}
+		args = append(args, filters.NomeFantasia)
 		argPos++
 	}
 
@@ -91,60 +98,112 @@ func (r *EstabelecimentoRepository) SearchEstabelecimentos(
 		argPos++
 	}
 
-	// Count query — skip for fuzzy text searches (ILIKE on 70M+ rows).
+	keyset := useKeysetPagination(filters.Cursor, filters.Offset)
 	skipCount := hasFuzzyTextFilter(filters)
 	if filters.Limit <= 0 {
 		filters.Limit = 100
 	}
 	queryLimit := filters.Limit
-	if skipCount {
+	if skipCount || keyset {
 		queryLimit = filters.Limit + 1
 	}
 
+	if keyset {
+		var clause string
+		var err error
+		switch nomeMode {
+		case textSearchFTS:
+			clause, err = estabelecimentoFTSKeysetClause(filters.Cursor, nomeFantasiaPos, &argPos, &args)
+		case textSearchTrigram:
+			clause, err = estabelecimentoKeysetClause(filters.Cursor, nomeFantasiaPos, true, &argPos, &args)
+		default:
+			clause, err = estabelecimentoKeysetClause(filters.Cursor, 0, false, &argPos, &args)
+		}
+		if err != nil {
+			return nil, PageMeta{}, fmt.Errorf("invalid cursor: %w", err)
+		}
+		query += clause
+	}
+
 	var total int64
-	if !skipCount {
-		countQuery := "SELECT COUNT(*) FROM (" + query + ") AS count_query"
+	if !skipCount && !keyset {
+		countQuery := "SELECT COUNT(*) FROM (" + strings.Replace(query, selectClause, "SELECT 1", 1) + ") AS count_query"
 		if err := r.db.QueryRowContext(ctx, countQuery, args...).Scan(&total); err != nil {
-			return nil, 0, fmt.Errorf("failed to count estabelecimentos: %w", err)
+			return nil, PageMeta{}, fmt.Errorf("failed to count estabelecimentos: %w", err)
 		}
 	}
 
-	orderBy := "e.nome_fantasia"
-	if nomeFantasiaPos > 0 {
+	orderBy := "e.id ASC"
+	switch nomeMode {
+	case textSearchFTS:
+		orderBy = ftsNomeFantasiaOrder(nomeFantasiaPos)
+	case textSearchTrigram:
 		orderBy = fuzzyNomeFantasiaOrder(nomeFantasiaPos)
 	}
 
-	// Add pagination
+	scoreSelect := nomeFantasiaScoreSelect(nomeFantasiaPos, nomeMode)
+	query = strings.Replace(query, selectClause, selectClause+scoreSelect, 1)
+
 	// #nosec G202 -- placeholders are generated from internal counters, not user input.
-	query += fmt.Sprintf(" ORDER BY %s LIMIT $%d OFFSET $%d", orderBy, argPos, argPos+1)
-	args = append(args, queryLimit, filters.Offset)
+	if keyset {
+		query += fmt.Sprintf(" ORDER BY %s LIMIT $%d", orderBy, argPos)
+		args = append(args, queryLimit)
+	} else {
+		query += fmt.Sprintf(" ORDER BY %s LIMIT $%d OFFSET $%d", orderBy, argPos, argPos+1)
+		args = append(args, queryLimit, filters.Offset)
+	}
 
 	rows, err := r.db.QueryContext(ctx, query, args...)
 	if err != nil {
-		return nil, 0, fmt.Errorf("failed to query estabelecimentos: %w", err)
+		return nil, PageMeta{}, fmt.Errorf("failed to query estabelecimentos: %w", err)
 	}
 	defer rows.Close()
 
-	var estabelecimentos = make([]models.EstabelecimentoCompleto, 0)
+	trackScore := nomeMode != textSearchNone
+	estabelecimentos := make([]models.EstabelecimentoCompleto, 0)
+	var lastScore float64
 	for rows.Next() {
 		var est models.EstabelecimentoCompleto
-		if err := scanEstabelecimentoCompleto(rows, &est); err != nil {
-			return nil, 0, err
+		var score float64
+		if trackScore {
+			if err := scanEstabelecimentoCompletoWithScore(rows, &est, &score); err != nil {
+				return nil, PageMeta{}, err
+			}
+			lastScore = score
+		} else if err := scanEstabelecimentoCompleto(rows, &est); err != nil {
+			return nil, PageMeta{}, err
 		}
 		estabelecimentos = append(estabelecimentos, est)
 	}
 	if err := rows.Err(); err != nil {
-		return nil, 0, fmt.Errorf("failed iterating estabelecimentos rows: %w", err)
+		return nil, PageMeta{}, fmt.Errorf("failed iterating estabelecimentos rows: %w", err)
 	}
 
-	if skipCount {
-		total = fuzzySearchTotal(filters.Offset, filters.Limit, int64(len(estabelecimentos)))
-		if int64(len(estabelecimentos)) > int64(filters.Limit) {
+	meta := PageMeta{Total: total}
+	fetched := int64(len(estabelecimentos))
+	if skipCount || keyset {
+		meta.HasMore = fetched > int64(filters.Limit)
+		if meta.HasMore {
 			estabelecimentos = estabelecimentos[:filters.Limit]
+		}
+		if skipCount {
+			meta.Total = fuzzySearchTotal(filters.Offset, filters.Limit, fetched)
+		}
+	} else {
+		meta.HasMore = filters.Offset+filters.Limit < int(total)
+	}
+
+	if meta.HasMore && len(estabelecimentos) > 0 {
+		last := estabelecimentos[len(estabelecimentos)-1]
+		switch nomeMode {
+		case textSearchFTS, textSearchTrigram:
+			meta.NextCursor = buildScoreIDCursor(lastScore, last.ID)
+		default:
+			meta.NextCursor = buildIDCursor(last.ID)
 		}
 	}
 
-	return estabelecimentos, total, nil
+	return estabelecimentos, meta, nil
 }
 
 func (r *EstabelecimentoRepository) GetByCNPJCompleto(

@@ -11,10 +11,11 @@ import (
 )
 
 type Config struct {
-	Database   DatabaseConfig
-	Redis      RedisConfig
-	ClickHouse ClickHouseConfig
-	Server     ServerConfig
+	Database    DatabaseConfig
+	Redis       RedisConfig
+	ClickHouse  ClickHouseConfig
+	Meilisearch MeilisearchConfig
+	Server      ServerConfig
 	Import     ImportConfig
 	Cache      CacheConfig
 	Logging    LoggingConfig
@@ -48,6 +49,13 @@ type ClickHouseConfig struct {
 	User     string
 	Password string
 	Database string
+}
+
+type MeilisearchConfig struct {
+	Enabled bool
+	Host    string
+	Port    int
+	APIKey  string
 }
 
 type ServerConfig struct {
@@ -131,6 +139,12 @@ func Load() error {
 			Password: viper.GetString("clickhouse.password"),
 			Database: viper.GetString("clickhouse.database"),
 		},
+		Meilisearch: MeilisearchConfig{
+			Enabled: viper.GetBool("meilisearch.enabled"),
+			Host:    viper.GetString("meilisearch.host"),
+			Port:    viper.GetInt("meilisearch.port"),
+			APIKey:  viper.GetString("meilisearch.api_key"),
+		},
 		Server: ServerConfig{
 			Port:                   viper.GetInt("server.port"),
 			Prefork:                viper.GetBool("server.prefork"),
@@ -207,6 +221,11 @@ func setDefaults() {
 	viper.SetDefault("clickhouse.user", "receita_user")
 	viper.SetDefault("clickhouse.password", "receita_password")
 	viper.SetDefault("clickhouse.database", "receita_analytics")
+
+	viper.SetDefault("meilisearch.enabled", false)
+	viper.SetDefault("meilisearch.host", "localhost")
+	viper.SetDefault("meilisearch.port", 7700)
+	viper.SetDefault("meilisearch.api_key", "dev_master_key_change_me")
 
 	viper.SetDefault("server.port", 8080)
 	viper.SetDefault("server.prefork", false)

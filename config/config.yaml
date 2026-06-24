@@ -25,6 +25,12 @@ clickhouse:
   password: receita_password
   database: receita_analytics
 
+meilisearch:
+  enabled: false
+  host: localhost
+  port: 7700
+  api_key: dev_master_key_change_me
+
 server:
   port: 8080
   prefork: false

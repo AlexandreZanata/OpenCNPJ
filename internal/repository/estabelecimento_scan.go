@@ -84,6 +84,60 @@ func scanEstabelecimentoCompleto(scanner interface {
 	return nil
 }
 
+func scanEstabelecimentoCompletoWithScore(
+	scanner interface{ Scan(dest ...any) error },
+	est *models.EstabelecimentoCompleto,
+	score *float64,
+) error {
+	err := scanner.Scan(
+		&est.ID,
+		&est.UUIDID,
+		&est.CNPJBasico,
+		&est.CNPJOrdem,
+		&est.CNPJDV,
+		&est.CNPJCompleto,
+		&est.IdentificadorMatrizFilial,
+		&est.NomeFantasia,
+		&est.SituacaoCadastral,
+		&est.DataSituacaoCadastral,
+		&est.MotivoSituacaoCadastral,
+		&est.NomeCidadeExterior,
+		&est.Pais,
+		&est.DataInicioAtividade,
+		&est.CNAEFiscalPrincipal,
+		&est.CNAEFiscalSecundaria,
+		&est.TipoLogradouro,
+		&est.Logradouro,
+		&est.Numero,
+		&est.Complemento,
+		&est.Bairro,
+		&est.CEP,
+		&est.UF,
+		&est.Municipio,
+		&est.DDD1,
+		&est.Telefone1,
+		&est.DDD2,
+		&est.Telefone2,
+		&est.DDDFax,
+		&est.Fax,
+		&est.Email,
+		&est.SituacaoEspecial,
+		&est.DataSituacaoEspecial,
+		&est.CreatedAt,
+		&est.RazaoSocial,
+		&est.CapitalSocial,
+		&est.CNAEDescricao,
+		&est.MunicipioNome,
+		&est.MotivoDescricao,
+		&est.PaisDescricao,
+		score,
+	)
+	if err != nil {
+		return fmt.Errorf("scan estabelecimento completo with score: %w", err)
+	}
+	return nil
+}
+
 func scanEstabelecimentoRows(rows *sql.Rows) ([]models.EstabelecimentoCompleto, error) {
 	out := make([]models.EstabelecimentoCompleto, 0)
 	for rows.Next() {
