@@ -20,6 +20,7 @@ export function PhoneExportPage() {
   const [sector, setSector] = useState<SectorSelection>(null)
   const [uf, setUf] = useState<LookupItem | null>(null)
   const [city, setCity] = useState<LookupItem | null>(null)
+  const [cityQuery, setCityQuery] = useState('')
   const [nomeFantasia, setNomeFantasia] = useState<LookupItem | null>(null)
   const [createdFrom, setCreatedFrom] = useState('')
   const [createdTo, setCreatedTo] = useState('')
@@ -46,6 +47,7 @@ export function PhoneExportPage() {
     cnae: sector?.type === 'cnae' ? sector.code : undefined,
     uf: uf?.code || undefined,
     municipio: city?.code || undefined,
+    municipio_nome: city?.code ? undefined : (cityQuery.trim().length >= 2 ? cityQuery.trim() : undefined),
     nome_fantasia: nomeFantasia?.code || undefined,
     created_from: createdFrom || undefined,
     created_to: createdTo || undefined,
@@ -53,13 +55,20 @@ export function PhoneExportPage() {
     export_all: exportAll,
     limit: exportAll ? undefined : limit,
     format: 'csv',
-  }), [sector, uf, city, nomeFantasia, createdFrom, createdTo, onlyActive, exportAll, limit])
+  }), [sector, uf, city, cityQuery, nomeFantasia, createdFrom, createdTo, onlyActive, exportAll, limit])
 
-  const canExport = Boolean(sector?.code || payload.cnae || payload.nome_fantasia)
+  const canExport = Boolean(
+    sector?.code ||
+    payload.cnae ||
+    payload.nome_fantasia ||
+    payload.uf ||
+    payload.municipio ||
+    payload.municipio_nome,
+  )
 
   const runExport = async (format: 'csv' | 'txt') => {
     if (!canExport) {
-      setError('Select a category/CNAE or nome fantasia filter before exporting.')
+      setError('Select at least one filter: category/CNAE, UF, city, or nome fantasia.')
       return
     }
     setLoading(format)
@@ -80,7 +89,7 @@ export function PhoneExportPage() {
       <div>
         <h1 className="text-2xl font-bold text-white">Phone Export</h1>
         <p className="text-slate-400">
-          Smart search by CNAE code or description. Type to find categories, cities, and business names instantly.
+          Export phone contacts by UF, city, CNAE category, or business name. CNAE is optional.
         </p>
       </div>
 
@@ -114,16 +123,21 @@ export function PhoneExportPage() {
             onSelect={(item) => {
               setUf(item)
               setCity(null)
+              setCityQuery('')
             }}
           />
           <SearchCombobox
             label="City (Município)"
             placeholder="Curitiba, Campinas…"
-            value={city?.label ?? ''}
-            hint="Uses IBGE municipality code when selected — faster export"
+            value={city?.label ?? cityQuery}
+            hint="Type to search; pick from list for exact IBGE code (works with or without UF)"
             minChars={2}
             onQuery={queryCity}
-            onSelect={setCity}
+            onInputChange={setCityQuery}
+            onSelect={(item) => {
+              setCity(item)
+              setCityQuery(item?.label ?? '')
+            }}
           />
           <SearchCombobox
             label="Nome Fantasia"

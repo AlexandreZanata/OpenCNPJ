@@ -77,11 +77,14 @@ func (r *LookupRepository) SearchMunicipios(
 	}
 
 	rows, err := r.db.QueryContext(ctx, `
-		SELECT codigo, descricao, COALESCE(uf, '')
-		FROM municipios
-		WHERE ($1 = '' OR uf = $1)
-		  AND (codigo LIKE $2 OR descricao ILIKE $3)
-		ORDER BY CASE WHEN codigo LIKE $4 THEN 0 ELSE 1 END, descricao
+		SELECT m.codigo, m.descricao, COALESCE($1, '')
+		FROM municipios m
+		WHERE ($1 = '' OR EXISTS (
+			SELECT 1 FROM estabelecimentos e
+			WHERE e.municipio = m.codigo AND e.uf = $1
+		))
+		  AND (m.codigo LIKE $2 OR m.descricao ILIKE $3)
+		ORDER BY CASE WHEN m.codigo LIKE $4 THEN 0 ELSE 1 END, m.descricao
 		LIMIT $5
 	`, uf, term+"%", "%"+term+"%", term+"%", limit)
 	if err != nil {

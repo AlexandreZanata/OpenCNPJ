@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
@@ -32,8 +33,16 @@ func TestBuildPhoneExportQueryWithDateRange(t *testing.T) {
 	if !strings.Contains(query, "data_inicio_atividade <=") {
 		t.Fatalf("missing to filter: %s", query)
 	}
-	if len(args) < 3 {
-		t.Fatalf("expected date args, got %d", len(args))
+	if !strings.Contains(query, " LIMIT $") {
+		t.Fatalf("missing LIMIT clause: %s", query)
+	}
+	limit, ok := args[len(args)-1].(int)
+	if !ok || limit != 100 {
+		t.Fatalf("last arg must be limit int 100, got %#v", args[len(args)-1])
+	}
+	wantLimit := fmt.Sprintf(" LIMIT $%d", len(args))
+	if !strings.Contains(query, wantLimit) {
+		t.Fatalf("expected %q in query, got: %s", wantLimit, query)
 	}
 }
 

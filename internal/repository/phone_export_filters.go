@@ -33,6 +33,7 @@ func appendPhoneDateFilters(
 		}
 		whereParts = append(whereParts, fmt.Sprintf("e.data_inicio_atividade <= $%d", argPos))
 		args = append(args, to)
+		argPos++
 	}
 	return whereParts, args, argPos, nil
 }

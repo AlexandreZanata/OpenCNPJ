@@ -28,7 +28,48 @@ func TestFormatPhone(t *testing.T) {
 func TestBuildPhoneExportQueryRequiresFilter(t *testing.T) {
 	_, _, err := buildPhoneExportQuery(models.PhoneExportRequest{Limit: 100})
 	if err == nil {
-		t.Fatal("expected error without category/cnae/nome_fantasia")
+		t.Fatal("expected error without any scope filter")
+	}
+}
+
+func TestBuildPhoneExportQueryWithUFOnly(t *testing.T) {
+	query, args, err := buildPhoneExportQuery(models.PhoneExportRequest{
+		UF:    "SP",
+		Limit: 100,
+	})
+	if err != nil {
+		t.Fatalf("build query: %v", err)
+	}
+	if !strings.Contains(query, "e.uf = ") {
+		t.Fatalf("expected UF filter: %s", query)
+	}
+	if len(args) == 0 {
+		t.Fatal("expected args")
+	}
+}
+
+func TestBuildPhoneExportQueryWithMunicipioNomeOnly(t *testing.T) {
+	query, _, err := buildPhoneExportQuery(models.PhoneExportRequest{
+		MunicipioNome: "Curitiba",
+		Limit:         50,
+	})
+	if err != nil {
+		t.Fatalf("build query: %v", err)
+	}
+	if !strings.Contains(query, "m.descricao ILIKE") {
+		t.Fatalf("expected city name filter: %s", query)
+	}
+}
+
+func TestHasPhoneExportFilter(t *testing.T) {
+	if hasPhoneExportFilter(models.PhoneExportRequest{}) {
+		t.Fatal("empty request should not pass")
+	}
+	if !hasPhoneExportFilter(models.PhoneExportRequest{UF: "PR"}) {
+		t.Fatal("UF alone should pass")
+	}
+	if !hasPhoneExportFilter(models.PhoneExportRequest{MunicipioNome: "Curitiba"}) {
+		t.Fatal("city name alone should pass")
 	}
 }
 

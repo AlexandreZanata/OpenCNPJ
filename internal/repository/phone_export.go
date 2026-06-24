@@ -83,7 +83,7 @@ func buildPhoneExportQuery(req models.PhoneExportRequest) (string, []any, error)
 	if err != nil {
 		return "", nil, err
 	}
-	if req.Category == "" && req.CNAEPrincipal == "" && req.NomeFantasia == "" {
+	if !hasPhoneExportFilter(req) {
 		return "", nil, ErrPhoneFilterRequired
 	}
 
@@ -103,6 +103,13 @@ func buildPhoneExportQuery(req models.PhoneExportRequest) (string, []any, error)
 		selectList, phoneFromClause, joinPhoneWhere(whereParts), phoneExportOrderBy(), limitClause,
 	)
 	return query, args, nil
+}
+
+func hasPhoneExportFilter(req models.PhoneExportRequest) bool {
+	if req.Category != "" || req.CNAEPrincipal != "" || req.NomeFantasia != "" {
+		return true
+	}
+	return req.UF != "" || req.Municipio != "" || req.MunicipioNome != ""
 }
 
 func normalizePhoneLimit(limit int) int {
