@@ -74,14 +74,19 @@ else
   warn "EXPLAIN pruning (STRICT=1 + LIST migration applied)"
 fi
 
-echo "--- API UF search smoke ---"
-uf_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 \
-  "$API_BASE/api/v1/estabelecimentos/search?uf=SP&limit=5" || true)
-if [[ "$uf_code" == "200" ]]; then ok "estabelecimentos search uf=SP -> 200"; else bad "uf search -> $uf_code"; fi
+echo "--- API readiness ---"
+ready_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 "${API_BASE%/}/readyz" 2>/dev/null || true)
+if [[ "$ready_code" == "200" ]]; then ok "API /readyz -> 200"; else warn "API not ready ($ready_code)"; fi
 
+echo "--- API UF search smoke ---"
+# UF-only list runs full COUNT on large partitions — use indexed filters (plan 02 Phase 6).
 cnae_uf_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 \
   "$API_BASE/api/v1/estabelecimentos/search?uf=RJ&cnae_principal=6201501&limit=5" || true)
 if [[ "$cnae_uf_code" == "200" ]]; then ok "estabelecimentos cnae+uf -> 200"; else bad "cnae+uf -> $cnae_uf_code"; fi
+
+nome_uf_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 60 \
+  "$API_BASE/api/v1/estabelecimentos/search?uf=SP&nome_fantasia=PADARIA&limit=5" || true)
+if [[ "$nome_uf_code" == "200" ]]; then ok "estabelecimentos nome+uf -> 200"; else bad "nome+uf -> $nome_uf_code"; fi
 
 echo
 echo "=== Summary: $pass passed, $fail failed, $skip skipped ==="
