@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"busca-cnpj-2026/internal/models"
+	"busca-cnpj-2026/internal/repository"
 	"busca-cnpj-2026/internal/services"
 )
 
@@ -25,10 +26,7 @@ func (h *ExportHandler) ExportCSV(c *fiber.Ctx) error {
 	if err := c.BodyParser(&req); err != nil {
 		return exportBadRequest(c, err)
 	}
-	if req.Filters.Limit <= 0 {
-		req.Filters.Limit = 10000
-	}
-
+	normalizeCSVExportRequest(&req)
 	c.Set("Content-Type", "text/csv; charset=utf-8")
 	c.Set("Content-Disposition", "attachment; filename=export.csv")
 	if err := h.exportService.ExportCSV(c.Context(), c.Response().BodyWriter(), req); err != nil {
@@ -87,4 +85,8 @@ func exportFailed(c *fiber.Ctx, err error) error {
 		Message: err.Error(),
 		Code:    code,
 	})
+}
+
+func normalizeCSVExportRequest(req *models.ExportRequest) {
+	req.Filters.Limit = repository.NormalizeExportLimit(req.Filters.Limit)
 }

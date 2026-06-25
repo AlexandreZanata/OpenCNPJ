@@ -312,10 +312,7 @@ func (r *EmpresaRepository) ExportToCSV(
 		argPos++
 	}
 
-	limit := filters.Limit
-	if limit <= 0 {
-		limit = 10000
-	}
+	limit := NormalizeExportLimit(filters.Limit)
 
 	// #nosec G202 -- placeholders are generated from internal counters, not user input.
 	query := fmt.Sprintf(

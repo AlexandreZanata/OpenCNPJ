@@ -322,10 +322,7 @@ func (r *EstabelecimentoRepository) ExportToCSV(
 		argPos++
 	}
 
-	limit := filters.Limit
-	if limit <= 0 {
-		limit = 10000
-	}
+	limit := NormalizeExportLimit(filters.Limit)
 
 	fromClause := `
 		FROM estabelecimentos e

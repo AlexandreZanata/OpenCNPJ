@@ -44,7 +44,11 @@ Production-like Postgres + API config on workstation (see `docs/ops/LOCAL-VPS-PA
 make web-dev   # http://localhost:5173
 ```
 
-Report: `docs/benchmarks/YYYY-MM-DD-vps-parity-local-frontend.md`
+Report: `docs/benchmarks/YYYY-MM-DD-export-throughput.md`
+
+```bash
+./scripts/benchmark_export.sh http://localhost:8080
+```
 
 ## Parser micro-benchmarks (CI)
 

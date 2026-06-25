@@ -197,3 +197,10 @@ Sequential IDs for new features that still need production-grade automated tests
 - **Added**: 2026-06-25
 - **Needs**: off-peak apply on 150M-row VPS; STRICT EXPLAIN gate in CI; post-migrate k6 uf_search p99 < 80 ms
 - **Status**: open
+
+## DVT-26: CSV bulk export 500k row cap
+
+- **Scope**: `internal/repository/export_limits.go`, `internal/handlers/export_handler.go`, `scripts/benchmark_export.sh`, `docs/benchmarks/2026-06-25-export-throughput.md`
+- **Added**: 2026-06-25
+- **Needs**: e2e export 500k on VPS with timeout/load test; UI `ExportPanel` limit parity
+- **Status**: open
