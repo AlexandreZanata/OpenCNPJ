@@ -53,6 +53,10 @@ cache:
   ttl_search: 300
   ttl_analytics: 3600
   ttl_lookup: 900
+  l1_enabled: true
+  l1_max_cost_mb: 256
+  l1_num_counters: 10000000
+  l1_buffer_items: 64
 
 logging:
   level: info

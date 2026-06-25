@@ -169,3 +169,10 @@ Sequential IDs for new features that still need production-grade automated tests
 - **Added**: 2026-06-25
 - **Needs**: Apply on VPS; `STRICT_VPS=1` SHOW GUC verification; post-apply k6 delta vs Phase 0 baseline
 - **Status**: open
+
+## DVT-22: OpenCNPJ plan 02 Phase 3 Ristretto L1 cache
+
+- **Scope**: `internal/cache/l1/`, `internal/services/cache_layers.go`, `scripts/opencnpj_advanced_phase3.sh`, `internal/perfvalidation/phase3_gate.go`
+- **Added**: 2026-06-25
+- **Needs**: k6 steady-load L1 hit rate > 70% on CNPJ path; integration test with Redis testcontainer
+- **Status**: open

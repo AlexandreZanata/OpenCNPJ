@@ -2,12 +2,13 @@ package services
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
-	"busca-cnpj-2026/internal/database"
+	"github.com/redis/go-redis/v9"
 )
 
-// GetOrSetJSON retrieves a typed value from cache or executes fn and stores the result.
+// GetOrSetJSON retrieves a typed value from L1 → Redis or executes fn and stores the result.
 func GetOrSetJSON[T any](
 	ctx context.Context,
 	s *CacheService,
@@ -19,14 +20,15 @@ func GetOrSetJSON[T any](
 		return fn()
 	}
 
-	val, err := database.RedisClient.Get(ctx, key).Result()
-	if err == nil {
+	val, hit, err := s.fetchCachedBytes(ctx, key)
+	if hit {
 		var result T
-		if unmarshalErr := unmarshalCacheValue([]byte(val), &result); unmarshalErr == nil {
-			recordCacheHit(key)
+		if unmarshalErr := unmarshalCacheValue(val, &result); unmarshalErr == nil {
 			return result, nil
 		}
 		_ = s.Delete(ctx, key)
+	} else if err != nil && !errors.Is(err, redis.Nil) {
+		return zero, fmt.Errorf("cache fetch: %w", err)
 	}
 
 	recordCacheMiss(key)
@@ -36,7 +38,7 @@ func GetOrSetJSON[T any](
 		return zero, err
 	}
 
-	if setErr := s.Set(ctx, key, result); setErr != nil {
+	if setErr := s.storeCachedValue(ctx, key, result); setErr != nil {
 		fmt.Printf("Failed to set cache key %s: %v\n", key, setErr)
 	}
 

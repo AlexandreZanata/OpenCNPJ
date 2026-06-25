@@ -14,4 +14,6 @@ func TestCacheKeyPrefix(t *testing.T) {
 func TestRecordCacheMetricsNoPanic(_ *testing.T) {
 	recordCacheHit("empresas:search:v4:deadbeef")
 	recordCacheMiss("estabelecimentos:search:v4:cafebabe")
+	recordL1CacheHit("estabelecimento:cnpj:v2:1")
+	recordL1CacheMiss("estabelecimento:cnpj:v2:2")
 }

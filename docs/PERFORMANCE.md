@@ -45,7 +45,24 @@ Expect `Content-Encoding: gzip` on large JSON payloads.
 
 Cache values are stored as msgpack (legacy JSON keys remain readable).
 
-## Keyset pagination
+## L1 cache (Ristretto, plan 02 Phase 3)
+
+In-process L1 sits above Redis L2: **L1 → Redis → PostgreSQL**.
+
+| Setting | Default | Notes |
+|---------|---------|-------|
+| `cache.l1_enabled` | `true` | Disable for minimal memory footprint |
+| `cache.l1_max_cost_mb` | `256` | ~256 MB on 16 GB VPS |
+| `cache.l1_num_counters` | `10000000` | Ristretto frequency sketch |
+| `cache.l1_buffer_items` | `64` | Set buffer |
+
+Prometheus: `busca_cnpj_l1_cache_hits_total`, `busca_cnpj_l1_cache_misses_total` (L2: `busca_cnpj_cache_hits_total`).
+
+```bash
+./scripts/opencnpj_advanced_phase3.sh http://localhost:8080
+```
+
+Package: `internal/cache/l1/`
 
 Search endpoints accept optional `cursor` (cannot combine with `offset`):
 
@@ -149,3 +166,11 @@ STRICT_VPS=1 ./scripts/opencnpj_advanced_phase2.sh http://localhost:8080   # aft
 ```
 
 Artifacts: `deploy/vps/*.example` · Runbook: `docs/ops/VPS-POSTGRESQL.md`
+
+## OpenCNPJ advanced plan — Phase 3 gate (Ristretto L1)
+
+```bash
+./scripts/opencnpj_advanced_phase3.sh http://localhost:8080
+```
+
+Requires API rebuilt with L1 enabled (`cache.l1_enabled: true`). Warm CNPJ path should show `busca_cnpj_l1_cache_hits_total` in `/metrics`.

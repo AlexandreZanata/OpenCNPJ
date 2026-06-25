@@ -8,13 +8,17 @@ import (
 	"fmt"
 	"time"
 
+	"busca-cnpj-2026/internal/cache/l1"
 	"busca-cnpj-2026/internal/config"
 	"busca-cnpj-2026/internal/database"
+
+	"github.com/redis/go-redis/v9"
 )
 
 type CacheService struct {
 	enabled bool
 	ttl     cacheTTLProfile
+	l1      *l1.Cache
 }
 
 var errCacheDisabled = errors.New("cache disabled")
@@ -23,6 +27,7 @@ func NewCacheService() *CacheService {
 	return &CacheService{
 		enabled: config.AppConfig.Cache.Enabled,
 		ttl:     newCacheTTLProfile(),
+		l1:      newL1Cache(),
 	}
 }
 
@@ -32,13 +37,15 @@ func (s *CacheService) GetOrSet(ctx context.Context, key string, fn func() (inte
 		return fn()
 	}
 
-	val, err := database.RedisClient.Get(ctx, key).Result()
-	if err == nil {
+	val, hit, err := s.fetchCachedBytes(ctx, key)
+	if hit {
 		var result interface{}
-		if unmarshalErr := unmarshalCacheValue([]byte(val), &result); unmarshalErr == nil {
-			recordCacheHit(key)
+		if unmarshalErr := unmarshalCacheValue(val, &result); unmarshalErr == nil {
 			return result, nil
 		}
+		_ = s.Delete(ctx, key)
+	} else if err != nil && !errors.Is(err, redis.Nil) {
+		return nil, fmt.Errorf("cache fetch: %w", err)
 	}
 
 	recordCacheMiss(key)
@@ -48,7 +55,7 @@ func (s *CacheService) GetOrSet(ctx context.Context, key string, fn func() (inte
 		return nil, err
 	}
 
-	if setErr := s.setWithTTL(ctx, key, result, s.ttl.forKey(key)); setErr != nil {
+	if setErr := s.storeCachedValue(ctx, key, result); setErr != nil {
 		fmt.Printf("Failed to set cache key %s: %v\n", key, setErr)
 	}
 
@@ -68,7 +75,21 @@ func (s *CacheService) setWithTTL(ctx context.Context, key string, value interfa
 	if err != nil {
 		return fmt.Errorf("failed to marshal cache value: %w", err)
 	}
-	return database.RedisClient.Set(ctx, key, data, ttl).Err()
+	if err := database.RedisClient.Set(ctx, key, data, ttl).Err(); err != nil {
+		return err
+	}
+	if s.l1 != nil {
+		s.l1.SetWithTTL(key, data, ttl)
+	}
+	return nil
+}
+
+func (s *CacheService) storeCachedValue(ctx context.Context, key string, value interface{}) error {
+	data, err := marshalCacheValue(value)
+	if err != nil {
+		return fmt.Errorf("failed to marshal cache value: %w", err)
+	}
+	return s.storeCachedBytes(ctx, key, data)
 }
 
 // Get retrieves a value from cache.
@@ -77,23 +98,27 @@ func (s *CacheService) Get(ctx context.Context, key string) (interface{}, error)
 		return nil, errCacheDisabled
 	}
 
-	val, err := database.RedisClient.Get(ctx, key).Result()
-	if err != nil {
-		return nil, err
+	val, hit, err := s.fetchCachedBytes(ctx, key)
+	if hit {
+		var result interface{}
+		if unmarshalErr := unmarshalCacheValue(val, &result); unmarshalErr == nil {
+			return result, nil
+		}
+		_ = s.Delete(ctx, key)
 	}
-
-	var result interface{}
-	if err := unmarshalCacheValue([]byte(val), &result); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal cache value: %w", err)
+	if err != nil && !errors.Is(err, redis.Nil) {
+		return nil, fmt.Errorf("cache get: %w", err)
 	}
-
-	return result, nil
+	return nil, err
 }
 
 // Delete removes a key from cache.
 func (s *CacheService) Delete(ctx context.Context, key string) error {
 	if !s.enabled {
 		return nil
+	}
+	if s.l1 != nil {
+		s.l1.Delete(key)
 	}
 
 	return database.RedisClient.Del(ctx, key).Err()

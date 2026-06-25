@@ -83,6 +83,10 @@ type CacheConfig struct {
 	TTLSearch    int
 	TTLAnalytics int
 	TTLLookup    int
+	L1Enabled    bool
+	L1MaxCostMB  int
+	L1NumCounters int64
+	L1BufferItems int64
 }
 
 type LoggingConfig struct {
@@ -162,12 +166,16 @@ func Load() error {
 			DataPath:       viper.GetString("import.data_path"),
 		},
 		Cache: CacheConfig{
-			Enabled:      viper.GetBool("cache.enabled"),
-			TTL:          viper.GetInt("cache.ttl"),
-			TTLCNPJ:      viper.GetInt("cache.ttl_cnpj"),
-			TTLSearch:    viper.GetInt("cache.ttl_search"),
-			TTLAnalytics: viper.GetInt("cache.ttl_analytics"),
-			TTLLookup:    viper.GetInt("cache.ttl_lookup"),
+			Enabled:       viper.GetBool("cache.enabled"),
+			TTL:           viper.GetInt("cache.ttl"),
+			TTLCNPJ:       viper.GetInt("cache.ttl_cnpj"),
+			TTLSearch:     viper.GetInt("cache.ttl_search"),
+			TTLAnalytics:  viper.GetInt("cache.ttl_analytics"),
+			TTLLookup:     viper.GetInt("cache.ttl_lookup"),
+			L1Enabled:     viper.GetBool("cache.l1_enabled"),
+			L1MaxCostMB:   viper.GetInt("cache.l1_max_cost_mb"),
+			L1NumCounters: viper.GetInt64("cache.l1_num_counters"),
+			L1BufferItems: viper.GetInt64("cache.l1_buffer_items"),
 		},
 		Logging: LoggingConfig{
 			Level:  viper.GetString("logging.level"),
@@ -247,6 +255,10 @@ func setDefaults() {
 	viper.SetDefault("cache.ttl_search", 300)
 	viper.SetDefault("cache.ttl_analytics", 3600)
 	viper.SetDefault("cache.ttl_lookup", 900)
+	viper.SetDefault("cache.l1_enabled", true)
+	viper.SetDefault("cache.l1_max_cost_mb", 256)
+	viper.SetDefault("cache.l1_num_counters", 10000000)
+	viper.SetDefault("cache.l1_buffer_items", 64)
 
 	viper.SetDefault("logging.level", "info")
 	viper.SetDefault("logging.format", "json")
