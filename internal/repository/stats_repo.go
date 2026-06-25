@@ -12,13 +12,15 @@ import (
 )
 
 const (
-	tableStatsByUF     = "stats_estabelecimentos_by_uf"
-	tableStatsByCNAE   = "stats_estabelecimentos_by_cnae"
-	tableStatsByCNAEUF = "stats_estabelecimentos_by_cnae_uf"
+	tableStatsByUF     = "mv_stats_estabelecimentos_by_uf"
+	tableStatsByCNAE   = "mv_stats_estabelecimentos_by_cnae"
+	tableStatsByCNAEUF = "mv_stats_estabelecimentos_by_cnae_uf"
+	tableLookupCNAE    = "mv_lookup_cnaes"
+	tableLookupMunicip = "mv_lookup_municipios"
 )
 
-// ErrStatsNotReady indicates aggregate tables were not refreshed after import.
-var ErrStatsNotReady = errors.New("stats aggregates empty — run refresh_estabelecimento_stats() after import")
+// ErrStatsNotReady indicates materialized views were not refreshed after import.
+var ErrStatsNotReady = errors.New("stats materialized views empty — run refresh_estabelecimento_stats() after import")
 
 type StatsRepository struct {
 	db *sql.DB
@@ -130,7 +132,7 @@ func (r *StatsRepository) AnalyticsSummary(
 	}
 
 	return &models.AnalyticsSummaryResponse{
-		Source:      "aggregates",
+		Source:      "materialized_views",
 		RefreshedAt: refreshedAt,
 		ByUF:        byUF,
 		TopCNAE:     topCNAE,

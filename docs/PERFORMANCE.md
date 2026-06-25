@@ -64,6 +64,20 @@ Prometheus: `busca_cnpj_l1_cache_hits_total`, `busca_cnpj_l1_cache_misses_total`
 
 Package: `internal/cache/l1/`
 
+## Materialized views (plan 02 Phase 4)
+
+Analytics and lookup read from PostgreSQL MVs (`migrations/000013_*`).
+
+```bash
+go run ./cmd/migrate
+./scripts/refresh_stats_aggregates.sh
+./scripts/opencnpj_advanced_phase4.sh http://localhost:8080
+```
+
+Runbook: `docs/ops/MATERIALIZED-VIEWS.md`
+
+## Keyset pagination
+
 Search endpoints accept optional `cursor` (cannot combine with `offset`):
 
 ```bash
@@ -174,3 +188,11 @@ Artifacts: `deploy/vps/*.example` · Runbook: `docs/ops/VPS-POSTGRESQL.md`
 ```
 
 Requires API rebuilt with L1 enabled (`cache.l1_enabled: true`). Warm CNPJ path should show `busca_cnpj_l1_cache_hits_total` in `/metrics`.
+
+## OpenCNPJ advanced plan — Phase 4 gate (materialized views)
+
+```bash
+./scripts/opencnpj_advanced_phase4.sh http://localhost:8080
+```
+
+Requires migration `000013` + `refresh_estabelecimento_stats()` after import.

@@ -76,14 +76,14 @@ func (r *LookupRepository) SearchCNAE(ctx context.Context, query string, limit i
 	// #nosec G201 -- SQL placeholders are integers from argPos, not user input.
 	sql := fmt.Sprintf(`
 		SELECT codigo, descricao
-		FROM cnaes
+		FROM %s
 		WHERE codigo LIKE $%d OR (%s)
 		ORDER BY
 		  CASE WHEN codigo LIKE $%d THEN 0 ELSE 1 END,
 		  similarity(%s, $%d) DESC,
 		  descricao
 		LIMIT $%d
-	`, codeArg, descMatch, codeArg, foldedDesc, simArg, limitArg)
+	`, tableLookupCNAE, codeArg, descMatch, codeArg, foldedDesc, simArg, limitArg)
 
 	rows, err := r.db.QueryContext(ctx, sql, args...)
 	if err != nil {
@@ -112,9 +112,9 @@ func (r *LookupRepository) SearchMunicipios(
 		return nil, nil
 	}
 
-	rows, err := r.db.QueryContext(ctx, `
-		SELECT m.codigo, m.descricao, COALESCE(m.uf, '')
-		FROM municipios m
+	rows, err := r.db.QueryContext(ctx, fmt.Sprintf(`
+		SELECT m.codigo, m.descricao, m.uf
+		FROM %s m
 		WHERE ($1 = '' OR m.uf = $1)
 		  AND (m.codigo LIKE $2 OR m.descricao ILIKE $3)
 		ORDER BY
@@ -122,7 +122,7 @@ func (r *LookupRepository) SearchMunicipios(
 		  CASE WHEN m.uf IS NOT NULL AND m.uf <> '' THEN 0 ELSE 1 END,
 		  m.descricao
 		LIMIT $5
-	`, uf, term+"%", "%"+term+"%", term+"%", limit)
+	`, tableLookupMunicip), uf, term+"%", "%"+term+"%", term+"%", limit)
 	if err != nil {
 		return nil, fmt.Errorf("lookup municipio: %w", err)
 	}

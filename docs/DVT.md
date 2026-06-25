@@ -176,3 +176,10 @@ Sequential IDs for new features that still need production-grade automated tests
 - **Added**: 2026-06-25
 - **Needs**: k6 steady-load L1 hit rate > 70% on CNPJ path; integration test with Redis testcontainer
 - **Status**: open
+
+## DVT-23: OpenCNPJ plan 02 Phase 4 materialized views
+
+- **Scope**: `migrations/000013_*`, `internal/repository/stats_repo.go`, `internal/repository/lookup_repo.go`, `scripts/opencnpj_advanced_phase4.sh`, `docs/ops/MATERIALIZED-VIEWS.md`
+- **Added**: 2026-06-25
+- **Needs**: integration test verifying CONCURRENTLY refresh + `/analytics/summary` p99 < 20ms; pg_cron on VPS
+- **Status**: open

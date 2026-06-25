@@ -11,7 +11,7 @@ PGUSER="${PGUSER:-receita_user}"
 PGDATABASE="${PGDATABASE:-receita_db}"
 export PGPASSWORD="${PGPASSWORD:-receita_password}"
 
-echo "Refreshing stats aggregates on ${PGHOST}:${PGPORT}/${PGDATABASE}…"
+echo "Refreshing materialized views (analytics + lookup) on ${PGHOST}:${PGPORT}/${PGDATABASE}…"
 START=$(date +%s)
 
 docker exec receita-postgres psql -U "$PGUSER" -d "$PGDATABASE" -c \
