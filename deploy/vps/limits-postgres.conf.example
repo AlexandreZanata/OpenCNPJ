@@ -1,0 +1,7 @@
+# EXAMPLE ONLY — copy to /etc/security/limits.d/ on the VPS; adjust for your postgres user.
+#   sudo cp deploy/vps/limits-postgres.conf.example /etc/security/limits.d/99-opencnpj-postgres.conf
+
+postgres soft nofile 65536
+postgres hard nofile 65536
+postgres soft nproc 65536
+postgres hard nproc 65536

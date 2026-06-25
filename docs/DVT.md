@@ -162,3 +162,10 @@ Sequential IDs for new features that still need production-grade automated tests
 - **Added**: 2026-06-25
 - **Needs**: Apply on 16 GB VPS; `STRICT_VPS=1` gate in staging workflow; post-reboot verification
 - **Status**: open
+
+## DVT-21: OpenCNPJ plan 02 Phase 2 PostgreSQL 16 GB profile gate
+
+- **Scope**: `deploy/vps/*.example`, `scripts/opencnpj_advanced_phase2.sh`, `scripts/vps_analyze_search_tables.sh`, `internal/perfvalidation/phase2_gate.go`, `docs/ops/VPS-POSTGRESQL.md`
+- **Added**: 2026-06-25
+- **Needs**: Apply on VPS; `STRICT_VPS=1` SHOW GUC verification; post-apply k6 delta vs Phase 0 baseline
+- **Status**: open

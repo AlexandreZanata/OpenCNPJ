@@ -136,4 +136,16 @@ Kernel, ulimits, and I/O scheduler templates for 16 GB production VPS:
 STRICT_VPS=1 ./scripts/opencnpj_advanced_phase1.sh http://localhost:8080   # after host apply
 ```
 
-Artifacts: `deploy/vps/` · Runbook: `docs/ops/VPS-OS-TUNING.md`
+Artifacts: `deploy/vps/*.example` · Runbook: `docs/ops/VPS-OS-TUNING.md`
+
+## OpenCNPJ advanced plan — Phase 2 gate (PostgreSQL 16 GB profile)
+
+Production `postgresql.conf` snippets for 16 GB VPS (~4 GB `shared_buffers`, 64 MB `work_mem`, autovacuum on):
+
+```bash
+./scripts/opencnpj_advanced_phase2.sh http://localhost:8080
+STRICT_VPS=1 ./scripts/opencnpj_advanced_phase2.sh http://localhost:8080   # after PG apply
+./scripts/vps_analyze_search_tables.sh   # refresh planner stats
+```
+
+Artifacts: `deploy/vps/*.example` · Runbook: `docs/ops/VPS-POSTGRESQL.md`

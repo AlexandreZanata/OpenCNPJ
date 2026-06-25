@@ -1,0 +1,35 @@
+-- EXAMPLE ONLY — copy to the VPS or run via scripts/vps_analyze_search_tables.sh
+-- Safe to re-run. Connects to Postgres on the direct port (not pgBouncer).
+
+\set ON_ERROR_STOP on
+
+CREATE OR REPLACE PROCEDURE opencnpj_set_partition_autovacuum(
+  parent regclass,
+  vacuum_scale real,
+  analyze_scale real
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  part regclass;
+BEGIN
+  FOR part IN
+    SELECT inhrelid::regclass
+    FROM pg_inherits
+    WHERE inhparent = parent
+  LOOP
+    EXECUTE format(
+      'ALTER TABLE %s SET (autovacuum_vacuum_scale_factor = %s, autovacuum_analyze_scale_factor = %s)',
+      part, vacuum_scale, analyze_scale
+    );
+  END LOOP;
+END;
+$$;
+
+CALL opencnpj_set_partition_autovacuum('empresas'::regclass, 0.02, 0.01);
+CALL opencnpj_set_partition_autovacuum('estabelecimentos'::regclass, 0.01, 0.005);
+
+ANALYZE empresas;
+ANALYZE estabelecimentos;
+
+DROP PROCEDURE IF EXISTS opencnpj_set_partition_autovacuum(regclass, real, real);

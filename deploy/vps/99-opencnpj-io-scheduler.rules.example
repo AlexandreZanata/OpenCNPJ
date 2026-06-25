@@ -1,0 +1,6 @@
+# EXAMPLE ONLY — copy to /etc/udev/rules.d/ on the VPS; verify block devices first (lsblk).
+#   sudo cp deploy/vps/99-opencnpj-io-scheduler.rules.example /etc/udev/rules.d/99-opencnpj-io-scheduler.rules
+#   sudo udevadm control --reload-rules && sudo udevadm trigger
+
+ACTION=="add|change", KERNEL=="nvme[0-9]n[0-9]", ATTR{queue/rotational}=="0", ATTR{queue/scheduler}="mq-deadline"
+ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="0", ATTR{queue/scheduler}="mq-deadline"

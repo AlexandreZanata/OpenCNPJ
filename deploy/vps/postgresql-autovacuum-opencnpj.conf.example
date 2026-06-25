@@ -1,0 +1,12 @@
+# EXAMPLE ONLY — include after postgresql-opencnpj.conf on the VPS host.
+#   sudo cp deploy/vps/postgresql-autovacuum-opencnpj.conf.example /etc/postgresql/18/main/conf.d/99-opencnpj-autovacuum.conf
+
+autovacuum = on
+autovacuum_max_workers = 4
+autovacuum_naptime = 30s
+autovacuum_vacuum_scale_factor = 0.05
+autovacuum_analyze_scale_factor = 0.02
+autovacuum_vacuum_cost_delay = 2ms
+autovacuum_vacuum_cost_limit = 1000
+
+# After apply: run scripts/vps_analyze_search_tables.sh (uses *.sql.example or local *.sql).

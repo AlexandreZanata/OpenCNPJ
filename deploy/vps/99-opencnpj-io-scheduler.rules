@@ -1,7 +1,0 @@
-# Set mq-deadline scheduler on SSD/NVMe block devices.
-# Install: sudo cp deploy/vps/99-opencnpj-io-scheduler.rules /etc/udev/rules.d/
-#          sudo udevadm control --reload-rules && sudo udevadm trigger
-# Verify:  lsblk -d -o NAME,ROTA,SCHED
-
-ACTION=="add|change", KERNEL=="nvme[0-9]n[0-9]", ATTR{queue/rotational}=="0", ATTR{queue/scheduler}="mq-deadline"
-ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="0", ATTR{queue/scheduler}="mq-deadline"

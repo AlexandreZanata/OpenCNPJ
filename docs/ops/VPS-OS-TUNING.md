@@ -1,25 +1,33 @@
 # VPS OS tuning (OpenCNPJ plan 02 Phase 1)
 
-Production kernel and disk settings for a **16 GB RAM** VPS running PostgreSQL 18, Redis, and the Go API.
+Kernel and disk **example templates** for a DB-heavy VPS. Real configs stay on the host (gitignored under `deploy/vps/` if copied locally).
 
 ## Scope
 
-| Area | Artifact | Apply on |
-|------|----------|----------|
-| `sysctl` | `deploy/vps/sysctl-opencnpj.conf` | VPS host |
-| `ulimits` | `deploy/vps/limits-postgres.conf` | VPS host |
-| I/O scheduler | `deploy/vps/99-opencnpj-io-scheduler.rules` | VPS host |
+| Area | Example template | Apply on |
+|------|------------------|----------|
+| `sysctl` | `deploy/vps/sysctl-opencnpj.conf.example` | VPS host |
+| `ulimits` | `deploy/vps/limits-postgres.conf.example` | VPS host |
+| I/O scheduler | `deploy/vps/99-opencnpj-io-scheduler.rules.example` | VPS host |
 | Mount options | `deploy/vps/fstab-postgres.example` | VPS host |
 
 Local Docker development **does not** require these changes.
 
-## Key values
+## Workflow
 
-| Parameter | Value | Rationale |
-|-----------|-------|-----------|
+```bash
+# On VPS — copy, edit, apply (see deploy/vps/README.md)
+sudo cp deploy/vps/sysctl-opencnpj.conf.example /etc/sysctl.d/99-opencnpj.conf
+# ... edit, then sysctl --system
+```
+
+## Example starting values (~16 GB RAM)
+
+| Parameter | Example | Rationale |
+|-----------|---------|-----------|
 | `vm.swappiness` | 1 | Keep Postgres buffer cache in RAM |
 | `vm.dirty_ratio` | 10 | Bounded writeback under load |
-| `kernel.shmmax` | 4 GB | Matches production `shared_buffers` (Phase 2) |
+| `kernel.shmmax` | 4 GB | Align with example `shared_buffers` (Phase 2) |
 | `net.core.somaxconn` | 4096 | API + pgBouncer backlog |
 | Postgres `nofile` | 65536 | Many connections via pooler |
 
@@ -30,10 +38,7 @@ Local Docker development **does not** require these changes.
 STRICT_VPS=1 ./scripts/opencnpj_advanced_phase1.sh http://localhost:8080  # after VPS apply
 ```
 
-Gate: artifact checks pass; light k6 load does not spike swap usage beyond threshold.
-
 ## References
 
-- `deploy/vps/README.md` — apply steps
+- `deploy/vps/README.md` — copy/edit/apply checklist
 - `.local/02-opencnpj-advanced-optimization/OFICIAL_SOURCES.md` — Linux / VPS links
-- PostgreSQL kernel resources — huge pages (optional)

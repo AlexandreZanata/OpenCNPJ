@@ -71,3 +71,8 @@ data/system_guard.log
 
 # Optional local agent overrides
 .local/
+
+# VPS — real host configs only on the server (repo ships *.example templates)
+deploy/vps/*
+!deploy/vps/README.md
+!deploy/vps/*.example

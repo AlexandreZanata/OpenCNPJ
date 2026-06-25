@@ -36,16 +36,16 @@ fi
 
 echo "--- Deploy artifacts ---"
 for f in \
-  deploy/vps/sysctl-opencnpj.conf \
-  deploy/vps/limits-postgres.conf \
-  deploy/vps/99-opencnpj-io-scheduler.rules \
+  deploy/vps/sysctl-opencnpj.conf.example \
+  deploy/vps/limits-postgres.conf.example \
+  deploy/vps/99-opencnpj-io-scheduler.rules.example \
   deploy/vps/fstab-postgres.example \
   deploy/vps/README.md \
   docs/ops/VPS-OS-TUNING.md; do
   if [[ -f "$ROOT/$f" ]]; then ok "artifact $f"; else bad "missing $f"; fi
 done
 
-sysctl_file="$ROOT/deploy/vps/sysctl-opencnpj.conf"
+sysctl_file="$ROOT/deploy/vps/sysctl-opencnpj.conf.example"
 if grep -q 'vm.swappiness = 1' "$sysctl_file" && grep -q 'kernel.shmmax = 4294967296' "$sysctl_file"; then
   ok "sysctl template has swappiness + shmmax"
 else
