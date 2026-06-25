@@ -126,3 +126,14 @@ Before plan `02` optimizations (Ristretto L1, MVs, Meilisearch selective index):
 
 Artifacts: `.local/02-opencnpj-advanced-optimization/benchmarks/` (gitignored).
 Report template: `docs/benchmarks/2026-06-25-opencnpj-phase0-baseline.md`
+
+## OpenCNPJ advanced plan — Phase 1 gate (VPS OS tuning)
+
+Kernel, ulimits, and I/O scheduler templates for 16 GB production VPS:
+
+```bash
+./scripts/opencnpj_advanced_phase1.sh http://localhost:8080
+STRICT_VPS=1 ./scripts/opencnpj_advanced_phase1.sh http://localhost:8080   # after host apply
+```
+
+Artifacts: `deploy/vps/` · Runbook: `docs/ops/VPS-OS-TUNING.md`

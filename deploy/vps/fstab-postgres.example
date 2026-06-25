@@ -1,0 +1,4 @@
+# Example /etc/fstab line for PostgreSQL data volume (adjust UUID/path).
+# Add noatime,nodiratime to reduce metadata writes on SSD.
+
+# UUID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx  /var/lib/postgresql  ext4  defaults,noatime,nodiratime  0  2

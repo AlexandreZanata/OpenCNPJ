@@ -155,3 +155,10 @@ Sequential IDs for new features that still need production-grade automated tests
 - **Added**: 2026-06-25
 - **Needs**: CI job + VPS k6 baseline on 150M-row staging; wire `opencnpj_advanced_phase0.sh` into workflow
 - **Status**: open
+
+## DVT-20: OpenCNPJ plan 02 Phase 1 VPS OS tuning gate
+
+- **Scope**: `deploy/vps/`, `scripts/opencnpj_advanced_phase1.sh`, `internal/perfvalidation/phase1_gate.go`, `docs/ops/VPS-OS-TUNING.md`
+- **Added**: 2026-06-25
+- **Needs**: Apply on 16 GB VPS; `STRICT_VPS=1` gate in staging workflow; post-reboot verification
+- **Status**: open
