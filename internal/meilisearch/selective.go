@@ -13,8 +13,8 @@ const SelectiveEmpresaSQL = `
 		WHERE EXISTS (
 			SELECT 1 FROM estabelecimentos est
 			WHERE est.cnpj_basico = e.cnpj_basico
-			  AND est.situacao_cadastral = '02'
-			  AND est.identificador_matriz_filial = '1'
+			  AND est.situacao_cadastral = '` + activeSituacaoCadastral + `'
+			  AND est.identificador_matriz_filial = '` + matrizIdentificador + `'
 		)
 		ORDER BY e.cnpj_basico
 		LIMIT $1 OFFSET $2`
@@ -23,8 +23,8 @@ const SelectiveEmpresaSQL = `
 const SelectiveEstabSQL = `
 		SELECT id::text, cnpj_completo, COALESCE(nome_fantasia, ''), situacao_cadastral, COALESCE(uf, '')
 		FROM estabelecimentos
-		WHERE situacao_cadastral = '02'
-		  AND identificador_matriz_filial = '1'
+		WHERE situacao_cadastral = '` + activeSituacaoCadastral + `'
+		  AND identificador_matriz_filial = '` + matrizIdentificador + `'
 		ORDER BY id
 		LIMIT $1 OFFSET $2`
 

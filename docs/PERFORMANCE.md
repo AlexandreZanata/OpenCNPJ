@@ -215,3 +215,16 @@ MEILI_STRICT=1 ./scripts/opencnpj_advanced_phase5.sh http://localhost:8080   # s
 ```
 
 Runbook: `docs/ops/MEILISEARCH-SELECTIVE.md` · Package: `internal/meilisearch/selective.go`
+
+## OpenCNPJ advanced plan — Phase 6 gate (UF LIST partitions)
+
+Migrates `estabelecimentos` from HASH(`cnpj_basico`) to LIST(`uf`) for UF query pruning.
+
+```bash
+go run ./cmd/migrate   # applies 000014 (off-peak on VPS)
+./scripts/explain_uf_partition_pruning.sh
+./scripts/opencnpj_advanced_phase6.sh http://localhost:8080
+STRICT=1 ./scripts/opencnpj_advanced_phase6.sh http://localhost:8080
+```
+
+Runbook: `docs/ops/UF-PARTITIONING.md` · UF codes: `internal/partition/br_uf.go`

@@ -2,7 +2,6 @@ package perfvalidation
 
 import (
 	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -24,7 +23,7 @@ func TestPhase2GUCExpectations(t *testing.T) {
 
 func TestPhase2PostgreSQLTemplateHasRequiredGUCs(t *testing.T) {
 	root := findRepoRoot(t)
-	path := filepath.Join(root, "deploy/vps/postgresql-opencnpj.conf.example")
+	path := repoPath(root, "deploy", "vps", "postgresql-opencnpj.conf.example")
 	body, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatalf("read postgresql template: %v", err)
@@ -38,7 +37,7 @@ func TestPhase2PostgreSQLTemplateHasRequiredGUCs(t *testing.T) {
 			t.Fatalf("postgresql template missing %s = %s", key, want)
 		}
 	}
-	autoPath := filepath.Join(root, "deploy/vps/postgresql-autovacuum-opencnpj.conf.example")
+	autoPath := repoPath(root, "deploy", "vps", "postgresql-autovacuum-opencnpj.conf.example")
 	autoBody, err := os.ReadFile(autoPath)
 	if err != nil {
 		t.Fatalf("read autovacuum template: %v", err)
@@ -55,7 +54,7 @@ func TestPhase2PostgreSQLTemplateHasRequiredGUCs(t *testing.T) {
 
 func TestPhase2AnalyzeSQL(t *testing.T) {
 	root := findRepoRoot(t)
-	path := filepath.Join(root, "deploy/vps/analyze-search-tables.sql.example")
+	path := repoPath(root, "deploy", "vps", "analyze-search-tables.sql.example")
 	body, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatalf("read analyze sql: %v", err)

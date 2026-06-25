@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"busca-cnpj-2026/internal/cache/l1"
@@ -39,7 +40,7 @@ func (s *CacheService) fetchCachedBytes(ctx context.Context, key string) ([]byte
 
 	val, err := database.RedisClient.Get(ctx, key).Result()
 	if err != nil {
-		if err == redis.Nil {
+		if errors.Is(err, redis.Nil) {
 			return nil, false, redis.Nil
 		}
 		return nil, false, err

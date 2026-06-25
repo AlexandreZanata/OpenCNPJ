@@ -2,7 +2,6 @@ package perfvalidation
 
 import (
 	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -15,7 +14,7 @@ func TestPhase5ConfigKeys(t *testing.T) {
 
 func TestPhase5SelectiveSQLInIndexer(t *testing.T) {
 	root := findRepoRoot(t)
-	path := filepath.Join(root, "internal/meilisearch/selective.go")
+	path := repoPath(root, "internal", "meilisearch", "selective.go")
 	body, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatalf("read selective.go: %v", err)
@@ -30,7 +29,7 @@ func TestPhase5SelectiveSQLInIndexer(t *testing.T) {
 
 func TestPhase5MeilisearchIndexCMD(t *testing.T) {
 	root := findRepoRoot(t)
-	path := filepath.Join(root, "cmd/meilisearch-index/main.go")
+	path := repoPath(root, "cmd", "meilisearch-index", "main.go")
 	body, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatalf("read meilisearch-index: %v", err)

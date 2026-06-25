@@ -9,9 +9,9 @@ import (
 
 // Config holds Ristretto L1 cache sizing (plan 02 Phase 3).
 type Config struct {
-	MaxCostMB    int
-	NumCounters  int64
-	BufferItems  int64
+	MaxCostMB   int
+	NumCounters int64
+	BufferItems int64
 }
 
 // Cache is an in-process byte cache (msgpack payloads) above Redis L2.

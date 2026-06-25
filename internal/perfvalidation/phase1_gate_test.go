@@ -24,7 +24,7 @@ func TestPhase1SysctlExpectations(t *testing.T) {
 
 func TestPhase1SysctlTemplateHasRequiredKeys(t *testing.T) {
 	root := findRepoRoot(t)
-	path := filepath.Join(root, "deploy/vps/sysctl-opencnpj.conf.example")
+	path := repoPath(root, "deploy", "vps", "sysctl-opencnpj.conf.example")
 	body, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatalf("read sysctl template: %v", err)
@@ -47,7 +47,7 @@ func TestPhase1SysctlTemplateHasRequiredKeys(t *testing.T) {
 
 func TestPhase1LimitsTemplate(t *testing.T) {
 	root := findRepoRoot(t)
-	path := filepath.Join(root, "deploy/vps/limits-postgres.conf.example")
+	path := repoPath(root, "deploy", "vps", "limits-postgres.conf.example")
 	body, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatalf("read limits template: %v", err)
@@ -74,4 +74,8 @@ func findRepoRoot(t *testing.T) string {
 		}
 		dir = parent
 	}
+}
+
+func repoPath(root string, parts ...string) string {
+	return filepath.Join(append([]string{root}, parts...)...)
 }

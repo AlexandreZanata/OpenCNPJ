@@ -2,7 +2,6 @@ package perfvalidation
 
 import (
 	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -15,7 +14,7 @@ func TestPhase3RequiredMetrics(t *testing.T) {
 
 func TestPhase3ConfigYAML(t *testing.T) {
 	root := findRepoRoot(t)
-	path := filepath.Join(root, "config/config.yaml")
+	path := repoPath(root, "config", "config.yaml")
 	body, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatalf("read config: %v", err)
@@ -33,7 +32,7 @@ func TestPhase3ConfigYAML(t *testing.T) {
 
 func TestPhase3L1PackageExists(t *testing.T) {
 	root := findRepoRoot(t)
-	path := filepath.Join(root, "internal/cache/l1/cache.go")
+	path := repoPath(root, "internal", "cache", "l1", "cache.go")
 	if _, err := os.Stat(path); err != nil {
 		t.Fatalf("missing L1 package: %v", err)
 	}

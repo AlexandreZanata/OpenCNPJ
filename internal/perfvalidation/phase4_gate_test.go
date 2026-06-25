@@ -2,7 +2,6 @@ package perfvalidation
 
 import (
 	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -15,7 +14,7 @@ func TestPhase4MaterializedViewsList(t *testing.T) {
 
 func TestPhase4MigrationDefinesMVs(t *testing.T) {
 	root := findRepoRoot(t)
-	path := filepath.Join(root, Phase4MigrationFile)
+	path := repoPath(root, "migrations", "000013_materialized_views.up.sql")
 	body, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatalf("read migration: %v", err)
@@ -36,7 +35,7 @@ func TestPhase4MigrationDefinesMVs(t *testing.T) {
 
 func TestPhase4RepositoryUsesMVNames(t *testing.T) {
 	root := findRepoRoot(t)
-	path := filepath.Join(root, "internal/repository/stats_repo.go")
+	path := repoPath(root, "internal", "repository", "stats_repo.go")
 	body, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatalf("read stats_repo: %v", err)

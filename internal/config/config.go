@@ -78,14 +78,14 @@ type ImportConfig struct {
 }
 
 type CacheConfig struct {
-	Enabled      bool
-	TTL          int
-	TTLCNPJ      int
-	TTLSearch    int
-	TTLAnalytics int
-	TTLLookup    int
-	L1Enabled    bool
-	L1MaxCostMB  int
+	Enabled       bool
+	TTL           int
+	TTLCNPJ       int
+	TTLSearch     int
+	TTLAnalytics  int
+	TTLLookup     int
+	L1Enabled     bool
+	L1MaxCostMB   int
 	L1NumCounters int64
 	L1BufferItems int64
 }

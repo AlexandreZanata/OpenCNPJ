@@ -99,7 +99,14 @@ func (idx *Indexer) fetchDocs(
 		return nil, fmt.Errorf("query index batch: %w", err)
 	}
 	defer rows.Close()
-	return scan(rows)
+	docs, err := scan(rows)
+	if err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return docs, nil
 }
 
 func (idx *Indexer) scanEmpresaRows(rows *sql.Rows) ([]map[string]interface{}, error) {

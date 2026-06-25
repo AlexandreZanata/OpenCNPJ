@@ -190,3 +190,10 @@ Sequential IDs for new features that still need production-grade automated tests
 - **Added**: 2026-06-25
 - **Needs**: full ~20M doc index on staging; text search p99 < 80 ms k6 gate; importer post-import sync e2e
 - **Status**: open
+
+## DVT-25: OpenCNPJ plan 02 Phase 6 UF LIST partitioning
+
+- **Scope**: `migrations/000014_*`, `internal/partition/`, `scripts/opencnpj_advanced_phase6.sh`, `scripts/explain_uf_partition_pruning.sh`, `docs/ops/UF-PARTITIONING.md`
+- **Added**: 2026-06-25
+- **Needs**: off-peak apply on 150M-row VPS; STRICT EXPLAIN gate in CI; post-migrate k6 uf_search p99 < 80 ms
+- **Status**: open
