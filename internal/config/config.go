@@ -52,10 +52,11 @@ type ClickHouseConfig struct {
 }
 
 type MeilisearchConfig struct {
-	Enabled bool
-	Host    string
-	Port    int
-	APIKey  string
+	Enabled               bool
+	Host                  string
+	Port                  int
+	APIKey                string
+	SelectiveActiveMatriz bool
 }
 
 type ServerConfig struct {
@@ -144,10 +145,11 @@ func Load() error {
 			Database: viper.GetString("clickhouse.database"),
 		},
 		Meilisearch: MeilisearchConfig{
-			Enabled: viper.GetBool("meilisearch.enabled"),
-			Host:    viper.GetString("meilisearch.host"),
-			Port:    viper.GetInt("meilisearch.port"),
-			APIKey:  viper.GetString("meilisearch.api_key"),
+			Enabled:               viper.GetBool("meilisearch.enabled"),
+			Host:                  viper.GetString("meilisearch.host"),
+			Port:                  viper.GetInt("meilisearch.port"),
+			APIKey:                viper.GetString("meilisearch.api_key"),
+			SelectiveActiveMatriz: viper.GetBool("meilisearch.selective_active_matriz"),
 		},
 		Server: ServerConfig{
 			Port:                   viper.GetInt("server.port"),
@@ -234,6 +236,7 @@ func setDefaults() {
 	viper.SetDefault("meilisearch.host", "localhost")
 	viper.SetDefault("meilisearch.port", 7700)
 	viper.SetDefault("meilisearch.api_key", "dev_master_key_change_me")
+	viper.SetDefault("meilisearch.selective_active_matriz", true)
 
 	viper.SetDefault("server.port", 8080)
 	viper.SetDefault("server.prefork", false)

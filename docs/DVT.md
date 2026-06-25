@@ -183,3 +183,10 @@ Sequential IDs for new features that still need production-grade automated tests
 - **Added**: 2026-06-25
 - **Needs**: integration test verifying CONCURRENTLY refresh + `/analytics/summary` p99 < 20ms; pg_cron on VPS
 - **Status**: open
+
+## DVT-24: OpenCNPJ plan 02 Phase 5 Meilisearch selective index
+
+- **Scope**: `internal/meilisearch/selective.go`, `internal/meilisearch/indexer.go`, `cmd/meilisearch-index`, `scripts/opencnpj_advanced_phase5.sh`, `docs/ops/MEILISEARCH-SELECTIVE.md`
+- **Added**: 2026-06-25
+- **Needs**: full ~20M doc index on staging; text search p99 < 80 ms k6 gate; importer post-import sync e2e
+- **Status**: open

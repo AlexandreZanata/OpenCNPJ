@@ -38,3 +38,15 @@ func TestClientAddDocumentsEmpty(t *testing.T) {
 		t.Fatalf("empty add: %v", err)
 	}
 }
+
+func TestClientHealth(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer srv.Close()
+
+	c := &Client{baseURL: srv.URL, httpClient: srv.Client()}
+	if err := c.Health(context.Background()); err != nil {
+		t.Fatalf("health: %v", err)
+	}
+}

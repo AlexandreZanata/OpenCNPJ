@@ -13,13 +13,11 @@ import (
 
 func main() {
 	batchSize := flag.Int("batch-size", 5000, "Documents per Meilisearch batch")
+	maxBatches := flag.Int("max-batches", 0, "Max batches per index stream (0 = all)")
 	flag.Parse()
 
 	if err := config.Load(); err != nil {
 		log.Fatal(err)
-	}
-	if !config.AppConfig.Meilisearch.Enabled {
-		log.Fatal("meilisearch.enabled must be true in config")
 	}
 	if err := database.InitPostgresForMigrate(); err != nil {
 		log.Fatal(err)
@@ -32,8 +30,16 @@ func main() {
 
 	cfg := config.AppConfig.Meilisearch
 	client := meilisearch.NewClient(cfg.Host, cfg.Port, cfg.APIKey)
+	if err := client.Health(context.Background()); err != nil {
+		log.Fatalf("meilisearch health: %v", err)
+	}
 	idx := meilisearch.NewIndexer(client, database.DB, log.New(os.Stdout, "", log.LstdFlags))
-	if err := idx.SyncAll(context.Background(), *batchSize); err != nil {
+	opts := meilisearch.SyncOptions{
+		BatchSize:             *batchSize,
+		MaxBatches:            *maxBatches,
+		SelectiveActiveMatriz: cfg.SelectiveActiveMatriz,
+	}
+	if err := idx.SyncAll(context.Background(), opts); err != nil {
 		log.Fatal(err)
 	}
 	log.Println("meilisearch sync complete")

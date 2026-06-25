@@ -126,10 +126,11 @@ Default: `false`. DB/Redis/ClickHouse init runs once in `main()` before `fiber.N
 
 ## Meilisearch (optional)
 
-Docker service on port `7700`. Set `meilisearch.enabled: true` in `config/config.yaml` to delegate text-only search to Meili (Postgres remains source of truth for enrichment).
+Docker service on port `7700`. Set `meilisearch.enabled: true` in `config/config.yaml` to delegate text-only search to Meili (Postgres remains source of truth for enrichment). With `selective_active_matriz: true` (default), the indexer scopes to active headquarters rows only.
 
 ```bash
-go run ./cmd/meilisearch-index   # full re-index
+go run ./cmd/meilisearch-index   # full selective re-index
+go run ./cmd/meilisearch-index -max-batches 2   # dev sample
 # importer auto-syncs when meilisearch.enabled is true
 ```
 
@@ -196,3 +197,21 @@ Requires API rebuilt with L1 enabled (`cache.l1_enabled: true`). Warm CNPJ path 
 ```
 
 Requires migration `000013` + `refresh_estabelecimento_stats()` after import.
+
+## OpenCNPJ advanced plan — Phase 5 gate (Meilisearch selective index)
+
+Indexes **active matriz** only (`situacao_cadastral = 02`, `identificador_matriz_filial = 1`) — ~20M docs target vs full branch set.
+
+| Setting | Default | Notes |
+|---------|---------|-------|
+| `meilisearch.enabled` | `false` | Enable after Meilisearch is up |
+| `meilisearch.selective_active_matriz` | `true` | Plan 02 selective scope |
+
+```bash
+docker compose up -d meilisearch
+./scripts/opencnpj_advanced_phase5.sh http://localhost:8080
+MEILI_STRICT=1 ./scripts/opencnpj_advanced_phase5.sh http://localhost:8080   # sample index
+./scripts/meilisearch_selective_index.sh
+```
+
+Runbook: `docs/ops/MEILISEARCH-SELECTIVE.md` · Package: `internal/meilisearch/selective.go`

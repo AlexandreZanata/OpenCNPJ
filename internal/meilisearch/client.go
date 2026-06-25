@@ -99,11 +99,40 @@ func (c *Client) Search(ctx context.Context, uid, query string, limit, offset in
 }
 
 func (c *Client) post(ctx context.Context, path string, body, out interface{}) error {
+	return c.doJSON(ctx, http.MethodPost, path, body, out)
+}
+
+func (c *Client) patch(ctx context.Context, path string, body, out interface{}) error {
+	return c.doJSON(ctx, http.MethodPatch, path, body, out)
+}
+
+// Health checks Meilisearch availability (GET /health).
+func (c *Client) Health(ctx context.Context) error {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.baseURL+"/health", http.NoBody)
+	if err != nil {
+		return fmt.Errorf("health request: %w", err)
+	}
+	if c.apiKey != "" {
+		req.Header.Set("Authorization", "Bearer "+c.apiKey)
+	}
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("health http: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode >= 300 {
+		data, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("%w: health %s %s", errMeilisearchHTTP, resp.Status, string(data))
+	}
+	return nil
+}
+
+func (c *Client) doJSON(ctx context.Context, method, path string, body, out interface{}) error {
 	payload, err := json.Marshal(body)
 	if err != nil {
 		return fmt.Errorf("marshal: %w", err)
 	}
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.baseURL+path, bytes.NewReader(payload))
+	req, err := http.NewRequestWithContext(ctx, method, c.baseURL+path, bytes.NewReader(payload))
 	if err != nil {
 		return fmt.Errorf("request: %w", err)
 	}

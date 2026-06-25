@@ -30,6 +30,7 @@ meilisearch:
   host: localhost
   port: 7700
   api_key: dev_master_key_change_me
+  selective_active_matriz: true
 
 server:
   port: 8080

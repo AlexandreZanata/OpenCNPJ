@@ -100,5 +100,8 @@ func syncMeilisearchAfterImport(ctx context.Context, logger *log.Logger) error {
 	cfg := config.AppConfig.Meilisearch
 	client := meilisearch.NewClient(cfg.Host, cfg.Port, cfg.APIKey)
 	idx := meilisearch.NewIndexer(client, database.DB, logger)
-	return idx.SyncAll(ctx, 5000)
+	return idx.SyncAll(ctx, meilisearch.SyncOptions{
+		BatchSize:             5000,
+		SelectiveActiveMatriz: cfg.SelectiveActiveMatriz,
+	})
 }

@@ -35,6 +35,7 @@ sudo systemctl reload postgresql
 | `postgresql-opencnpj.conf.example` | Memory, WAL, planner GUCs |
 | `postgresql-autovacuum-opencnpj.conf.example` | Autovacuum defaults |
 | `analyze-search-tables.sql.example` | Partition autovacuum + `ANALYZE` |
+| `meilisearch-opencnpj.env.example` | Meilisearch RAM cap + master key (Phase 5) |
 
 ## Gitignored (never commit)
 
