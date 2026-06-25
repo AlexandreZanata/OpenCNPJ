@@ -114,3 +114,15 @@ go test ./... -short && go vet ./...
 Report: `docs/benchmarks/2026-06-24-api-search-performance.md`
 
 Redis hit-rate helper: `internal/perfvalidation` (40% gate for steady load).
+
+## OpenCNPJ advanced plan — Phase 0 gate
+
+Before plan `02` optimizations (Ristretto L1, MVs, Meilisearch selective index):
+
+```bash
+./scripts/opencnpj_advanced_phase0.sh http://localhost:8080
+./scripts/opencnpj_advanced_baseline.sh http://localhost:8080   # k6 + system snapshot
+```
+
+Artifacts: `.local/02-opencnpj-advanced-optimization/benchmarks/` (gitignored).
+Report template: `docs/benchmarks/2026-06-25-opencnpj-phase0-baseline.md`

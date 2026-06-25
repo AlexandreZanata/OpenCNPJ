@@ -148,9 +148,12 @@ func main() {
 	// Prometheus metrics endpoint
 	// Fiber uses fasthttp which is incompatible with net/http, so we use an adapter
 	app.Get("/metrics", func(c *fiber.Ctx) error {
-		// Create an HTTP adapter for Fiber that implements http.ResponseWriter
 		adapter := newFiberPrometheusAdapter(c)
-		promhttp.Handler().ServeHTTP(adapter, nil)
+		req, err := http.NewRequestWithContext(c.Context(), http.MethodGet, "/metrics", http.NoBody)
+		if err != nil {
+			return err
+		}
+		promhttp.Handler().ServeHTTP(adapter, req)
 		return nil
 	})
 

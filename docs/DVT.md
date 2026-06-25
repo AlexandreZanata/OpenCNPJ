@@ -21,6 +21,7 @@ Sequential IDs for new features that still need production-grade automated tests
 | DVT-16 | PostgreSQL FTS for multi-word search | open |
 | DVT-17 | Meilisearch indexer and search delegation | partial |
 | DVT-18 | CI automated API perf validation gate | open |
+| DVT-19 | OpenCNPJ plan 02 Phase 0 advanced baseline gate | open |
 
 ## DVT-01: CNPJ open-data downloader (WebDAV)
 
@@ -146,4 +147,11 @@ Sequential IDs for new features that still need production-grade automated tests
 - **Scope**: `scripts/api_perf_validation.sh`, `internal/perfvalidation/stats.go`
 - **Added**: 2026-06-24
 - **Needs**: GitHub Actions job running validation script against docker-compose stack on PR
+- **Status**: open
+
+## DVT-19: OpenCNPJ plan 02 Phase 0 advanced baseline gate
+
+- **Scope**: `scripts/opencnpj_advanced_phase0.sh`, `scripts/opencnpj_advanced_baseline.sh`, `internal/perfvalidation/phase0_gate.go`
+- **Added**: 2026-06-25
+- **Needs**: CI job + VPS k6 baseline on 150M-row staging; wire `opencnpj_advanced_phase0.sh` into workflow
 - **Status**: open
