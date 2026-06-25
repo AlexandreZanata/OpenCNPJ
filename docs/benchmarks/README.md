@@ -35,6 +35,17 @@ cat /tmp/full_import_performance_report.txt
 
 Latest measured run: [2026-06-24-full-import-i7-13620H-31GB.md](2026-06-24-full-import-i7-13620H-31GB.md)
 
+## API / frontend (VPS parity local)
+
+Production-like Postgres + API config on workstation (see `docs/ops/LOCAL-VPS-PARITY.md`):
+
+```bash
+./scripts/local_vps_parity_stack.sh
+make web-dev   # http://localhost:5173
+```
+
+Report: `docs/benchmarks/YYYY-MM-DD-vps-parity-local-frontend.md`
+
 ## Parser micro-benchmarks (CI)
 
 ```bash

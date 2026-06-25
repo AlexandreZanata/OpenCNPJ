@@ -98,18 +98,19 @@ type LoggingConfig struct {
 var AppConfig *Config
 
 func Load() error {
-	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath("./config")
-	viper.AddConfigPath(".")
-
-	// Enable environment variables
 	viper.AutomaticEnv()
 
-	// Set defaults
+	if path := os.Getenv("CONFIG_FILE"); path != "" {
+		viper.SetConfigFile(path)
+	} else {
+		viper.SetConfigName("config")
+		viper.SetConfigType("yaml")
+		viper.AddConfigPath("./config")
+		viper.AddConfigPath(".")
+	}
+
 	setDefaults()
 
-	// Read config file
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
 			return fmt.Errorf("error reading config file: %w", err)

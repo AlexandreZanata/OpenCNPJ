@@ -1,0 +1,68 @@
+# VPS API parity — same runtime settings as production (16 GB VPS / plan 02).
+# Load with: CONFIG_FILE=config/config.vps-parity.yaml go run ./cmd/api
+# Do NOT set BENCHMARK_MODE (rate limiter stays enabled).
+
+database:
+  host: localhost
+  port: 6432
+  migrate_port: 5434
+  user: receita_user
+  password: receita_password
+  name: receita_db
+  sslmode: disable
+  max_open_conns: 20
+  max_idle_conns: 5
+  conn_max_lifetime: 3600
+  conn_max_idle_time: 30
+
+redis:
+  host: localhost
+  port: 6380
+  password: ""
+  db: 0
+  pool_size: 10
+
+clickhouse:
+  host: localhost
+  port: 9001
+  user: receita_user
+  password: receita_password
+  database: receita_analytics
+
+meilisearch:
+  enabled: false
+  host: localhost
+  port: 7700
+  api_key: dev_master_key_change_me
+  selective_active_matriz: true
+
+server:
+  port: 8080
+  prefork: false
+  read_buffer_size: 16384
+  write_buffer_size: 4096
+  rate_limit_max: 6000
+  rate_limit_window_seconds: 60
+
+import:
+  workers: 16
+  copy_workers: 10
+  batch_size: 100000
+  read_buffer_size: 33554432
+  data_path: ./data
+
+cache:
+  enabled: true
+  ttl: 300
+  ttl_cnpj: 86400
+  ttl_search: 300
+  ttl_analytics: 3600
+  ttl_lookup: 900
+  l1_enabled: true
+  l1_max_cost_mb: 256
+  l1_num_counters: 10000000
+  l1_buffer_items: 64
+
+logging:
+  level: info
+  format: json
