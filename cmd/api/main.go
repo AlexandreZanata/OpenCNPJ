@@ -2,13 +2,9 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
-
-	//nolint:gosec // pprof gated by ENABLE_PPROF or debug logging.
-	_ "net/http/pprof"
 	"os"
 	"os/signal"
 	"syscall"
@@ -159,16 +155,7 @@ func main() {
 
 	// Profiling endpoints (staging or debug)
 	if os.Getenv("ENABLE_PPROF") == "true" || config.AppConfig.Logging.Level == "debug" {
-		go func() {
-			pprofServer := &http.Server{
-				Addr:              ":6060",
-				Handler:           nil,
-				ReadHeaderTimeout: 5 * time.Second,
-			}
-			if err := pprofServer.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-				log.Printf("pprof server error: %v", err)
-			}
-		}()
+		go servePprof(":6060")
 		log.Println("pprof enabled on :6060")
 	}
 

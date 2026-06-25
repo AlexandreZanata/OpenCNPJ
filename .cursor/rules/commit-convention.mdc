@@ -27,7 +27,7 @@ MUST use one of these — **CI fails on unknown scopes**:
 
 `parser`, `loader`, `pipeline`, `model`, `config`, `metrics`, `ci`, `docs`, `bench`, `benchmarks`,
 `migration`, `fixtures`, `importer`, `downloader`, `oss`, `api`, `web`, `export`, `security`,
-`git`, `docker`, `scripts`, `workflow`, `deps`, `repository`, `handlers`, `services`, `middleware`, `commitlint`
+`git`, `docker`, `scripts`, `workflow`, `deps`, `repository`, `handlers`, `services`, `middleware`, `meilisearch`, `commitlint`
 
 ## Scope picker
 
