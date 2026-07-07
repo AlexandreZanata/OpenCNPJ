@@ -27,6 +27,7 @@ Sequential IDs for new features that still need production-grade automated tests
 | DVT-29 | Public CNPJ API (sqlc + pgx) | open |
 | DVT-30 | Admin auth + TOTP MFA | open |
 | DVT-31 | Admin panel (server-rendered HTML) | open |
+| DVT-34 | SaaS security hardening (Phase 9) | open |
 
 ## DVT-01: CNPJ open-data downloader (WebDAV)
 
@@ -257,4 +258,11 @@ Sequential IDs for new features that still need production-grade automated tests
 - **Scope**: `docs/api/*`, `internal/apidocs/`, `scripts/api_docs_gate.sh`, admin panel API docs link
 - **Added**: 2026-07-07
 - **Needs**: QUICKSTART e2e on staging VPS with test key; Redoc `/docs` behind nginx in non-prod only
+- **Status**: open
+
+## DVT-34: SaaS security hardening (Phase 9)
+
+- **Scope**: `internal/saas/hash_compare.go`, `internal/middleware/metrics_auth.go`, `internal/handlers/admin/csrf.go`, `internal/adminauth/audit/`, `scripts/security_hardening_gate.sh`, `docs/SECURITY.md`
+- **Added**: 2026-07-07
+- **Needs**: staging VPS pen-test (no auth bypass on `/api/v1/cnpj/*`); nginx TLS/HSTS verification; audit log e2e after admin actions
 - **Status**: open

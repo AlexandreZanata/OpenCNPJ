@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/gofiber/fiber/v2/middleware/session"
+	"github.com/google/uuid"
 
 	"busca-cnpj-2026/internal/adminauth/token"
 	"busca-cnpj-2026/internal/adminauth/usecase"
@@ -22,4 +23,9 @@ type Deps struct {
 	DefaultQuota  int32
 	Renderer      *Renderer
 	DocsPublicURL string
+	Audit         auditWriter
+}
+
+type auditWriter interface {
+	Log(ctx context.Context, adminID uuid.UUID, action, resourceType, resourceID string, details []byte) error
 }

@@ -50,12 +50,15 @@ saas:
   default_monthly_quota: 0
   docs_enabled: false
   docs_public_url: "https://github.com/AlexandreZanata/BUSCA-CNPJ-2026/blob/main/docs/api/QUICKSTART.md"
+  admin_host: "admin.comerc.app.br"
 
 meilisearch:
   enabled: false
 
 metrics:
   enabled: true
+  internal_only: true
+  # bearer_token: set via METRICS_BEARER_TOKEN env on VPS
 
 # Env vars (never in committed config on disk):
 #   CNPJ_DATABASE_URL, SAAS_DATABASE_URL

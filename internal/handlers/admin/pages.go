@@ -5,17 +5,21 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 
+	"busca-cnpj-2026/internal/adminauth/audit"
 	"busca-cnpj-2026/internal/adminauth/autherr"
 	"busca-cnpj-2026/internal/adminauth/usecase"
 )
 
 type loginPage struct {
-	Error string
+	Error     string
+	CSRFToken string
 }
 
 type mfaPage struct {
-	Error string
+	Error     string
+	CSRFToken string
 }
 
 type dashboardPage struct {
@@ -26,7 +30,8 @@ type dashboardPage struct {
 
 // GetLogin shows the login form.
 func (h *Handler) GetLogin(c *fiber.Ctx) error {
-	return h.html(c, "login.html", loginPage{})
+	token, _ := h.csrfToken(c)
+	return h.html(c, "login.html", loginPage{CSRFToken: token})
 }
 
 // PostLogin handles credential submission.
@@ -35,11 +40,13 @@ func (h *Handler) PostLogin(c *fiber.Ctx) error {
 	pass := c.FormValue("password")
 	out, err := h.Login(c.Context(), usecase.LoginInput{Email: email, Password: pass})
 	if err != nil {
+		token, _ := h.csrfToken(c)
 		msg := "Invalid credentials"
 		if err == autherr.ErrAccountLocked {
 			msg = "Account temporarily locked"
 		}
-		return h.html(c, "login.html", loginPage{Error: msg})
+		_ = h.logAudit(c, uuid.Nil, audit.ActionLoginFailure, "admin_user", email, nil)
+		return h.html(c, "login.html", loginPage{Error: msg, CSRFToken: token})
 	}
 	sess, err := getSess(c, h.Session)
 	if err != nil {
@@ -61,7 +68,8 @@ func (h *Handler) GetMFA(c *fiber.Ctx) error {
 	if _, ok := sessGetUUID(sess, sessChallengeID); !ok {
 		return c.Redirect("/admin/login")
 	}
-	return h.html(c, "mfa.html", mfaPage{})
+	token, _ := h.csrfToken(c)
+	return h.html(c, "mfa.html", mfaPage{CSRFToken: token})
 }
 
 // PostMFA verifies TOTP and establishes session.
@@ -79,12 +87,14 @@ func (h *Handler) PostMFA(c *fiber.Ctx) error {
 		Code:        strings.TrimSpace(c.FormValue("code")),
 	})
 	if err != nil {
+		token, _ := h.csrfToken(c)
 		msg := "Invalid code"
-		return h.html(c, "mfa.html", mfaPage{Error: msg})
+		return h.html(c, "mfa.html", mfaPage{Error: msg, CSRFToken: token})
 	}
 	claims, err := h.Signer.ParseAccessToken(tokens.AccessToken)
 	if err != nil {
-		return h.html(c, "mfa.html", mfaPage{Error: "Session error"})
+		token, _ := h.csrfToken(c)
+		return h.html(c, "mfa.html", mfaPage{Error: "Session error", CSRFToken: token})
 	}
 	sess.Delete(sessChallengeID)
 	sessSetUUID(sess, sessAdminID, claims.AdminID)
@@ -92,6 +102,8 @@ func (h *Handler) PostMFA(c *fiber.Ctx) error {
 	if err := sess.Save(); err != nil {
 		return err
 	}
+	_ = h.logAudit(c, claims.AdminID, audit.ActionMFAVerified, "admin_user", claims.AdminID.String(), nil)
+	_ = h.logAudit(c, claims.AdminID, audit.ActionLoginSuccess, "admin_user", claims.AdminID.String(), nil)
 	setRefreshCookie(c, h.RefreshCookie, tokens.RefreshToken, tokens.RefreshExpires)
 	return c.Redirect("/admin/")
 }
@@ -119,7 +131,7 @@ func (h *Handler) GetDashboard(c *fiber.Ctx) error {
 		return err
 	}
 	return h.html(c, "dashboard.html", dashboardPage{
-		LayoutData:    h.shell("Dashboard", "dashboard", "dashboard-content", true),
+		LayoutData:    h.shell(c, "Dashboard", "dashboard", "dashboard-content", true),
 		TotalClients:  clients,
 		RequestsToday: today,
 	})

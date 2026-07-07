@@ -11,11 +11,12 @@ import (
 )
 
 type Config struct {
-	Database    DatabaseConfig
+	Database     DatabaseConfig
 	DatabaseCNPJ DatabaseURLConfig
 	DatabaseSaaS DatabaseURLConfig
-	SaaS        SaasConfig
-	Redis       RedisConfig
+	SaaS         SaasConfig
+	Metrics      MetricsConfig
+	Redis        RedisConfig
 	ClickHouse  ClickHouseConfig
 	Meilisearch MeilisearchConfig
 	Server      ServerConfig
@@ -97,6 +98,13 @@ type CacheConfig struct {
 type LoggingConfig struct {
 	Level  string
 	Format string
+}
+
+// MetricsConfig controls Prometheus /metrics exposure.
+type MetricsConfig struct {
+	Enabled      bool
+	BearerToken  string
+	InternalOnly bool
 }
 
 var AppConfig *Config
@@ -188,6 +196,11 @@ func Load() error {
 		Logging: LoggingConfig{
 			Level:  viper.GetString("logging.level"),
 			Format: viper.GetString("logging.format"),
+		},
+		Metrics: MetricsConfig{
+			Enabled:      viper.GetBool("metrics.enabled"),
+			BearerToken:  firstNonEmpty(os.Getenv("METRICS_BEARER_TOKEN"), viper.GetString("metrics.bearer_token")),
+			InternalOnly: viper.GetBool("metrics.internal_only"),
 		},
 	}
 
@@ -298,6 +311,9 @@ func setDefaults() {
 
 	viper.SetDefault("logging.level", "info")
 	viper.SetDefault("logging.format", "json")
+
+	viper.SetDefault("metrics.enabled", true)
+	viper.SetDefault("metrics.internal_only", false)
 
 	viper.SetDefault("saas.enabled", false)
 	viper.SetDefault("saas.public_api_only", false)

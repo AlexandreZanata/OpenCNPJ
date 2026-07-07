@@ -41,9 +41,13 @@ func (s *KeyStore) Authenticate(ctx context.Context, rawKey string) (Authenticat
 	row, err := s.queries.GetAPIKeyByHash(ctx, hash)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
+			_ = SecureCompareKeyHash(nil, hash)
 			return AuthenticatedClient{}, ErrInvalidKey
 		}
 		return AuthenticatedClient{}, fmt.Errorf("lookup api key: %w", err)
+	}
+	if !SecureCompareKeyHash(row.KeyHash, hash) {
+		return AuthenticatedClient{}, ErrInvalidKey
 	}
 	if row.ExpiresAt.Valid && row.ExpiresAt.Time.Before(time.Now()) {
 		return AuthenticatedClient{}, ErrExpiredKey

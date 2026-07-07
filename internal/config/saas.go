@@ -29,6 +29,7 @@ type SaasConfig struct {
 	DefaultMonthlyQuota  int
 	DocsEnabled          bool
 	DocsPublicURL        string
+	AdminHost            string
 }
 
 // DatabaseURLConfig is a Postgres URL plus pool settings (SaaS VPS layout).
@@ -51,6 +52,7 @@ func loadSaasFromViper() (SaasConfig, DatabaseURLConfig, DatabaseURLConfig) {
 		DefaultMonthlyQuota:  viper.GetInt("saas.default_monthly_quota"),
 		DocsEnabled:          viper.GetBool("saas.docs_enabled"),
 		DocsPublicURL:        viper.GetString("saas.docs_public_url"),
+		AdminHost:            viper.GetString("saas.admin_host"),
 	}
 
 	cnpj := DatabaseURLConfig{

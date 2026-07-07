@@ -168,7 +168,7 @@ func main() {
 
 	// Prometheus metrics endpoint
 	// Fiber uses fasthttp which is incompatible with net/http, so we use an adapter
-	app.Get("/metrics", func(c *fiber.Ctx) error {
+	metricsHandler := func(c *fiber.Ctx) error {
 		adapter := newFiberPrometheusAdapter(c)
 		req, err := http.NewRequestWithContext(c.Context(), http.MethodGet, "/metrics", http.NoBody)
 		if err != nil {
@@ -176,10 +176,18 @@ func main() {
 		}
 		promhttp.Handler().ServeHTTP(adapter, req)
 		return nil
-	})
+	}
+	if config.AppConfig.Metrics.BearerToken != "" || config.AppConfig.Metrics.InternalOnly {
+		app.Get("/metrics", middleware.MetricsAuth(
+			config.AppConfig.Metrics.BearerToken,
+			config.AppConfig.Metrics.InternalOnly,
+		), metricsHandler)
+	} else {
+		app.Get("/metrics", metricsHandler)
+	}
 
-	// Profiling endpoints (staging or debug)
-	if os.Getenv("ENABLE_PPROF") == "true" || config.AppConfig.Logging.Level == "debug" {
+	// Profiling endpoints (staging or debug; disabled when public_api_only)
+	if pprofAllowed() {
 		go servePprof(":6060")
 		log.Println("pprof enabled on :6060")
 	}
@@ -212,12 +220,12 @@ func main() {
 		if err != nil {
 			log.Fatalf("Failed to initialize admin auth: %v", err)
 		}
-		adminhandlers.RegisterRoutes(app, adminDeps.Handler, adminDeps.Signer)
+		adminhandlers.RegisterRoutes(app, adminDeps.Handler, adminDeps.Signer, config.AppConfig.SaaS.AdminHost)
 		panel, err := adminpanel.WirePanel(adminDeps, saasdb.New(database.SaaSPool), config.AppConfig.SaaS)
 		if err != nil {
 			log.Fatalf("Failed to initialize admin panel: %v", err)
 		}
-		if err := adminpanel.RegisterRoutes(app, panel); err != nil {
+		if err := adminpanel.RegisterRoutes(app, panel, config.AppConfig.SaaS.AdminHost); err != nil {
 			log.Fatalf("Failed to register admin panel routes: %v", err)
 		}
 		log.Println("Admin panel enabled at /admin/")

@@ -97,6 +97,69 @@ See [SECURITY-COMMANDS.md](SECURITY-COMMANDS.md) for full command reference.
 
 ---
 
+## 8. SaaS production hardening (OpenCNPJ VPS)
+
+When `saas.enabled: true` on the public API VPS (`api.comerc.app.br`), enforce the following.
+
+### API layer
+
+| Control | Implementation |
+|---------|----------------|
+| API key on all `/api/v1/*` customer routes | `X-API-Key` header via `internal/saas/middleware/api_key.go` |
+| Constant-time key hash compare | `saas.SecureCompareKeyHash` (SHA-256 digest) |
+| Masked API keys in logs | `saas.MaskAPIKey` via request logger |
+| Request correlation | `X-Request-ID` middleware |
+| Rate limits | Per-IP (`middleware.RateLimiter`) + per-client (Redis) |
+| No debug in production | `saas.public_api_only: true` disables pprof |
+
+### Admin layer
+
+| Control | Implementation |
+|---------|----------------|
+| MFA mandatory | `saas.mfa_required` + login rejects admins without MFA |
+| Argon2id passwords | 64 MB, t=3, p=4 (`internal/adminauth/password`) |
+| Refresh token rotation | `usecase.Refresh` revokes old token on use |
+| Secure cookies | HttpOnly, Secure (HTTPS), SameSite=Strict |
+| CSRF on HTML forms | `_csrf` session token on all admin POST routes |
+| Admin subdomain | `saas.admin_host` (e.g. `admin.comerc.app.br`) |
+
+### Infrastructure (nginx / VPS)
+
+- TLS 1.2+ only; HSTS `max-age=31536000; includeSubDomains`
+- PostgreSQL `sslmode=require`; DB host IP whitelist
+- Redis bound to `127.0.0.1` only
+- `/metrics` — `metrics.internal_only` or `METRICS_BEARER_TOKEN`
+
+### Secrets on disk
+
+| Secret | Path (mode 600) |
+|--------|-----------------|
+| JWT private key | `/etc/opencnpj/jwt-private.pem` |
+| MFA encryption key | `/etc/opencnpj/mfa.key` or `MFA_SECRET_ENCRYPTION_KEY` |
+| DB passwords | `/etc/opencnpj/api.env` |
+
+API key plaintext is **never** stored — only SHA-256 hash in `api_keys.key_hash`.
+
+### Audit log
+
+Admin actions are appended to `admin_audit_log`:
+
+- client created / suspended
+- API key created / revoked
+- admin login success / failure
+- MFA verification success
+
+### Local gate
+
+```bash
+chmod +x scripts/security_hardening_gate.sh
+./scripts/security_hardening_gate.sh
+```
+
+CI: `.github/workflows/security.yml` (gosec, staticcheck, govulncheck).
+
+---
+
 ## 7. Data protection (LGPD)
 
 CNPJ data may include masked CPF and partner names. Production deployments must:

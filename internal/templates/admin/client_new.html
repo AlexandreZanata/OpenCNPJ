@@ -5,6 +5,7 @@
 <h2 class="page-title">New client</h2>
 {{if .Error}}<div class="alert alert-error">{{.Error}}</div>{{end}}
 <form method="post" action="/admin/clients">
+  <input type="hidden" name="_csrf" value="{{.CSRFToken}}">
   <label for="name">Name</label>
   <input id="name" name="name" required maxlength="255">
   <label for="email">Email</label>

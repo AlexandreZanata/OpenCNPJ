@@ -11,6 +11,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 
+	"busca-cnpj-2026/internal/adminauth/audit"
 	saasdb "busca-cnpj-2026/internal/db/saas"
 	"busca-cnpj-2026/internal/saas"
 )
@@ -95,7 +96,7 @@ func (h *Handler) GetClients(c *fiber.Ctx) error {
 		pages = 1
 	}
 	return h.html(c, "clients_list.html", clientsListPage{
-		LayoutData: h.shell("Clients", "clients", "clients-list-content", false),
+		LayoutData: h.shell(c, "Clients", "clients", "clients-list-content", false),
 		Clients:    clients,
 		Page:       page,
 		TotalPages: pages,
@@ -105,7 +106,7 @@ func (h *Handler) GetClients(c *fiber.Ctx) error {
 // GetClientNew shows the create form.
 func (h *Handler) GetClientNew(c *fiber.Ctx) error {
 	return h.html(c, "client_new.html", clientNewPage{
-		LayoutData:   h.shell("New client", "clients", "client-new-content", false),
+		LayoutData:   h.shell(c, "New client", "clients", "client-new-content", false),
 		DefaultRate:  h.DefaultRate,
 		DefaultQuota: h.DefaultQuota,
 	})
@@ -119,7 +120,7 @@ func (h *Handler) PostClient(c *fiber.Ctx) error {
 	quota := int32(parseIntDefault(c.FormValue("monthly_quota"), int(h.DefaultQuota)))
 	if name == "" || email == "" {
 		return h.html(c, "client_new.html", clientNewPage{
-			LayoutData:  h.shell("New client", "clients", "client-new-content", false),
+			LayoutData:  h.shell(c, "New client", "clients", "client-new-content", false),
 			Error:       "Name and email are required",
 			DefaultRate: h.DefaultRate, DefaultQuota: h.DefaultQuota,
 		})
@@ -130,12 +131,13 @@ func (h *Handler) PostClient(c *fiber.Ctx) error {
 	})
 	if err != nil {
 		return h.html(c, "client_new.html", clientNewPage{
-			LayoutData:  h.shell("New client", "clients", "client-new-content", false),
+			LayoutData:  h.shell(c, "New client", "clients", "client-new-content", false),
 			Error:       "Could not create client",
 			DefaultRate: h.DefaultRate, DefaultQuota: h.DefaultQuota,
 		})
 	}
 	id, _ := uuidFromPg(row.ID)
+	_ = h.logAudit(c, h.adminIDFromCtx(c), audit.ActionClientCreated, "api_client", id.String(), nil)
 	return c.Redirect(fmt.Sprintf("/admin/clients/%s", id))
 }
 
@@ -161,7 +163,7 @@ func (h *Handler) GetClientDetail(c *fiber.Ctx) error {
 		return err
 	}
 	page := clientDetailPage{
-		LayoutData: h.shell(client.Name, "clients", "client-detail-content", false),
+		LayoutData: h.shell(c, client.Name, "clients", "client-detail-content", false),
 		Client: ClientView{
 			ID: id.String(), Name: client.Name, Email: client.Email, Status: client.Status,
 		},
@@ -186,6 +188,7 @@ func (h *Handler) PostSuspend(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
+	_ = h.logAudit(c, h.adminIDFromCtx(c), audit.ActionClientSuspended, "api_client", id.String(), nil)
 	return c.Redirect(fmt.Sprintf("/admin/clients/%s", id))
 }
 

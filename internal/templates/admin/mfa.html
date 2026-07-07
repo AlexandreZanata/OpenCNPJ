@@ -13,6 +13,7 @@
     <h2>Two-factor authentication</h2>
     {{if .Error}}<div class="alert alert-error">{{.Error}}</div>{{end}}
     <form method="post" action="/admin/mfa">
+      <input type="hidden" name="_csrf" value="{{.CSRFToken}}">
       <label for="code">6-digit code</label>
       <input id="code" name="code" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required autocomplete="one-time-code">
       <button type="submit">Verify</button>

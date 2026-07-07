@@ -4,6 +4,7 @@ import (
 	"context"
 
 	adminapp "busca-cnpj-2026/internal/adminauth/app"
+	"busca-cnpj-2026/internal/adminauth/audit"
 	"busca-cnpj-2026/internal/adminauth/usecase"
 	"busca-cnpj-2026/internal/apidocs"
 	"busca-cnpj-2026/internal/config"
@@ -36,5 +37,6 @@ func WirePanel(auth *adminapp.Deps, queries saasdb.Querier, saasCfg config.SaasC
 		DefaultQuota:  int32(saasCfg.DefaultMonthlyQuota),
 		Renderer:      r,
 		DocsPublicURL: docsURL,
+		Audit:         audit.NewLogger(queries),
 	}), nil
 }

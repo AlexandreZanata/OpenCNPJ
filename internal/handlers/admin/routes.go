@@ -5,31 +5,34 @@ import (
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
+
+	"busca-cnpj-2026/internal/middleware"
 )
 
 // RegisterRoutes mounts server-rendered admin panel routes.
-func RegisterRoutes(app *fiber.App, h *Handler) error {
+func RegisterRoutes(app *fiber.App, h *Handler, adminHost string) error {
 	staticFS, err := StaticFS()
 	if err != nil {
 		return err
 	}
-	app.Get("/admin/static/*", staticHandler(staticFS))
+	adminApp := app.Group("/admin", middleware.AdminHostRequired(adminHost))
+	adminApp.Get("/static/*", staticHandler(staticFS))
 
-	app.Get("/admin/login", h.GetLogin)
-	app.Post("/admin/login", h.PostLogin)
-	app.Get("/admin/mfa", h.GetMFA)
-	app.Post("/admin/mfa", h.PostMFA)
-	app.Post("/admin/logout", h.PostLogout)
+	adminApp.Get("/login", h.GetLogin)
+	adminApp.Post("/login", h.ValidateCSRF, h.PostLogin)
+	adminApp.Get("/mfa", h.GetMFA)
+	adminApp.Post("/mfa", h.ValidateCSRF, h.PostMFA)
+	adminApp.Post("/logout", h.ValidateCSRF, h.PostLogout)
 
-	g := app.Group("/admin", h.requireAuth)
+	g := adminApp.Group("", h.requireAuth)
 	g.Get("/", h.GetDashboard)
 	g.Get("/clients", h.GetClients)
 	g.Get("/clients/new", h.GetClientNew)
-	g.Post("/clients", h.PostClient)
+	g.Post("/clients", h.ValidateCSRF, h.PostClient)
 	g.Get("/clients/:id", h.GetClientDetail)
-	g.Post("/clients/:id/keys", h.PostCreateKey)
-	g.Post("/clients/:id/keys/:kid/revoke", h.PostRevokeKey)
-	g.Post("/clients/:id/suspend", h.PostSuspend)
+	g.Post("/clients/:id/keys", h.ValidateCSRF, h.PostCreateKey)
+	g.Post("/clients/:id/keys/:kid/revoke", h.ValidateCSRF, h.PostRevokeKey)
+	g.Post("/clients/:id/suspend", h.ValidateCSRF, h.PostSuspend)
 	g.Get("/usage", h.GetUsage)
 	return nil
 }

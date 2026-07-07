@@ -1,5 +1,5 @@
 -- name: GetAPIKeyByHash :one
-SELECT k.id, k.client_id, k.key_prefix, k.revoked_at, k.expires_at,
+SELECT k.id, k.client_id, k.key_prefix, k.key_hash, k.revoked_at, k.expires_at,
        c.status, c.rate_limit_per_min, c.monthly_quota
 FROM api_keys k
 JOIN api_clients c ON c.id = k.client_id

@@ -2,13 +2,25 @@ package admin
 
 import (
 	"bytes"
+	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 func TestShellIncludesAPIDocsURL(t *testing.T) {
-	h := &Handler{Deps: Deps{DocsPublicURL: "https://example.com/docs"}}
-	data := h.shell("Dashboard", "dashboard", "dashboard-content", true)
+	app := fiber.New()
+	h := &Handler{Deps: Deps{DocsPublicURL: "https://example.com/docs", Session: NewSession()}}
+	var data LayoutData
+	app.Get("/", func(c *fiber.Ctx) error {
+		data = h.shell(c, "Dashboard", "dashboard", "dashboard-content", true)
+		return nil
+	})
+	if _, err := app.Test(httptest.NewRequest(http.MethodGet, "/", http.NoBody)); err != nil {
+		t.Fatal(err)
+	}
 	if data.APIDocsURL != "https://example.com/docs" {
 		t.Fatalf("url = %q", data.APIDocsURL)
 	}

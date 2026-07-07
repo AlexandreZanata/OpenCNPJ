@@ -20,6 +20,7 @@ type Querier interface {
 	GetValidRefreshToken(ctx context.Context, tokenHash []byte) (AdminRefreshToken, error)
 	InsertAPIClient(ctx context.Context, arg InsertAPIClientParams) (ApiClient, error)
 	InsertAPIKey(ctx context.Context, arg InsertAPIKeyParams) (InsertAPIKeyRow, error)
+	InsertAdminAuditLog(ctx context.Context, arg InsertAdminAuditLogParams) (AdminAuditLog, error)
 	InsertAdminRefreshToken(ctx context.Context, arg InsertAdminRefreshTokenParams) (AdminRefreshToken, error)
 	ListAPIClients(ctx context.Context, arg ListAPIClientsParams) ([]ApiClient, error)
 	ListAPIKeysByClient(ctx context.Context, clientID pgtype.UUID) ([]ListAPIKeysByClientRow, error)

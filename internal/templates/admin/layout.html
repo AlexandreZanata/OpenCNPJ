@@ -23,6 +23,7 @@
     <header class="header">
       <span>Admin</span>
       <form method="post" action="/admin/logout" class="inline-form">
+        <input type="hidden" name="_csrf" value="{{.CSRFToken}}">
         <button type="submit" class="btn-muted">Logout</button>
       </form>
     </header>

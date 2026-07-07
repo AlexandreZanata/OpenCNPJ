@@ -130,7 +130,7 @@ func TestPhase5Gate(t *testing.T) {
 		cfg.RefreshCookieName,
 	)
 	app := fiber.New()
-	adminhandlers.RegisterRoutes(app, handler, signer)
+	adminhandlers.RegisterRoutes(app, handler, signer, "")
 
 	// 1. Login without MFA code returns mfa_required
 	loginResp := postJSON(t, app, "/admin/api/v1/auth/login", `{"email":"admin@test.local","password":"admin-pass"}`)

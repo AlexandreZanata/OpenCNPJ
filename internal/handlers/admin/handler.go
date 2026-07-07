@@ -1,5 +1,7 @@
 package admin
 
+import "github.com/gofiber/fiber/v2"
+
 // Handler serves server-rendered admin pages.
 type Handler struct {
 	Deps
@@ -21,14 +23,17 @@ type LayoutData struct {
 	RefreshMeta bool
 	Flash       string
 	APIDocsURL  string
+	CSRFToken   string
 }
 
-func (h *Handler) shell(title, nav, contentTpl string, refresh bool) LayoutData {
+func (h *Handler) shell(c *fiber.Ctx, title, nav, contentTpl string, refresh bool) LayoutData {
+	token, _ := h.csrfToken(c)
 	return LayoutData{
 		Title:       title,
 		Nav:         nav,
 		ContentTpl:  contentTpl,
 		RefreshMeta: refresh,
 		APIDocsURL:  h.DocsPublicURL,
+		CSRFToken:   token,
 	}
 }

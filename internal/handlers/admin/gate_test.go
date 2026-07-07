@@ -79,20 +79,17 @@ func TestPhase6Gate(t *testing.T) {
 	})
 
 	app := fiber.New()
-	if err := admin.RegisterRoutes(app, h); err != nil {
+	if err := admin.RegisterRoutes(app, h, ""); err != nil {
 		t.Fatal(err)
 	}
 
-	// Static CSS
-	staticResp := get(t, app, "/admin/static/admin.css")
-	if staticResp.StatusCode != http.StatusOK {
-		t.Fatalf("static css status=%d", staticResp.StatusCode)
-	}
+	loginPage := get(t, app, "/admin/login")
+	csrf := extractCSRF(readBody(loginPage))
 
 	// Login → MFA redirect
 	loginResp := postForm(t, app, "/admin/login", url.Values{
-		"email": {"admin@test.local"}, "password": {"pass"},
-	})
+		"email": {"admin@test.local"}, "password": {"pass"}, "_csrf": {csrf},
+	}, loginPage.Cookies()...)
 	if loginResp.StatusCode != http.StatusFound {
 		t.Fatalf("login status=%d", loginResp.StatusCode)
 	}
@@ -101,30 +98,41 @@ func TestPhase6Gate(t *testing.T) {
 	}
 
 	// MFA → dashboard
-	mfaResp := postForm(t, app, "/admin/mfa", url.Values{"code": {"123456"}}, loginResp.Cookies()...)
+	mfaPage := get(t, app, "/admin/mfa", loginResp.Cookies()...)
+	mfaCSRF := extractCSRF(readBody(mfaPage))
+	mfaResp := postForm(t, app, "/admin/mfa", url.Values{"code": {"123456"}, "_csrf": {mfaCSRF}}, mergeCookies(loginPage.Cookies(), loginResp.Cookies())...)
 	if mfaResp.StatusCode != http.StatusFound {
 		t.Fatalf("mfa status=%d body=%s", mfaResp.StatusCode, readBody(mfaResp))
 	}
 
-	cookies := mergeCookies(loginResp.Cookies(), mfaResp.Cookies())
+	cookies := mergeCookies(loginPage.Cookies(), loginResp.Cookies(), mfaResp.Cookies())
 	dash := get(t, app, "/admin/", cookies...)
 	dashBody := readBody(dash)
 	if dash.StatusCode != http.StatusOK || !strings.Contains(dashBody, "Dashboard") {
 		t.Fatalf("dashboard failed status=%d body=%s", dash.StatusCode, dashBody)
 	}
+	dashCSRF := extractCSRF(dashBody)
+
+	// Static CSS
+	staticResp := get(t, app, "/admin/static/admin.css", cookies...)
+	if staticResp.StatusCode != http.StatusOK {
+		t.Fatalf("static css status=%d", staticResp.StatusCode)
+	}
 
 	// Create client
 	create := postForm(t, app, "/admin/clients", url.Values{
 		"name": {"Gate Co"}, "email": {"gate@test.local"},
-		"rate_limit": {"60"}, "monthly_quota": {"0"},
+		"rate_limit": {"60"}, "monthly_quota": {"0"}, "_csrf": {dashCSRF},
 	}, cookies...)
 	if create.StatusCode != http.StatusFound {
 		t.Fatalf("create client status=%d", create.StatusCode)
 	}
 
 	// Generate key — one-time plaintext
+	detailPage := get(t, app, "/admin/clients/"+clientID.String(), cookies...)
+	detailCSRF := extractCSRF(readBody(detailPage))
 	keyResp := postForm(t, app, "/admin/clients/"+clientID.String()+"/keys", url.Values{
-		"label": {"production"},
+		"label": {"production"}, "_csrf": {detailCSRF},
 	}, cookies...)
 	if keyResp.StatusCode != http.StatusFound {
 		t.Fatalf("create key status=%d", keyResp.StatusCode)
@@ -231,6 +239,9 @@ func (m *mockQuerier) UpsertAdminUser(context.Context, saasdb.UpsertAdminUserPar
 }
 func (m *mockQuerier) UpsertUsageDaily(context.Context, saasdb.UpsertUsageDailyParams) error {
 	panic("unused")
+}
+func (m *mockQuerier) InsertAdminAuditLog(context.Context, saasdb.InsertAdminAuditLogParams) (saasdb.AdminAuditLog, error) {
+	return saasdb.AdminAuditLog{ID: 1}, nil
 }
 
 func pgUUID(id uuid.UUID) pgtype.UUID {

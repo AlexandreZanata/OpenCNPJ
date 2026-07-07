@@ -15,11 +15,13 @@
 <div class="toolbar">
   <h3 style="font-size:1rem">API keys</h3>
   <form method="post" action="/admin/clients/{{.Client.ID}}/keys" class="inline-form">
+    <input type="hidden" name="_csrf" value="{{.CSRFToken}}">
     <input type="hidden" name="label" value="production">
     <button type="submit">Generate key</button>
   </form>
   {{if eq .Client.Status "active"}}
   <form method="post" action="/admin/clients/{{.Client.ID}}/suspend" class="inline-form" style="margin-left:0.5rem">
+    <input type="hidden" name="_csrf" value="{{.CSRFToken}}">
     <button type="submit" class="btn-danger">Suspend</button>
   </form>
   {{end}}
@@ -36,6 +38,7 @@
       <td>
         {{if not .Revoked}}
         <form method="post" action="/admin/clients/{{$.Client.ID}}/keys/{{.ID}}/revoke" class="inline-form">
+          <input type="hidden" name="_csrf" value="{{$.CSRFToken}}">
           <button type="submit" class="btn-danger" style="padding:0.25rem 0.5rem;font-size:0.75rem">Revoke</button>
         </form>
         {{end}}

@@ -12,7 +12,7 @@ import (
 )
 
 const getAPIKeyByHash = `-- name: GetAPIKeyByHash :one
-SELECT k.id, k.client_id, k.key_prefix, k.revoked_at, k.expires_at,
+SELECT k.id, k.client_id, k.key_prefix, k.key_hash, k.revoked_at, k.expires_at,
        c.status, c.rate_limit_per_min, c.monthly_quota
 FROM api_keys k
 JOIN api_clients c ON c.id = k.client_id
@@ -23,6 +23,7 @@ type GetAPIKeyByHashRow struct {
 	ID              pgtype.UUID        `json:"id"`
 	ClientID        pgtype.UUID        `json:"client_id"`
 	KeyPrefix       string             `json:"key_prefix"`
+	KeyHash         []byte             `json:"key_hash"`
 	RevokedAt       pgtype.Timestamptz `json:"revoked_at"`
 	ExpiresAt       pgtype.Timestamptz `json:"expires_at"`
 	Status          string             `json:"status"`
@@ -37,6 +38,7 @@ func (q *Queries) GetAPIKeyByHash(ctx context.Context, keyHash []byte) (GetAPIKe
 		&i.ID,
 		&i.ClientID,
 		&i.KeyPrefix,
+		&i.KeyHash,
 		&i.RevokedAt,
 		&i.ExpiresAt,
 		&i.Status,
