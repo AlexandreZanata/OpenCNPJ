@@ -6,9 +6,9 @@ import (
 
 	"github.com/jackc/pgx/v5/pgtype"
 
-	cnpjdb "busca-cnpj-2026/internal/db/cnpj"
 	"busca-cnpj-2026/internal/cnpj"
 	"busca-cnpj-2026/internal/config"
+	cnpjdb "busca-cnpj-2026/internal/db/cnpj"
 	"busca-cnpj-2026/internal/services"
 )
 
@@ -19,7 +19,9 @@ type mockQueries struct {
 	simples cnpjdb.GetSimplesByBasicoRow
 }
 
-func (m *mockQueries) GetEstabelecimentoByCNPJ(context.Context, pgtype.Text) (cnpjdb.GetEstabelecimentoByCNPJRow, error) {
+func (m *mockQueries) GetEstabelecimentoByCNPJ(
+	_ context.Context, _ pgtype.Text,
+) (cnpjdb.GetEstabelecimentoByCNPJRow, error) {
 	return m.est, nil
 }
 func (m *mockQueries) GetEmpresaByBasico(context.Context, string) (cnpjdb.GetEmpresaByBasicoRow, error) {
@@ -36,14 +38,14 @@ func TestLookupServiceBuildsDTO(t *testing.T) {
 	config.AppConfig = &config.Config{Cache: config.CacheConfig{Enabled: false}}
 	q := &mockQueries{
 		est: cnpjdb.GetEstabelecimentoByCNPJRow{
-			CnpjCompleto: pgtype.Text{String: "00000000000191", Valid: true},
-			CnpjBasico:   "00000000",
-			NomeFantasia: pgtype.Text{String: "FANTASIA", Valid: true},
-			Uf:           pgtype.Text{String: "DF", Valid: true},
-			MunicipioNome: "BRASILIA",
+			CnpjCompleto:        pgtype.Text{String: "00000000000191", Valid: true},
+			CnpjBasico:          "00000000",
+			NomeFantasia:        pgtype.Text{String: "FANTASIA", Valid: true},
+			Uf:                  pgtype.Text{String: "DF", Valid: true},
+			MunicipioNome:       "BRASILIA",
 			CnaeFiscalPrincipal: pgtype.Text{String: "6422100", Valid: true},
-			CnaeDescricao: "Banco",
-			RazaoSocial:   "BANCO DO BRASIL SA",
+			CnaeDescricao:       "Banco",
+			RazaoSocial:         "BANCO DO BRASIL SA",
 		},
 		emp: cnpjdb.GetEmpresaByBasicoRow{
 			CnpjBasico:  "00000000",

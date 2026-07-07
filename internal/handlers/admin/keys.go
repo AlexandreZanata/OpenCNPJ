@@ -35,7 +35,7 @@ func (h *Handler) PostCreateKey(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	_ = h.logAudit(c, h.adminIDFromCtx(c), audit.ActionKeyCreated, "api_client", clientID.String(), nil)
+	_ = h.logAudit(c, h.adminIDFromCtx(c), audit.ActionKeyCreated, "api_client", clientID.String())
 	sess, err := getSess(c, h.Session)
 	if err != nil {
 		return err
@@ -63,6 +63,6 @@ func (h *Handler) PostRevokeKey(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	_ = h.logAudit(c, h.adminIDFromCtx(c), audit.ActionKeyRevoked, "api_key", keyID.String(), nil)
+	_ = h.logAudit(c, h.adminIDFromCtx(c), audit.ActionKeyRevoked, "api_key", keyID.String())
 	return c.Redirect(fmt.Sprintf("/admin/clients/%s", clientID))
 }

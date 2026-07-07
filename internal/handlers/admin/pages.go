@@ -45,7 +45,7 @@ func (h *Handler) PostLogin(c *fiber.Ctx) error {
 		if err == autherr.ErrAccountLocked {
 			msg = "Account temporarily locked"
 		}
-		_ = h.logAudit(c, uuid.Nil, audit.ActionLoginFailure, "admin_user", email, nil)
+		_ = h.logAudit(c, uuid.Nil, audit.ActionLoginFailure, "admin_user", email)
 		return h.html(c, "login.html", loginPage{Error: msg, CSRFToken: token})
 	}
 	sess, err := getSess(c, h.Session)
@@ -102,8 +102,8 @@ func (h *Handler) PostMFA(c *fiber.Ctx) error {
 	if err := sess.Save(); err != nil {
 		return err
 	}
-	_ = h.logAudit(c, claims.AdminID, audit.ActionMFAVerified, "admin_user", claims.AdminID.String(), nil)
-	_ = h.logAudit(c, claims.AdminID, audit.ActionLoginSuccess, "admin_user", claims.AdminID.String(), nil)
+	_ = h.logAudit(c, claims.AdminID, audit.ActionMFAVerified, "admin_user", claims.AdminID.String())
+	_ = h.logAudit(c, claims.AdminID, audit.ActionLoginSuccess, "admin_user", claims.AdminID.String())
 	setRefreshCookie(c, h.RefreshCookie, tokens.RefreshToken, tokens.RefreshExpires)
 	return c.Redirect("/admin/")
 }

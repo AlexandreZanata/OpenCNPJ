@@ -8,17 +8,17 @@ import (
 
 // Config holds admin JWT, MFA, and cookie settings (env-backed).
 type Config struct {
-	JWTPrivateKeyPath    string
-	JWTPublicKeyPath     string
-	MFASecretKey         []byte
-	TOTPIssuer           string
-	RefreshCookieName    string
-	AccessTTLMinutes     int
-	RefreshTTLDays       int
-	ChallengeTTLSeconds  int
-	MaxLoginFailures     int
-	LockoutMinutes         int
-	Role                 string
+	JWTPrivateKeyPath   string
+	JWTPublicKeyPath    string
+	MFASecretKey        []byte
+	TOTPIssuer          string
+	RefreshCookieName   string
+	AccessTTLMinutes    int
+	RefreshTTLDays      int
+	ChallengeTTLSeconds int
+	MaxLoginFailures    int
+	LockoutMinutes      int
+	Role                string
 }
 
 // LoadConfig reads admin auth settings from environment variables.

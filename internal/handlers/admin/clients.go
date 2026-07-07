@@ -137,7 +137,7 @@ func (h *Handler) PostClient(c *fiber.Ctx) error {
 		})
 	}
 	id, _ := uuidFromPg(row.ID)
-	_ = h.logAudit(c, h.adminIDFromCtx(c), audit.ActionClientCreated, "api_client", id.String(), nil)
+	_ = h.logAudit(c, h.adminIDFromCtx(c), audit.ActionClientCreated, "api_client", id.String())
 	return c.Redirect(fmt.Sprintf("/admin/clients/%s", id))
 }
 
@@ -188,7 +188,7 @@ func (h *Handler) PostSuspend(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	_ = h.logAudit(c, h.adminIDFromCtx(c), audit.ActionClientSuspended, "api_client", id.String(), nil)
+	_ = h.logAudit(c, h.adminIDFromCtx(c), audit.ActionClientSuspended, "api_client", id.String())
 	return c.Redirect(fmt.Sprintf("/admin/clients/%s", id))
 }
 

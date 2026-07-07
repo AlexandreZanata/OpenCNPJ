@@ -58,7 +58,9 @@ func Wire(_ context.Context, queries saasdb.Querier, rdb *redis.Client, saasCfg 
 	totpSvc := totpsvc.NewService(cfg.TOTPIssuer)
 
 	loginDeps := usecase.LoginDeps{Repo: repo, Guard: guard, ChStore: chStore, Cfg: cfg}
-	verifyDeps := usecase.VerifyMFADeps{Repo: repo, ChStore: chStore, Cipher: aead, TOTP: totpSvc, Signer: signer, Cfg: cfg}
+	verifyDeps := usecase.VerifyMFADeps{
+		Repo: repo, ChStore: chStore, Cipher: aead, TOTP: totpSvc, Signer: signer, Cfg: cfg,
+	}
 	refreshDeps := usecase.RefreshDeps{Repo: repo, Signer: signer, Cfg: cfg}
 
 	handler := adminhandlers.NewAuthHandler(

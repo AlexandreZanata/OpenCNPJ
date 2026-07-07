@@ -216,7 +216,12 @@ func main() {
 		if database.SaaSPool == nil {
 			log.Fatalf("Admin auth requires SaaS database pool")
 		}
-		adminDeps, err := adminapp.Wire(context.Background(), saasdb.New(database.SaaSPool), database.RedisClient, config.AppConfig.SaaS)
+		adminDeps, err := adminapp.Wire(
+			context.Background(),
+			saasdb.New(database.SaaSPool),
+			database.RedisClient,
+			config.AppConfig.SaaS,
+		)
 		if err != nil {
 			log.Fatalf("Failed to initialize admin auth: %v", err)
 		}

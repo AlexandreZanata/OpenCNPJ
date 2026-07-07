@@ -17,12 +17,12 @@ type Config struct {
 	SaaS         SaasConfig
 	Metrics      MetricsConfig
 	Redis        RedisConfig
-	ClickHouse  ClickHouseConfig
-	Meilisearch MeilisearchConfig
-	Server      ServerConfig
-	Import      ImportConfig
-	Cache       CacheConfig
-	Logging     LoggingConfig
+	ClickHouse   ClickHouseConfig
+	Meilisearch  MeilisearchConfig
+	Server       ServerConfig
+	Import       ImportConfig
+	Cache        CacheConfig
+	Logging      LoggingConfig
 }
 
 type DatabaseConfig struct {
@@ -325,7 +325,8 @@ func setDefaults() {
 	viper.SetDefault("saas.default_client_rate_per_min", 60)
 	viper.SetDefault("saas.default_monthly_quota", 0)
 	viper.SetDefault("saas.docs_enabled", false)
-	viper.SetDefault("saas.docs_public_url", "https://github.com/AlexandreZanata/BUSCA-CNPJ-2026/blob/main/docs/api/QUICKSTART.md")
+	viper.SetDefault("saas.docs_public_url",
+		"https://github.com/AlexandreZanata/BUSCA-CNPJ-2026/blob/main/docs/api/QUICKSTART.md")
 
 	// Load .env file if exists - use godotenv or manual loading
 	if _, err := os.Stat(".env"); err == nil {

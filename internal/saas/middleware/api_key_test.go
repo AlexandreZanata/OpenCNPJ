@@ -32,11 +32,13 @@ func (s stubRate) Allow(context.Context, uuid.UUID, int) (bool, error) {
 	return s.allow, s.err
 }
 
+const liveTestKeySuffix = "0123456789abcdef0123456789abcdef"
+
 type stubUsage struct {
 	requests int
 }
 
-func (s *stubUsage) RecordRequest(uuid.UUID) { s.requests++ }
+func (s *stubUsage) RecordRequest(uuid.UUID)    { s.requests++ }
 func (s *stubUsage) RecordCNPJLookup(uuid.UUID) {}
 func (s *stubUsage) MonthCount(context.Context, uuid.UUID) (int64, error) {
 	return 0, nil
@@ -99,7 +101,7 @@ func TestAPIKeyValid200(t *testing.T) {
 		return c.SendStatus(fiber.StatusOK)
 	})
 
-	resp := mustRequest(t, app, "ocnpj_live_"+repeatHex(32))
+	resp := mustRequest(t, app, "ocnpj_live_"+liveTestKeySuffix)
 	if resp.StatusCode != fiber.StatusOK {
 		t.Fatalf("status = %d", resp.StatusCode)
 	}
@@ -121,7 +123,7 @@ func TestAPIKeyRateLimited429(t *testing.T) {
 	}))
 	app.Get("/", func(c *fiber.Ctx) error { return c.SendStatus(fiber.StatusOK) })
 
-	resp := mustRequest(t, app, "ocnpj_live_"+repeatHex(32))
+	resp := mustRequest(t, app, "ocnpj_live_"+liveTestKeySuffix)
 	if resp.StatusCode != fiber.StatusTooManyRequests {
 		t.Fatalf("status = %d", resp.StatusCode)
 	}
@@ -134,7 +136,7 @@ func TestAPIKeyExpired401(t *testing.T) {
 	}))
 	app.Get("/", func(c *fiber.Ctx) error { return c.SendStatus(fiber.StatusOK) })
 
-	resp := mustRequest(t, app, "ocnpj_live_"+repeatHex(32))
+	resp := mustRequest(t, app, "ocnpj_live_"+liveTestKeySuffix)
 	if resp.StatusCode != fiber.StatusUnauthorized {
 		t.Fatalf("status = %d", resp.StatusCode)
 	}
@@ -154,7 +156,7 @@ func TestAPIKeyQuotaExceeded429(t *testing.T) {
 	}))
 	app.Get("/", func(c *fiber.Ctx) error { return c.SendStatus(fiber.StatusOK) })
 
-	resp := mustRequest(t, app, "ocnpj_live_"+repeatHex(32))
+	resp := mustRequest(t, app, "ocnpj_live_"+liveTestKeySuffix)
 	if resp.StatusCode != fiber.StatusTooManyRequests {
 		t.Fatalf("status = %d", resp.StatusCode)
 	}
@@ -167,7 +169,7 @@ func TestAPIKeySuspended403(t *testing.T) {
 	}))
 	app.Get("/", func(c *fiber.Ctx) error { return c.SendStatus(fiber.StatusOK) })
 
-	resp := mustRequest(t, app, "ocnpj_live_"+repeatHex(32))
+	resp := mustRequest(t, app, "ocnpj_live_"+liveTestKeySuffix)
 	if resp.StatusCode != fiber.StatusForbidden {
 		t.Fatalf("status = %d", resp.StatusCode)
 	}
@@ -185,13 +187,4 @@ func mustRequest(t *testing.T, app *fiber.App, apiKey string) *http.Response {
 	}
 	_, _ = io.Copy(io.Discard, resp.Body)
 	return resp
-}
-
-func repeatHex(n int) string {
-	const hex = "0123456789abcdef"
-	out := make([]byte, n)
-	for i := range out {
-		out[i] = hex[i%16]
-	}
-	return string(out)
 }

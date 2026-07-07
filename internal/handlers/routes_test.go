@@ -38,8 +38,9 @@ func TestRegisterV1RoutesFullAPI(t *testing.T) {
 }
 
 func collectRoutePaths(app *fiber.App) []string {
-	var paths []string
-	for _, r := range app.GetRoutes() {
+	routes := app.GetRoutes()
+	paths := make([]string, 0, len(routes))
+	for _, r := range routes {
 		paths = append(paths, r.Path)
 	}
 	return paths

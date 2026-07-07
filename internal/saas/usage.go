@@ -171,8 +171,8 @@ func (t *UsageTracker) flushKey(ctx context.Context, key string) error {
 	if len(parts) != 5 {
 		return nil
 	}
-	clientID, err := uuid.Parse(parts[2])
-	if err != nil {
+	clientID, ok := parseUsageClientID(parts[2])
+	if !ok {
 		return nil
 	}
 	dateStr := parts[4]
@@ -185,8 +185,8 @@ func (t *UsageTracker) flushKey(ctx context.Context, key string) error {
 	if reqs == 0 && cnpj == 0 {
 		return nil
 	}
-	day, err := time.Parse("2006-01-02", dateStr)
-	if err != nil {
+	day, ok := parseUsageDate(dateStr)
+	if !ok {
 		return nil
 	}
 	if err := t.queries.UpsertUsageDaily(ctx, saasdb.UpsertUsageDailyParams{
@@ -218,14 +218,30 @@ func (t *UsageTracker) MonthCount(ctx context.Context, clientID uuid.UUID) (int6
 	return strconv.ParseInt(val, 10, 64)
 }
 
+func parseUsageClientID(part string) (uuid.UUID, bool) {
+	id, err := uuid.Parse(part)
+	if err != nil {
+		return uuid.Nil, false
+	}
+	return id, true
+}
+
+func parseUsageDate(dateStr string) (time.Time, bool) {
+	day, err := time.Parse("2006-01-02", dateStr)
+	if err != nil {
+		return time.Time{}, false
+	}
+	return day, true
+}
+
 // NoopUsageRecorder discards usage events (unit tests).
 type NoopUsageRecorder struct{}
 
-func (NoopUsageRecorder) RecordRequest(uuid.UUID)              {}
-func (NoopUsageRecorder) RecordCNPJLookup(uuid.UUID)           {}
+func (NoopUsageRecorder) RecordRequest(uuid.UUID)    {}
+func (NoopUsageRecorder) RecordCNPJLookup(uuid.UUID) {}
 func (NoopUsageRecorder) MonthCount(context.Context, uuid.UUID) (int64, error) {
 	return 0, nil
 }
 func (NoopUsageRecorder) Flush(context.Context) error { return nil }
 func (NoopUsageRecorder) Start(context.Context)       {}
-func (NoopUsageRecorder) Stop()                         {}
+func (NoopUsageRecorder) Stop()                       {}

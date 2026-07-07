@@ -1,8 +1,8 @@
 package cnpj
 
 import (
-	cnpjdb "busca-cnpj-2026/internal/db/cnpj"
 	"busca-cnpj-2026/internal/database"
+	cnpjdb "busca-cnpj-2026/internal/db/cnpj"
 	"busca-cnpj-2026/internal/services"
 )
 

@@ -6,8 +6,8 @@ import (
 
 	"github.com/google/uuid"
 
-	saasdb "busca-cnpj-2026/internal/db/saas"
 	"busca-cnpj-2026/internal/adminauth/audit"
+	saasdb "busca-cnpj-2026/internal/db/saas"
 )
 
 type stubQuerier struct {
@@ -15,7 +15,9 @@ type stubQuerier struct {
 	params saasdb.InsertAdminAuditLogParams
 }
 
-func (s *stubQuerier) InsertAdminAuditLog(_ context.Context, p saasdb.InsertAdminAuditLogParams) (saasdb.AdminAuditLog, error) {
+func (s *stubQuerier) InsertAdminAuditLog(
+	_ context.Context, p saasdb.InsertAdminAuditLogParams,
+) (saasdb.AdminAuditLog, error) {
 	s.called = true
 	s.params = p
 	return saasdb.AdminAuditLog{ID: 1}, nil

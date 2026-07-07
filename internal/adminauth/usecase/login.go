@@ -23,8 +23,8 @@ type LoginInput struct {
 
 // LoginMFARequired is returned when password is valid and MFA is pending.
 type LoginMFARequired struct {
-	ChallengeID        uuid.UUID
-	ExpiresInSeconds   int
+	ChallengeID      uuid.UUID
+	ExpiresInSeconds int
 }
 
 // LoginDeps are collaborators for the login use case.
@@ -73,4 +73,3 @@ func Login(ctx context.Context, d LoginDeps, in LoginInput) (LoginMFARequired, e
 		ExpiresInSeconds: d.Cfg.ChallengeTTLSeconds,
 	}, nil
 }
-

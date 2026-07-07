@@ -5,8 +5,8 @@ import (
 	"log"
 	"time"
 
-	saasdb "busca-cnpj-2026/internal/db/saas"
 	"busca-cnpj-2026/internal/database"
+	saasdb "busca-cnpj-2026/internal/db/saas"
 )
 
 // WireDeps builds SaaS middleware dependencies when saas.enabled is true.

@@ -100,7 +100,11 @@ func TestPhase6Gate(t *testing.T) {
 	// MFA → dashboard
 	mfaPage := get(t, app, "/admin/mfa", loginResp.Cookies()...)
 	mfaCSRF := extractCSRF(readBody(mfaPage))
-	mfaResp := postForm(t, app, "/admin/mfa", url.Values{"code": {"123456"}, "_csrf": {mfaCSRF}}, mergeCookies(loginPage.Cookies(), loginResp.Cookies())...)
+	mfaResp := postForm(
+		t, app, "/admin/mfa",
+		url.Values{"code": {"123456"}, "_csrf": {mfaCSRF}},
+		mergeCookies(loginPage.Cookies(), loginResp.Cookies())...,
+	)
 	if mfaResp.StatusCode != http.StatusFound {
 		t.Fatalf("mfa status=%d body=%s", mfaResp.StatusCode, readBody(mfaResp))
 	}
@@ -198,7 +202,9 @@ func (m *mockQuerier) InsertAPIKey(ctx context.Context, arg saasdb.InsertAPIKeyP
 func (m *mockQuerier) RevokeAPIKey(context.Context, saasdb.RevokeAPIKeyParams) (int64, error) {
 	return 1, nil
 }
-func (m *mockQuerier) ListUsageByClient(context.Context, saasdb.ListUsageByClientParams) ([]saasdb.ApiUsageDaily, error) {
+func (m *mockQuerier) ListUsageByClient(
+	_ context.Context, _ saasdb.ListUsageByClientParams,
+) ([]saasdb.ApiUsageDaily, error) {
 	return []saasdb.ApiUsageDaily{{
 		ClientID: pgUUID(m.clientID), Date: pgDate(time.Now()),
 		RequestCount: 5, CnpjLookupCount: 2,
@@ -224,7 +230,9 @@ func (m *mockQuerier) GetUsageDaily(context.Context, saasdb.GetUsageDailyParams)
 func (m *mockQuerier) GetValidRefreshToken(context.Context, []byte) (saasdb.AdminRefreshToken, error) {
 	panic("unused")
 }
-func (m *mockQuerier) InsertAdminRefreshToken(context.Context, saasdb.InsertAdminRefreshTokenParams) (saasdb.AdminRefreshToken, error) {
+func (m *mockQuerier) InsertAdminRefreshToken(
+	_ context.Context, _ saasdb.InsertAdminRefreshTokenParams,
+) (saasdb.AdminRefreshToken, error) {
 	panic("unused")
 }
 func (m *mockQuerier) RevokeRefreshToken(context.Context, pgtype.UUID) error { panic("unused") }
@@ -240,7 +248,9 @@ func (m *mockQuerier) UpsertAdminUser(context.Context, saasdb.UpsertAdminUserPar
 func (m *mockQuerier) UpsertUsageDaily(context.Context, saasdb.UpsertUsageDailyParams) error {
 	panic("unused")
 }
-func (m *mockQuerier) InsertAdminAuditLog(context.Context, saasdb.InsertAdminAuditLogParams) (saasdb.AdminAuditLog, error) {
+func (m *mockQuerier) InsertAdminAuditLog(
+	_ context.Context, _ saasdb.InsertAdminAuditLogParams,
+) (saasdb.AdminAuditLog, error) {
 	return saasdb.AdminAuditLog{ID: 1}, nil
 }
 

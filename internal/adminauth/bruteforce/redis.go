@@ -15,8 +15,8 @@ const keyPrefix = "login_fail:email:"
 
 // Guard tracks failed login attempts per email hash.
 type Guard struct {
-	rdb    redisCmd
-	max    int
+	rdb     redisCmd
+	max     int
 	lockTTL time.Duration
 }
 

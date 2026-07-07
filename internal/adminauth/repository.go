@@ -85,7 +85,9 @@ func (r *AdminRepository) LoadMFASecret(ctx context.Context, adminID uuid.UUID) 
 }
 
 // StoreRefreshToken persists a hashed refresh token.
-func (r *AdminRepository) StoreRefreshToken(ctx context.Context, adminID uuid.UUID, token string, expires time.Time) error {
+func (r *AdminRepository) StoreRefreshToken(
+	ctx context.Context, adminID uuid.UUID, token string, expires time.Time,
+) error {
 	_, err := r.q.InsertAdminRefreshToken(ctx, saasdb.InsertAdminRefreshTokenParams{
 		AdminID:   pgUUID(adminID),
 		TokenHash: hashToken(token),

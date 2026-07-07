@@ -16,10 +16,10 @@ import (
 
 // AuthHandler exposes admin login and MFA endpoints.
 type AuthHandler struct {
-	login  loginFn
-	verify verifyFn
+	login   loginFn
+	verify  verifyFn
 	refresh refreshFn
-	cfg    string
+	cfg     string
 }
 
 type loginFn func(ctx context.Context, in usecase.LoginInput) (usecase.LoginMFARequired, error)
