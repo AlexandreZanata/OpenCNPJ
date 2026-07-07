@@ -70,7 +70,7 @@ func empresaKeysetClause(
 			return "", fmt.Errorf("invalid cursor score: %w", err)
 		}
 		clause := fmt.Sprintf(
-			" AND (similarity(razao_social, $%d), cnpj_basico) < ($%d, $%d)",
+			" AND (word_similarity($%d, razao_social), cnpj_basico) < ($%d, $%d)",
 			textPos, *argPos, *argPos+1,
 		)
 		*args = append(*args, score, cnpj)
@@ -118,7 +118,7 @@ func estabelecimentoKeysetClause(
 			return "", fmt.Errorf("invalid cursor id: %w", err)
 		}
 		clause := fmt.Sprintf(
-			" AND (similarity(e.nome_fantasia, $%d), e.id) < ($%d, $%d)",
+			" AND (word_similarity($%d, e.nome_fantasia), e.id) < ($%d, $%d)",
 			textPos, *argPos, *argPos+1,
 		)
 		*args = append(*args, score, id)

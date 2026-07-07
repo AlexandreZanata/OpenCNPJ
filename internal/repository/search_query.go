@@ -25,11 +25,11 @@ func detectTextSearchMode(term string) textSearchMode {
 }
 
 func fuzzyRazaoSocialWhere(argPos int) string {
-	return fmt.Sprintf(" AND razao_social %% $%d", argPos)
+	return fmt.Sprintf(" AND razao_social %%> $%d", argPos)
 }
 
 func fuzzyNomeFantasiaWhere(argPos int) string {
-	return fmt.Sprintf(" AND e.nome_fantasia %% $%d", argPos)
+	return fmt.Sprintf(" AND e.nome_fantasia %%> $%d", argPos)
 }
 
 func ftsRazaoSocialWhere(argPos int) string {
@@ -41,11 +41,11 @@ func ftsNomeFantasiaWhere(argPos int) string {
 }
 
 func fuzzyRazaoSocialOrder(argPos int) string {
-	return fmt.Sprintf("similarity(razao_social, $%d) DESC, cnpj_basico ASC", argPos)
+	return fmt.Sprintf("word_similarity($%d, razao_social) DESC, cnpj_basico ASC", argPos)
 }
 
 func fuzzyNomeFantasiaOrder(argPos int) string {
-	return fmt.Sprintf("similarity(e.nome_fantasia, $%d) DESC, e.id ASC", argPos)
+	return fmt.Sprintf("word_similarity($%d, e.nome_fantasia) DESC, e.id ASC", argPos)
 }
 
 func ftsRazaoSocialOrder(argPos int) string {
@@ -61,7 +61,7 @@ func razaoSocialScoreSelect(argPos int, mode textSearchMode) string {
 	case textSearchNone:
 		return ""
 	case textSearchTrigram:
-		return fmt.Sprintf(", similarity(razao_social, $%d) AS _search_score", argPos)
+		return fmt.Sprintf(", word_similarity($%d, razao_social) AS _search_score", argPos)
 	case textSearchFTS:
 		return fmt.Sprintf(", ts_rank(busca, plainto_tsquery('portuguese', $%d)) AS _search_score", argPos)
 	}
@@ -73,7 +73,7 @@ func nomeFantasiaScoreSelect(argPos int, mode textSearchMode) string {
 	case textSearchNone:
 		return ""
 	case textSearchTrigram:
-		return fmt.Sprintf(", similarity(e.nome_fantasia, $%d) AS _search_score", argPos)
+		return fmt.Sprintf(", word_similarity($%d, e.nome_fantasia) AS _search_score", argPos)
 	case textSearchFTS:
 		return fmt.Sprintf(", ts_rank(e.busca, plainto_tsquery('portuguese', $%d)) AS _search_score", argPos)
 	}

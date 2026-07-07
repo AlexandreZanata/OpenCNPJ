@@ -4,11 +4,11 @@ import "testing"
 
 func TestFuzzyRazaoSocialSQL(t *testing.T) {
 	where := fuzzyRazaoSocialWhere(2)
-	if where != " AND razao_social % $2" {
+	if where != " AND razao_social %> $2" {
 		t.Fatalf("where = %q", where)
 	}
 	order := fuzzyRazaoSocialOrder(2)
-	if order != "similarity(razao_social, $2) DESC, cnpj_basico ASC" {
+	if order != "word_similarity($2, razao_social) DESC, cnpj_basico ASC" {
 		t.Fatalf("order = %q", order)
 	}
 }
@@ -35,11 +35,11 @@ func TestFTSRazaoSocialSQL(t *testing.T) {
 
 func TestFuzzyNomeFantasiaSQL(t *testing.T) {
 	where := fuzzyNomeFantasiaWhere(3)
-	if where != " AND e.nome_fantasia % $3" {
+	if where != " AND e.nome_fantasia %> $3" {
 		t.Fatalf("where = %q", where)
 	}
 	order := fuzzyNomeFantasiaOrder(3)
-	if order != "similarity(e.nome_fantasia, $3) DESC, e.id ASC" {
+	if order != "word_similarity($3, e.nome_fantasia) DESC, e.id ASC" {
 		t.Fatalf("order = %q", order)
 	}
 }
