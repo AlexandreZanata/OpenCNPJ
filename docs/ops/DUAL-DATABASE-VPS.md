@@ -66,7 +66,7 @@ curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8081/readyz   # 200
 
 **Never** run `go run ./cmd/migrate --saas` against `opencnpj_cnpj`.
 
-CNPJ schema migrations (`000001`–`000014`) run on the **local import PC** before `pg_dump`.
+CNPJ schema migrations (`000001`–`000016`) run on the **local import PC** before `pg_dump`.
 
 ## Validate (repo / CI)
 

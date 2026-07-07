@@ -244,3 +244,10 @@ Sequential IDs for new features that still need production-grade automated tests
 - **Added**: 2026-07-07
 - **Needs**: staging VPS browser e2e (create client/key, usage after API call); `ps aux` RSS gate < 80 MB idle
 - **Status**: open
+
+## DVT-32: OpenCNPJ plan 02 Phase 7 CNAE HASH sub-partitions
+
+- **Scope**: `migrations/000016_*`, `internal/partition/cnae_hash.go`, `scripts/opencnpj_advanced_phase7.sh`, `scripts/explain_cnae_uf_partition_pruning.sh`, `docs/ops/CNAE-PARTITIONING.md`
+- **Added**: 2026-07-07
+- **Needs**: off-peak apply on 150M-row VPS; EXPLAIN before/after on production-size copy; post-migrate k6 cnae+uf_search p99 < 80 ms
+- **Status**: open

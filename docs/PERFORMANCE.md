@@ -228,3 +228,16 @@ STRICT=1 ./scripts/opencnpj_advanced_phase6.sh http://localhost:8080
 ```
 
 Runbook: `docs/ops/UF-PARTITIONING.md` · UF codes: `internal/partition/br_uf.go`
+
+## OpenCNPJ advanced plan — Phase 7 gate (CNAE HASH sub-partitions)
+
+Adds HASH(`cnae_fiscal_principal`) sub-partitions under each LIST(`uf`) branch for CNAE+UF query pruning.
+
+```bash
+go run ./cmd/migrate   # applies 000016 (off-peak on VPS; requires 000014)
+./scripts/explain_cnae_uf_partition_pruning.sh
+./scripts/opencnpj_advanced_phase7.sh http://localhost:8080
+STRICT=1 ./scripts/opencnpj_advanced_phase7.sh http://localhost:8080
+```
+
+Runbook: `docs/ops/CNAE-PARTITIONING.md` · Buckets: `internal/partition/cnae_hash.go`
