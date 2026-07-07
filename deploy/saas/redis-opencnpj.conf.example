@@ -1,0 +1,11 @@
+# Redis — OpenCNPJ SaaS (EXAMPLE — bind localhost only)
+# Install: sudo cp deploy/saas/redis-opencnpj.conf.example /etc/redis/opencnpj.conf
+# Start:   redis-server /etc/redis/opencnpj.conf --daemonize yes
+
+bind 127.0.0.1
+port 6381
+maxmemory 128mb
+maxmemory-policy allkeys-lru
+save ""
+appendonly no
+protected-mode yes

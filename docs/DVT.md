@@ -28,6 +28,7 @@ Sequential IDs for new features that still need production-grade automated tests
 | DVT-30 | Admin auth + TOTP MFA | open |
 | DVT-31 | Admin panel (server-rendered HTML) | open |
 | DVT-34 | SaaS security hardening (Phase 9) | open |
+| DVT-35 | SaaS production deploy runbook (Phase 10) | open |
 
 ## DVT-01: CNPJ open-data downloader (WebDAV)
 
@@ -265,4 +266,11 @@ Sequential IDs for new features that still need production-grade automated tests
 - **Scope**: `internal/saas/hash_compare.go`, `internal/middleware/metrics_auth.go`, `internal/handlers/admin/csrf.go`, `internal/adminauth/audit/`, `scripts/security_hardening_gate.sh`, `docs/SECURITY.md`
 - **Added**: 2026-07-07
 - **Needs**: staging VPS pen-test (no auth bypass on `/api/v1/cnpj/*`); nginx TLS/HSTS verification; audit log e2e after admin actions
+- **Status**: open
+
+## DVT-35: SaaS production deploy runbook (Phase 10)
+
+- **Scope**: `docs/ops/DEPLOY-RUNBOOK.md`, `scripts/saas_smoke.sh`, `scripts/saas_deploy_gate.sh`, `scripts/build_opencnpj_api.sh`, `deploy/saas/redis-opencnpj.conf.example`, `deploy/saas/rollback.example.sh`
+- **Added**: 2026-07-07
+- **Needs**: full empty-VPS → working API path executed once on staging; smoke with production API key after first client created
 - **Status**: open

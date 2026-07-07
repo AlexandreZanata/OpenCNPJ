@@ -43,6 +43,11 @@ Detailed phased tasks: **`.local/03-saas-vps-comerc-api/TASKS.md`**
 | `deploy/saas/pgbouncer.ini.example` | Optional pgBouncer dual DB |
 | `deploy/saas/systemd-opencnpj-api.example` | systemd service |
 | `deploy/saas/monthly-cnpj-sync.example.sh` | Monthly dump/upload/restore workflow |
+| `deploy/saas/redis-opencnpj.conf.example` | Dedicated Redis (127.0.0.1:6381, 128 MB) |
+| `deploy/saas/rollback.example.sh` | Binary rollback helper |
+| `scripts/saas_smoke.sh` | Post-deploy health + auth smoke test |
+| `scripts/saas_deploy_gate.sh` | Phase 10 deploy gate |
+| `scripts/build_opencnpj_api.sh` | Build stripped API binary |
 | `config/config.saas.example.yaml` | Dual-database API config |
 | `docs/api/OPENAPI.yaml` | Public API contract |
 
@@ -54,7 +59,8 @@ Detailed phased tasks: **`.local/03-saas-vps-comerc-api/TASKS.md`**
 4. **Phase 3–4:** API keys + public CNPJ route.
 5. **Phase 5:** Admin MFA — see [ADMIN-AUTH.md](ADMIN-AUTH.md)
 6. **Phase 6:** Admin panel — see [ADMIN-PANEL.md](ADMIN-PANEL.md)
-6. **Monthly:** Repeat Phase 11 only for CNPJ data refresh.
+7. **Phase 10:** Production deploy — see [DEPLOY-RUNBOOK.md](DEPLOY-RUNBOOK.md)
+8. **Monthly:** Repeat Phase 11 only for CNPJ data refresh.
 
 ### Apply SaaS migrations (VPS)
 

@@ -30,6 +30,7 @@ Enterprise documentation for the OpenCNPJ platform.
 | [HARDWARE.md](HARDWARE.md) | RAM/CPU/disk tuning by machine |
 | [PERFORMANCE.md](PERFORMANCE.md) | Import tuning and API latency targets |
 | [ops/SAAS-VPS-DEPLOY.md](ops/SAAS-VPS-DEPLOY.md) | SaaS API on VPS (comerc.app.br) — templates only |
+| [ops/DEPLOY-RUNBOOK.md](ops/DEPLOY-RUNBOOK.md) | Phase 10 — production deploy runbook (VPS operator) |
 | [ops/NGINX-SAAS.md](ops/NGINX-SAAS.md) | Nginx + Cloudflare for api/admin subdomains |
 | [ops/ADMIN-AUTH.md](ops/ADMIN-AUTH.md) | Admin login, TOTP MFA, JWT, bootstrap CLI |
 | [ops/ADMIN-PANEL.md](ops/ADMIN-PANEL.md) | Server-rendered admin UI (no Node on VPS) |
