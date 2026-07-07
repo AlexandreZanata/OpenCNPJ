@@ -1,0 +1,7 @@
+# pg_hba.conf snippet — append to VPS Postgres (EXAMPLE ONLY)
+# No external access; API connects via 127.0.0.1 only.
+
+host    opencnpj_cnpj   opencnpj_reader       127.0.0.1/32    scram-sha-256
+host    opencnpj_cnpj   opencnpj_restore      127.0.0.1/32    scram-sha-256
+host    opencnpj_saas   opencnpj_saas         127.0.0.1/32    scram-sha-256
+host    opencnpj_saas   opencnpj_migrate_saas 127.0.0.1/32    scram-sha-256

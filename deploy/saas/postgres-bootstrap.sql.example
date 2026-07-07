@@ -1,0 +1,59 @@
+-- VPS PostgreSQL bootstrap (EXAMPLE ONLY)
+-- Run as superuser on the VPS Postgres instance:
+--   sudo -u postgres psql -v ON_ERROR_STOP=1 -f postgres-bootstrap.sql
+--
+-- Replace CHANGE_ME passwords before running.
+-- Never commit real credentials.
+
+\set ON_ERROR_STOP on
+
+-- Roles
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'opencnpj_reader') THEN
+    CREATE ROLE opencnpj_reader LOGIN PASSWORD 'CHANGE_ME';
+  END IF;
+  IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'opencnpj_saas') THEN
+    CREATE ROLE opencnpj_saas LOGIN PASSWORD 'CHANGE_ME';
+  END IF;
+  IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'opencnpj_migrate_saas') THEN
+    CREATE ROLE opencnpj_migrate_saas LOGIN PASSWORD 'CHANGE_ME';
+  END IF;
+  IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'opencnpj_restore') THEN
+    CREATE ROLE opencnpj_restore LOGIN PASSWORD 'CHANGE_ME';
+  END IF;
+END
+$$;
+
+-- Databases (skip if already exist — monthly sync replaces opencnpj_cnpj via restore)
+SELECT 'CREATE DATABASE opencnpj_cnpj'
+WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'opencnpj_cnpj')\gexec
+
+SELECT 'CREATE DATABASE opencnpj_saas OWNER opencnpj_saas'
+WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'opencnpj_saas')\gexec
+
+-- CNPJ DB: read-only for API
+GRANT CONNECT ON DATABASE opencnpj_cnpj TO opencnpj_reader;
+GRANT CONNECT ON DATABASE opencnpj_cnpj TO opencnpj_restore;
+
+\c opencnpj_cnpj
+GRANT USAGE ON SCHEMA public TO opencnpj_reader;
+GRANT USAGE ON SCHEMA public TO opencnpj_restore;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO opencnpj_reader;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO opencnpj_reader;
+-- Restore role needs write during monthly sync only
+GRANT ALL ON SCHEMA public TO opencnpj_restore;
+GRANT ALL ON ALL TABLES IN SCHEMA public TO opencnpj_restore;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO opencnpj_restore;
+
+-- SaaS DB: app runtime + migrate role
+GRANT ALL PRIVILEGES ON DATABASE opencnpj_saas TO opencnpj_saas;
+GRANT ALL PRIVILEGES ON DATABASE opencnpj_saas TO opencnpj_migrate_saas;
+
+\c opencnpj_saas
+GRANT ALL ON SCHEMA public TO opencnpj_saas;
+GRANT ALL ON SCHEMA public TO opencnpj_migrate_saas;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO opencnpj_saas;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO opencnpj_migrate_saas;
+
+\echo 'Bootstrap complete. Next: SAAS_DATABASE_URL=... go run ./cmd/migrate --saas'

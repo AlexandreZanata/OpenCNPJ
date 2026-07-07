@@ -38,6 +38,9 @@ Detailed phased tasks: **`.local/03-saas-vps-comerc-api/TASKS.md`**
 |------|---------|
 | `deploy/saas/nginx-comerc.app.br.example` | Multi-site nginx vhost |
 | `deploy/saas/cloudflare-real-ip.conf.example` | Cloudflare `set_real_ip_from` snippet |
+| `deploy/saas/postgres-bootstrap.sql.example` | VPS Postgres DBs + roles |
+| `deploy/saas/api.env.example` | `CNPJ_DATABASE_URL` + `SAAS_DATABASE_URL` |
+| `deploy/saas/pgbouncer.ini.example` | Optional pgBouncer dual DB |
 | `deploy/saas/systemd-opencnpj-api.example` | systemd service |
 | `deploy/saas/monthly-cnpj-sync.example.sh` | Monthly dump/upload/restore workflow |
 | `config/config.saas.example.yaml` | Dual-database API config |
@@ -46,7 +49,7 @@ Detailed phased tasks: **`.local/03-saas-vps-comerc-api/TASKS.md`**
 ## Quick start (operator)
 
 1. **Phase 0–1:** VPS inventory + nginx for `api.` / `admin.` — see [NGINX-SAAS.md](NGINX-SAAS.md)
-2. **Phase 2:** Create `opencnpj_cnpj` + `opencnpj_saas` on VPS Postgres.
+2. **Phase 2:** Create `opencnpj_cnpj` + `opencnpj_saas` on VPS Postgres — [DUAL-DATABASE-VPS.md](DUAL-DATABASE-VPS.md)
 3. **Phase 11:** First CNPJ dump from local PC → restore on VPS.
 4. **Phase 3–4:** API keys + public CNPJ route.
 5. **Phase 5–6:** Admin MFA + panel on `opencnpj_saas`.
@@ -71,6 +74,15 @@ curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8081/readyz   # expect 2
 ```
 
 When `saas.enabled: true`, `/readyz` pings **both** PostgreSQL pools. With `saas.public_api_only: true`, only `GET /api/v1/cnpj/:cnpj` is registered (plus health/metrics).
+
+### Dual-database gate (Phase 2)
+
+```bash
+./scripts/saas_dual_db_gate.sh           # template checks
+./scripts/saas_dual_db_gate.sh --docker  # migrate + /readyz (CI/local)
+```
+
+See [DUAL-DATABASE-VPS.md](DUAL-DATABASE-VPS.md) for VPS operator steps.
 
 ### Nginx (Phase 1)
 
@@ -100,4 +112,5 @@ curl -sI https://api.comerc.app.br/readyz   # 200 or 502, not 404
 - `docs/IMPORT.md` — local import pipeline
 - `docs/ops/VPS-POSTGRESQL.md` — Postgres tuning on VPS
 - `docs/ops/NGINX-SAAS.md` — nginx + Cloudflare for api/admin subdomains
+- `docs/ops/DUAL-DATABASE-VPS.md` — two Postgres databases on VPS
 - `docs/PERFORMANCE.md` — CNPJ lookup cache

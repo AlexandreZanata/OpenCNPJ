@@ -1,0 +1,21 @@
+# pgBouncer — dual logical databases (EXAMPLE ONLY)
+# Install: sudo cp deploy/saas/pgbouncer.ini.example /etc/pgbouncer/pgbouncer.ini
+# Point API URLs to port 6432 instead of 5432 when enabled.
+
+[databases]
+opencnpj_cnpj = host=127.0.0.1 port=5432 dbname=opencnpj_cnpj
+opencnpj_saas = host=127.0.0.1 port=5432 dbname=opencnpj_saas
+
+[pgbouncer]
+listen_addr = 127.0.0.1
+listen_port = 6432
+auth_type = scram-sha-256
+auth_file = /etc/pgbouncer/userlist.txt
+pool_mode = transaction
+max_client_conn = 200
+default_pool_size = 15
+min_pool_size = 3
+reserve_pool_size = 5
+
+# userlist.txt (mode 600): "opencnpj_reader" "SCRAM-SHA-256$..."
+# Generate with: psql -c "SELECT rolpassword FROM pg_authid WHERE rolname='opencnpj_reader'"
