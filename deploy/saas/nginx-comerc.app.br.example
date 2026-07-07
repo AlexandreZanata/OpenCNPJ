@@ -1,9 +1,16 @@
 # Nginx — OpenCNPJ on comerc.app.br (EXAMPLE ONLY)
 #
+# Multi-site VPS: add this file WITHOUT replacing existing vhosts.
+#
 # Install:
+#   sudo cp deploy/saas/cloudflare-real-ip.conf.example /etc/nginx/snippets/cloudflare-real-ip.conf
 #   sudo cp deploy/saas/nginx-comerc.app.br.example /etc/nginx/sites-available/opencnpj-comerc
 #   sudo ln -sf /etc/nginx/sites-available/opencnpj-comerc /etc/nginx/sites-enabled/
+#   sudo certbot certonly --nginx -d api.comerc.app.br -d admin.comerc.app.br
 #   sudo nginx -t && sudo systemctl reload nginx
+#
+# Validate locally (repo):
+#   ./scripts/validate_nginx_saas.sh
 #
 # Replace YOUR_* placeholders. Do not commit real certs or IPs.
 
@@ -23,18 +30,31 @@ server {
     ssl_certificate_key /etc/letsencrypt/live/api.comerc.app.br/privkey.pem;
     ssl_protocols TLSv1.2 TLSv1.3;
 
+    client_max_body_size 1m;
+
     add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
     add_header X-Content-Type-Options nosniff always;
     add_header X-Frame-Options DENY always;
 
-    # Cloudflare real IP (update ranges from https://www.cloudflare.com/ips/)
-    set_real_ip_from 173.245.48.0/20;
-    real_ip_header CF-Connecting-IP;
+    include /etc/nginx/snippets/cloudflare-real-ip.conf;
+
+    # Health probe — no rate limit (Cloudflare / uptime monitors)
+    location = /readyz {
+        proxy_pass http://opencnpj_api;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 10s;
+    }
 
     location / {
         limit_req zone=opencnpj_api burst=20 nodelay;
         proxy_pass http://opencnpj_api;
         proxy_http_version 1.1;
+        proxy_set_header Connection "";
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -57,15 +77,40 @@ server {
     ssl_certificate_key /etc/letsencrypt/live/admin.comerc.app.br/privkey.pem;
     ssl_protocols TLSv1.2 TLSv1.3;
 
-    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    client_max_body_size 1m;
 
-    location / {
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    add_header X-Content-Type-Options nosniff always;
+    add_header X-Frame-Options DENY always;
+
+    include /etc/nginx/snippets/cloudflare-real-ip.conf;
+
+    location = /readyz {
         proxy_pass http://opencnpj_api;
         proxy_http_version 1.1;
+        proxy_set_header Connection "";
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 10s;
+    }
+
+    location / {
+        limit_req zone=opencnpj_api burst=20 nodelay;
+        proxy_pass http://opencnpj_api;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 30s;
+    }
+
+    location /metrics {
+        deny all;
+        return 404;
     }
 }
 

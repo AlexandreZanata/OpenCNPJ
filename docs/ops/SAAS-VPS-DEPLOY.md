@@ -37,6 +37,7 @@ Detailed phased tasks: **`.local/03-saas-vps-comerc-api/TASKS.md`**
 | File | Purpose |
 |------|---------|
 | `deploy/saas/nginx-comerc.app.br.example` | Multi-site nginx vhost |
+| `deploy/saas/cloudflare-real-ip.conf.example` | Cloudflare `set_real_ip_from` snippet |
 | `deploy/saas/systemd-opencnpj-api.example` | systemd service |
 | `deploy/saas/monthly-cnpj-sync.example.sh` | Monthly dump/upload/restore workflow |
 | `config/config.saas.example.yaml` | Dual-database API config |
@@ -44,7 +45,7 @@ Detailed phased tasks: **`.local/03-saas-vps-comerc-api/TASKS.md`**
 
 ## Quick start (operator)
 
-1. **Phase 0–1:** VPS inventory + nginx for `api.` / `admin.`
+1. **Phase 0–1:** VPS inventory + nginx for `api.` / `admin.` — see [NGINX-SAAS.md](NGINX-SAAS.md)
 2. **Phase 2:** Create `opencnpj_cnpj` + `opencnpj_saas` on VPS Postgres.
 3. **Phase 11:** First CNPJ dump from local PC → restore on VPS.
 4. **Phase 3–4:** API keys + public CNPJ route.
@@ -71,6 +72,14 @@ curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8081/readyz   # expect 2
 
 When `saas.enabled: true`, `/readyz` pings **both** PostgreSQL pools. With `saas.public_api_only: true`, only `GET /api/v1/cnpj/:cnpj` is registered (plus health/metrics).
 
+### Nginx (Phase 1)
+
+```bash
+./scripts/validate_nginx_saas.sh   # local syntax + directive gate
+# On VPS: copy templates from deploy/saas/ — see docs/ops/NGINX-SAAS.md
+curl -sI https://api.comerc.app.br/readyz   # 200 or 502, not 404
+```
+
 ## Memory budget
 
 | Component | VPS RAM target |
@@ -90,4 +99,5 @@ When `saas.enabled: true`, `/readyz` pings **both** PostgreSQL pools. With `saas
 
 - `docs/IMPORT.md` — local import pipeline
 - `docs/ops/VPS-POSTGRESQL.md` — Postgres tuning on VPS
+- `docs/ops/NGINX-SAAS.md` — nginx + Cloudflare for api/admin subdomains
 - `docs/PERFORMANCE.md` — CNPJ lookup cache
