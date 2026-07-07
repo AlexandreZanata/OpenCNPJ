@@ -26,6 +26,7 @@ Sequential IDs for new features that still need production-grade automated tests
 | DVT-28 | SaaS API keys and usage tracking | open |
 | DVT-29 | Public CNPJ API (sqlc + pgx) | open |
 | DVT-30 | Admin auth + TOTP MFA | open |
+| DVT-31 | Admin panel (server-rendered HTML) | open |
 
 ## DVT-01: CNPJ open-data downloader (WebDAV)
 
@@ -235,4 +236,11 @@ Sequential IDs for new features that still need production-grade automated tests
 - **Scope**: `internal/adminauth/`, `cmd/admin-bootstrap`, `db/queries/saas/admin_auth.sql`, `migrations/saas/000004_admin_seed`
 - **Added**: 2026-07-07
 - **Needs**: staging VPS e2e with real Redis + RS256 keys; verify brute-force lockout and refresh rotation under load
+- **Status**: open
+
+## DVT-31: Admin panel (server-rendered HTML)
+
+- **Scope**: `internal/handlers/admin/`, `internal/templates/admin/`, `internal/static/admin/`, `db/queries/saas/admin_panel.sql`
+- **Added**: 2026-07-07
+- **Needs**: staging VPS browser e2e (create client/key, usage after API call); `ps aux` RSS gate < 80 MB idle
 - **Status**: open

@@ -11,6 +11,7 @@ import (
 )
 
 type Querier interface {
+	CountAPIClients(ctx context.Context) (int64, error)
 	GetAPIKeyByHash(ctx context.Context, keyHash []byte) (GetAPIKeyByHashRow, error)
 	GetAdminMFASecret(ctx context.Context, adminID pgtype.UUID) (AdminMfaSecret, error)
 	GetAdminUserByEmail(ctx context.Context, email string) (AdminUser, error)
@@ -20,8 +21,15 @@ type Querier interface {
 	InsertAPIClient(ctx context.Context, arg InsertAPIClientParams) (ApiClient, error)
 	InsertAPIKey(ctx context.Context, arg InsertAPIKeyParams) (InsertAPIKeyRow, error)
 	InsertAdminRefreshToken(ctx context.Context, arg InsertAdminRefreshTokenParams) (AdminRefreshToken, error)
+	ListAPIClients(ctx context.Context, arg ListAPIClientsParams) ([]ApiClient, error)
+	ListAPIKeysByClient(ctx context.Context, clientID pgtype.UUID) ([]ListAPIKeysByClientRow, error)
+	ListRecentUsage(ctx context.Context, limit int32) ([]ListRecentUsageRow, error)
+	ListUsageByClient(ctx context.Context, arg ListUsageByClientParams) ([]ApiUsageDaily, error)
+	RevokeAPIKey(ctx context.Context, arg RevokeAPIKeyParams) (int64, error)
 	RevokeRefreshToken(ctx context.Context, id pgtype.UUID) error
 	SetAdminMFAEnabled(ctx context.Context, arg SetAdminMFAEnabledParams) error
+	SumUsageRequestsToday(ctx context.Context) (int64, error)
+	UpdateClientStatus(ctx context.Context, arg UpdateClientStatusParams) error
 	UpsertAdminMFASecret(ctx context.Context, arg UpsertAdminMFASecretParams) error
 	UpsertAdminUser(ctx context.Context, arg UpsertAdminUserParams) (AdminUser, error)
 	UpsertUsageDaily(ctx context.Context, arg UpsertUsageDailyParams) error

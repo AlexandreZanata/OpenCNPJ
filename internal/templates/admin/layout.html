@@ -1,0 +1,40 @@
+{{define "layout"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{.Title}} — OpenCNPJ Admin</title>
+  <link rel="stylesheet" href="/admin/static/admin.css">
+  {{if .RefreshMeta}}<meta http-equiv="refresh" content="60">{{end}}
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <h1>OpenCNPJ</h1>
+    <nav>
+      <a href="/admin/" {{if eq .Nav "dashboard"}}class="active"{{end}}>Dashboard</a>
+      <a href="/admin/clients" {{if eq .Nav "clients"}}class="active"{{end}}>Clients</a>
+      <a href="/admin/usage" {{if eq .Nav "usage"}}class="active"{{end}}>Usage</a>
+    </nav>
+  </aside>
+  <div class="main">
+    <header class="header">
+      <span>Admin</span>
+      <form method="post" action="/admin/logout" class="inline-form">
+        <button type="submit" class="btn-muted">Logout</button>
+      </form>
+    </header>
+    <div class="content">
+      {{if .Flash}}{{.Flash}}{{end}}
+      {{if eq .ContentTpl "dashboard-content"}}{{template "dashboard-content" .}}{{end}}
+      {{if eq .ContentTpl "clients-list-content"}}{{template "clients-list-content" .}}{{end}}
+      {{if eq .ContentTpl "client-new-content"}}{{template "client-new-content" .}}{{end}}
+      {{if eq .ContentTpl "client-detail-content"}}{{template "client-detail-content" .}}{{end}}
+      {{if eq .ContentTpl "usage-content"}}{{template "usage-content" .}}{{end}}
+    </div>
+  </div>
+</div>
+</body>
+</html>
+{{end}}

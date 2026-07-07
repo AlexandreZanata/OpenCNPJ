@@ -46,13 +46,23 @@ type verifyBody struct {
 	Code        string `json:"code"`
 }
 
+// Login runs the credential step (for HTML panel and JSON API).
+func (h *AuthHandler) Login(ctx context.Context, in usecase.LoginInput) (usecase.LoginMFARequired, error) {
+	return h.login(ctx, in)
+}
+
+// Verify runs MFA verification (for HTML panel and JSON API).
+func (h *AuthHandler) Verify(ctx context.Context, in usecase.VerifyMFAInput) (usecase.AuthTokens, error) {
+	return h.verify(ctx, in)
+}
+
 // PostLogin handles POST /admin/api/v1/auth/login.
 func (h *AuthHandler) PostLogin(c *fiber.Ctx) error {
 	var body loginBody
 	if err := c.BodyParser(&body); err != nil {
 		return badRequest(c, "invalid_json")
 	}
-	out, err := h.login(c.Context(), usecase.LoginInput{
+	out, err := h.Login(c.Context(), usecase.LoginInput{
 		Email:    strings.TrimSpace(body.Email),
 		Password: body.Password,
 	})
@@ -76,7 +86,7 @@ func (h *AuthHandler) PostMFAVerify(c *fiber.Ctx) error {
 	if err != nil {
 		return badRequest(c, "invalid_challenge_id")
 	}
-	tokens, err := h.verify(c.Context(), usecase.VerifyMFAInput{ChallengeID: chID, Code: body.Code})
+	tokens, err := h.Verify(c.Context(), usecase.VerifyMFAInput{ChallengeID: chID, Code: body.Code})
 	if err != nil {
 		return mapAuthErr(c, err)
 	}

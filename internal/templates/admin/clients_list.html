@@ -1,0 +1,31 @@
+{{define "clients_list.html"}}
+{{template "layout" .}}
+{{end}}
+{{define "clients-list-content"}}
+<div class="toolbar">
+  <h2 class="page-title" style="margin:0;flex:1">Clients</h2>
+  <a href="/admin/clients/new" class="btn">New client</a>
+</div>
+<table>
+  <thead>
+    <tr><th>Name</th><th>Email</th><th>Status</th><th>Rate/min</th><th>Quota</th><th></th></tr>
+  </thead>
+  <tbody>
+    {{range .Clients}}
+    <tr>
+      <td>{{.Name}}</td>
+      <td>{{.Email}}</td>
+      <td><span class="badge {{if eq .Status "active"}}badge-ok{{else}}badge-warn{{end}}">{{.Status}}</span></td>
+      <td>{{.RateLimit}}</td>
+      <td>{{if eq .MonthlyQuota 0}}∞{{else}}{{.MonthlyQuota}}{{end}}</td>
+      <td><a href="/admin/clients/{{.ID}}">View</a></td>
+    </tr>
+    {{else}}
+    <tr><td colspan="6">No clients yet.</td></tr>
+    {{end}}
+  </tbody>
+</table>
+{{if gt .TotalPages 1}}
+<p style="margin-top:1rem;color:var(--muted)">Page {{.Page}} of {{.TotalPages}}</p>
+{{end}}
+{{end}}

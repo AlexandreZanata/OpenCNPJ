@@ -24,6 +24,7 @@ import (
 	cnpjsvc "busca-cnpj-2026/internal/cnpj"
 	adminapp "busca-cnpj-2026/internal/adminauth/app"
 	adminhandlers "busca-cnpj-2026/internal/adminauth/handlers"
+	adminpanel "busca-cnpj-2026/internal/handlers/admin"
 	saasdb "busca-cnpj-2026/internal/db/saas"
 )
 
@@ -204,7 +205,14 @@ func main() {
 			log.Fatalf("Failed to initialize admin auth: %v", err)
 		}
 		adminhandlers.RegisterRoutes(app, adminDeps.Handler, adminDeps.Signer)
-		log.Println("Admin auth routes enabled at /admin/api/v1")
+		panel, err := adminpanel.WirePanel(adminDeps, saasdb.New(database.SaaSPool), config.AppConfig.SaaS)
+		if err != nil {
+			log.Fatalf("Failed to initialize admin panel: %v", err)
+		}
+		if err := adminpanel.RegisterRoutes(app, panel); err != nil {
+			log.Fatalf("Failed to register admin panel routes: %v", err)
+		}
+		log.Println("Admin panel enabled at /admin/")
 	}
 
 	// Root endpoint

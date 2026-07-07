@@ -1,0 +1,17 @@
+{{define "dashboard.html"}}
+{{template "layout" .}}
+{{end}}
+{{define "dashboard-content"}}
+<h2 class="page-title">Dashboard</h2>
+<div class="stats">
+  <div class="stat">
+    <span class="muted">Total clients</span>
+    <strong>{{.TotalClients}}</strong>
+  </div>
+  <div class="stat">
+    <span class="muted">Requests today</span>
+    <strong>{{.RequestsToday}}</strong>
+  </div>
+</div>
+<p style="margin-top:1.5rem;color:var(--muted);font-size:0.85rem;">Auto-refreshes every 60 seconds.</p>
+{{end}}

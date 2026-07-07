@@ -1,0 +1,26 @@
+{{define "login.html"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login — OpenCNPJ Admin</title>
+  <link rel="stylesheet" href="/admin/static/admin.css">
+</head>
+<body>
+<div class="auth-wrap">
+  <div class="auth-card">
+    <h2>Admin login</h2>
+    {{if .Error}}<div class="alert alert-error">{{.Error}}</div>{{end}}
+    <form method="post" action="/admin/login">
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email" required autocomplete="username">
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" required autocomplete="current-password">
+      <button type="submit">Continue</button>
+    </form>
+  </div>
+</div>
+</body>
+</html>
+{{end}}

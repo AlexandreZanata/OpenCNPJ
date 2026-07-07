@@ -1,0 +1,19 @@
+{{define "client_new.html"}}
+{{template "layout" .}}
+{{end}}
+{{define "client-new-content"}}
+<h2 class="page-title">New client</h2>
+{{if .Error}}<div class="alert alert-error">{{.Error}}</div>{{end}}
+<form method="post" action="/admin/clients">
+  <label for="name">Name</label>
+  <input id="name" name="name" required maxlength="255">
+  <label for="email">Email</label>
+  <input id="email" name="email" type="email" required maxlength="255">
+  <label for="rate_limit">Rate limit (req/min)</label>
+  <input id="rate_limit" name="rate_limit" type="number" min="1" value="{{.DefaultRate}}">
+  <label for="monthly_quota">Monthly quota (0 = unlimited)</label>
+  <input id="monthly_quota" name="monthly_quota" type="number" min="0" value="{{.DefaultQuota}}">
+  <button type="submit">Create client</button>
+  <a href="/admin/clients" class="btn btn-muted" style="margin-left:0.5rem">Cancel</a>
+</form>
+{{end}}

@@ -1,0 +1,24 @@
+{{define "mfa.html"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MFA — OpenCNPJ Admin</title>
+  <link rel="stylesheet" href="/admin/static/admin.css">
+</head>
+<body>
+<div class="auth-wrap">
+  <div class="auth-card">
+    <h2>Two-factor authentication</h2>
+    {{if .Error}}<div class="alert alert-error">{{.Error}}</div>{{end}}
+    <form method="post" action="/admin/mfa">
+      <label for="code">6-digit code</label>
+      <input id="code" name="code" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required autocomplete="one-time-code">
+      <button type="submit">Verify</button>
+    </form>
+  </div>
+</div>
+</body>
+</html>
+{{end}}

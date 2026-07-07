@@ -1,0 +1,60 @@
+{{define "client_detail.html"}}
+{{template "layout" .}}
+{{end}}
+{{define "client-detail-content"}}
+<h2 class="page-title">{{.Client.Name}}</h2>
+<p style="color:var(--muted);margin-bottom:1rem">{{.Client.Email}} ·
+  <span class="badge {{if eq .Client.Status "active"}}badge-ok{{else}}badge-warn{{end}}">{{.Client.Status}}</span>
+</p>
+{{if .NewKey}}
+<div class="key-once">
+  <strong>Copy now — this key will not be shown again.</strong>
+  <code>{{.NewKey}}</code>
+</div>
+{{end}}
+<div class="toolbar">
+  <h3 style="font-size:1rem">API keys</h3>
+  <form method="post" action="/admin/clients/{{.Client.ID}}/keys" class="inline-form">
+    <input type="hidden" name="label" value="production">
+    <button type="submit">Generate key</button>
+  </form>
+  {{if eq .Client.Status "active"}}
+  <form method="post" action="/admin/clients/{{.Client.ID}}/suspend" class="inline-form" style="margin-left:0.5rem">
+    <button type="submit" class="btn-danger">Suspend</button>
+  </form>
+  {{end}}
+</div>
+<table>
+  <thead><tr><th>Prefix</th><th>Label</th><th>Created</th><th>Status</th><th></th></tr></thead>
+  <tbody>
+    {{range .Keys}}
+    <tr>
+      <td><code>{{.Prefix}}</code></td>
+      <td>{{.Label}}</td>
+      <td>{{.CreatedAt}}</td>
+      <td>{{if .Revoked}}<span class="badge badge-warn">revoked</span>{{else}}<span class="badge badge-ok">active</span>{{end}}</td>
+      <td>
+        {{if not .Revoked}}
+        <form method="post" action="/admin/clients/{{$.Client.ID}}/keys/{{.ID}}/revoke" class="inline-form">
+          <button type="submit" class="btn-danger" style="padding:0.25rem 0.5rem;font-size:0.75rem">Revoke</button>
+        </form>
+        {{end}}
+      </td>
+    </tr>
+    {{else}}
+    <tr><td colspan="5">No keys yet.</td></tr>
+    {{end}}
+  </tbody>
+</table>
+<h3 style="margin-top:2rem;font-size:1rem">Usage (last {{len .Usage}} days)</h3>
+<table>
+  <thead><tr><th>Date</th><th>Requests</th><th>CNPJ lookups</th></tr></thead>
+  <tbody>
+    {{range .Usage}}
+    <tr><td>{{.Date}}</td><td>{{.Requests}}</td><td>{{.CNPJLookups}}</td></tr>
+    {{else}}
+    <tr><td colspan="3">No usage recorded.</td></tr>
+    {{end}}
+  </tbody>
+</table>
+{{end}}

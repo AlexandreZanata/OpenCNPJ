@@ -1,0 +1,21 @@
+{{define "usage.html"}}
+{{template "layout" .}}
+{{end}}
+{{define "usage-content"}}
+<h2 class="page-title">Usage</h2>
+<table>
+  <thead><tr><th>Client</th><th>Date</th><th>Requests</th><th>CNPJ lookups</th></tr></thead>
+  <tbody>
+    {{range .Rows}}
+    <tr>
+      <td><a href="/admin/clients/{{.ClientID}}">{{.ClientName}}</a></td>
+      <td>{{.Date}}</td>
+      <td>{{.Requests}}</td>
+      <td>{{.CNPJLookups}}</td>
+    </tr>
+    {{else}}
+    <tr><td colspan="4">No usage data.</td></tr>
+    {{end}}
+  </tbody>
+</table>
+{{end}}
