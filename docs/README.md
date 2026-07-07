@@ -35,6 +35,7 @@ Enterprise documentation for the OpenCNPJ platform.
 | [ops/ADMIN-AUTH.md](ops/ADMIN-AUTH.md) | Admin login, TOTP MFA, JWT, bootstrap CLI |
 | [ops/ADMIN-PANEL.md](ops/ADMIN-PANEL.md) | Server-rendered admin UI (no Node on VPS) |
 | [ops/DUAL-DATABASE-VPS.md](ops/DUAL-DATABASE-VPS.md) | Two Postgres DBs on VPS (CNPJ + SaaS) |
+| [ops/DATA-ACCESS-PERFORMANCE.md](ops/DATA-ACCESS-PERFORMANCE.md) | Phase 12 — sqlc + pgx v5 data-access stack |
 | [ops/MONTHLY-CNPJ-SYNC.md](ops/MONTHLY-CNPJ-SYNC.md) | Phase 11 — monthly CNPJ dump/restore (local PC → VPS) |
 | [ops/CNAE-PARTITIONING.md](ops/CNAE-PARTITIONING.md) | CNAE HASH sub-partitions under LIST(uf) |
 | [api/QUICKSTART.md](api/QUICKSTART.md) | Customer API quickstart (CNPJ lookup) |

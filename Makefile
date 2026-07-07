@@ -1,6 +1,8 @@
-.PHONY: build build-downloader test test-integration bench lint vet migrate import seed coverage setup download download-latest download-and-import import-full list-months web-dev web-build web-test sqlc
+.PHONY: build build-downloader test test-integration bench lint vet migrate import seed coverage setup download download-latest download-and-import import-full list-months web-dev web-build web-test sqlc sqlc-vet sqlc-install
 
 GO      = go
+SQLC    ?= sqlc
+SQLC_VERSION = v1.29.0
 BINARY  = bin/importer
 DOWNLOADER = bin/downloader
 GOFLAGS = -ldflags="-s -w"
@@ -58,7 +60,13 @@ test-integration:
 	$(GO) test ./tests/integration/... -v -timeout 15m
 
 sqlc:
-	sqlc generate
+	$(SQLC) generate
+
+sqlc-vet:
+	$(SQLC) vet
+
+sqlc-install:
+	$(GO) install github.com/sqlc-dev/sqlc/cmd/sqlc@$(SQLC_VERSION)
 
 bench:
 	$(GO) test ./tests/benchmark/... -bench=. -benchmem -benchtime=5s -count=3 \

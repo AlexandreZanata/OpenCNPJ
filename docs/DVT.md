@@ -30,6 +30,7 @@ Sequential IDs for new features that still need production-grade automated tests
 | DVT-34 | SaaS security hardening (Phase 9) | open |
 | DVT-35 | SaaS production deploy runbook (Phase 10) | open |
 | DVT-36 | Monthly CNPJ sync local PC → VPS (Phase 11) | open |
+| DVT-37 | Data access & API performance stack (Phase 12) | open |
 
 ## DVT-01: CNPJ open-data downloader (WebDAV)
 
@@ -281,4 +282,11 @@ Sequential IDs for new features that still need production-grade automated tests
 - **Scope**: `docs/ops/MONTHLY-CNPJ-SYNC.md`, `deploy/saas/monthly-cnpj-sync.example.sh`, `deploy/saas/grant-reader.sql.example`, `scripts/saas_monthly_cnpj_sync_gate.sh`
 - **Added**: 2026-07-07
 - **Needs**: full operator cycle on staging VPS with real multi-GB dump; verify `opencnpj_saas` row counts unchanged; CNPJ lookup smoke after swap
+- **Status**: open
+
+## DVT-37: Data access & API performance stack (Phase 12)
+
+- **Scope**: `docs/ops/DATA-ACCESS-PERFORMANCE.md`, `sqlc.yaml`, `internal/database/cnpj_pgx.go`, `internal/cnpj/service.go`, `scripts/saas_data_access_gate.sh`
+- **Added**: 2026-07-07
+- **Needs**: staging VPS p95 CNPJ lookup < 150 ms cache miss; API key middleware < 5 ms p95; post-restore EXPLAIN on production-size copy
 - **Status**: open

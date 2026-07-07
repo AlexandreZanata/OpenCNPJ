@@ -45,6 +45,8 @@ Detailed phased tasks: **`.local/03-saas-vps-comerc-api/TASKS.md`**
 | `deploy/saas/monthly-cnpj-sync.example.sh` | Monthly dump/upload/restore workflow |
 | `deploy/saas/grant-reader.sql.example` | Re-apply reader grants after restore swap |
 | `scripts/saas_monthly_cnpj_sync_gate.sh` | Phase 11 gate (templates + optional Docker swap test) |
+| `scripts/saas_data_access_gate.sh` | Phase 12 gate (sqlc + pgx + EXPLAIN) |
+| `docs/ops/DATA-ACCESS-PERFORMANCE.md` | sqlc + pgx stack, indexes, goroutine budget |
 | `deploy/saas/redis-opencnpj.conf.example` | Dedicated Redis (127.0.0.1:6381, 128 MB) |
 | `deploy/saas/rollback.example.sh` | Binary rollback helper |
 | `scripts/saas_smoke.sh` | Post-deploy health + auth smoke test |
