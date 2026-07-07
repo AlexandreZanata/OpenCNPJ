@@ -57,7 +57,7 @@ func NewUsageTracker(rdb *redis.Client, queries saasdb.Querier, interval time.Du
 // Start launches the async recorder and periodic flush goroutines.
 func (t *UsageTracker) Start(ctx context.Context) {
 	t.wg.Add(2)
-	go t.consumeEvents()
+	go t.consumeEvents(ctx)
 	go t.flushLoop(ctx)
 }
 
@@ -85,7 +85,7 @@ func (t *UsageTracker) enqueue(clientID uuid.UUID, cnpj bool) {
 	}
 }
 
-func (t *UsageTracker) consumeEvents() {
+func (t *UsageTracker) consumeEvents(ctx context.Context) {
 	defer t.wg.Done()
 	for {
 		select {
@@ -93,18 +93,20 @@ func (t *UsageTracker) consumeEvents() {
 			if !ok {
 				return
 			}
-			t.applyRedis(ev)
+			t.applyRedis(ctx, ev)
 		case <-t.stopCh:
+			return
+		case <-ctx.Done():
 			return
 		}
 	}
 }
 
-func (t *UsageTracker) applyRedis(ev usageEvent) {
+func (t *UsageTracker) applyRedis(ctx context.Context, ev usageEvent) {
 	if t.rdb == nil {
 		return
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
 	defer cancel()
 	day := time.Now().UTC().Format("2006-01-02")
 	month := time.Now().UTC().Format("2006-01")
@@ -132,7 +134,7 @@ func (t *UsageTracker) flushLoop(ctx context.Context) {
 		case <-ticker.C:
 			_ = t.Flush(ctx)
 		case <-t.stopCh:
-			flushCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			flushCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 10*time.Second)
 			_ = t.Flush(flushCtx)
 			cancel()
 			return
