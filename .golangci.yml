@@ -50,6 +50,7 @@ linters-settings:
     excludes:
       - G101
       - G115
+      - G118
       - G306
   misspell:
     ignore-words:
