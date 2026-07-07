@@ -3,6 +3,7 @@ package middleware
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -27,7 +28,11 @@ func ResponseCache() fiber.Handler {
 		}
 
 		sum := sha256.Sum256(body)
-		c.Set("Cache-Control", "public, max-age=300")
+		cc := "public, max-age=300"
+		if strings.HasPrefix(c.Path(), "/api/v1/cnpj/") {
+			cc = "private, max-age=300"
+		}
+		c.Set("Cache-Control", cc)
 		c.Set("ETag", `"`+hex.EncodeToString(sum[:8])+`"`)
 		return nil
 	}

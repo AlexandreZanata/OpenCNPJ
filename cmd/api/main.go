@@ -21,6 +21,7 @@ import (
 	"busca-cnpj-2026/internal/handlers"
 	"busca-cnpj-2026/internal/middleware"
 	"busca-cnpj-2026/internal/saas"
+	cnpjsvc "busca-cnpj-2026/internal/cnpj"
 )
 
 // fiberPrometheusAdapter adapts Fiber's context to http.ResponseWriter for Prometheus.
@@ -89,7 +90,13 @@ func main() {
 	}
 
 	var saasDeps *saas.Deps
+	var cnpjHandler *handlers.CNPJHandler
 	if config.AppConfig.SaaS.Enabled {
+		if err := database.InitCNPJPgx(); err != nil {
+			log.Fatalf("Failed to initialize CNPJ pgx pool: %v", err)
+		}
+		defer database.CloseCNPJPgx()
+
 		ctx := context.Background()
 		deps, cleanup, err := saas.WireDeps(ctx)
 		if err != nil {
@@ -97,6 +104,8 @@ func main() {
 		}
 		saasDeps = deps
 		defer cleanup()
+
+		cnpjHandler = handlers.NewCNPJHandler(cnpjsvc.NewDefaultLookupService(), saasDeps.Usage)
 	}
 
 	// Initialize ClickHouse (optional)
@@ -178,7 +187,7 @@ func main() {
 	lookupHandler := handlers.NewLookupHandler()
 
 	// Routes
-	handlers.RegisterV1Routes(app, searchHandler, exportHandler, lookupHandler, statsHandler, saasDeps)
+	handlers.RegisterV1Routes(app, searchHandler, exportHandler, lookupHandler, statsHandler, cnpjHandler, saasDeps)
 
 	// Root endpoint
 	app.Get("/", func(c *fiber.Ctx) error {

@@ -115,6 +115,24 @@ curl -s -o /dev/null -w '%{http_code}\n' -H "X-API-Key: ocnpj_live_..." \
   http://127.0.0.1:8081/api/v1/cnpj/00000000000191   # 200 or 404
 ```
 
+### Public CNPJ API (Phase 4)
+
+`GET /api/v1/cnpj/:cnpj` uses sqlc + pgx (`CNPJPool`) with parallel fetch via `errgroup`, L1/Redis cache, and a slim public DTO (no internal UUIDs).
+
+| Component | Path |
+|-----------|------|
+| sqlc queries | `db/queries/cnpj/` |
+| Schema snapshot | `db/schema/cnpj.sql` |
+| Lookup service | `internal/cnpj/` |
+| Handler | `internal/handlers/cnpj_handler.go` |
+
+```bash
+./scripts/saas_public_cnpj_gate.sh               # unit gate
+./scripts/saas_public_cnpj_gate.sh --docker      # + EXPLAIN idx_estabelecimentos_cnpj_completo
+```
+
+With `saas.public_api_only: true`, only `GET /api/v1/cnpj/:cnpj` is registered under `/api/v1` (plus health/metrics). Cache headers: `Cache-Control: private, max-age=300`.
+
 ### Nginx (Phase 1)
 
 ```bash

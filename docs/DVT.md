@@ -24,6 +24,7 @@ Sequential IDs for new features that still need production-grade automated tests
 | DVT-19 | OpenCNPJ plan 02 Phase 0 advanced baseline gate | open |
 | DVT-27 | SaaS dual-database VPS mode | open |
 | DVT-28 | SaaS API keys and usage tracking | open |
+| DVT-29 | Public CNPJ API (sqlc + pgx) | open |
 
 ## DVT-01: CNPJ open-data downloader (WebDAV)
 
@@ -219,4 +220,11 @@ Sequential IDs for new features that still need production-grade automated tests
 - **Scope**: `internal/saas/`, `internal/db/saas/`, `db/queries/saas/`, `sqlc.yaml`, `migrations/saas/000003_*`
 - **Added**: 2026-07-07
 - **Needs**: e2e gate on staging VPS with real Redis; verify `api_usage_daily` flush after 5 min; k6 load test per-client rate limit
+- **Status**: open
+
+## DVT-29: Public CNPJ API (sqlc + pgx)
+
+- **Scope**: `internal/cnpj/`, `internal/handlers/cnpj_handler.go`, `db/queries/cnpj/`, `internal/database/cnpj_pgx.go`
+- **Added**: 2026-07-07
+- **Needs**: staging VPS e2e with real CNPJ data; k6 warm-cache p95 gate; monthly dump regression on `idx_estabelecimentos_cnpj_completo`
 - **Status**: open

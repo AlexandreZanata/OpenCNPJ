@@ -35,6 +35,71 @@ components:
         code:
           type: integer
 
+    PublicCNPJResponse:
+      type: object
+      required: [cnpj, razao_social, socios]
+      properties:
+        cnpj:
+          type: string
+          pattern: '^\d{14}$'
+        razao_social:
+          type: string
+        nome_fantasia:
+          type: string
+        situacao_cadastral:
+          type: string
+        uf:
+          type: string
+        municipio:
+          type: string
+        cnae_principal:
+          type: object
+          properties:
+            codigo:
+              type: string
+            descricao:
+              type: string
+        endereco:
+          type: object
+          properties:
+            logradouro:
+              type: string
+            numero:
+              type: string
+            complemento:
+              type: string
+            bairro:
+              type: string
+            cep:
+              type: string
+            uf:
+              type: string
+            municipio:
+              type: string
+        telefone:
+          type: string
+        email:
+          type: string
+        socios:
+          type: array
+          items:
+            type: object
+            properties:
+              nome:
+                type: string
+              qualificacao:
+                type: string
+              data_entrada_sociedade:
+                type: string
+                format: date
+        simples:
+          type: object
+          properties:
+            opcao_simples:
+              type: string
+            opcao_mei:
+              type: string
+
 paths:
   /api/v1/cnpj/{cnpj}:
     get:
@@ -52,6 +117,10 @@ paths:
       responses:
         "200":
           description: Establishment found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublicCNPJResponse"
         "400":
           description: Invalid CNPJ format
           content:

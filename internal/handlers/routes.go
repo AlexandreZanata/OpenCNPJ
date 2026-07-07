@@ -20,6 +20,7 @@ func RegisterV1Routes(
 	export *ExportHandler,
 	lookup *LookupHandler,
 	stats *StatsHandler,
+	cnpj *CNPJHandler,
 	saasDeps *saas.Deps,
 ) {
 	v1 := app.Group("/api/v1")
@@ -28,18 +29,22 @@ func RegisterV1Routes(
 	}
 
 	if config.AppConfig.SaaS.Enabled && config.AppConfig.SaaS.PublicAPIOnly {
-		cnpjHandler := search.GetEstabelecimentoByCNPJ
-		if saasDeps != nil && saasDeps.Usage != nil {
-			cnpjHandler = wrapCNPJUsage(saasDeps.Usage, cnpjHandler)
+		if cnpj == nil {
+			panic("cnpj handler required when saas.public_api_only is enabled")
 		}
-		v1.Get("/cnpj/:cnpj", cnpjHandler)
+		v1.Get("/cnpj/:cnpj", cnpj.Get)
 		return
+	}
+
+	if config.AppConfig.SaaS.Enabled && cnpj != nil {
+		v1.Get("/cnpj/:cnpj", cnpj.Get)
+	} else {
+		v1.Get("/cnpj/:cnpj", wrapCNPJRoute(saasDeps, search.GetEstabelecimentoByCNPJ))
 	}
 
 	v1.Get("/empresas/search", timeout.NewWithContext(search.SearchEmpresas, searchTimeout))
 	v1.Get("/estabelecimentos/search", timeout.NewWithContext(search.SearchEstabelecimentos, searchTimeout))
 	v1.Get("/estabelecimentos/:cnpj", wrapCNPJRoute(saasDeps, search.GetEstabelecimentoByCNPJ))
-	v1.Get("/cnpj/:cnpj", wrapCNPJRoute(saasDeps, search.GetEstabelecimentoByCNPJ))
 
 	v1.Post("/export/csv", export.ExportCSV)
 	v1.Post("/export/phones", export.ExportPhones)

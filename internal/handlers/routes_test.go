@@ -13,7 +13,7 @@ func TestRegisterV1RoutesPublicAPIOnly(t *testing.T) {
 		SaaS: config.SaasConfig{Enabled: true, PublicAPIOnly: true},
 	}
 	app := fiber.New()
-	RegisterV1Routes(app, &SearchHandler{}, &ExportHandler{}, &LookupHandler{}, &StatsHandler{}, nil)
+	RegisterV1Routes(app, &SearchHandler{}, &ExportHandler{}, &LookupHandler{}, &StatsHandler{}, &CNPJHandler{}, nil)
 
 	routes := collectRoutePaths(app)
 	if !containsPath(routes, "/api/v1/cnpj/:cnpj") {
@@ -29,7 +29,7 @@ func TestRegisterV1RoutesFullAPI(t *testing.T) {
 		SaaS: config.SaasConfig{Enabled: false},
 	}
 	app := fiber.New()
-	RegisterV1Routes(app, &SearchHandler{}, &ExportHandler{}, &LookupHandler{}, &StatsHandler{}, nil)
+	RegisterV1Routes(app, &SearchHandler{}, &ExportHandler{}, &LookupHandler{}, &StatsHandler{}, &CNPJHandler{}, nil)
 
 	routes := collectRoutePaths(app)
 	if !containsPath(routes, "/api/v1/empresas/search") {
