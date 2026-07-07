@@ -2,6 +2,7 @@ package saas
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -209,7 +210,7 @@ func (t *UsageTracker) MonthCount(ctx context.Context, clientID uuid.UUID) (int6
 	month := time.Now().UTC().Format("2006-01")
 	key := fmt.Sprintf("usage:client:%s:month:%s", clientID, month)
 	val, err := t.rdb.HGet(ctx, key, "request_count").Result()
-	if err == redis.Nil {
+	if errors.Is(err, redis.Nil) {
 		return 0, nil
 	}
 	if err != nil {

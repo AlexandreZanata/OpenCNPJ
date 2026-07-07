@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"errors"
 	"strings"
 	"time"
 
@@ -42,7 +43,7 @@ func (h *Handler) PostLogin(c *fiber.Ctx) error {
 	if err != nil {
 		token, _ := h.csrfToken(c)
 		msg := "Invalid credentials"
-		if err == autherr.ErrAccountLocked {
+		if errors.Is(err, autherr.ErrAccountLocked) {
 			msg = "Account temporarily locked"
 		}
 		_ = h.logAudit(c, uuid.Nil, audit.ActionLoginFailure, "admin_user", email)

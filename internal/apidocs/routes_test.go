@@ -1,6 +1,7 @@
 package apidocs
 
 import (
+	"bytes"
 	"io"
 	"io/fs"
 	"net/http"
@@ -66,7 +67,7 @@ func TestEmbeddedOpenAPIMatchesDocs(t *testing.T) {
 	if err != nil {
 		t.Fatalf("read embedded: %v", err)
 	}
-	if string(got) != string(want) {
+	if !bytes.Equal(got, want) {
 		t.Fatal("embedded openapi.yaml out of sync with docs/api/OPENAPI.yaml")
 	}
 }

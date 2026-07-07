@@ -8,7 +8,6 @@ import (
 	"log"
 	"os"
 	"strings"
-	"syscall"
 	"time"
 
 	"golang.org/x/term"
@@ -98,8 +97,8 @@ func main() {
 
 func readPassword(prompt string) (string, error) {
 	fmt.Fprint(os.Stderr, prompt)
-	if term.IsTerminal(int(syscall.Stdin)) {
-		b, err := term.ReadPassword(int(syscall.Stdin))
+	if term.IsTerminal(int(os.Stdin.Fd())) {
+		b, err := term.ReadPassword(int(os.Stdin.Fd()))
 		fmt.Fprintln(os.Stderr)
 		if err != nil {
 			return "", err

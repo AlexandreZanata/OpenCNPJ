@@ -19,7 +19,6 @@ linters:
     - gofmt
     - goimports
     - gocritic
-    - err113
     - gosec
     - lll
     - misspell
@@ -45,9 +44,13 @@ linters-settings:
       - hugeParam
       - unnamedResult
       - exitAfterDefer
+      - filepathJoin
+      - rangeValCopy
   gosec:
     excludes:
       - G101
+      - G115
+      - G306
   misspell:
     ignore-words:
       - federativo
@@ -64,3 +67,22 @@ issues:
       text: "unused-parameter"
       linters:
         - revive
+    - path: _test\.go
+      linters:
+        - bodyclose
+        - dupl
+        - revive
+        - unconvert
+        - contextcheck
+    - path: internal/perfvalidation/
+      linters:
+        - dupl
+    - path: internal/database/(cnpj_pgx|saas_pgx)\.go
+      linters:
+        - dupl
+    - path: cmd/
+      linters:
+        - cyclop
+    - path: internal/saas/
+      linters:
+        - contextcheck

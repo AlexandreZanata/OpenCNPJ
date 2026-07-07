@@ -19,7 +19,7 @@ func NewService(issuer string) *Service {
 }
 
 // Generate creates a new base32 secret and otpauth URL for QR provisioning.
-func (s *Service) Generate(account string) (secret string, otpauthURL string, err error) {
+func (s *Service) Generate(account string) (secret, otpauthURL string, err error) {
 	key, err := totp.Generate(totp.GenerateOpts{
 		Issuer:      s.issuer,
 		AccountName: account,

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	_ "github.com/lib/pq"
+	_ "github.com/lib/pq" // database/sql driver for legacy dual-DB ping and migrate helpers
 
 	"busca-cnpj-2026/internal/config"
 )

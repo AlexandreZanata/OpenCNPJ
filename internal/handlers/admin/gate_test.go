@@ -196,7 +196,9 @@ func (m *mockQuerier) ListAPIKeysByClient(context.Context, pgtype.UUID) ([]saasd
 		CreatedAt: pgtype.Timestamptz{Time: time.Now(), Valid: true},
 	}}, nil
 }
-func (m *mockQuerier) InsertAPIKey(ctx context.Context, arg saasdb.InsertAPIKeyParams) (saasdb.InsertAPIKeyRow, error) {
+func (m *mockQuerier) InsertAPIKey(
+	_ context.Context, arg saasdb.InsertAPIKeyParams,
+) (saasdb.InsertAPIKeyRow, error) {
 	return saasdb.InsertAPIKeyRow{ID: pgUUID(m.keyID), KeyPrefix: arg.KeyPrefix, Label: arg.Label}, nil
 }
 func (m *mockQuerier) RevokeAPIKey(context.Context, saasdb.RevokeAPIKeyParams) (int64, error) {

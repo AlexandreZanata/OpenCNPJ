@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -39,7 +40,7 @@ func NewGuard(rdb redisCmd, maxFailures, lockoutMinutes int) *Guard {
 // IsLocked reports whether the email is temporarily locked.
 func (g *Guard) IsLocked(ctx context.Context, email string) (bool, error) {
 	n, err := g.rdb.Get(ctx, g.key(email)).Int()
-	if err == redis.Nil {
+	if errors.Is(err, redis.Nil) {
 		return false, nil
 	}
 	if err != nil {

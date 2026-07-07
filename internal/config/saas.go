@@ -88,15 +88,6 @@ func resolveRateLimitWindow() int {
 	return viper.GetInt("server.rate_limit_window_seconds")
 }
 
-func firstNonZero(values ...int) int {
-	for _, v := range values {
-		if v > 0 {
-			return v
-		}
-	}
-	return 0
-}
-
 // GetCNPJDatabaseURL returns the CNPJ consulta DSN (URL or key=value form).
 func GetCNPJDatabaseURL() string {
 	if u := strings.TrimSpace(os.Getenv("CNPJ_DATABASE_URL")); u != "" {
