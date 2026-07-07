@@ -36,7 +36,7 @@ for var in CNPJ_DATABASE_URL SAAS_DATABASE_URL REDIS_URL CONFIG_FILE; do
 done
 
 echo "==> Checking SaaS migrations"
-for f in 000001_saas_metadata.up.sql 000002_saas_indexes.up.sql; do
+for f in 000001_saas_metadata.up.sql 000002_saas_indexes.up.sql 000003_api_key_index_rename.up.sql; do
   if [[ ! -f "$ROOT/migrations/saas/$f" ]]; then
     echo "MISSING migration: $f" >&2
     exit 1

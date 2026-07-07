@@ -4,6 +4,7 @@ go 1.25.11
 
 require (
 	github.com/ClickHouse/clickhouse-go/v2 v2.43.0
+	github.com/alicebob/miniredis/v2 v2.35.0
 	github.com/bytedance/sonic v1.14.2
 	github.com/dgraph-io/ristretto/v2 v2.2.0
 	github.com/gofiber/fiber/v2 v2.52.12
@@ -102,6 +103,7 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.69.0 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
+	github.com/yuin/gopher-lua v1.1.1 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.67.0 // indirect

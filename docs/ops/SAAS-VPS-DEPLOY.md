@@ -84,6 +84,37 @@ When `saas.enabled: true`, `/readyz` pings **both** PostgreSQL pools. With `saas
 
 See [DUAL-DATABASE-VPS.md](DUAL-DATABASE-VPS.md) for VPS operator steps.
 
+### API keys + usage (Phase 3)
+
+When `saas.enabled: true`, all `/api/v1/*` routes require `X-API-Key` (`ocnpj_live_<32 hex>`).
+
+| Component | Path |
+|-----------|------|
+| sqlc queries | `db/queries/saas/` |
+| Generated code | `internal/db/saas/` |
+| Domain logic | `internal/saas/` |
+| Middleware | `internal/saas/middleware/api_key.go` |
+
+```bash
+make sqlc                                    # regenerate after SQL changes
+./scripts/saas_api_key_gate.sh               # unit gate
+./scripts/saas_api_key_gate.sh --docker      # + Postgres EXPLAIN integration
+```
+
+Seed a test client (SQL on `opencnpj_saas`):
+
+```sql
+-- Use internal/saas.CreateClientKey from a one-off admin CLI, or insert via admin panel (Phase 6).
+```
+
+Manual gate:
+
+```bash
+curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:8081/api/v1/cnpj/00000000000191          # 401
+curl -s -o /dev/null -w '%{http_code}\n' -H "X-API-Key: ocnpj_live_..." \
+  http://127.0.0.1:8081/api/v1/cnpj/00000000000191   # 200 or 404
+```
+
 ### Nginx (Phase 1)
 
 ```bash

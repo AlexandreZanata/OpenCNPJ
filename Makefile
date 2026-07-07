@@ -1,4 +1,4 @@
-.PHONY: build build-downloader test test-integration bench lint vet migrate import seed coverage setup download download-latest download-and-import import-full list-months web-dev web-build web-test
+.PHONY: build build-downloader test test-integration bench lint vet migrate import seed coverage setup download download-latest download-and-import import-full list-months web-dev web-build web-test sqlc
 
 GO      = go
 BINARY  = bin/importer
@@ -56,6 +56,9 @@ test:
 
 test-integration:
 	$(GO) test ./tests/integration/... -v -timeout 15m
+
+sqlc:
+	sqlc generate
 
 bench:
 	$(GO) test ./tests/benchmark/... -bench=. -benchmem -benchtime=5s -count=3 \

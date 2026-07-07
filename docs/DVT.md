@@ -23,6 +23,7 @@ Sequential IDs for new features that still need production-grade automated tests
 | DVT-18 | CI automated API perf validation gate | open |
 | DVT-19 | OpenCNPJ plan 02 Phase 0 advanced baseline gate | open |
 | DVT-27 | SaaS dual-database VPS mode | open |
+| DVT-28 | SaaS API keys and usage tracking | open |
 
 ## DVT-01: CNPJ open-data downloader (WebDAV)
 
@@ -211,4 +212,11 @@ Sequential IDs for new features that still need production-grade automated tests
 - **Scope**: `internal/config/saas.go`, `internal/database/postgres_dual.go`, `migrations/saas/`, `config/config.saas.example.yaml`, `cmd/migrate --saas`
 - **Added**: 2026-07-07
 - **Needs**: integration test with testcontainers (two Postgres DBs); e2e `readyz` + `public_api_only` route gate on staging VPS
+- **Status**: open
+
+## DVT-28: SaaS API keys and usage tracking
+
+- **Scope**: `internal/saas/`, `internal/db/saas/`, `db/queries/saas/`, `sqlc.yaml`, `migrations/saas/000003_*`
+- **Added**: 2026-07-07
+- **Needs**: e2e gate on staging VPS with real Redis; verify `api_usage_daily` flush after 5 min; k6 load test per-client rate limit
 - **Status**: open

@@ -20,6 +20,7 @@ import (
 	"busca-cnpj-2026/internal/database"
 	"busca-cnpj-2026/internal/handlers"
 	"busca-cnpj-2026/internal/middleware"
+	"busca-cnpj-2026/internal/saas"
 )
 
 // fiberPrometheusAdapter adapts Fiber's context to http.ResponseWriter for Prometheus.
@@ -85,6 +86,17 @@ func main() {
 				log.Printf("Warning: failed to close Redis: %v", err)
 			}
 		}()
+	}
+
+	var saasDeps *saas.Deps
+	if config.AppConfig.SaaS.Enabled {
+		ctx := context.Background()
+		deps, cleanup, err := saas.WireDeps(ctx)
+		if err != nil {
+			log.Fatalf("Failed to initialize SaaS layer: %v", err)
+		}
+		saasDeps = deps
+		defer cleanup()
 	}
 
 	// Initialize ClickHouse (optional)
@@ -166,7 +178,7 @@ func main() {
 	lookupHandler := handlers.NewLookupHandler()
 
 	// Routes
-	handlers.RegisterV1Routes(app, searchHandler, exportHandler, lookupHandler, statsHandler)
+	handlers.RegisterV1Routes(app, searchHandler, exportHandler, lookupHandler, statsHandler, saasDeps)
 
 	// Root endpoint
 	app.Get("/", func(c *fiber.Ctx) error {
