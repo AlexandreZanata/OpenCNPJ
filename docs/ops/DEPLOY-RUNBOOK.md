@@ -153,6 +153,7 @@ sudo systemctl start opencnpj-api
 ## Related docs
 
 - [SAAS-VPS-DEPLOY.md](SAAS-VPS-DEPLOY.md) — overview and phase index
+- [MONTHLY-CNPJ-SYNC.md](MONTHLY-CNPJ-SYNC.md) — monthly CNPJ dump/restore (Phase 11)
 - [DUAL-DATABASE-VPS.md](DUAL-DATABASE-VPS.md) — two-database model
 - [NGINX-SAAS.md](NGINX-SAAS.md) — Cloudflare + TLS
 - [SECURITY.md](../SECURITY.md) §8 — SaaS hardening

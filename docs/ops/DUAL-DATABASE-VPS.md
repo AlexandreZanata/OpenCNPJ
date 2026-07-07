@@ -9,7 +9,7 @@
 | `opencnpj_cnpj` | **Never** — SELECT only | Monthly `pg_dump` restore from local PC |
 | `opencnpj_saas` | Yes — keys, usage, admin | Continuous |
 
-**CNPJ import never runs on the VPS.** See [SAAS-VPS-DEPLOY.md](SAAS-VPS-DEPLOY.md) and `11-MONTHLY-CNPJ-SYNC.md` (local task plan).
+**CNPJ import never runs on the VPS.** See [SAAS-VPS-DEPLOY.md](SAAS-VPS-DEPLOY.md) and [MONTHLY-CNPJ-SYNC.md](MONTHLY-CNPJ-SYNC.md).
 
 ## Repo templates
 

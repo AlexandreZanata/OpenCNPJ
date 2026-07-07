@@ -1,0 +1,11 @@
+-- Re-apply read-only grants on opencnpj_cnpj after monthly pg_restore swap.
+-- Run as superuser:
+--   sudo -u postgres psql -d opencnpj_cnpj -f /etc/opencnpj/grant-reader.sql
+\set ON_ERROR_STOP on
+
+GRANT CONNECT ON DATABASE opencnpj_cnpj TO opencnpj_reader;
+GRANT USAGE ON SCHEMA public TO opencnpj_reader;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO opencnpj_reader;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO opencnpj_reader;
+
+\echo 'Reader grants applied on opencnpj_cnpj'

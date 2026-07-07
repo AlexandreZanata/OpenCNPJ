@@ -26,7 +26,7 @@
 3. **VPS:** Restore into `opencnpj_cnpj` (swap strategy) — see `deploy/saas/monthly-cnpj-sync.example.sh`.
 4. **VPS:** Flush CNPJ cache in Redis; restart API. SaaS DB unchanged.
 
-Full steps: `.local/03-saas-vps-comerc-api/11-MONTHLY-CNPJ-SYNC.md` (gitignored task plan).
+Full steps: [MONTHLY-CNPJ-SYNC.md](MONTHLY-CNPJ-SYNC.md).
 
 ## Local task plan
 
@@ -43,6 +43,8 @@ Detailed phased tasks: **`.local/03-saas-vps-comerc-api/TASKS.md`**
 | `deploy/saas/pgbouncer.ini.example` | Optional pgBouncer dual DB |
 | `deploy/saas/systemd-opencnpj-api.example` | systemd service |
 | `deploy/saas/monthly-cnpj-sync.example.sh` | Monthly dump/upload/restore workflow |
+| `deploy/saas/grant-reader.sql.example` | Re-apply reader grants after restore swap |
+| `scripts/saas_monthly_cnpj_sync_gate.sh` | Phase 11 gate (templates + optional Docker swap test) |
 | `deploy/saas/redis-opencnpj.conf.example` | Dedicated Redis (127.0.0.1:6381, 128 MB) |
 | `deploy/saas/rollback.example.sh` | Binary rollback helper |
 | `scripts/saas_smoke.sh` | Post-deploy health + auth smoke test |

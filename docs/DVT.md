@@ -29,6 +29,7 @@ Sequential IDs for new features that still need production-grade automated tests
 | DVT-31 | Admin panel (server-rendered HTML) | open |
 | DVT-34 | SaaS security hardening (Phase 9) | open |
 | DVT-35 | SaaS production deploy runbook (Phase 10) | open |
+| DVT-36 | Monthly CNPJ sync local PC → VPS (Phase 11) | open |
 
 ## DVT-01: CNPJ open-data downloader (WebDAV)
 
@@ -273,4 +274,11 @@ Sequential IDs for new features that still need production-grade automated tests
 - **Scope**: `docs/ops/DEPLOY-RUNBOOK.md`, `scripts/saas_smoke.sh`, `scripts/saas_deploy_gate.sh`, `scripts/build_opencnpj_api.sh`, `deploy/saas/redis-opencnpj.conf.example`, `deploy/saas/rollback.example.sh`
 - **Added**: 2026-07-07
 - **Needs**: full empty-VPS → working API path executed once on staging; smoke with production API key after first client created
+- **Status**: open
+
+## DVT-36: Monthly CNPJ sync local PC → VPS (Phase 11)
+
+- **Scope**: `docs/ops/MONTHLY-CNPJ-SYNC.md`, `deploy/saas/monthly-cnpj-sync.example.sh`, `deploy/saas/grant-reader.sql.example`, `scripts/saas_monthly_cnpj_sync_gate.sh`
+- **Added**: 2026-07-07
+- **Needs**: full operator cycle on staging VPS with real multi-GB dump; verify `opencnpj_saas` row counts unchanged; CNPJ lookup smoke after swap
 - **Status**: open
