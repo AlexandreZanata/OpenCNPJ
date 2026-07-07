@@ -16,16 +16,17 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/healthcheck"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
-	"busca-cnpj-2026/internal/config"
-	"busca-cnpj-2026/internal/database"
-	"busca-cnpj-2026/internal/handlers"
-	"busca-cnpj-2026/internal/middleware"
-	"busca-cnpj-2026/internal/saas"
-	cnpjsvc "busca-cnpj-2026/internal/cnpj"
 	adminapp "busca-cnpj-2026/internal/adminauth/app"
 	adminhandlers "busca-cnpj-2026/internal/adminauth/handlers"
-	adminpanel "busca-cnpj-2026/internal/handlers/admin"
+	"busca-cnpj-2026/internal/apidocs"
+	cnpjsvc "busca-cnpj-2026/internal/cnpj"
+	"busca-cnpj-2026/internal/config"
+	"busca-cnpj-2026/internal/database"
 	saasdb "busca-cnpj-2026/internal/db/saas"
+	"busca-cnpj-2026/internal/handlers"
+	adminpanel "busca-cnpj-2026/internal/handlers/admin"
+	"busca-cnpj-2026/internal/middleware"
+	"busca-cnpj-2026/internal/saas"
 )
 
 // fiberPrometheusAdapter adapts Fiber's context to http.ResponseWriter for Prometheus.
@@ -192,6 +193,13 @@ func main() {
 
 	// Routes
 	handlers.RegisterV1Routes(app, searchHandler, exportHandler, lookupHandler, statsHandler, cnpjHandler, saasDeps)
+
+	if config.AppConfig.SaaS.DocsEnabled {
+		if err := apidocs.RegisterRoutes(app); err != nil {
+			log.Fatalf("Failed to register API docs routes: %v", err)
+		}
+		log.Println("API docs enabled at /docs/")
+	}
 
 	if config.AppConfig.SaaS.Enabled && config.AppConfig.SaaS.AdminEnabled {
 		if database.RedisClient == nil {

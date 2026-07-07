@@ -162,7 +162,7 @@ type mockQuerier struct {
 	usage    []saasdb.ListRecentUsageRow
 }
 
-func (m *mockQuerier) CountAPIClients(context.Context) (int64, error) { return 1, nil }
+func (m *mockQuerier) CountAPIClients(context.Context) (int64, error)       { return 1, nil }
 func (m *mockQuerier) SumUsageRequestsToday(context.Context) (int64, error) { return 5, nil }
 func (m *mockQuerier) ListAPIClients(context.Context, saasdb.ListAPIClientsParams) ([]saasdb.ApiClient, error) {
 	return nil, nil

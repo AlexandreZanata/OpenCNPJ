@@ -20,8 +20,8 @@ type mfaPage struct {
 
 type dashboardPage struct {
 	LayoutData
-	TotalClients   int64
-	RequestsToday  int64
+	TotalClients  int64
+	RequestsToday int64
 }
 
 // GetLogin shows the login form.
@@ -119,7 +119,7 @@ func (h *Handler) GetDashboard(c *fiber.Ctx) error {
 		return err
 	}
 	return h.html(c, "dashboard.html", dashboardPage{
-		LayoutData:    LayoutData{Title: "Dashboard", Nav: "dashboard", ContentTpl: "dashboard-content", RefreshMeta: true},
+		LayoutData:    h.shell("Dashboard", "dashboard", "dashboard-content", true),
 		TotalClients:  clients,
 		RequestsToday: today,
 	})

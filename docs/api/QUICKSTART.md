@@ -1,10 +1,10 @@
 # OpenCNPJ API — Quickstart
 
-> Replace placeholders before running. Never commit real API keys.
+> Replace placeholders before running. **Never commit real API keys.**
 
 ## 1. Get an API key
 
-Contact the platform admin or create one in the admin panel (`https://admin.comerc.app.br`).
+Create a client and key in the admin panel (`https://admin.comerc.app.br`) or ask your platform operator.
 
 Key format:
 
@@ -18,23 +18,45 @@ ocnpj_live_<32 hexadecimal characters>
 export API_KEY="ocnpj_live_YOUR_KEY_HERE"
 export API_BASE="https://api.comerc.app.br"
 
-curl -s -H "X-API-Key: ${API_KEY}" \
+curl -sS -H "X-API-Key: ${API_KEY}" \
   "${API_BASE}/api/v1/cnpj/00000000000191" | jq .
+```
+
+### Local development
+
+```bash
+export API_BASE="http://localhost:8080"
+# Enable docs UI: saas.docs_enabled: true in config (off in production by default)
+open "${API_BASE}/docs"
 ```
 
 ## 3. Error handling
 
-| HTTP | Meaning |
-|------|---------|
-| 401 | Invalid or missing `X-API-Key` |
-| 404 | CNPJ not in database |
-| 429 | Rate limit exceeded |
-| 504 | Server timeout — retry with backoff |
+See [ERRORS.md](ERRORS.md) for the full catalog.
+
+| HTTP | `error` (typical) | Action |
+|------|-------------------|--------|
+| 400 | `invalid_cnpj` | Fix request |
+| 401 | `missing_api_key` / `invalid_api_key` | Check header |
+| 403 | `client_suspended` | Contact operator |
+| 404 | `cnpj_not_found` | Not in database |
+| 429 | `rate_limit_exceeded` / `quota_exceeded` | Back off |
+| 504 | — | Retry with backoff |
 
 ## 4. Rate limits
 
-Default: **60 requests/minute** per API key (configurable per client).
+Default: **60 requests/minute** per API key (configurable per client). Optional monthly quota when set on the client.
 
-## 5. Full specification
+## 5. Specification
 
-See `docs/api/OPENAPI.yaml`.
+| Document | Purpose |
+|----------|---------|
+| [OPENAPI.yaml](OPENAPI.yaml) | OpenAPI 3.1 contract |
+| [ERRORS.md](ERRORS.md) | Error codes |
+| [CHANGELOG.md](CHANGELOG.md) | Version history |
+
+Validate locally:
+
+```bash
+./scripts/api_docs_gate.sh
+```

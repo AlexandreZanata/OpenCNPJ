@@ -21,4 +21,5 @@ type Deps struct {
 	DefaultRate   int32
 	DefaultQuota  int32
 	Renderer      *Renderer
+	DocsPublicURL string
 }

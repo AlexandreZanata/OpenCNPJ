@@ -20,4 +20,15 @@ type LayoutData struct {
 	ContentTpl  string
 	RefreshMeta bool
 	Flash       string
+	APIDocsURL  string
+}
+
+func (h *Handler) shell(title, nav, contentTpl string, refresh bool) LayoutData {
+	return LayoutData{
+		Title:       title,
+		Nav:         nav,
+		ContentTpl:  contentTpl,
+		RefreshMeta: refresh,
+		APIDocsURL:  h.DocsPublicURL,
+	}
 }

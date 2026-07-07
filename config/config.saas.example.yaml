@@ -48,6 +48,8 @@ saas:
   mfa_totp_issuer: "OpenCNPJ-Admin"
   default_client_rate_per_min: 60
   default_monthly_quota: 0
+  docs_enabled: false
+  docs_public_url: "https://github.com/AlexandreZanata/BUSCA-CNPJ-2026/blob/main/docs/api/QUICKSTART.md"
 
 meilisearch:
   enabled: false

@@ -37,6 +37,8 @@ Enterprise documentation for the OpenCNPJ platform.
 | [ops/CNAE-PARTITIONING.md](ops/CNAE-PARTITIONING.md) | CNAE HASH sub-partitions under LIST(uf) |
 | [api/QUICKSTART.md](api/QUICKSTART.md) | Customer API quickstart (CNPJ lookup) |
 | [api/OPENAPI.yaml](api/OPENAPI.yaml) | OpenAPI 3.1 spec (v1 CNPJ route) |
+| [api/ERRORS.md](api/ERRORS.md) | Public API error codes |
+| [api/CHANGELOG.md](api/CHANGELOG.md) | Public API version history |
 | [benchmarks/README.md](benchmarks/README.md) | Benchmark suite overview |
 | [benchmarks/COMPARISON.md](benchmarks/COMPARISON.md) | Approach comparison results |
 | [benchmarks/HARDWARE-RTX4060-32GB.md](benchmarks/HARDWARE-RTX4060-32GB.md) | Import speed (32 GB RAM / RTX 4060) |

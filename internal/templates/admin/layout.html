@@ -16,6 +16,7 @@
       <a href="/admin/" {{if eq .Nav "dashboard"}}class="active"{{end}}>Dashboard</a>
       <a href="/admin/clients" {{if eq .Nav "clients"}}class="active"{{end}}>Clients</a>
       <a href="/admin/usage" {{if eq .Nav "usage"}}class="active"{{end}}>Usage</a>
+      {{if .APIDocsURL}}<a href="{{.APIDocsURL}}" target="_blank" rel="noopener">API docs</a>{{end}}
     </nav>
   </aside>
   <div class="main">

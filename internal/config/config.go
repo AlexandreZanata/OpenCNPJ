@@ -308,6 +308,8 @@ func setDefaults() {
 	viper.SetDefault("saas.mfa_totp_issuer", "OpenCNPJ-Admin")
 	viper.SetDefault("saas.default_client_rate_per_min", 60)
 	viper.SetDefault("saas.default_monthly_quota", 0)
+	viper.SetDefault("saas.docs_enabled", false)
+	viper.SetDefault("saas.docs_public_url", "https://github.com/AlexandreZanata/BUSCA-CNPJ-2026/blob/main/docs/api/QUICKSTART.md")
 
 	// Load .env file if exists - use godotenv or manual loading
 	if _, err := os.Stat(".env"); err == nil {

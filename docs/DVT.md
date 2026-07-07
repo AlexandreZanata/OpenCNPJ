@@ -251,3 +251,10 @@ Sequential IDs for new features that still need production-grade automated tests
 - **Added**: 2026-07-07
 - **Needs**: off-peak apply on 150M-row VPS; EXPLAIN before/after on production-size copy; post-migrate k6 cnae+uf_search p99 < 80 ms
 - **Status**: open
+
+## DVT-33: SaaS public API documentation (Phase 8)
+
+- **Scope**: `docs/api/*`, `internal/apidocs/`, `scripts/api_docs_gate.sh`, admin panel API docs link
+- **Added**: 2026-07-07
+- **Needs**: QUICKSTART e2e on staging VPS with test key; Redoc `/docs` behind nginx in non-prod only
+- **Status**: open

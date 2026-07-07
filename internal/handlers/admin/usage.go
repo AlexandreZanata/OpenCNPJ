@@ -36,7 +36,7 @@ func (h *Handler) GetUsage(c *fiber.Ctx) error {
 		})
 	}
 	return h.html(c, "usage.html", usagePage{
-		LayoutData: LayoutData{Title: "Usage", Nav: "usage", ContentTpl: "usage-content"},
+		LayoutData: h.shell("Usage", "usage", "usage-content", false),
 		Rows:       out,
 	})
 }

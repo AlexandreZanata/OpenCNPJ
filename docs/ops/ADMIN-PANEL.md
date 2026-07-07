@@ -31,6 +31,21 @@
 
 Static assets: `GET /admin/static/admin.css`
 
+External link: **API docs** → `saas.docs_public_url` (default GitHub `docs/api/QUICKSTART.md`)
+
+## API documentation (customer)
+
+| Doc | Path |
+|-----|------|
+| Quickstart | `docs/api/QUICKSTART.md` |
+| OpenAPI | `docs/api/OPENAPI.yaml` |
+| Errors | `docs/api/ERRORS.md` |
+| Changelog | `docs/api/CHANGELOG.md` |
+
+Optional Redoc UI: `GET /docs/` when `saas.docs_enabled: true` (off in production by default).
+
+Gate: `./scripts/api_docs_gate.sh`
+
 ## Session
 
 Fiber cookie session (`opencnpj_admin_session`) stores admin ID + access JWT after MFA.

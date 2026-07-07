@@ -5,6 +5,7 @@ import (
 
 	adminapp "busca-cnpj-2026/internal/adminauth/app"
 	"busca-cnpj-2026/internal/adminauth/usecase"
+	"busca-cnpj-2026/internal/apidocs"
 	"busca-cnpj-2026/internal/config"
 	saasdb "busca-cnpj-2026/internal/db/saas"
 )
@@ -16,6 +17,10 @@ func WirePanel(auth *adminapp.Deps, queries saasdb.Querier, saasCfg config.SaasC
 		return nil, err
 	}
 	store := NewSession()
+	docsURL := saasCfg.DocsPublicURL
+	if docsURL == "" {
+		docsURL = apidocs.DefaultPublicDocsURL
+	}
 	return NewHandler(Deps{
 		Queries: queries,
 		Login: func(ctx context.Context, in usecase.LoginInput) (usecase.LoginMFARequired, error) {
@@ -30,5 +35,6 @@ func WirePanel(auth *adminapp.Deps, queries saasdb.Querier, saasCfg config.SaasC
 		DefaultRate:   int32(saasCfg.DefaultClientRateMin),
 		DefaultQuota:  int32(saasCfg.DefaultMonthlyQuota),
 		Renderer:      r,
+		DocsPublicURL: docsURL,
 	}), nil
 }

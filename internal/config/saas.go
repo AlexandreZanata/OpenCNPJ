@@ -18,15 +18,17 @@ type PoolConfig struct {
 
 // SaasConfig toggles SaaS deployment mode (dual DB, admin, public API).
 type SaasConfig struct {
-	Enabled               bool
-	PublicAPIOnly         bool
-	AdminEnabled          bool
-	AdminJWTTTLMinutes    int
-	AdminRefreshTTLDays   int
-	MFARequired           bool
-	MFATOTPIssuer         string
-	DefaultClientRateMin  int
-	DefaultMonthlyQuota   int
+	Enabled              bool
+	PublicAPIOnly        bool
+	AdminEnabled         bool
+	AdminJWTTTLMinutes   int
+	AdminRefreshTTLDays  int
+	MFARequired          bool
+	MFATOTPIssuer        string
+	DefaultClientRateMin int
+	DefaultMonthlyQuota  int
+	DocsEnabled          bool
+	DocsPublicURL        string
 }
 
 // DatabaseURLConfig is a Postgres URL plus pool settings (SaaS VPS layout).
@@ -47,6 +49,8 @@ func loadSaasFromViper() (SaasConfig, DatabaseURLConfig, DatabaseURLConfig) {
 		MFATOTPIssuer:        viper.GetString("saas.mfa_totp_issuer"),
 		DefaultClientRateMin: viper.GetInt("saas.default_client_rate_per_min"),
 		DefaultMonthlyQuota:  viper.GetInt("saas.default_monthly_quota"),
+		DocsEnabled:          viper.GetBool("saas.docs_enabled"),
+		DocsPublicURL:        viper.GetString("saas.docs_public_url"),
 	}
 
 	cnpj := DatabaseURLConfig{
