@@ -25,6 +25,7 @@ Sequential IDs for new features that still need production-grade automated tests
 | DVT-27 | SaaS dual-database VPS mode | open |
 | DVT-28 | SaaS API keys and usage tracking | open |
 | DVT-29 | Public CNPJ API (sqlc + pgx) | open |
+| DVT-30 | Admin auth + TOTP MFA | open |
 
 ## DVT-01: CNPJ open-data downloader (WebDAV)
 
@@ -227,4 +228,11 @@ Sequential IDs for new features that still need production-grade automated tests
 - **Scope**: `internal/cnpj/`, `internal/handlers/cnpj_handler.go`, `db/queries/cnpj/`, `internal/database/cnpj_pgx.go`
 - **Added**: 2026-07-07
 - **Needs**: staging VPS e2e with real CNPJ data; k6 warm-cache p95 gate; monthly dump regression on `idx_estabelecimentos_cnpj_completo`
+- **Status**: open
+
+## DVT-30: Admin auth + TOTP MFA
+
+- **Scope**: `internal/adminauth/`, `cmd/admin-bootstrap`, `db/queries/saas/admin_auth.sql`, `migrations/saas/000004_admin_seed`
+- **Added**: 2026-07-07
+- **Needs**: staging VPS e2e with real Redis + RS256 keys; verify brute-force lockout and refresh rotation under load
 - **Status**: open

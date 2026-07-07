@@ -12,10 +12,18 @@ import (
 
 type Querier interface {
 	GetAPIKeyByHash(ctx context.Context, keyHash []byte) (GetAPIKeyByHashRow, error)
+	GetAdminMFASecret(ctx context.Context, adminID pgtype.UUID) (AdminMfaSecret, error)
+	GetAdminUserByEmail(ctx context.Context, email string) (AdminUser, error)
 	GetClientByID(ctx context.Context, id pgtype.UUID) (ApiClient, error)
 	GetUsageDaily(ctx context.Context, arg GetUsageDailyParams) (ApiUsageDaily, error)
+	GetValidRefreshToken(ctx context.Context, tokenHash []byte) (AdminRefreshToken, error)
 	InsertAPIClient(ctx context.Context, arg InsertAPIClientParams) (ApiClient, error)
 	InsertAPIKey(ctx context.Context, arg InsertAPIKeyParams) (InsertAPIKeyRow, error)
+	InsertAdminRefreshToken(ctx context.Context, arg InsertAdminRefreshTokenParams) (AdminRefreshToken, error)
+	RevokeRefreshToken(ctx context.Context, id pgtype.UUID) error
+	SetAdminMFAEnabled(ctx context.Context, arg SetAdminMFAEnabledParams) error
+	UpsertAdminMFASecret(ctx context.Context, arg UpsertAdminMFASecretParams) error
+	UpsertAdminUser(ctx context.Context, arg UpsertAdminUserParams) (AdminUser, error)
 	UpsertUsageDaily(ctx context.Context, arg UpsertUsageDailyParams) error
 }
 

@@ -31,7 +31,7 @@ Enterprise documentation for the OpenCNPJ platform.
 | [PERFORMANCE.md](PERFORMANCE.md) | Import tuning and API latency targets |
 | [ops/SAAS-VPS-DEPLOY.md](ops/SAAS-VPS-DEPLOY.md) | SaaS API on VPS (comerc.app.br) — templates only |
 | [ops/NGINX-SAAS.md](ops/NGINX-SAAS.md) | Nginx + Cloudflare for api/admin subdomains |
-| [ops/DUAL-DATABASE-VPS.md](ops/DUAL-DATABASE-VPS.md) | Two Postgres DBs on VPS (CNPJ + SaaS) |
+| [ops/ADMIN-AUTH.md](ops/ADMIN-AUTH.md) | Admin login, TOTP MFA, JWT, bootstrap CLI |
 | [api/QUICKSTART.md](api/QUICKSTART.md) | Customer API quickstart (CNPJ lookup) |
 | [api/OPENAPI.yaml](api/OPENAPI.yaml) | OpenAPI 3.1 spec (v1 CNPJ route) |
 | [benchmarks/README.md](benchmarks/README.md) | Benchmark suite overview |

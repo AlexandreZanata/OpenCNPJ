@@ -22,6 +22,9 @@ import (
 	"busca-cnpj-2026/internal/middleware"
 	"busca-cnpj-2026/internal/saas"
 	cnpjsvc "busca-cnpj-2026/internal/cnpj"
+	adminapp "busca-cnpj-2026/internal/adminauth/app"
+	adminhandlers "busca-cnpj-2026/internal/adminauth/handlers"
+	saasdb "busca-cnpj-2026/internal/db/saas"
 )
 
 // fiberPrometheusAdapter adapts Fiber's context to http.ResponseWriter for Prometheus.
@@ -188,6 +191,21 @@ func main() {
 
 	// Routes
 	handlers.RegisterV1Routes(app, searchHandler, exportHandler, lookupHandler, statsHandler, cnpjHandler, saasDeps)
+
+	if config.AppConfig.SaaS.Enabled && config.AppConfig.SaaS.AdminEnabled {
+		if database.RedisClient == nil {
+			log.Fatalf("Admin auth requires Redis (MFA challenges and brute-force guard)")
+		}
+		if database.SaaSPool == nil {
+			log.Fatalf("Admin auth requires SaaS database pool")
+		}
+		adminDeps, err := adminapp.Wire(context.Background(), saasdb.New(database.SaaSPool), database.RedisClient, config.AppConfig.SaaS)
+		if err != nil {
+			log.Fatalf("Failed to initialize admin auth: %v", err)
+		}
+		adminhandlers.RegisterRoutes(app, adminDeps.Handler, adminDeps.Signer)
+		log.Println("Admin auth routes enabled at /admin/api/v1")
+	}
 
 	// Root endpoint
 	app.Get("/", func(c *fiber.Ctx) error {

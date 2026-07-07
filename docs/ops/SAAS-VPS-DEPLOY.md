@@ -52,7 +52,8 @@ Detailed phased tasks: **`.local/03-saas-vps-comerc-api/TASKS.md`**
 2. **Phase 2:** Create `opencnpj_cnpj` + `opencnpj_saas` on VPS Postgres — [DUAL-DATABASE-VPS.md](DUAL-DATABASE-VPS.md)
 3. **Phase 11:** First CNPJ dump from local PC → restore on VPS.
 4. **Phase 3–4:** API keys + public CNPJ route.
-5. **Phase 5–6:** Admin MFA + panel on `opencnpj_saas`.
+5. **Phase 5:** Admin MFA — see [ADMIN-AUTH.md](ADMIN-AUTH.md)
+6. **Phase 6:** Admin panel on `opencnpj_saas`.
 6. **Monthly:** Repeat Phase 11 only for CNPJ data refresh.
 
 ### Apply SaaS migrations (VPS)
