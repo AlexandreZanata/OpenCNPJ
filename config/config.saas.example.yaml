@@ -1,0 +1,60 @@
+# SaaS production config (EXAMPLE — copy to server, do not commit secrets)
+# Copy: cp config/config.saas.example.yaml /etc/opencnpj/config.saas.yaml
+#
+# TWO databases on VPS:
+#   opencnpj_cnpj  — read-only CNPJ data (monthly dump from local PC)
+#   opencnpj_saas  — API keys, admin, usage (persistent, never replaced by dump)
+
+server:
+  host: "0.0.0.0"
+  port: 8081
+  prefork: false
+
+# CNPJ consulta DB — SELECT only (~80 GB, restored monthly from local pg_dump)
+database_cnpj:
+  # Override with CNPJ_DATABASE_URL env var
+  url: "postgres://opencnpj_reader:CHANGE_ME@127.0.0.1:5432/opencnpj_cnpj?sslmode=disable"
+  max_open_conns: 15
+  max_idle_conns: 5
+
+# SaaS metadata DB — read/write (< 500 MB, lives only on VPS)
+database_saas:
+  # Override with SAAS_DATABASE_URL env var
+  url: "postgres://opencnpj_saas:CHANGE_ME@127.0.0.1:5432/opencnpj_saas?sslmode=disable"
+  max_open_conns: 10
+  max_idle_conns: 3
+
+redis:
+  url: "redis://127.0.0.1:6381/0"
+
+cache:
+  enabled: true
+  l1_enabled: true
+  l1_max_cost_mb: 64
+  ttl_cnpj: 86400
+
+rate_limit:
+  enabled: true
+  max_requests: 6000
+  window_seconds: 60
+
+saas:
+  enabled: true
+  public_api_only: true
+  admin_enabled: true
+  admin_jwt_ttl_minutes: 15
+  admin_refresh_ttl_days: 30
+  mfa_required: true
+  mfa_totp_issuer: "OpenCNPJ-Admin"
+  default_client_rate_per_min: 60
+  default_monthly_quota: 0
+
+meilisearch:
+  enabled: false
+
+metrics:
+  enabled: true
+
+# Env vars (never in committed config on disk):
+#   CNPJ_DATABASE_URL, SAAS_DATABASE_URL
+#   MFA_SECRET_ENCRYPTION_KEY, ADMIN_JWT_*_KEY_PATH

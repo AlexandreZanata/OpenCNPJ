@@ -29,6 +29,9 @@ Enterprise documentation for the OpenCNPJ platform.
 | [IMPORT.md](IMPORT.md) | Full and sample data import |
 | [HARDWARE.md](HARDWARE.md) | RAM/CPU/disk tuning by machine |
 | [PERFORMANCE.md](PERFORMANCE.md) | Import tuning and API latency targets |
+| [ops/SAAS-VPS-DEPLOY.md](ops/SAAS-VPS-DEPLOY.md) | SaaS API on VPS (comerc.app.br) — templates only |
+| [api/QUICKSTART.md](api/QUICKSTART.md) | Customer API quickstart (CNPJ lookup) |
+| [api/OPENAPI.yaml](api/OPENAPI.yaml) | OpenAPI 3.1 spec (v1 CNPJ route) |
 | [benchmarks/README.md](benchmarks/README.md) | Benchmark suite overview |
 | [benchmarks/COMPARISON.md](benchmarks/COMPARISON.md) | Approach comparison results |
 | [benchmarks/HARDWARE-RTX4060-32GB.md](benchmarks/HARDWARE-RTX4060-32GB.md) | Import speed (32 GB RAM / RTX 4060) |

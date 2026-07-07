@@ -1,0 +1,77 @@
+openapi: 3.1.0
+info:
+  title: OpenCNPJ API
+  version: 1.0.0
+  description: |
+    Brazilian CNPJ lookup API (Receita Federal open data).
+    Authenticate with `X-API-Key` header.
+  license:
+    name: MIT OR Apache-2.0
+
+servers:
+  - url: https://api.comerc.app.br
+    description: Production (example — replace with your domain)
+
+security:
+  - ApiKeyAuth: []
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: "Format: ocnpj_live_<32 hex chars>"
+
+  schemas:
+    ErrorResponse:
+      type: object
+      required: [error, message, code]
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        code:
+          type: integer
+
+paths:
+  /api/v1/cnpj/{cnpj}:
+    get:
+      operationId: getCnpj
+      summary: Lookup establishment by CNPJ
+      description: Returns full establishment data for a 14-digit CNPJ.
+      parameters:
+        - name: cnpj
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^\d{14}$'
+          example: "00000000000191"
+      responses:
+        "200":
+          description: Establishment found
+        "400":
+          description: Invalid CNPJ format
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Missing or invalid API key
+        "404":
+          description: CNPJ not found
+        "429":
+          description: Rate limit or quota exceeded
+        "504":
+          description: Query timeout
+
+  /readyz:
+    get:
+      operationId: readiness
+      summary: Readiness probe
+      security: []
+      responses:
+        "200":
+          description: API and database ready

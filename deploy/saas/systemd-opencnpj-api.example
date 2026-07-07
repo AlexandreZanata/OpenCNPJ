@@ -1,0 +1,36 @@
+# systemd unit — OpenCNPJ API (EXAMPLE ONLY)
+#
+# Install:
+#   sudo cp deploy/saas/systemd-opencnpj-api.example /etc/systemd/system/opencnpj-api.service
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now opencnpj-api
+#
+# Secrets live in /etc/opencnpj/api.env (mode 600, not in repo).
+
+[Unit]
+Description=OpenCNPJ SaaS API
+After=network-online.target redis-server.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=opencnpj
+Group=opencnpj
+WorkingDirectory=/opt/opencnpj
+EnvironmentFile=/etc/opencnpj/api.env
+ExecStart=/usr/local/bin/opencnpj-api
+Restart=on-failure
+RestartSec=5
+LimitNOFILE=65536
+
+# Memory guard — adjust for your VPS
+MemoryMax=512M
+MemoryHigh=448M
+
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/log/opencnpj
+
+[Install]
+WantedBy=multi-user.target

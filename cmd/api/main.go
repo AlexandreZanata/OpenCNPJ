@@ -14,7 +14,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/healthcheck"
-	"github.com/gofiber/fiber/v2/middleware/timeout"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"busca-cnpj-2026/internal/config"
@@ -129,15 +128,15 @@ func main() {
 	app.Use(middleware.Metrics())
 	app.Use(middleware.ResponseCache())
 
-	// Health check
+	// Health check — /livez and /readyz (readyz pings all required Postgres pools)
 	app.Use(healthcheck.New(healthcheck.Config{
 		LivenessProbe: func(_ *fiber.Ctx) bool {
 			return true
 		},
-		ReadinessProbe: func(_ *fiber.Ctx) bool {
-			ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		ReadinessProbe: func(c *fiber.Ctx) bool {
+			ctx, cancel := context.WithTimeout(c.Context(), 2*time.Second)
 			defer cancel()
-			return database.DB.PingContext(ctx) == nil
+			return database.PostgresReady(ctx)
 		},
 	}))
 
@@ -167,30 +166,7 @@ func main() {
 	lookupHandler := handlers.NewLookupHandler()
 
 	// Routes
-	v1 := app.Group("/api/v1")
-
-	// Search routes (5s timeout on heavy fuzzy queries)
-	const searchTimeout = 5 * time.Second
-	v1.Get("/empresas/search", timeout.NewWithContext(searchHandler.SearchEmpresas, searchTimeout))
-	v1.Get("/estabelecimentos/search", timeout.NewWithContext(searchHandler.SearchEstabelecimentos, searchTimeout))
-	v1.Get("/estabelecimentos/:cnpj", searchHandler.GetEstabelecimentoByCNPJ)
-
-	// Export routes
-	v1.Post("/export/csv", exportHandler.ExportCSV)
-	v1.Post("/export/phones", exportHandler.ExportPhones)
-	v1.Get("/export/categories", exportHandler.ListExportCategories)
-
-	v1.Get("/lookup/sectors", lookupHandler.SearchSectors)
-	v1.Get("/lookup/cnae", lookupHandler.SearchCNAE)
-	v1.Get("/lookup/municipio", lookupHandler.SearchMunicipios)
-	v1.Get("/lookup/nome-fantasia", lookupHandler.SearchNomeFantasia)
-	v1.Get("/lookup/uf", lookupHandler.SearchUF)
-
-	// Stats routes
-	v1.Get("/stats/cnae", statsHandler.StatsPerCNAE)
-	v1.Get("/stats/uf", statsHandler.StatsPerUF)
-	v1.Get("/stats/cnae/:cnae/uf", statsHandler.StatsPerCNAEAndUF)
-	v1.Get("/analytics/summary", statsHandler.AnalyticsSummary)
+	handlers.RegisterV1Routes(app, searchHandler, exportHandler, lookupHandler, statsHandler)
 
 	// Root endpoint
 	app.Get("/", func(c *fiber.Ctx) error {

@@ -22,6 +22,7 @@ Sequential IDs for new features that still need production-grade automated tests
 | DVT-17 | Meilisearch indexer and search delegation | partial |
 | DVT-18 | CI automated API perf validation gate | open |
 | DVT-19 | OpenCNPJ plan 02 Phase 0 advanced baseline gate | open |
+| DVT-27 | SaaS dual-database VPS mode | open |
 
 ## DVT-01: CNPJ open-data downloader (WebDAV)
 
@@ -203,4 +204,11 @@ Sequential IDs for new features that still need production-grade automated tests
 - **Scope**: `internal/repository/export_limits.go`, `internal/handlers/export_handler.go`, `scripts/benchmark_export.sh`, `docs/benchmarks/2026-06-25-export-throughput.md`
 - **Added**: 2026-06-25
 - **Needs**: e2e export 500k on VPS with timeout/load test; UI `ExportPanel` limit parity
+- **Status**: open
+
+## DVT-27: SaaS dual-database VPS mode
+
+- **Scope**: `internal/config/saas.go`, `internal/database/postgres_dual.go`, `migrations/saas/`, `config/config.saas.example.yaml`, `cmd/migrate --saas`
+- **Added**: 2026-07-07
+- **Needs**: integration test with testcontainers (two Postgres DBs); e2e `readyz` + `public_api_only` route gate on staging VPS
 - **Status**: open

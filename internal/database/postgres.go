@@ -1,13 +1,10 @@
 package database
 
 import (
-	"context"
 	"database/sql"
 	"errors"
 	"fmt"
-	"runtime"
 	"sync"
-	"time"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
@@ -32,44 +29,16 @@ func init() {
 	}
 }
 
-func InitPostgres() error {
-	return initPostgresWithDSN(config.GetDSN())
-}
-
 func InitPostgresForMigrate() error {
-	return initPostgresWithDSN(config.GetMigrateDSN())
+	return initPostgresWithDSN(config.GetMigrateDSN(), config.AppConfig.Database.AsPoolConfig())
 }
 
-func initPostgresWithDSN(dsn string) error {
+func initPostgresWithDSN(dsn string, pool config.PoolConfig) error {
 	var err error
-	DB, err = sql.Open("postgres", dsn)
+	DB, err = openPostgresPool(dsn, pool)
 	if err != nil {
 		return fmt.Errorf("failed to open database: %w", err)
 	}
-
-	// Configure connection pool
-	maxOpenConns := config.AppConfig.Database.MaxOpenConns
-	if maxOpenConns == 0 {
-		maxOpenConns = runtime.NumCPU() * 4
-	}
-	maxIdleConns := config.AppConfig.Database.MaxIdleConns
-	if maxIdleConns == 0 {
-		maxIdleConns = runtime.NumCPU() * 2
-	}
-
-	DB.SetMaxOpenConns(maxOpenConns)
-	DB.SetMaxIdleConns(maxIdleConns)
-	DB.SetConnMaxLifetime(time.Duration(config.AppConfig.Database.ConnMaxLifetime) * time.Second)
-	DB.SetConnMaxIdleTime(time.Duration(config.AppConfig.Database.ConnMaxIdleTime) * time.Second)
-
-	// Test connection
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	if err := DB.PingContext(ctx); err != nil {
-		return fmt.Errorf("failed to ping database: %w", err)
-	}
-
 	return nil
 }
 
@@ -95,10 +64,26 @@ func RunMigrations() error {
 	return nil
 }
 
-func ClosePostgres() error {
-	if DB != nil {
-		return DB.Close()
+// RunSaasMigrations applies migrations from migrations/saas (opencnpj_saas only).
+func RunSaasMigrations() error {
+	driver, err := postgres.WithInstance(DB, &postgres.Config{})
+	if err != nil {
+		return fmt.Errorf("failed to create migration driver: %w", err)
 	}
+
+	m, err := migrate.NewWithDatabaseInstance(
+		"file://migrations/saas",
+		"postgres",
+		driver,
+	)
+	if err != nil {
+		return fmt.Errorf("failed to create migrate instance: %w", err)
+	}
+
+	if err := m.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
+		return fmt.Errorf("failed to run saas migrations: %w", err)
+	}
+
 	return nil
 }
 

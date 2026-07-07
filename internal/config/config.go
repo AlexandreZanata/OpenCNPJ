@@ -12,6 +12,9 @@ import (
 
 type Config struct {
 	Database    DatabaseConfig
+	DatabaseCNPJ DatabaseURLConfig
+	DatabaseSaaS DatabaseURLConfig
+	SaaS        SaasConfig
 	Redis       RedisConfig
 	ClickHouse  ClickHouseConfig
 	Meilisearch MeilisearchConfig
@@ -36,6 +39,7 @@ type DatabaseConfig struct {
 }
 
 type RedisConfig struct {
+	URL      string
 	Host     string
 	Port     int
 	Password string
@@ -117,7 +121,14 @@ func Load() error {
 		}
 	}
 
+	applySaasRateLimitDefaults()
+
+	saasCfg, dbCNPJ, dbSaaS := loadSaasFromViper()
+
 	AppConfig = &Config{
+		SaaS:         saasCfg,
+		DatabaseCNPJ: dbCNPJ,
+		DatabaseSaaS: dbSaaS,
 		Database: DatabaseConfig{
 			Host:            viper.GetString("database.host"),
 			Port:            viper.GetInt("database.port"),
@@ -131,13 +142,7 @@ func Load() error {
 			ConnMaxLifetime: viper.GetInt("database.conn_max_lifetime"),
 			ConnMaxIdleTime: viper.GetInt("database.conn_max_idle_time"),
 		},
-		Redis: RedisConfig{
-			Host:     viper.GetString("redis.host"),
-			Port:     viper.GetInt("redis.port"),
-			Password: viper.GetString("redis.password"),
-			DB:       viper.GetInt("redis.db"),
-			PoolSize: viper.GetInt("redis.pool_size"),
-		},
+		Redis: loadRedisConfig(),
 		ClickHouse: ClickHouseConfig{
 			Host:     viper.GetString("clickhouse.host"),
 			Port:     viper.GetInt("clickhouse.port"),
@@ -157,8 +162,8 @@ func Load() error {
 			Prefork:                viper.GetBool("server.prefork"),
 			ReadBufferSize:         viper.GetInt("server.read_buffer_size"),
 			WriteBufferSize:        viper.GetInt("server.write_buffer_size"),
-			RateLimitMax:           viper.GetInt("server.rate_limit_max"),
-			RateLimitWindowSeconds: viper.GetInt("server.rate_limit_window_seconds"),
+			RateLimitMax:           resolveRateLimitMax(),
+			RateLimitWindowSeconds: resolveRateLimitWindow(),
 		},
 		Import: ImportConfig{
 			Workers:        viper.GetInt("import.workers"),
@@ -206,6 +211,33 @@ func Load() error {
 	}
 
 	return nil
+}
+
+func loadRedisConfig() RedisConfig {
+	cfg := RedisConfig{
+		URL:      firstNonEmpty(os.Getenv("REDIS_URL"), viper.GetString("redis.url")),
+		Host:     viper.GetString("redis.host"),
+		Port:     viper.GetInt("redis.port"),
+		Password: viper.GetString("redis.password"),
+		DB:       viper.GetInt("redis.db"),
+		PoolSize: viper.GetInt("redis.pool_size"),
+	}
+	applyRedisURLDefaults(&cfg)
+	return cfg
+}
+
+func applyRedisURLDefaults(cfg *RedisConfig) {
+	if cfg.URL == "" {
+		return
+	}
+	host, port, password, db, err := parseRedisURL(cfg.URL)
+	if err != nil {
+		return
+	}
+	cfg.Host = host
+	cfg.Port = port
+	cfg.Password = password
+	cfg.DB = db
 }
 
 func setDefaults() {
@@ -266,6 +298,16 @@ func setDefaults() {
 
 	viper.SetDefault("logging.level", "info")
 	viper.SetDefault("logging.format", "json")
+
+	viper.SetDefault("saas.enabled", false)
+	viper.SetDefault("saas.public_api_only", false)
+	viper.SetDefault("saas.admin_enabled", false)
+	viper.SetDefault("saas.admin_jwt_ttl_minutes", 15)
+	viper.SetDefault("saas.admin_refresh_ttl_days", 30)
+	viper.SetDefault("saas.mfa_required", true)
+	viper.SetDefault("saas.mfa_totp_issuer", "OpenCNPJ-Admin")
+	viper.SetDefault("saas.default_client_rate_per_min", 60)
+	viper.SetDefault("saas.default_monthly_quota", 0)
 
 	// Load .env file if exists - use godotenv or manual loading
 	if _, err := os.Stat(".env"); err == nil {
