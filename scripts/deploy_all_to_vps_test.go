@@ -26,7 +26,10 @@ func TestDeployAllScriptContainsSteps(t *testing.T) {
 		t.Fatal(err)
 	}
 	text := string(data)
-	for _, needle := range []string{"pg_dump", "opencnpj-api", "vps_first_deploy.sh", "credentials.txt", "migrations/", "API_ONLY=1"} {
+	for _, needle := range []string{
+		"pg_dump", "opencnpj-api", "vps_first_deploy.sh",
+		"credentials.txt", "migrations/", "API_ONLY=1",
+	} {
 		if !strings.Contains(text, needle) {
 			t.Fatalf("missing %q", needle)
 		}
