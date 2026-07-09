@@ -72,6 +72,13 @@ data/system_guard.log
 # Optional local agent overrides
 .local/
 
+# Local docker-compose tuning (host-specific RAM profile)
+docker-compose.override.yml
+
+# VPS deploy credentials (fetched locally by deploy scripts — never commit)
+opencnpj-credentials-*.txt
+.deploy-staging/
+
 # VPS — real host configs only on the server (repo ships *.example templates)
 deploy/vps/*
 !deploy/vps/README.md

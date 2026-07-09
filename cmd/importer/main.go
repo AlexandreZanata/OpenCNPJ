@@ -38,6 +38,7 @@ func run() error {
 	skipSocios := flag.Bool("skip-socios", false, "Skip socios")
 	skipSimples := flag.Bool("skip-simples", false, "Skip simples")
 	noClean := flag.Bool("no-clean", false, "Do not truncate tables before import")
+	refsOnly := flag.Bool("refs-only", false, "Load reference tables only (VPS restore)")
 	flag.Parse()
 
 	if err := config.Load(); err != nil {
@@ -73,6 +74,7 @@ func run() error {
 		SkipSocios:           *skipSocios,
 		SkipSimples:          *skipSimples,
 		NoClean:              *noClean,
+		RefsOnly:             *refsOnly,
 	}
 
 	logger.Printf("import started sample=%d%% path=%s", opts.SamplePercent, opts.DataPath)

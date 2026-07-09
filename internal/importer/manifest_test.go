@@ -33,6 +33,27 @@ func TestDiscoverDatasetFindsCoreFiles(t *testing.T) {
 	}
 }
 
+func TestDiscoverReferencesFindsLookupFiles(t *testing.T) {
+	dir := t.TempDir()
+	names := []string{
+		"F.K03200$Z.D60509.NATJUCSV",
+		"F.K03200$Z.D60509.QUALSCSV",
+	}
+	for _, name := range names {
+		if err := os.WriteFile(filepath.Join(dir, name), []byte("x"), 0o600); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	ds, err := DiscoverReferences(dir)
+	if err != nil {
+		t.Fatalf("DiscoverReferences: %v", err)
+	}
+	if ds.Naturezas == "" || ds.Qualificacoes == "" {
+		t.Fatalf("unexpected refs dataset: %+v", ds)
+	}
+}
+
 func TestRowLimitFullSample(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "sample.csv")

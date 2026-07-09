@@ -290,3 +290,10 @@ Sequential IDs for new features that still need production-grade automated tests
 - **Added**: 2026-07-07
 - **Needs**: staging VPS p95 CNPJ lookup < 150 ms cache miss; API key middleware < 5 ms p95; post-restore EXPLAIN on production-size copy
 - **Status**: open
+
+## DVT-38: VPS one-shot deploy scripts (PC → VPS)
+
+- **Scope**: `scripts/deploy_all_to_vps.sh`, `scripts/vps_first_deploy.sh`, `scripts/pc_to_vps_sync.sh`, `cmd/seed-saas/`, `internal/importer` `--refs-only`
+- **Added**: 2026-07-09
+- **Needs**: full empty-VPS → working API e2e on staging; verify no secrets in git; monthly re-sync smoke after second dump
+- **Status**: open

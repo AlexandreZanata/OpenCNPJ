@@ -27,6 +27,9 @@ type Runner struct {
 }
 
 func (r *Runner) Run(ctx context.Context) (Result, error) {
+	if r.Opts.RefsOnly {
+		return r.runRefsOnly(ctx)
+	}
 	started := time.Now()
 	ds, err := DiscoverDataset(r.Opts.DataPath)
 	if err != nil {
@@ -68,6 +71,21 @@ func (r *Runner) Run(ctx context.Context) (Result, error) {
 
 	r.Logger.Printf("import finished rows=%d elapsed=%s", total, elapsed.Round(time.Millisecond))
 	return Result{TotalRows: total, Elapsed: elapsed, Timings: &timings}, nil
+}
+
+func (r *Runner) runRefsOnly(ctx context.Context) (Result, error) {
+	started := time.Now()
+	ds, err := DiscoverReferences(r.Opts.DataPath)
+	if err != nil {
+		return Result{}, err
+	}
+	r.Logger.Printf("import: loading reference tables only")
+	if err := ImportReferences(ctx, ds, r.Copier); err != nil {
+		return Result{}, err
+	}
+	elapsed := time.Since(started)
+	r.Logger.Printf("import finished refs-only elapsed=%s", elapsed.Round(time.Millisecond))
+	return Result{Elapsed: elapsed}, nil
 }
 
 func (r *Runner) importStages(ctx context.Context, ds Dataset, timings *Timings) (int64, error) {

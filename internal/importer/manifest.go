@@ -23,7 +23,7 @@ type Dataset struct {
 	Qualificacoes    string
 }
 
-func DiscoverDataset(dir string) (Dataset, error) {
+func discoverFiles(dir string) (Dataset, error) {
 	entries, err := os.ReadDir(dir)
 	if err != nil {
 		return Dataset{}, fmt.Errorf("read data dir: %w", err)
@@ -63,9 +63,29 @@ func DiscoverDataset(dir string) (Dataset, error) {
 	ds.Empresas = pickLatestByPartition(ds.Empresas)
 	ds.Estabelecimentos = pickLatestByPartition(ds.Estabelecimentos)
 	ds.Socios = pickLatestByPartition(ds.Socios)
+	return ds, nil
+}
 
+func DiscoverDataset(dir string) (Dataset, error) {
+	ds, err := discoverFiles(dir)
+	if err != nil {
+		return ds, err
+	}
 	if len(ds.Empresas) == 0 {
 		return ds, fmt.Errorf("%w: %s", ErrNoEmpresasFiles, dir)
+	}
+	return ds, nil
+}
+
+// DiscoverReferences finds lookup CSV files without requiring fact-table dumps.
+func DiscoverReferences(dir string) (Dataset, error) {
+	ds, err := discoverFiles(dir)
+	if err != nil {
+		return ds, err
+	}
+	if ds.CNAEs == "" && ds.Motivos == "" && ds.Municipios == "" &&
+		ds.Naturezas == "" && ds.Paises == "" && ds.Qualificacoes == "" {
+		return ds, fmt.Errorf("no reference CSV files in %s", dir)
 	}
 	return ds, nil
 }

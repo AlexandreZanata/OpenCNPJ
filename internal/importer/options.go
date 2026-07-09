@@ -15,4 +15,5 @@ type Options struct {
 	SkipSocios           bool
 	SkipSimples          bool
 	NoClean              bool
+	RefsOnly             bool
 }

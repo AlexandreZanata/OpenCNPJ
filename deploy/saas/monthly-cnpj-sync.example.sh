@@ -147,7 +147,10 @@ create_staging_db() {
 restore_staging() {
   local dump
   dump="$(incoming_dump)"
-  run_cmd "$PG_RESTORE" -j "$RESTORE_JOBS" --no-owner --no-acl -d "$STAGING_DB" "$dump"
+  run_cmd "$PG_RESTORE" --section=pre-data --no-owner --no-acl -d "$STAGING_DB" "$dump"
+  PGOPTIONS="-c session_replication_role=replica" \
+    run_cmd "$PG_RESTORE" --section=data -j "$RESTORE_JOBS" --no-owner --no-acl -d "$STAGING_DB" "$dump"
+  run_cmd "$PG_RESTORE" --section=post-data --no-owner --no-acl -d "$STAGING_DB" "$dump"
 }
 
 validate_staging() {
