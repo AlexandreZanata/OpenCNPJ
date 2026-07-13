@@ -230,6 +230,7 @@ func main() {
 		if err != nil {
 			log.Fatalf("Failed to initialize admin panel: %v", err)
 		}
+		adminpanel.RegisterAPIRoutes(app, panel, adminDeps.Signer, config.AppConfig.SaaS.AdminHost)
 		if err := adminpanel.RegisterRoutes(app, panel, config.AppConfig.SaaS.AdminHost); err != nil {
 			log.Fatalf("Failed to register admin panel routes: %v", err)
 		}

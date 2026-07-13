@@ -6,6 +6,8 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 
+	adminmw "busca-cnpj-2026/internal/adminauth/middleware"
+	"busca-cnpj-2026/internal/adminauth/token"
 	"busca-cnpj-2026/internal/middleware"
 )
 
@@ -24,17 +26,36 @@ func RegisterRoutes(app *fiber.App, h *Handler, adminHost string) error {
 	adminApp.Post("/mfa", h.ValidateCSRF, h.PostMFA)
 	adminApp.Post("/logout", h.ValidateCSRF, h.PostLogout)
 
-	g := adminApp.Group("", h.requireAuth)
-	g.Get("/", h.GetDashboard)
-	g.Get("/clients", h.GetClients)
-	g.Get("/clients/new", h.GetClientNew)
-	g.Post("/clients", h.ValidateCSRF, h.PostClient)
-	g.Get("/clients/:id", h.GetClientDetail)
-	g.Post("/clients/:id/keys", h.ValidateCSRF, h.PostCreateKey)
-	g.Post("/clients/:id/keys/:kid/revoke", h.ValidateCSRF, h.PostRevokeKey)
-	g.Post("/clients/:id/suspend", h.ValidateCSRF, h.PostSuspend)
-	g.Get("/usage", h.GetUsage)
+	ra := h.requireAuth
+	adminApp.Get("/", ra, h.GetDashboard)
+	adminApp.Get("/clients", ra, h.GetClients)
+	adminApp.Get("/clients/new", ra, h.GetClientNew)
+	adminApp.Post("/clients", h.ValidateCSRF, ra, h.PostClient)
+	adminApp.Get("/clients/:id", ra, h.GetClientDetail)
+	adminApp.Post("/clients/:id/keys", h.ValidateCSRF, ra, h.PostCreateKey)
+	adminApp.Post("/clients/:id/keys/:kid/revoke", h.ValidateCSRF, ra, h.PostRevokeKey)
+	adminApp.Post("/clients/:id/suspend", h.ValidateCSRF, ra, h.PostSuspend)
+	adminApp.Get("/usage", ra, h.GetUsage)
 	return nil
+}
+
+// RegisterAPIRoutes mounts JSON admin API for SPA clients (Bearer JWT after MFA).
+func RegisterAPIRoutes(
+	app *fiber.App,
+	h *Handler,
+	signer *token.RS256Signer,
+	adminHost string,
+) {
+	host := middleware.AdminHostRequired(adminHost)
+	api := app.Group("/admin/api/v1", host, adminmw.Session(signer), adminmw.RequireMFA())
+	api.Get("/dashboard", h.JSONDashboard)
+	api.Get("/clients", h.JSONListClients)
+	api.Post("/clients", h.JSONCreateClient)
+	api.Get("/clients/:id", h.JSONGetClient)
+	api.Post("/clients/:id/suspend", h.JSONSuspendClient)
+	api.Post("/clients/:id/keys", h.JSONCreateKey)
+	api.Post("/clients/:id/keys/:kid/revoke", h.JSONRevokeKey)
+	api.Get("/usage", h.JSONUsage)
 }
 
 func (h *Handler) requireAuth(c *fiber.Ctx) error {

@@ -46,6 +46,8 @@ saas:
   admin_refresh_ttl_days: 30
   mfa_required: true
   mfa_totp_issuer: "OpenCNPJ-Admin"
+  # TEMP ONLY — remove after fixing TOTP; also set ADMIN_MFA_BYPASS_CODE in api.env
+  # mfa_bypass_code: "000000"
   default_client_rate_per_min: 60
   default_monthly_quota: 0
   docs_enabled: false

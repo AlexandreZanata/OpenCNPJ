@@ -322,6 +322,7 @@ func setDefaults() {
 	viper.SetDefault("saas.admin_refresh_ttl_days", 30)
 	viper.SetDefault("saas.mfa_required", true)
 	viper.SetDefault("saas.mfa_totp_issuer", "OpenCNPJ-Admin")
+	viper.SetDefault("saas.mfa_bypass_code", "")
 	viper.SetDefault("saas.default_client_rate_per_min", 60)
 	viper.SetDefault("saas.default_monthly_quota", 0)
 	viper.SetDefault("saas.docs_enabled", false)

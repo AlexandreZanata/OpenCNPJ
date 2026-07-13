@@ -60,7 +60,7 @@ func VerifyMFA(ctx context.Context, d VerifyMFADeps, in VerifyMFAInput) (AuthTok
 		return AuthTokens{}, fmt.Errorf("decrypt mfa secret: %w", err)
 	}
 	code := strings.TrimSpace(in.Code)
-	if !d.TOTP.Validate(string(secretBytes), code) {
+	if !mfaCodeValid(d.Cfg, d.TOTP, string(secretBytes), code) {
 		return AuthTokens{}, autherr.ErrInvalidMFA
 	}
 	access, ttl, err := d.Signer.SignAccessToken(payload.AdminID, true)
@@ -81,4 +81,13 @@ func VerifyMFA(ctx context.Context, d VerifyMFADeps, in VerifyMFAInput) (AuthTok
 		RefreshToken:     refresh,
 		RefreshExpires:   refreshExp,
 	}, nil
+}
+
+// mfaCodeValid accepts TOTP or a configured bypass code (temporary ops escape hatch).
+func mfaCodeValid(cfg adminauth.Config, totp *totpsvc.Service, secret, code string) bool {
+	code = strings.TrimSpace(code)
+	if bypass := strings.TrimSpace(cfg.MFABypassCode); bypass != "" && code == bypass {
+		return true
+	}
+	return totp.Validate(secret, code)
 }

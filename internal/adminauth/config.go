@@ -19,6 +19,7 @@ type Config struct {
 	MaxLoginFailures    int
 	LockoutMinutes      int
 	Role                string
+	MFABypassCode       string // TEMP: set via ADMIN_MFA_BYPASS_CODE or saas.mfa_bypass_code; remove in production
 }
 
 // LoadConfig reads admin auth settings from environment variables.
@@ -49,6 +50,7 @@ func LoadConfig(accessTTLMin, refreshTTLDays int, totpIssuer string) (Config, er
 	if totpIssuer == "" {
 		totpIssuer = "OpenCNPJ-Admin"
 	}
+	bypass := strings.TrimSpace(os.Getenv("ADMIN_MFA_BYPASS_CODE"))
 	return Config{
 		JWTPrivateKeyPath:   priv,
 		JWTPublicKeyPath:    pub,
@@ -61,5 +63,6 @@ func LoadConfig(accessTTLMin, refreshTTLDays int, totpIssuer string) (Config, er
 		MaxLoginFailures:    5,
 		LockoutMinutes:      15,
 		Role:                "super_admin",
+		MFABypassCode:       bypass,
 	}, nil
 }

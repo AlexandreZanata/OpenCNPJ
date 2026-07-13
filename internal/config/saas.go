@@ -25,6 +25,7 @@ type SaasConfig struct {
 	AdminRefreshTTLDays  int
 	MFARequired          bool
 	MFATOTPIssuer        string
+	MFABypassCode        string
 	DefaultClientRateMin int
 	DefaultMonthlyQuota  int
 	DocsEnabled          bool
@@ -48,6 +49,7 @@ func loadSaasFromViper() (SaasConfig, DatabaseURLConfig, DatabaseURLConfig) {
 		AdminRefreshTTLDays:  viper.GetInt("saas.admin_refresh_ttl_days"),
 		MFARequired:          viper.GetBool("saas.mfa_required"),
 		MFATOTPIssuer:        viper.GetString("saas.mfa_totp_issuer"),
+		MFABypassCode:        viper.GetString("saas.mfa_bypass_code"),
 		DefaultClientRateMin: viper.GetInt("saas.default_client_rate_per_min"),
 		DefaultMonthlyQuota:  viper.GetInt("saas.default_monthly_quota"),
 		DocsEnabled:          viper.GetBool("saas.docs_enabled"),

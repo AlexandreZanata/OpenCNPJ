@@ -1,0 +1,29 @@
+---
+description: Agent must confirm before risky actions (sudo, VPS, secrets, push)
+alwaysApply: true
+---
+
+# Agent approval harness
+
+## Run mode (user IDE)
+
+User runs Cursor in **Auto-review** — never **Run Everything** for this project.
+
+## MUST ask (approval card) before
+
+- `sudo`, `ssh`, `scp`, `rsync` to VPS or any remote host
+- `git push`, force git operations, production deploy scripts
+- Reading or printing credential files (`credentials.txt`, `.env`, JWT keys)
+- Installing system packages (`apt`, `snap`) unless user asked in the same message
+- Changing nginx, systemd, or Docker on VPS
+
+## Safe without extra prompt (still subject to Cursor classifier)
+
+- `go test`, `go vet`, `golangci-lint`, local `git diff` / `git status`
+- Editing files in this repo per user request
+
+## Sudo on Linux
+
+Agent terminals are non-interactive. User enables **Legacy Terminal Tool** in Cursor Settings for password prompts when approving a command.
+
+Prefer **scoped** `NOPASSWD` in `/etc/sudoers.d/cursor-agent` — never `NOPASSWD: ALL`.

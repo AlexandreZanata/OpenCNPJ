@@ -1,0 +1,14 @@
+{
+  "autoRun": {
+    "allow_instructions": [
+      "Read-only commands: git status, git diff, git log, go test, go vet, golangci-lint, curl GET health checks.",
+      "Local file reads and repo searches without network side effects."
+    ],
+    "block_instructions": [
+      "Always surface approval for sudo, ssh, scp, rsync to remote hosts, and any production/VPS mutation.",
+      "Always surface approval for git push, git reset --hard, DROP DATABASE, docker volume rm, and credential file reads.",
+      "Block autonomous runs that print secrets (API keys, passwords, TOTP, private keys) unless the user explicitly asked.",
+      "Block npm/pnpm publish, gh repo create, and Vercel deploy without explicit user confirmation in the same turn."
+    ]
+  }
+}

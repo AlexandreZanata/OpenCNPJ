@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -38,6 +39,9 @@ func Wire(_ context.Context, queries saasdb.Querier, rdb *redis.Client, saasCfg 
 	cfg, err := adminauth.LoadConfig(saasCfg.AdminJWTTTLMinutes, saasCfg.AdminRefreshTTLDays, saasCfg.MFATOTPIssuer)
 	if err != nil {
 		return nil, err
+	}
+	if cfg.MFABypassCode == "" {
+		cfg.MFABypassCode = strings.TrimSpace(saasCfg.MFABypassCode)
 	}
 	signer, err := token.NewRS256Signer(
 		cfg.JWTPrivateKeyPath,

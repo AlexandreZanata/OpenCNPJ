@@ -291,7 +291,21 @@ Sequential IDs for new features that still need production-grade automated tests
 - **Needs**: staging VPS p95 CNPJ lookup < 150 ms cache miss; API key middleware < 5 ms p95; post-restore EXPLAIN on production-size copy
 - **Status**: open
 
-## DVT-38: VPS one-shot deploy scripts (PC → VPS)
+## DVT-39: Admin SPA JSON API + Vercel panel
+
+- **Scope**: `internal/handlers/admin/json_*.go`, external repo `opencnpj-admin-panel`
+- **Added**: 2026-07-09
+- **Needs**: deploy JSON routes to VPS; e2e login → create client → generate key from Vercel SPA
+- **Status**: open
+
+## DVT-40: CLI create-api-key for ops test keys
+
+- **Scope**: `cmd/create-api-key/`
+- **Added**: 2026-07-10
+- **Needs**: integration test against staging SaaS DB; document in ops runbook
+- **Status**: open
+
+## DVT-38: VPS deploy pipeline (PC → VPS one-shot)
 
 - **Scope**: `scripts/deploy_all_to_vps.sh`, `scripts/vps_first_deploy.sh`, `scripts/pc_to_vps_sync.sh`, `cmd/seed-saas/`, `internal/importer` `--refs-only`
 - **Added**: 2026-07-09
