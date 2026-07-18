@@ -31,6 +31,7 @@ Sequential IDs for new features that still need production-grade automated tests
 | DVT-35 | SaaS production deploy runbook (Phase 10) | open |
 | DVT-36 | Monthly CNPJ sync local PC → VPS (Phase 11) | open |
 | DVT-37 | Data access & API performance stack (Phase 12) | open |
+| DVT-41 | CNPJ lookup LEFT JOIN + 50-CNPJ E2E fixture | open |
 
 ## DVT-01: CNPJ open-data downloader (WebDAV)
 
@@ -310,4 +311,11 @@ Sequential IDs for new features that still need production-grade automated tests
 - **Scope**: `scripts/deploy_all_to_vps.sh`, `scripts/vps_first_deploy.sh`, `scripts/pc_to_vps_sync.sh`, `cmd/seed-saas/`, `internal/importer` `--refs-only`
 - **Added**: 2026-07-09
 - **Needs**: full empty-VPS → working API e2e on staging; verify no secrets in git; monthly re-sync smoke after second dump
+- **Status**: open
+
+## DVT-41: CNPJ lookup LEFT JOIN + 50-CNPJ E2E fixture
+
+- **Scope**: `db/queries/cnpj/estabelecimento.sql`, `testdata/e2e/cnpj_lookup_50.json`, `scripts/e2e_cnpj_lookup_validation.sh`
+- **Added**: 2026-07-18
+- **Needs**: scheduled CI job hitting staging with API key secret; repair missing `empresas` orphans in monthly sync
 - **Status**: open

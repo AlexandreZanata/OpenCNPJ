@@ -26,7 +26,7 @@ const estabelecimentoCompletoSelect = `
 
 const estabelecimentoCompletoFrom = `
 		FROM estabelecimentos e
-		INNER JOIN empresas emp ON e.cnpj_basico = emp.cnpj_basico
+		LEFT JOIN empresas emp ON e.cnpj_basico = emp.cnpj_basico
 		LEFT JOIN cnaes c ON e.cnae_fiscal_principal = c.codigo
 		LEFT JOIN municipios m ON e.municipio = m.codigo
 		LEFT JOIN motivos mot ON e.motivo_situacao_cadastral = mot.codigo

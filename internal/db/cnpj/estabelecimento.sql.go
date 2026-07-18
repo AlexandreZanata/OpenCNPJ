@@ -35,7 +35,7 @@ SELECT
     e.email,
     COALESCE(emp.razao_social, '') AS razao_social
 FROM estabelecimentos e
-INNER JOIN empresas emp ON e.cnpj_basico = emp.cnpj_basico
+LEFT JOIN empresas emp ON e.cnpj_basico = emp.cnpj_basico
 LEFT JOIN cnaes c ON e.cnae_fiscal_principal = c.codigo
 LEFT JOIN municipios m ON e.municipio = m.codigo
 WHERE e.cnpj_completo = $1
