@@ -47,7 +47,7 @@ func secondsOrDefault(seconds int, fallback time.Duration) time.Duration {
 func (p cacheTTLProfile) forKey(key string) time.Duration {
 	prefix := cacheKeyPrefix(key)
 	switch {
-	case prefix == "estabelecimento":
+	case strings.HasPrefix(key, "public:cnpj:"), prefix == "estabelecimento":
 		return p.cnpjTTL
 	case prefix == "empresas" || prefix == "estabelecimentos":
 		return p.searchTTL

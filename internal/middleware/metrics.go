@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -46,13 +47,23 @@ func Metrics() fiber.Handler {
 		duration := time.Since(start).Seconds()
 		status := strconv.Itoa(c.Response().StatusCode())
 		method := c.Method()
-		path := c.Path()
+		path := normalizeMetricsEndpoint(c.Route().Path, c.Path())
 
 		httpRequestsTotal.WithLabelValues(method, path, status).Inc()
 		httpRequestDuration.WithLabelValues(method, path).Observe(duration)
 
 		return err
 	}
+}
+
+func normalizeMetricsEndpoint(routePath, rawPath string) string {
+	if routePath != "" && routePath != "/" {
+		return routePath
+	}
+	if strings.HasPrefix(rawPath, "/api/v1/cnpj/") {
+		return "/api/v1/cnpj/:cnpj"
+	}
+	return rawPath
 }
 
 func RecordQueryDuration(queryType string, duration time.Duration) {

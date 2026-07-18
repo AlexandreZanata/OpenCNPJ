@@ -7,7 +7,7 @@ const Phase12DataAccessDoc = "docs/ops/DATA-ACCESS-PERFORMANCE.md"
 const Phase12GateScript = "scripts/saas_data_access_gate.sh"
 
 // MaxCNPJLookupFanOut is the errgroup goroutine budget for GET /api/v1/cnpj/:cnpj.
-const MaxCNPJLookupFanOut = 4
+const MaxCNPJLookupFanOut = 3
 
 // Phase12RequiredFiles must exist for the data-access gate.
 var Phase12RequiredFiles = []string{

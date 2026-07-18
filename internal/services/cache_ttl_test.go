@@ -24,6 +24,7 @@ func TestCacheTTLForKey(t *testing.T) {
 		want time.Duration
 	}{
 		{"estabelecimento:cnpj:v2:123", 24 * time.Hour},
+		{"public:cnpj:v2:00000000000191", 24 * time.Hour},
 		{"empresas:search:v4:abc", 5 * time.Minute},
 		{"estabelecimentos:search:v4:abc", 5 * time.Minute},
 		{"stats:uf", time.Hour},

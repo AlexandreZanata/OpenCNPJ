@@ -12,6 +12,7 @@ import (
 )
 
 const searchTimeout = 5 * time.Second
+const cnpjLookupTimeout = 3 * time.Second
 
 // RegisterV1Routes mounts API v1 routes according to SaaS config.
 func RegisterV1Routes(
@@ -32,14 +33,15 @@ func RegisterV1Routes(
 		if cnpj == nil {
 			panic("cnpj handler required when saas.public_api_only is enabled")
 		}
-		v1.Get("/cnpj/:cnpj", cnpj.Get)
+		v1.Get("/cnpj/:cnpj", timeout.NewWithContext(cnpj.Get, cnpjLookupTimeout))
 		return
 	}
 
 	if config.AppConfig.SaaS.Enabled && cnpj != nil {
-		v1.Get("/cnpj/:cnpj", cnpj.Get)
+		v1.Get("/cnpj/:cnpj", timeout.NewWithContext(cnpj.Get, cnpjLookupTimeout))
 	} else {
-		v1.Get("/cnpj/:cnpj", wrapCNPJRoute(saasDeps, search.GetEstabelecimentoByCNPJ))
+		v1.Get("/cnpj/:cnpj", timeout.NewWithContext(
+			wrapCNPJRoute(saasDeps, search.GetEstabelecimentoByCNPJ), cnpjLookupTimeout))
 	}
 
 	v1.Get("/empresas/search", timeout.NewWithContext(search.SearchEmpresas, searchTimeout))

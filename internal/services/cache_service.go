@@ -31,6 +31,39 @@ func NewCacheService() *CacheService {
 	}
 }
 
+// Enabled reports whether L1/Redis caching is active.
+func (s *CacheService) Enabled() bool {
+	return s != nil && s.enabled
+}
+
+// GetJSON loads a typed value from L1 → Redis. ok=false on miss.
+func (s *CacheService) GetJSON(ctx context.Context, key string, dest any) (bool, error) {
+	if !s.enabled {
+		return false, nil
+	}
+	val, hit, err := s.fetchCachedBytes(ctx, key)
+	if hit {
+		if unmarshalErr := unmarshalCacheValue(val, dest); unmarshalErr == nil {
+			return true, nil
+		}
+		_ = s.Delete(ctx, key)
+		return false, nil
+	}
+	if err != nil && !errors.Is(err, redis.Nil) {
+		// Soft-fallback: Redis outage must not take down CNPJ lookups.
+		err = nil
+	}
+	return false, err
+}
+
+// SetWithTTL stores a value with an explicit TTL (used for negative CNPJ cache).
+func (s *CacheService) SetWithTTL(ctx context.Context, key string, value any, ttl time.Duration) error {
+	if !s.enabled {
+		return nil
+	}
+	return s.setWithTTL(ctx, key, value, ttl)
+}
+
 // GetOrSet retrieves a value from cache or executes fn and stores the result.
 func (s *CacheService) GetOrSet(ctx context.Context, key string, fn func() (interface{}, error)) (interface{}, error) {
 	if !s.enabled {
@@ -45,7 +78,8 @@ func (s *CacheService) GetOrSet(ctx context.Context, key string, fn func() (inte
 		}
 		_ = s.Delete(ctx, key)
 	} else if err != nil && !errors.Is(err, redis.Nil) {
-		return nil, fmt.Errorf("cache fetch: %w", err)
+		recordCacheMiss(key)
+		return fn()
 	}
 
 	recordCacheMiss(key)
@@ -75,8 +109,10 @@ func (s *CacheService) setWithTTL(ctx context.Context, key string, value interfa
 	if err != nil {
 		return fmt.Errorf("failed to marshal cache value: %w", err)
 	}
-	if err := database.RedisClient.Set(ctx, key, data, ttl).Err(); err != nil {
-		return err
+	if database.RedisClient != nil {
+		if err := database.RedisClient.Set(ctx, key, data, ttl).Err(); err != nil {
+			return err
+		}
 	}
 	if s.l1 != nil {
 		s.l1.SetWithTTL(key, data, ttl)

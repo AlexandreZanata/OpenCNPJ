@@ -38,6 +38,9 @@ func (s *CacheService) fetchCachedBytes(ctx context.Context, key string) ([]byte
 		recordL1CacheMiss(key)
 	}
 
+	if database.RedisClient == nil {
+		return nil, false, redis.Nil
+	}
 	val, err := database.RedisClient.Get(ctx, key).Result()
 	if err != nil {
 		if errors.Is(err, redis.Nil) {
@@ -51,8 +54,10 @@ func (s *CacheService) fetchCachedBytes(ctx context.Context, key string) ([]byte
 
 func (s *CacheService) storeCachedBytes(ctx context.Context, key string, data []byte) error {
 	ttl := s.ttl.forKey(key)
-	if err := database.RedisClient.Set(ctx, key, data, ttl).Err(); err != nil {
-		return err
+	if database.RedisClient != nil {
+		if err := database.RedisClient.Set(ctx, key, data, ttl).Err(); err != nil {
+			return err
+		}
 	}
 	if s.l1 != nil {
 		s.l1.SetWithTTL(key, data, ttl)

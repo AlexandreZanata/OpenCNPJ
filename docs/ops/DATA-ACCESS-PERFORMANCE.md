@@ -113,6 +113,9 @@ Wiring:
 |-------|----------------|--------|
 | `WHERE cnpj_completo = $1` (schema / local) | `idx_estabelecimentos_cnpj_completo` | `Index Scan` / `Bitmap Index Scan` |
 | `WHERE cnpj_completo = $1` (**VPS UF partitions**) | `idx_estab_uf_cnpj_completo` via `scripts/vps_create_indexes.sql` | never seq-scan all UFs |
+| Public API cache key | `public:cnpj:v2:{cnpj}` | hit TTL = `cache.ttl_cnpj` (24h); miss TTL = 2m negative cache |
+| Redis outage | soft-fallback to Postgres | lookup stays available |
+| pgx session | `jit=off`, `statement_timeout=2500ms` | short-query friendly |
 | `WHERE cnpj_basico = $1` (empresa) | PK on `empresas` | `Index Scan` |
 | socios by `cnpj_basico` | `idx_socios_cnpj_basico` | no seq scan |
 | simples by `cnpj_basico` | PK on `simples` | index only |
@@ -145,7 +148,7 @@ Migrations: `000001_saas_metadata`, `000002_saas_indexes`, `000003_api_key_index
 | CNPJ lookup p95 (warm L1+Redis) | < 50 ms |
 | CNPJ lookup p95 (cache miss, VPS) | < 150 ms |
 | API key middleware overhead | < 5 ms p95 |
-| Goroutine fan-out | ≤ 4 per lookup request |
+| Goroutine fan-out | ≤ 3 per lookup request |
 | `sqlc vet` + `go test` | green in CI |
 
 ## Gate (CI / local)

@@ -72,8 +72,8 @@ fi
 
 echo "==> Goroutine budget (errgroup fan-out)"
 fanout="$(grep -c 'g\.Go(' "$ROOT/internal/cnpj/service.go" || true)"
-if [[ "$fanout" -ne 4 ]]; then
-  echo "CNPJ lookup fan-out = $fanout, want 4" >&2
+if [[ "$fanout" -ne 3 ]]; then
+  echo "CNPJ lookup fan-out = $fanout, want 3" >&2
   exit 1
 fi
 

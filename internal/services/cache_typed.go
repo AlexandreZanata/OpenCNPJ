@@ -28,7 +28,9 @@ func GetOrSetJSON[T any](
 		}
 		_ = s.Delete(ctx, key)
 	} else if err != nil && !errors.Is(err, redis.Nil) {
-		return zero, fmt.Errorf("cache fetch: %w", err)
+		// Soft-fallback: Redis outage must not take down CNPJ lookups.
+		recordCacheMiss(key)
+		return fn()
 	}
 
 	recordCacheMiss(key)

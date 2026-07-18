@@ -11,17 +11,12 @@ import (
 
 func buildPublicResponse(
 	est cnpjdb.GetEstabelecimentoByCNPJRow,
-	emp cnpjdb.GetEmpresaByBasicoRow,
 	socios []cnpjdb.ListSociosByBasicoRow,
 	simples *cnpjdb.GetSimplesByBasicoRow,
 ) PublicResponse {
-	razao := est.RazaoSocial
-	if razao == "" {
-		razao = emp.RazaoSocial
-	}
 	resp := PublicResponse{
 		CNPJ:              textVal(est.CnpjCompleto),
-		RazaoSocial:       razao,
+		RazaoSocial:       est.RazaoSocial,
 		NomeFantasia:      textVal(est.NomeFantasia),
 		SituacaoCadastral: textVal(est.SituacaoCadastral),
 		UF:                textVal(est.Uf),

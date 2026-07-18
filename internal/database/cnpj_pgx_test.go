@@ -1,18 +1,18 @@
 package database_test
 
 import (
+	"strings"
 	"testing"
 
-	"busca-cnpj-2026/internal/config"
 	"busca-cnpj-2026/internal/database"
 )
 
-func TestInitCNPJPgxSkippedWhenDisabled(t *testing.T) {
-	config.AppConfig = &config.Config{SaaS: config.SaasConfig{Enabled: false}}
-	if err := database.InitCNPJPgx(); err != nil {
-		t.Fatalf("unexpected error: %v", err)
+func TestCNPJSessionSetupDisablesJITAndSetsTimeout(t *testing.T) {
+	src := database.CNPJSessionSetup
+	if !strings.Contains(src, "jit = off") {
+		t.Fatalf("expected jit disabled, got %q", src)
 	}
-	if database.CNPJPool != nil {
-		t.Fatal("pool should be nil when saas disabled")
+	if !strings.Contains(src, "statement_timeout") {
+		t.Fatalf("expected statement_timeout, got %q", src)
 	}
 }

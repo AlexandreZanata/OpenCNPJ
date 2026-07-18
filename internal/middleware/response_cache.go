@@ -18,7 +18,12 @@ func ResponseCache() fiber.Handler {
 		if err := c.Next(); err != nil {
 			return err
 		}
-		if c.Response().StatusCode() != fiber.StatusOK {
+		status := c.Response().StatusCode()
+		if status == fiber.StatusNotFound && strings.HasPrefix(c.Path(), "/api/v1/cnpj/") {
+			c.Set("Cache-Control", "private, max-age=60")
+			return nil
+		}
+		if status != fiber.StatusOK {
 			return nil
 		}
 

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"busca-cnpj-2026/internal/config"
@@ -12,6 +13,9 @@ import (
 
 // CNPJPool is the pgx v5 read pool for opencnpj_cnpj (public API hot path).
 var CNPJPool *pgxpool.Pool
+
+// CNPJSessionSetup is applied on every CNPJ pool connection (short lookups).
+const CNPJSessionSetup = "SET jit = off; SET statement_timeout = '2500ms'"
 
 // InitCNPJPgx opens the CNPJ consulta pgx pool when SaaS mode is enabled.
 func InitCNPJPgx() error {
@@ -32,6 +36,10 @@ func InitCNPJPgx() error {
 	}
 	if pool.MaxIdleConns > 0 {
 		cfg.MinConns = int32(pool.MaxIdleConns)
+	}
+	cfg.AfterConnect = func(ctx context.Context, conn *pgx.Conn) error {
+		_, err := conn.Exec(ctx, CNPJSessionSetup)
+		return err
 	}
 	CNPJPool, err = pgxpool.NewWithConfig(context.Background(), cfg)
 	if err != nil {
