@@ -67,8 +67,8 @@ docker exec receita-postgres psql -U receita_user -d receita_db -v ON_ERROR_STOP
 CREATE INDEX IF NOT EXISTS idx_empresas_razao_social_gin ON empresas USING gin(razao_social gin_trgm_ops);
 CREATE INDEX IF NOT EXISTS idx_empresas_natureza_juridica ON empresas(natureza_juridica);
 CREATE INDEX IF NOT EXISTS idx_empresas_porte ON empresas(porte_empresa);
-CREATE INDEX IF NOT EXISTS idx_estabelecimentos_cnpj_completo ON estabelecimentos(cnpj_completo);
-CREATE INDEX IF NOT EXISTS idx_estabelecimentos_cnpj_basico ON estabelecimentos(cnpj_basico);
+CREATE INDEX IF NOT EXISTS idx_estab_uf_cnpj_completo ON estabelecimentos(cnpj_completo);
+CREATE INDEX IF NOT EXISTS idx_estab_uf_cnpj_basico ON estabelecimentos(cnpj_basico);
 CREATE INDEX IF NOT EXISTS idx_estabelecimentos_cnae ON estabelecimentos(cnae_fiscal_principal);
 CREATE INDEX IF NOT EXISTS idx_estabelecimentos_municipio ON estabelecimentos(municipio);
 CREATE INDEX IF NOT EXISTS idx_estabelecimentos_uf ON estabelecimentos(uf);

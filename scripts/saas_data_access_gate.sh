@@ -48,7 +48,7 @@ for f in "${required[@]}"; do
   fi
 done
 
-echo "==> Index definitions in migrations"
+echo "==> Index definitions (schema + SaaS migrations + VPS restore script)"
 for needle in \
   idx_estabelecimentos_cnpj_completo \
   idx_api_keys_hash \
@@ -60,6 +60,15 @@ do
     exit 1
   fi
 done
+if ! grep -qF "idx_estab_uf_cnpj_completo" "$ROOT/scripts/vps_create_indexes.sql"; then
+  echo "MISSING VPS hot-path index idx_estab_uf_cnpj_completo in scripts/vps_create_indexes.sql" >&2
+  exit 1
+fi
+if grep -qF "CREATE INDEX IF NOT EXISTS idx_estabelecimentos_cnpj_completo ON estabelecimentos" \
+  "$ROOT/scripts/vps_create_indexes.sql"; then
+  echo "VPS index script must not use colliding idx_estabelecimentos_cnpj_completo on parent" >&2
+  exit 1
+fi
 
 echo "==> Goroutine budget (errgroup fan-out)"
 fanout="$(grep -c 'g\.Go(' "$ROOT/internal/cnpj/service.go" || true)"

@@ -59,7 +59,10 @@ func TestIntegration_EXPLAINCnpjCompletoIndex(t *testing.T) {
 	if strings.Contains(plan, "Seq Scan on estabelecimentos") {
 		t.Fatalf("sequential scan:\n%s", plan)
 	}
-	if !strings.Contains(plan, "idx_estabelecimentos_cnpj_completo") {
+	usesHotIndex := strings.Contains(plan, "idx_estabelecimentos_cnpj_completo") ||
+		strings.Contains(plan, "idx_estab_uf_cnpj_completo") ||
+		strings.Contains(plan, "cnpj_completo_idx")
+	if !usesHotIndex {
 		t.Fatalf("expected cnpj_completo index in plan:\n%s", plan)
 	}
 }

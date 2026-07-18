@@ -69,7 +69,7 @@ exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_empresas_natureza_juridica
 
 # Indexes for estabelecimentos
 echo "   Recreating estabelecimento indexes..."
-exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_estabelecimentos_cnpj_completo ON estabelecimentos(cnpj_completo);" || echo "    (index already exists or error)"
+exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_estab_uf_cnpj_completo ON estabelecimentos(cnpj_completo);" || echo "    (index already exists or error)"
 exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_estabelecimentos_cnpj_basico ON estabelecimentos(cnpj_basico);" || echo "    (index already exists or error)"
 exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_estabelecimentos_cnae ON estabelecimentos(cnae_fiscal_principal);" || echo "    (index already exists or error)"
 exec_sql "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_estabelecimentos_municipio ON estabelecimentos(municipio);" || echo "    (index already exists or error)"

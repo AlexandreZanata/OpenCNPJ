@@ -71,6 +71,43 @@ func TestPhase12CNPJSchemaHasCompletoIndex(t *testing.T) {
 	}
 }
 
+func TestPhase12VPSIndexScriptAvoidsLegacyNameCollision(t *testing.T) {
+	root := findRepoRoot(t)
+	body, err := os.ReadFile(repoPath(root, Phase12VPSIndexScript))
+	if err != nil {
+		t.Fatal(err)
+	}
+	text := string(body)
+	if !strings.Contains(text, Phase12VPSCNPJIndex) {
+		t.Fatalf("VPS index script missing hot-path index %s", Phase12VPSCNPJIndex)
+	}
+	if !strings.Contains(text, "idx_estab_uf_cnpj_basico") {
+		t.Fatal("VPS index script missing idx_estab_uf_cnpj_basico")
+	}
+	// Index names are schema-global. IF NOT EXISTS with the legacy name skips when
+	// estabelecimentos_legacy_range still owns idx_estabelecimentos_cnpj_completo,
+	// leaving UF partitions without indexes (multi-second seq scans on lookup).
+	legacyCreate := "CREATE INDEX IF NOT EXISTS " + Phase12CNPJIndex + " ON estabelecimentos"
+	if strings.Contains(text, legacyCreate) {
+		t.Fatalf("VPS script must not use colliding name %s on estabelecimentos; use %s",
+			Phase12CNPJIndex, Phase12VPSCNPJIndex)
+	}
+}
+
+func TestPhase12DataAccessDocCoversVPSHotPathIndex(t *testing.T) {
+	root := findRepoRoot(t)
+	body, err := os.ReadFile(repoPath(root, Phase12DataAccessDoc))
+	if err != nil {
+		t.Fatal(err)
+	}
+	text := string(body)
+	for _, needle := range []string{Phase12VPSCNPJIndex, Phase12VPSIndexScript, "legacy"} {
+		if !strings.Contains(text, needle) {
+			t.Fatalf("data-access doc missing %q", needle)
+		}
+	}
+}
+
 func TestPhase12SaaSMigrationsDefineIndexes(t *testing.T) {
 	root := findRepoRoot(t)
 	meta, err := os.ReadFile(repoPath(root, "migrations/saas/000001_saas_metadata.up.sql"))

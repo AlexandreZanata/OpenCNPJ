@@ -111,10 +111,16 @@ Wiring:
 
 | Query | Required index | Verify |
 |-------|----------------|--------|
-| `WHERE cnpj_completo = $1` | `idx_estabelecimentos_cnpj_completo` | `Index Scan` / `Bitmap Index Scan` |
+| `WHERE cnpj_completo = $1` (schema / local) | `idx_estabelecimentos_cnpj_completo` | `Index Scan` / `Bitmap Index Scan` |
+| `WHERE cnpj_completo = $1` (**VPS UF partitions**) | `idx_estab_uf_cnpj_completo` via `scripts/vps_create_indexes.sql` | never seq-scan all UFs |
 | `WHERE cnpj_basico = $1` (empresa) | PK on `empresas` | `Index Scan` |
 | socios by `cnpj_basico` | `idx_socios_cnpj_basico` | no seq scan |
 | simples by `cnpj_basico` | PK on `simples` | index only |
+
+> **VPS gotcha:** PostgreSQL index names are schema-global. If a leftover
+> `idx_estabelecimentos_cnpj_completo` exists on `estabelecimentos_legacy_range`,
+> `CREATE INDEX IF NOT EXISTS` on the UF parent is a no-op and lookups fall back to
+> multi-second parallel seq scans. Always use the `idx_estab_uf_*` names on VPS.
 
 ```sql
 EXPLAIN (ANALYZE, BUFFERS)

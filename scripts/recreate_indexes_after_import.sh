@@ -47,7 +47,7 @@ create_index_concurrently "idx_empresas_porte" "idx_empresas_porte ON empresas(p
 # 2. Recreate estabelecimento indexes
 echo ""
 echo "2. Recreating estabelecimento indexes..."
-create_index_concurrently "idx_estabelecimentos_cnpj_completo" "idx_estabelecimentos_cnpj_completo ON estabelecimentos(cnpj_completo)"
+create_index_concurrently "idx_estab_uf_cnpj_completo" "idx_estab_uf_cnpj_completo ON estabelecimentos(cnpj_completo)"
 create_index_concurrently "idx_estabelecimentos_cnpj_basico" "idx_estabelecimentos_cnpj_basico ON estabelecimentos(cnpj_basico)"
 create_index_concurrently "idx_estabelecimentos_cnae" "idx_estabelecimentos_cnae ON estabelecimentos(cnae_fiscal_principal)"
 create_index_concurrently "idx_estabelecimentos_municipio" "idx_estabelecimentos_municipio ON estabelecimentos(municipio)"

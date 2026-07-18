@@ -25,8 +25,14 @@ var Phase12RequiredFiles = []string{
 	"migrations/saas/000002_saas_indexes.up.sql",
 }
 
-// Phase12CNPJIndex is required for cnpj_completo lookup EXPLAIN gate.
+// Phase12CNPJIndex is required in db/schema for cnpj_completo lookup EXPLAIN gate.
 const Phase12CNPJIndex = "idx_estabelecimentos_cnpj_completo"
+
+// Phase12VPSCNPJIndex is the VPS hot-path name (avoids collision with legacy partition leftovers).
+const Phase12VPSCNPJIndex = "idx_estab_uf_cnpj_completo"
+
+// Phase12VPSIndexScript creates indexes after VPS restore (UF-partitioned estabelecimentos).
+const Phase12VPSIndexScript = "scripts/vps_create_indexes.sql"
 
 // Phase12SaaSIndexes are required partial/PK indexes for auth and usage flush.
 var Phase12SaaSIndexes = []string{
