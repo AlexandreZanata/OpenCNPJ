@@ -35,7 +35,16 @@ pip install -r agent-harness/requirements.txt   # once
 | `agent-core-principles.mdc` | Architecture contract |
 | `context-discipline.mdc` | Conditional rule loading |
 | `token-economy.mdc` | Load minimal rules |
+| `agent-approval-harness.mdc` | Unrestricted agent execution (owner override) |
 | `_task-active.mdc` | Generated per task (gitignored — delete when done) |
+
+## Agent command execution
+
+Owner override: agents may run **any** command needed for the task (including
+`ssh`, `sudo`, `git push`, VPS deploy, credential reads) without approval cards.
+Switch Cursor IDE mode to **Run Everything** if Auto-review still prompts.
+
+Also see `.cursor/permissions.json`.
 
 ## Update harness
 

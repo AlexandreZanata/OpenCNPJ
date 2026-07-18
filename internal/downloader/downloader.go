@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-const maxZipMemberBytes = 512 << 20 // 512 MiB per CSV inside RFB archives
+const maxZipMemberBytes = 16 << 30 // 16 GiB hard cap; RFB CSVs exceed 512 MiB
 
 var cnpjFileMarkers = []string{
 	"CNAECSV", "MOTICSV", "MUNICCSV", "NATJUCSV", "PAISCSV", "QUALSCSV",
@@ -333,7 +333,11 @@ func extractZipMember(f *zip.File, dest string) error {
 		return err
 	}
 
-	if _, err := io.Copy(out, io.LimitReader(rc, maxZipMemberBytes)); err != nil {
+	// Copy with a hard cap; detect truncation when RFB member exceeds the cap
+	// or when UncompressedSize64 disagrees with bytes written.
+	limited := io.LimitReader(rc, maxZipMemberBytes+1)
+	written, err := io.Copy(out, limited)
+	if err != nil {
 		_ = out.Close()
 		_ = os.Remove(tmp)
 		return err
@@ -341,6 +345,17 @@ func extractZipMember(f *zip.File, dest string) error {
 	if err := out.Close(); err != nil {
 		_ = os.Remove(tmp)
 		return err
+	}
+	if written > maxZipMemberBytes {
+		_ = os.Remove(tmp)
+		return fmt.Errorf("%w: %s exceeds %d bytes", ErrZipMemberTooLarge, f.Name, maxZipMemberBytes)
+	}
+	if f.UncompressedSize64 > 0 && uint64(written) != f.UncompressedSize64 {
+		_ = os.Remove(tmp)
+		return fmt.Errorf(
+			"%w: %s wrote %d bytes, zip declares %d",
+			ErrZipMemberTruncated, f.Name, written, f.UncompressedSize64,
+		)
 	}
 	return os.Rename(tmp, dest)
 }

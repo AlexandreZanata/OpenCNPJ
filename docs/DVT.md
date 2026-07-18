@@ -32,6 +32,7 @@ Sequential IDs for new features that still need production-grade automated tests
 | DVT-36 | Monthly CNPJ sync local PC → VPS (Phase 11) | open |
 | DVT-37 | Data access & API performance stack (Phase 12) | open |
 | DVT-41 | CNPJ lookup LEFT JOIN + 50-CNPJ E2E fixture | open |
+| DVT-42 | RFB ZIP extract 512MiB truncation | open |
 
 ## DVT-01: CNPJ open-data downloader (WebDAV)
 
@@ -315,7 +316,14 @@ Sequential IDs for new features that still need production-grade automated tests
 
 ## DVT-41: CNPJ lookup LEFT JOIN + 50-CNPJ E2E fixture
 
-- **Scope**: `db/queries/cnpj/estabelecimento.sql`, `testdata/e2e/cnpj_lookup_50.json`, `scripts/e2e_cnpj_lookup_validation.sh`
+- **Scope**: `db/queries/cnpj/estabelecimento.sql`, `testdata/e2e/cnpj_lookup_50.json`, `scripts/e2e_cnpj_lookup_validation.sh`, `scripts/e2e_cnpj_lookup_latency.sh`, `scripts/repair_orphan_empresas.sh`
 - **Added**: 2026-07-18
-- **Needs**: scheduled CI job hitting staging with API key secret; repair missing `empresas` orphans in monthly sync
+- **Needs**: CI latency gate on staging; monthly orphan check after RFB sync
+- **Status**: open
+
+## DVT-42: RFB ZIP extract 512MiB truncation
+
+- **Scope**: `internal/downloader/downloader.go` (`maxZipMemberBytes`)
+- **Added**: 2026-07-18
+- **Needs**: force re-download Estabelecimentos0-9, Socios0, Simples; import truncated tails; download smoke gate
 - **Status**: open

@@ -10,4 +10,6 @@ var (
 	ErrOpenZip              = errors.New("open zip")
 	ErrMonthNotAvailable    = errors.New("month not available")
 	ErrUnexpectedHTTPStatus = errors.New("unexpected HTTP status")
+	ErrZipMemberTooLarge    = errors.New("zip member exceeds max size")
+	ErrZipMemberTruncated   = errors.New("zip member size mismatch (truncated extract)")
 )
