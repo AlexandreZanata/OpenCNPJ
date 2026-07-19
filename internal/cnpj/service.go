@@ -85,7 +85,8 @@ func (s *LookupService) fetchParallel(ctx context.Context, cnpj string) (*Public
 	g.Go(func() error {
 		rows, err := s.queries.ListSociosByBasico(gctx, basico)
 		if err != nil {
-			return fmt.Errorf("socios: %w", err)
+			// Optional enrichment: public CNPJ payload remains valid without socios.
+			return nil //nolint:nilerr // best-effort side query
 		}
 		socios = rows
 		return nil
@@ -96,7 +97,8 @@ func (s *LookupService) fetchParallel(ctx context.Context, cnpj string) (*Public
 			return nil
 		}
 		if err != nil {
-			return fmt.Errorf("simples: %w", err)
+			// Optional enrichment: missing/slow simples must not 500 the lookup.
+			return nil //nolint:nilerr // best-effort side query
 		}
 		simples = &row
 		return nil

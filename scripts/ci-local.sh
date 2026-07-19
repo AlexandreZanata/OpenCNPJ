@@ -34,7 +34,8 @@ go vet ./...
 
 step "gosec"
 command -v gosec >/dev/null || go install github.com/securego/gosec/v2/cmd/gosec@latest
-gosec -fmt=text ./...
+# Keep excludes aligned with .github/workflows/security.yml
+gosec -exclude=G101,G115,G118,G304,G306 -fmt=text ./...
 
 step "staticcheck"
 command -v staticcheck >/dev/null || go install honnef.co/go/tools/cmd/staticcheck@latest

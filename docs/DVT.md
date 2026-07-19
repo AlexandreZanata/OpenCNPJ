@@ -325,5 +325,5 @@ Sequential IDs for new features that still need production-grade automated tests
 
 - **Scope**: `internal/downloader/downloader.go` (`maxZipMemberBytes`)
 - **Added**: 2026-07-18
-- **Needs**: force re-download Estabelecimentos0-9, Socios0, Simples; import truncated tails; download smoke gate
-- **Status**: open
+- **Needs**: CI download smoke gate asserting extracted CSV size ≠ 512 MiB
+- **Status**: mitigated — full 2026-06 re-import + VPS restore (71.7M estabelecimentos); import must recreate `empresas_cnpj_basico_uidx` + `simples_cnpj_basico_uidx` after dropping PKs

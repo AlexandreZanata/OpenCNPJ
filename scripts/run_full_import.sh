@@ -64,6 +64,7 @@ IMPORT_WALL=$(python3 -c "print(round($IMPORT_END - $IMPORT_START, 2))")
 echo "==> Index rebuild"
 INDEX_START=$(date +%s)
 docker exec receita-postgres psql -U receita_user -d receita_db -v ON_ERROR_STOP=1 -c "
+CREATE UNIQUE INDEX IF NOT EXISTS empresas_cnpj_basico_uidx ON empresas(cnpj_basico);
 CREATE INDEX IF NOT EXISTS idx_empresas_razao_social_gin ON empresas USING gin(razao_social gin_trgm_ops);
 CREATE INDEX IF NOT EXISTS idx_empresas_natureza_juridica ON empresas(natureza_juridica);
 CREATE INDEX IF NOT EXISTS idx_empresas_porte ON empresas(porte_empresa);
@@ -78,6 +79,7 @@ CREATE INDEX IF NOT EXISTS idx_estabelecimentos_cep ON estabelecimentos(cep);
 CREATE INDEX IF NOT EXISTS idx_estabelecimentos_cnae_uf_situacao ON estabelecimentos(cnae_fiscal_principal, uf, situacao_cadastral);
 CREATE INDEX IF NOT EXISTS idx_socios_cnpj_basico ON socios(cnpj_basico);
 CREATE INDEX IF NOT EXISTS idx_socios_nome_gin ON socios USING gin(nome_socio gin_trgm_ops);
+CREATE UNIQUE INDEX IF NOT EXISTS simples_cnpj_basico_uidx ON simples(cnpj_basico);
 CREATE INDEX IF NOT EXISTS idx_simples_opcao ON simples(opcao_simples) WHERE opcao_simples = 'S';
 CREATE INDEX IF NOT EXISTS idx_simples_mei ON simples(opcao_mei) WHERE opcao_mei = 'S';
 ANALYZE empresas; ANALYZE estabelecimentos; ANALYZE socios; ANALYZE simples;

@@ -133,7 +133,8 @@ local_dump() {
   docker exec "$PG_CONTAINER" pg_dump -Fc --no-owner --no-acl -U "$DB_USER" -d "$DB_NAME" >"$dump"
   log "pg_dump done in $(( $(date +%s) - start ))s — compressing with zstd"
   zstd -T0 -19 -f "$dump"
-  sha256sum "$archive" | tee "$checksum"
+  # Basename only — VPS verifies with `cd incoming && sha256sum -c`.
+  (cd "$(dirname "$archive")" && sha256sum "$(basename "$archive")") | tee "$checksum"
   local size
   size=$(du -h "$archive" | cut -f1)
   log "Dump ready: $archive ($size)"

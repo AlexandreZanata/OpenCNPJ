@@ -15,7 +15,8 @@ import (
 var CNPJPool *pgxpool.Pool
 
 // CNPJSessionSetup is applied on every CNPJ pool connection (short lookups).
-const CNPJSessionSetup = "SET jit = off; SET statement_timeout = '2500ms'"
+// 5s: cold UF-partition Append + joins after restore can exceed 2.5s.
+const CNPJSessionSetup = "SET jit = off; SET statement_timeout = '5000ms'"
 
 // InitCNPJPgx opens the CNPJ consulta pgx pool when SaaS mode is enabled.
 func InitCNPJPgx() error {

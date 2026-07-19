@@ -12,7 +12,7 @@ import (
 )
 
 const searchTimeout = 5 * time.Second
-const cnpjLookupTimeout = 3 * time.Second
+const cnpjLookupTimeout = 5 * time.Second
 
 // RegisterV1Routes mounts API v1 routes according to SaaS config.
 func RegisterV1Routes(

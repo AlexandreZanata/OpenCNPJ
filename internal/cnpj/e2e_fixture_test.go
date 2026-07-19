@@ -27,7 +27,6 @@ func TestE2EFixtureHasFiftyCNPJsAndAllUFs(t *testing.T) {
 		for i := 0; i < 5; i++ {
 			candidate := filepath.Join(wd, "testdata", "e2e", "cnpj_lookup_50.json")
 			if raw, err = os.ReadFile(candidate); err == nil {
-				path = candidate
 				break
 			}
 			wd = filepath.Dir(wd)

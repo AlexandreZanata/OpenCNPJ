@@ -15,4 +15,7 @@ func TestCNPJSessionSetupDisablesJITAndSetsTimeout(t *testing.T) {
 	if !strings.Contains(src, "statement_timeout") {
 		t.Fatalf("expected statement_timeout, got %q", src)
 	}
+	if !strings.Contains(src, "5000ms") {
+		t.Fatalf("expected 5000ms statement_timeout, got %q", src)
+	}
 }

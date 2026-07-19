@@ -14,6 +14,8 @@ PG_PORT="${PG_PORT:-5435}"
 REDIS_PORT="${REDIS_PORT:-6381}"
 
 FINISH_RESTORE="${FINISH_RESTORE:-0}"
+# RESTORE_ONLY=1 — swap a new dump into opencnpj_cnpj; leave API/nginx/saas untouched.
+RESTORE_ONLY="${RESTORE_ONLY:-0}"
 
 gen_pass() { openssl rand -base64 24 | tr -d '/+=' | head -c 24; }
 
@@ -307,6 +309,15 @@ install_nginx() {
   nginx -t && systemctl reload nginx
 }
 
+flush_cnpj_redis() {
+  # Container listens on 6379; host maps REDIS_PORT→6379.
+  if docker ps --format '{{.Names}}' | grep -qx "$REDIS_CONTAINER"; then
+    docker exec "$REDIS_CONTAINER" redis-cli --scan --pattern 'cnpj:*' \
+      | xargs -r -n 100 docker exec -i "$REDIS_CONTAINER" redis-cli DEL \
+      || true
+  fi
+}
+
 main() {
   if [[ "${API_ONLY:-0}" == "1" ]]; then
     ensure_docker
@@ -320,6 +331,18 @@ main() {
     curl -sf http://127.0.0.1:8081/readyz && log "API ready" || log "WARN: /readyz not 200 yet"
     log "=== CREDENTIALS (also in $ETC/credentials.txt) ==="
     cat "$ETC/credentials.txt"
+    return
+  fi
+  if [[ "${RESTORE_ONLY}" == "1" ]]; then
+    ensure_docker
+    start_postgres
+    systemctl stop opencnpj-api 2>/dev/null || true
+    restore_dump
+    flush_cnpj_redis
+    systemctl start opencnpj-api 2>/dev/null || true
+    sleep 3
+    curl -sf http://127.0.0.1:8081/readyz && log "API ready after restore" || log "WARN: /readyz not 200 yet"
+    log "RESTORE_ONLY complete — DUMP_TAG=$DUMP_TAG"
     return
   fi
   ensure_docker

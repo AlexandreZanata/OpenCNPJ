@@ -26,6 +26,8 @@
 3. **VPS:** Restore into `opencnpj_cnpj` (swap strategy) — see `deploy/saas/monthly-cnpj-sync.example.sh`.
 4. **VPS:** Flush CNPJ cache in Redis; restart API. SaaS DB unchanged.
 
+If restore or lookup fails after sync, see [DEPLOY-FAILURE-MODES.md](DEPLOY-FAILURE-MODES.md).
+
 Full steps: [MONTHLY-CNPJ-SYNC.md](MONTHLY-CNPJ-SYNC.md).
 
 ## Local task plan
