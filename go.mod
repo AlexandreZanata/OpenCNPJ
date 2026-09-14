@@ -1,6 +1,6 @@
 module busca-cnpj-2026
 
-go 1.25.12
+go 1.25.13
 
 require (
 	github.com/ClickHouse/clickhouse-go/v2 v2.43.0
@@ -22,9 +22,9 @@ require (
 	github.com/testcontainers/testcontainers-go v0.41.0
 	github.com/vmihailenco/msgpack/v5 v5.4.1
 	golang.org/x/crypto v0.49.0
-	golang.org/x/sync v0.20.0
+	golang.org/x/sync v0.21.0
 	golang.org/x/term v0.41.0
-	golang.org/x/text v0.35.0
+	golang.org/x/text v0.39.0
 )
 
 require (

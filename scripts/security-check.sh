@@ -38,10 +38,10 @@ ensure_tool() {
   fi
 }
 
-ensure_tool golangci-lint 'go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest'
-ensure_tool gosec 'go install github.com/securego/gosec/v2/cmd/gosec@latest'
-ensure_tool staticcheck 'go install honnef.co/go/tools/cmd/staticcheck@latest'
-ensure_tool govulncheck 'go install golang.org/x/vuln/cmd/govulncheck@latest'
+ensure_tool golangci-lint 'go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.8'
+ensure_tool gosec 'go install github.com/securego/gosec/v2/cmd/gosec@v2.29.0'
+ensure_tool staticcheck 'go install honnef.co/go/tools/cmd/staticcheck@2026.1'
+ensure_tool govulncheck 'go install golang.org/x/vuln/cmd/govulncheck@v1.1.4'
 
 echo ""
 echo "========== Security checks =========="

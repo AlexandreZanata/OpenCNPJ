@@ -33,19 +33,19 @@ step "go vet"
 go vet ./...
 
 step "gosec"
-command -v gosec >/dev/null || go install github.com/securego/gosec/v2/cmd/gosec@latest
+command -v gosec >/dev/null || go install github.com/securego/gosec/v2/cmd/gosec@v2.29.0
 # Keep excludes aligned with .github/workflows/security.yml
 gosec -exclude=G101,G115,G118,G304,G306 -fmt=text ./...
 
 step "staticcheck"
-command -v staticcheck >/dev/null || go install honnef.co/go/tools/cmd/staticcheck@latest
+command -v staticcheck >/dev/null || go install honnef.co/go/tools/cmd/staticcheck@2026.1
 staticcheck ./...
 
 step "go build ./cmd/..."
 go build -v -ldflags="-s -w" ./cmd/...
 
 step "govulncheck"
-command -v govulncheck >/dev/null || go install golang.org/x/vuln/cmd/govulncheck@latest
+command -v govulncheck >/dev/null || go install golang.org/x/vuln/cmd/govulncheck@v1.1.4
 govulncheck ./...
 
 echo ""
