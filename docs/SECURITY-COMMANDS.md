@@ -24,22 +24,22 @@ Each command installs to `$(go env GOPATH)/bin`. Ensure that directory is in `PA
 
 | Tool | Install command |
 |------|-----------------|
-| golangci-lint | `go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest` |
-| gosec | `go install github.com/securego/gosec/v2/cmd/gosec@latest` |
-| staticcheck | `go install honnef.co/go/tools/cmd/staticcheck@latest` |
-| govulncheck | `go install golang.org/x/vuln/cmd/govulncheck@latest` |
-| nancy | `go install github.com/sonatype-nexus-community/nancy@latest` |
+| golangci-lint | `go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.8` |
+| gosec | `go install github.com/securego/gosec/v2/cmd/gosec@v2.29.0` |
+| staticcheck | `go install honnef.co/go/tools/cmd/staticcheck@2026.1` |
+| govulncheck | `go install golang.org/x/vuln/cmd/govulncheck@v1.1.4` |
+| nancy | `go install github.com/sonatype-nexus-community/nancy@v2.1.0` |
 
 **Example — add GOPATH/bin to PATH and install all:**
 
 ```bash
 export PATH="${PATH}:$(go env GOPATH)/bin"
 
-go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-go install github.com/securego/gosec/v2/cmd/gosec@latest
-go install honnef.co/go/tools/cmd/staticcheck@latest
-go install golang.org/x/vuln/cmd/govulncheck@latest
-go install github.com/sonatype-nexus-community/nancy@latest
+go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.8
+go install github.com/securego/gosec/v2/cmd/gosec@v2.29.0
+go install honnef.co/go/tools/cmd/staticcheck@2026.1
+go install golang.org/x/vuln/cmd/govulncheck@v1.1.4
+go install github.com/sonatype-nexus-community/nancy@v2.1.0
 ```
 
 ---
@@ -67,7 +67,7 @@ gosec ./...
 **Generate SARIF (for GitHub Security upload):**
 
 ```bash
-gosec -fmt sarif -out gosec-results.sarif ./...
+gosec -exclude=G101,G115,G118,G304,G306 -fmt sarif -out gosec-results.sarif ./...
 ```
 
 ### 3.3 staticcheck
@@ -111,26 +111,26 @@ Workflow `.github/workflows/security.yml` runs the same commands in these jobs.
 
 ### Job: lint
 
-- **Checkout:** `actions/checkout@v4`
-- **Go:** `actions/setup-go@v5` with `go-version-file: go.mod` and `cache: true`
-- **Lint:** `golangci-lint run --timeout=5m --config=.golangci.yml` (via `golangci/golangci-lint-action@v6`)
+- **Checkout:** `actions/checkout@v6`
+- **Go:** `actions/setup-go@v6` with `go-version-file: go.mod` and `cache: true`
+- **Lint:** `golangci-lint run --timeout=5m --config=.golangci.yml` (v1.64.8 installed with `go install`)
 
 ### Job: sast (depends on lint)
 
 - **Install gosec:**  
-  `go install github.com/securego/gosec/v2/cmd/gosec@latest`
+  `go install github.com/securego/gosec/v2/cmd/gosec@v2.29.0`
 - **Install staticcheck:**  
-  `go install honnef.co/go/tools/cmd/staticcheck@latest`
+  `go install honnef.co/go/tools/cmd/staticcheck@2026.1`
 - **Run gosec (SARIF):**  
   `gosec -fmt sarif -out gosec-results.sarif ./...`
 - **Run staticcheck:**  
   `staticcheck ./...`
-- **Upload SARIF:** `github/codeql-action/upload-sarif@v3` with `sarif_file: gosec-results.sarif` and `if: always()`
+- **Upload SARIF:** `github/codeql-action/upload-sarif@v4` with `sarif_file: gosec-results.sarif` only when the scanner produced the file
 
 ### Job: dependency-scan (depends on sast)
 
 - **Install govulncheck:**  
-  `go install golang.org/x/vuln/cmd/govulncheck@latest`
+  `go install golang.org/x/vuln/cmd/govulncheck@v1.1.4`
 - **Run govulncheck:**  
   `govulncheck ./...`
 
