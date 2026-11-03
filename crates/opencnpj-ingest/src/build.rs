@@ -43,9 +43,10 @@ pub struct Profile {
 impl Profile {
     pub fn preset(name: &str) -> Option<Self> {
         let (codec, block_target, zstd_dict_bytes) = match name {
-            "compact" => (BlockCodec::Zstd { level: 19 }, 256 << 10, 0),
-            "balanced" => (BlockCodec::Zstd { level: 9 }, 64 << 10, 112 << 10),
-            "fast" => (BlockCodec::Zstd { level: 3 }, 16 << 10, 112 << 10),
+            // Chosen from the experiment matrix in docs/BENCHMARKS.md.
+            "compact" => (BlockCodec::Zstd { level: 19 }, 1 << 20, 0),
+            "balanced" => (BlockCodec::Zstd { level: 15 }, 64 << 10, 112 << 10),
+            "fast" => (BlockCodec::Zstd { level: 9 }, 4 << 10, 112 << 10),
             _ => return None,
         };
         Some(Self { name: name.into(), codec, block_target, zstd_dict_bytes })
@@ -369,7 +370,13 @@ fn emit_terms(c: &Company, doc: u32, tc: &mut TermCollector) {
     let razao = emp.map(|e| e[col::emp::RAZAO_SOCIAL].as_str()).unwrap_or("");
     let mut razao_tokens: Vec<String> = Vec::new();
     for e in &c.empresas {
-        tokenize(&e[col::emp::RAZAO_SOCIAL], |t| razao_tokens.push(t.to_string()));
+        // A name token equal to the company's own root (MEI names start with it) is not
+        // indexed: the reader resolves such tokens through the block directory instead.
+        tokenize(&e[col::emp::RAZAO_SOCIAL], |t| {
+            if t != c.basico {
+                razao_tokens.push(t.to_string());
+            }
+        });
     }
     razao_tokens.sort_unstable();
     razao_tokens.dedup();

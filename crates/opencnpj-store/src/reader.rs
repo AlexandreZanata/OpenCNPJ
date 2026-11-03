@@ -283,11 +283,28 @@ impl Snapshot {
 
     /// Exact lookup by `cnpj_basico` (8 characters).
     pub fn company(&self, basico: &str) -> Result<Option<Company>, Error> {
-        let Some((raw, pos)) = self.locate(basico)? else { return Ok(None) };
+        self.with_company(basico, |view, pos, counts, _| view.company(&self.codecs, pos, basico.to_string(), counts))
+    }
+
+    /// Runs `f(view, position, counts, block_first_doc)` on the block holding `basico`.
+    fn with_company<T>(
+        &self,
+        basico: &str,
+        f: impl FnOnce(&BlockView<'_>, usize, &[[u32; 4]], u32) -> Result<T, Error>,
+    ) -> Result<Option<T>, Error> {
+        let key = basico.as_bytes();
+        if key.len() != 8 {
+            return Ok(None);
+        }
+        let i = self.blocks.partition_point(|b| b.first_key.as_slice() <= key);
+        if i == 0 {
+            return Ok(None);
+        }
+        let raw = self.raw_block(i - 1)?;
         let view = BlockView::parse(&raw, &self.codecs)?;
-        let keys = view.keys()?;
+        let Some(pos) = view.find(key)? else { return Ok(None) };
         let counts = view.counts()?;
-        Ok(Some(view.company(&self.codecs, pos, keys[pos].clone(), &counts)?))
+        f(&view, pos, &counts, self.blocks[i - 1].first_doc).map(Some)
     }
 
     /// Resolves documents (ascending ids decompress each block once).
@@ -329,32 +346,24 @@ impl Snapshot {
     /// Establishment lookup that decodes only the matching row (plus company rows).
     /// Returns the company (with exactly one establishment) and its establishment count.
     pub fn establishment(&self, basico: &str, ordem: &str, dv: &str) -> Result<Option<(Company, usize)>, Error> {
-        let Some((raw, pos)) = self.locate(basico)? else { return Ok(None) };
-        let view = BlockView::parse(&raw, &self.codecs)?;
-        let keys = view.keys()?;
-        let counts = view.counts()?;
-        let ordens = view.estab_column(&self.codecs, pos, &counts, opencnpj_core::schema::col::est::ORDEM)?;
-        let dvs = view.estab_column(&self.codecs, pos, &counts, opencnpj_core::schema::col::est::DV)?;
-        let Some(k) = (0..ordens.len()).find(|&k| ordens[k] == ordem && dvs[k] == dv) else { return Ok(None) };
-        let c = view.company_select(&self.codecs, pos, keys[pos].clone(), &counts, Select { estab: Some(k), socios: true })?;
-        Ok(Some((c, ordens.len())))
+        use opencnpj_core::schema::col::est;
+        let found = self.with_company(basico, |view, pos, counts, _| {
+            let ordens = view.estab_column(&self.codecs, pos, counts, est::ORDEM)?;
+            let dvs = view.estab_column(&self.codecs, pos, counts, est::DV)?;
+            let Some(k) = (0..ordens.len()).find(|&k| ordens[k] == ordem && dvs[k] == dv) else { return Ok(None) };
+            let sel = Select { estab: Some(k), socios: true };
+            Ok(Some((view.company_select(&self.codecs, pos, basico.to_string(), counts, sel)?, ordens.len())))
+        })?;
+        Ok(found.flatten())
     }
 
-    /// Block bytes and company position for `basico`.
-    fn locate(&self, basico: &str) -> Result<Option<(Vec<u8>, usize)>, Error> {
-        let key = basico.as_bytes();
-        if key.len() != 8 {
-            return Ok(None);
-        }
-        let i = self.blocks.partition_point(|b| b.first_key.as_slice() <= key);
-        if i == 0 {
-            return Ok(None);
-        }
-        let raw = self.raw_block(i - 1)?;
-        let view = BlockView::parse(&raw, &self.codecs)?;
-        let keys = view.keys()?;
-        let Ok(pos) = keys.binary_search_by(|k| k.as_bytes().cmp(key)) else { return Ok(None) };
-        Ok(Some((raw, pos)))
+    /// Document ids of the company `basico` (its establishments, or its single document).
+    pub fn company_docs(&self, basico: &str) -> Result<Option<std::ops::Range<u32>>, Error> {
+        let e = Table::Estabelecimentos.index();
+        self.with_company(basico, |_, pos, counts, first_doc| {
+            let start = first_doc + counts[..pos].iter().map(|n| n[e].max(1)).sum::<u32>();
+            Ok(start..start + counts[pos][e].max(1))
+        })
     }
 
     /// Postings for an exact term.

@@ -46,7 +46,12 @@ enum Cmd {
         workers: usize,
     },
     /// Print the snapshot manifest and section sizes.
-    Info { snapshot: PathBuf },
+    Info {
+        snapshot: PathBuf,
+        /// Also report terms and postings bytes per index field.
+        #[arg(long)]
+        index: bool,
+    },
     /// Look up a CNPJ (14 chars) or a CNPJ root (8 chars).
     Get { snapshot: PathBuf, id: String },
     /// Search by name and/or filters.
@@ -283,9 +288,13 @@ fn main() -> Result<()> {
             log(&format!("verify passed in {:.1}s", t0.elapsed().as_secs_f64()));
             Ok(())
         }
-        Cmd::Info { snapshot } => {
+        Cmd::Info { snapshot, index } => {
             let snap = Snapshot::open(&snapshot)?;
-            println!("{}", serde_json::to_string_pretty(&output::info(&snap))?);
+            let mut v = output::info(&snap);
+            if index {
+                v["index"] = output::index_breakdown(&snap);
+            }
+            println!("{}", serde_json::to_string_pretty(&v)?);
             Ok(())
         }
         Cmd::Get { snapshot, id } => {

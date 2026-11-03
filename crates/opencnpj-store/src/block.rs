@@ -172,6 +172,37 @@ impl<'a> BlockView<'a> {
         Ok(out)
     }
 
+    /// Position of `key` without allocating (keys are sorted, so the scan stops early).
+    pub fn find(&self, key: &[u8]) -> Result<Option<usize>, Error> {
+        let mut r = Reader::new(self.streams[0]);
+        let mut prev = 0u64;
+        let mut buf = [0u8; 8];
+        for i in 0..self.companies {
+            let v = r.varint()?;
+            let k: &[u8] = if v == KEY_RAW {
+                r.lp_bytes()?
+            } else {
+                let n = prev.checked_add(v - 1).ok_or(Malformed)?;
+                if n > 99_999_999 {
+                    return Err(Error::Corrupt("numeric key out of range"));
+                }
+                prev = n;
+                let mut x = n;
+                for b in buf.iter_mut().rev() {
+                    *b = b'0' + (x % 10) as u8;
+                    x /= 10;
+                }
+                &buf
+            };
+            match k.cmp(key) {
+                std::cmp::Ordering::Less => {}
+                std::cmp::Ordering::Equal => return Ok(Some(i)),
+                std::cmp::Ordering::Greater => return Ok(None),
+            }
+        }
+        Ok(None)
+    }
+
     /// Per-company row counts for each table.
     pub fn counts(&self) -> Result<Vec<[u32; 4]>, Error> {
         let mut readers: Vec<Reader<'_>> = (1..=4).map(|i| Reader::new(self.streams[i])).collect();
@@ -340,6 +371,11 @@ mod tests {
         assert_eq!(v.all(&codecs).unwrap(), cs);
         let keys = v.keys().unwrap();
         let counts = v.counts().unwrap();
+        for (i, k) in keys.iter().enumerate() {
+            assert_eq!(v.find(k.as_bytes()).unwrap(), Some(i));
+        }
+        assert_eq!(v.find(b"00000001").unwrap(), None);
+        assert_eq!(v.find(b"99999999").unwrap(), None);
         for i in 0..cs.len() {
             assert_eq!(v.company(&codecs, i, keys[i].clone(), &counts).unwrap(), cs[i]);
         }

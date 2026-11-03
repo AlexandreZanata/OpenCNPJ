@@ -171,6 +171,19 @@ pub fn search_json(snap: &Snapshot, r: &SearchResult, docs: Vec<DocRecord>, _ful
     })
 }
 
+/// Terms and encoded postings bytes per index field (scans the whole term dictionary).
+pub fn index_breakdown(snap: &Snapshot) -> Value {
+    use opencnpj_store::postings::Field;
+    let fields = [Field::Razao, Field::Fantasia, Field::RazaoLen, Field::FantasiaLen].into_iter().chain(Field::FILTERS);
+    let mut out = Map::new();
+    for f in fields {
+        let terms = snap.prefix_terms(f, b"", usize::MAX);
+        let bytes: u64 = terms.iter().map(|(_, off)| snap.postings_size(*off)).sum();
+        out.insert(f.name().into(), json!({ "terms": terms.len(), "postings_bytes": bytes }));
+    }
+    Value::Object(out)
+}
+
 pub fn info(snap: &Snapshot) -> Value {
     let sections: BTreeMap<String, u64> = snap.sections().iter().map(|s| (format!("{:?}", s.kind).to_lowercase(), s.len)).collect();
     json!({

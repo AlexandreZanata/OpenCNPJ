@@ -74,6 +74,8 @@ fn fixture(dir: &Path) -> usize {
         rec(&["12ABC345", "EMPRESA ALFANUMÉRICA LTDA", "2062", "49", "0,00", "03", ""]),
         rec(&["22222222", "COMERCIO DE \"PEÇAS\" AUTO LTDA", "2062", "49", "500,00", "01", ""]),
         rec(&["33333333", "SEM ESTABELECIMENTO SA", "2054", "10", "1,5", "05", ""]),
+        rec(&["44444444", "55555555 JOANA PEREIRA", "2135", "50", "0,00", "01", ""]),
+        rec(&["55555555", "55555555 MARIA DA SILVA", "2135", "50", "0,00", "01", ""]),
     ];
     for i in 0..300 {
         empresas.push(rec(&[&format!("4{i:07}"), &format!("MERCADO NUMERO {i} LTDA"), "2062", "49", "10,00", "01", ""]));
@@ -167,6 +169,7 @@ fn build_query_and_integrity() {
     assert_eq!(rejects[0].line, 4);
     assert_eq!(rejects[0].raw_latin1, b"\"broken line without layout");
     assert_eq!(report.counts.companies_without_empresa, 1);
+    assert!(snap.company("55555555").unwrap().unwrap().estabelecimentos.is_empty());
     snap.verify(|_, _| {}).unwrap();
 
     // Exact values, including Latin-1 text, unescaped quotes and non-canonical money.
@@ -182,7 +185,7 @@ fn build_query_and_integrity() {
     assert_eq!(alnum.estabelecimentos[0][0], "01DE");
     assert_eq!(alnum.estabelecimentos[0][1], "35");
     assert!(snap.company("99999999").unwrap().unwrap().empresas.is_empty());
-    assert!(snap.company("55555555").unwrap().is_none());
+    assert!(snap.company("55555556").unwrap().is_none());
 
     // Text search: accents folded, prefix on the last token, ranking by shortest name.
     let q = |text: &str| Query { text: Some(text.into()), limit: 10, ..Default::default() };
@@ -192,6 +195,10 @@ fn build_query_and_integrity() {
     assert_eq!(r.total, 2);
     let docs = snap.docs(&r.docs).unwrap();
     assert_eq!(docs[0].company.estabelecimentos[docs[0].estab.unwrap()][0], "0001");
+    // MEI-style names: the own-root token is resolved through the block directory.
+    assert_eq!(search::search(&snap, &q("55555555 maria "), &Limits::DEFAULT).unwrap().total, 1);
+    assert_eq!(search::search(&snap, &q("55555555 "), &Limits::DEFAULT).unwrap().total, 2);
+    assert_eq!(search::search(&snap, &q("55555555"), &Limits::DEFAULT).unwrap().total, 2);
     let r = search::search(&snap, &q("mercado 17 "), &Limits::DEFAULT).unwrap();
     assert_eq!(r.total, 1);
     let mut fz = q("merkado 17 ");

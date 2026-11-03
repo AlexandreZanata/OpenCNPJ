@@ -112,6 +112,15 @@ fn token_postings(
     } else if let Some(p) = snap.postings(f, tok.as_bytes())? {
         parts.push(p);
     }
+    // Name tokens equal to a company's own root are not indexed (see the builder); the
+    // company is found through the block directory.
+    if f == Field::Razao && tok.len() == 8 && tok.bytes().all(|b| b.is_ascii_alphanumeric()) {
+        if let Some(range) = snap.company_docs(tok)? {
+            let mut own = RoaringBitmap::new();
+            own.insert_range(range);
+            parts.push(Arc::new(own));
+        }
+    }
     // Fuzzy adds near terms even when the token exists: a typo is often a rare real word.
     if fuzzy && tok.len() >= 4 {
         let dist = if tok.len() >= 8 { 2 } else { 1 };
