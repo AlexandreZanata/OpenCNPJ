@@ -78,7 +78,7 @@ impl Member {
             if f.enclosed_name().is_none() {
                 return Err(Error::Source(format!("{}: unsafe member name", path.display())));
             }
-            (f.name().to_string(), f.size())
+            (f.name().map_err(|e| Error::Source(e.to_string()))?.into_owned(), f.size())
         };
         if declared_size > MAX_MEMBER_BYTES || declared_size > zip_len.saturating_mul(MAX_RATIO).max(1 << 20) {
             return Err(Error::Source(format!("{}: member size {declared_size} exceeds limits", path.display())));

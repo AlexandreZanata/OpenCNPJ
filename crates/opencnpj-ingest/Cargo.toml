@@ -20,7 +20,7 @@ hex.workspace = true
 rayon.workspace = true
 memchr = "2"
 crossbeam-channel = "0.5"
-zip = { version = "2", default-features = false, features = ["deflate"] }
+zip = { version = "9", default-features = false, features = ["deflate"] }
 flate2 = { version = "1", default-features = false, features = ["zlib-rs"] }
 
 [dev-dependencies]
