@@ -30,7 +30,7 @@ You may choose **either** license at your option. Both are permissive and compat
 
 ## Third-party dependencies
 
-Runtime dependencies are listed in `go.mod` and `web/package.json`. Each dependency retains its own license. See [NOTICE](../NOTICE) for attribution summary.
+Dependencies are listed in `Cargo.lock`. Each retains its own license; all are permissive. See [NOTICE](../NOTICE) for attribution summary.
 
 ## Receita Federal data
 

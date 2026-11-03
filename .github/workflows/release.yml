@@ -1,26 +1,40 @@
-name: Release
+name: release
 
 on:
   push:
-    tags:
-      - "v*"
+    tags: ["v*"]
+
+permissions:
+  contents: write
 
 jobs:
-  goreleaser:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            bin: opencnpj
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            bin: opencnpj.exe
+    runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo build --release --locked --target ${{ matrix.target }} -p opencnpj
+      - uses: actions/upload-artifact@v4
         with:
-          fetch-depth: 0
-      - uses: actions/setup-go@v6
+          name: opencnpj-${{ matrix.target }}
+          path: target/${{ matrix.target }}/release/${{ matrix.bin }}
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+      - run: |
+          for d in opencnpj-*; do (cd "$d" && sha256sum * > SHA256SUMS && tar czf "../$d.tar.gz" .); done
+      - uses: softprops/action-gh-release@v2
         with:
-          go-version-file: go.mod
-          cache: true
-      - uses: goreleaser/goreleaser-action@v6
-        with:
-          version: latest
-          args: release --clean
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          files: opencnpj-*.tar.gz

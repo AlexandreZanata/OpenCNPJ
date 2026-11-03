@@ -1,0 +1,34 @@
+[package]
+name = "opencnpj"
+description = "Compact offline search engine and HTTP API for Brazilian CNPJ open data"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+default-run = "opencnpj"
+
+[dependencies]
+opencnpj-core.workspace = true
+opencnpj-store.workspace = true
+opencnpj-ingest.workspace = true
+anyhow.workspace = true
+thiserror.workspace = true
+clap.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+rayon.workspace = true
+xxhash-rust.workspace = true
+roaring.workspace = true
+tokio.workspace = true
+axum.workspace = true
+tower.workspace = true
+reqwest.workspace = true
+futures-util.workspace = true
+sha2.workspace = true
+hex.workspace = true
+zstd.workspace = true
+libc = "0.2"
+
+[dev-dependencies]
+tempfile.workspace = true

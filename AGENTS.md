@@ -1,92 +1,34 @@
-# AGENTS.md — BUSCA-CNPJ-2026
+# AGENTS.md — OpenCNPJ
 
-> Go API for Receita Federal open data (CNPJ search, import, export).
-> **Read this first** in every agent session.
-
-**Language:** 100% English for code, comments, docs, commits, and agent output.
-
----
-
-## Project + harness layout
+Rust engine for Receita Federal CNPJ open data: download, `.ocnpj` snapshot build,
+search, HTTP API. English only (code, comments, docs, commits).
 
 | Path | Purpose |
 |------|---------|
-| `cmd/` | API and importer entrypoints |
-| `internal/` | handlers, services, repository, importer pipeline |
-| `docs/` | Architecture, security, ADRs (human docs) |
-| `.cursor/rules/` | Cursor rules (project + harness) |
-| `agent-rules/` | Agent Harness rule library (symlink → `.agent-harness/rules`) |
-| `agent-harness/` | Resolve/install scripts (symlink → `.agent-harness/harness`) |
-| `.agent-harness/` | Git submodule — [GoodPraticesForLLMSandAgents](https://github.com/AlexandreZanata/GoodPraticesForLLMSandAgents) |
+| `crates/opencnpj-core` | CNPJ ids, RFB layouts, lossless codecs, normalization |
+| `crates/opencnpj-store` | Snapshot format, reader/writer, index, query engine |
+| `crates/opencnpj-ingest` | ZIP/CSV streaming, build pipeline |
+| `crates/opencnpj` | CLI + HTTP API + benchmark harness |
+| `docs/` | ARCHITECTURE, FORMAT, API, DATA_POLICY, BENCHMARKS |
+| `docs/legacy/` | Archived Go implementation notes and historical benchmarks |
+| `scripts/` | Experiment matrix and baselines (Parquet, SQLite) |
 
----
+## Rules
 
-## Rules path
+- Never trade correctness for speed: every source row must round-trip
+  (`opencnpj verify --sources`). Do not drop rows silently.
+- Snapshot layout changes update `docs/FORMAT.md` and the format version.
+- Do not report a performance number without the command and raw output.
+- No PostgreSQL/Redis/Elasticsearch or paid services.
+- No national datasets or large binaries in Git.
 
-```bash
-pip install -r agent-harness/requirements.txt   # once
-./agent-harness/rules-path.sh                   # → .../agent-rules
-```
-
----
-
-## Always load
-
-1. `agent-rules/AGENT-CORE-PRINCIPLES.md`
-2. `agent-rules/09-ai-agent-specific/token-economy.md`
-3. `agent-rules/09-ai-agent-specific/anti-hallucination.md`
-4. Project Cursor rules: `workflow.mdc`, `code-quality.mdc`, `testing-and-dvt.mdc`, `api-query-budget.mdc`
-
----
-
-## Conditional load (by task)
-
-See **`.cursor/rules/daily-harness-usage.mdc`** for full daily workflow.
+## Delivery gate
 
 ```bash
-cd /data/dev/projects/webstorm/BUSCA-CNPJ-2026
-./agent-harness/resolve-rules.sh <keywords>
-./agent-harness/generate-task-rules.sh api export   # optional
-./agent-harness/generate-task-rules.sh --clean       # when task done
+cargo fmt --all --check
+cargo clippy --workspace --all-targets -- -D warnings
+cargo test --workspace
 ```
 
-| Task | Keywords |
-|------|----------|
-| API / handlers | `api endpoint rest validation` |
-| Security | `owasp security authz injection` |
-| Import pipeline | `performance query async` |
-| Database | `migration query` |
-| Bug fix | `bugfix regression error` |
-
-**Domain glossary:** `docs/GLOSSARY.md`  
-**Security (Go):** `docs/SECURITY.md` + `agent-rules/03-security/`  
-**Architecture:** `docs/ARCHITECTURE.md`  
-**Import pipeline:** `docs/IMPORT.md`  
-**Docs index:** `README.md`
-
----
-
-## Project delivery gate (mandatory)
-
-From `.cursor/rules/workflow.mdc`:
-
-- `go test ./... -short` (or targeted packages)
-- `go vet ./...`
-- Propose commit message only — **do not** run `git commit` unless user asks
-- Format: `type(scope): subject` max 72 chars — see `docs/COMMIT_CONVENTION.md`
-
----
-
-## License
-
-Licensed under **MIT OR Apache-2.0**, at your option. See [docs/LICENSING.md](docs/LICENSING.md).
-
----
-
-## Harness updates
-
-```bash
-git submodule update --remote .agent-harness
-```
-
-Full harness docs: `.agent-harness/harness/README.md`
+Commits: `type(scope): subject` (≤ 72 chars), see `docs/COMMIT_CONVENTION.md`.
+Do not commit or push unless asked. The legacy Go code is at tag `legacy-go-final`.
