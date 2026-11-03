@@ -8,8 +8,10 @@ use std::path::Path;
 use opencnpj_core::Table;
 use opencnpj_ingest::build::{self, BuildConfig, Profile};
 use opencnpj_store::Snapshot;
+use opencnpj_store::format::{self, Footer, Header, SectionKind};
 use opencnpj_store::postings::Field;
 use opencnpj_store::search::{self, Limits, Query};
+use roaring::RoaringBitmap;
 
 fn zip(dir: &Path, name: &str, member: &str, lines: &[Vec<u8>]) {
     let f = std::fs::File::create(dir.join(name)).unwrap();
@@ -86,6 +88,8 @@ fn fixture(dir: &Path) -> usize {
         estab("11111111", "0001", "PADARIA DO JOÃO", "SP", "7107", "1091102", "02"),
         estab("12ABC345", "01DE", "", "RJ", "6001", "6201501", "02"),
         estab("22222222", "0001", "", "MG", "4123", "4530703", "08"),
+        // No município and no CNAE: no doc value (id 0).
+        estab("22222222", "0002", "", "MG", "", "", "02"),
         estab("99999999", "0001", "ORFAO SEM EMPRESA", "BA", "3849", "4711302", "02"),
     ];
     for i in 0..300 {
@@ -222,8 +226,9 @@ fn build_query_and_integrity() {
     )
     .unwrap();
     assert_eq!(r.total, 1);
+    // Company values are propagated: both establishments of the MEI company match.
     let r = search::search(&snap, &f(vec![(Field::Mei, vec!["S".into()])]), &Limits::DEFAULT).unwrap();
-    assert_eq!(r.total, 1);
+    assert_eq!(r.total, 2);
     let groups = search::group_counts(&snap, &Query::default(), Field::Uf, &Limits::DEFAULT).unwrap();
     assert_eq!(groups[0], ("SP".to_string(), 152));
     assert!(search::search(&snap, &Query { limit: 10, ..Default::default() }, &Limits::DEFAULT).is_err());
@@ -235,6 +240,83 @@ fn build_query_and_integrity() {
         assert_eq!(all_rows(&other), base, "profile {p} differs");
     }
     assert_eq!(snap.label("municipios", "7107"), Some("SAO PAULO"));
+}
+
+/// Rewrites a snapshot as format 1.0 would have written it: no `docvalues` section.
+fn downgrade_to_1_0(path: &Path, out: &Path) {
+    let b = std::fs::read(path).unwrap();
+    let footer = Footer::decode(&b[b.len() - format::FOOTER_LEN..]).unwrap();
+    let table = &b[footer.table_offset as usize..b.len() - format::FOOTER_LEN];
+    let mut sections = format::decode_sections(table, footer.table_offset, format::FORMAT_MINOR).unwrap();
+    assert!(sections.iter().any(|s| s.kind == SectionKind::DocValues));
+    sections.retain(|s| s.kind != SectionKind::DocValues);
+    let mut header = Header::decode(&b).unwrap();
+    header.minor = 0;
+    let table = format::encode_sections(&sections);
+    let mut o = b[..footer.table_offset as usize].to_vec();
+    o[..format::HEADER_LEN].copy_from_slice(&header.encode());
+    o.extend_from_slice(&table);
+    let file_len = (o.len() + format::FOOTER_LEN) as u64;
+    let table_xxh3 = xxhash_rust::xxh3::xxh3_64(&table);
+    o.extend_from_slice(&Footer { table_offset: footer.table_offset, table_len: table.len() as u64, table_xxh3, file_len }.encode());
+    std::fs::write(out, o).unwrap();
+}
+
+fn sorted(mut v: Vec<(String, u64)>) -> Vec<(String, u64)> {
+    v.sort();
+    v
+}
+
+#[test]
+fn doc_values_match_postings() {
+    let dir = tempfile::tempdir().unwrap();
+    std::fs::create_dir_all(dir.path().join("2026-10")).unwrap();
+    fixture(&dir.path().join("2026-10"));
+    let (snap, report) = build_profile(dir.path(), "balanced");
+    assert_eq!(snap.header.minor, format::FORMAT_MINOR);
+    assert!(report.section_bytes.contains_key("docvalues"));
+    snap.verify(|_, _| {}).unwrap();
+    for f in [Field::Municipio, Field::Cnae] {
+        assert!(snap.doc_values(f).is_some(), "{} column", f.name());
+    }
+    assert!(snap.doc_values(Field::CnaeSecundaria).is_none());
+
+    let old_path = dir.path().join("v1_0.ocnpj");
+    downgrade_to_1_0(snap.path(), &old_path);
+    let old = Snapshot::open(&old_path).unwrap();
+    assert_eq!(old.header.minor, 0);
+    assert!(old.doc_values(Field::Municipio).is_none());
+    old.verify(|_, _| {}).unwrap();
+
+    let f = |filters: Vec<(Field, Vec<String>)>| Query { filters, limit: 10, ..Default::default() };
+    let queries = [
+        f(vec![(Field::Uf, vec!["SP".into()])]),
+        f(vec![(Field::Uf, vec!["MG".into(), "PR".into()])]),
+        f(vec![(Field::Situacao, vec!["02".into()])]),
+        f(vec![(Field::Porte, vec!["05".into()])]),
+        Query { text: Some("mercad".into()), limit: 10, ..Default::default() },
+    ];
+    let all = RoaringBitmap::from_iter(0..snap.doc_count());
+    for field in [Field::Municipio, Field::Cnae] {
+        // Every document, including those without the field.
+        let col = snap.doc_values(field).unwrap();
+        let counts = snap.doc_value_counts(col, all.iter()).unwrap();
+        let by_dv: Vec<(String, u64)> = col.values.iter().cloned().zip(counts[1..].iter().copied()).collect();
+        assert_eq!(sorted(by_dv), sorted(search::group_counts_postings(&snap, Some(&all), field).unwrap()));
+        assert!(counts[0] >= 4, "documents without {}: {}", field.name(), counts[0]);
+        for q in &queries {
+            let set = search::candidates(&snap, q, &Limits::DEFAULT).unwrap().all.unwrap();
+            let fast = search::group_counts(&snap, q, field, &Limits::DEFAULT).unwrap();
+            let reference = search::group_counts_postings(&snap, Some(&set), field).unwrap();
+            assert!(!fast.is_empty());
+            assert_eq!(sorted(fast.clone()), sorted(reference), "{} {:?}", field.name(), q.filters);
+            // Older snapshots answer through postings, with the same order.
+            assert_eq!(search::group_counts(&old, q, field, &Limits::DEFAULT).unwrap(), fast);
+        }
+    }
+    let sp = search::group_counts(&snap, &queries[0], Field::Municipio, &Limits::DEFAULT).unwrap();
+    assert_eq!(sp, [("7107".to_string(), 152)]);
+    assert!(search::group_counts(&snap, &Query::default(), Field::Municipio, &Limits::DEFAULT).is_err());
 }
 
 #[test]

@@ -15,6 +15,7 @@ use xxhash_rust::xxh3::xxh3_64;
 use crate::Error;
 use crate::block::{BlockView, Codecs, Select};
 use crate::compress::BlockDecompressor;
+use crate::docvalues::{self, DocValuesColumn};
 use crate::format::*;
 use crate::manifest::Manifest;
 use crate::postings::{self, Field};
@@ -54,6 +55,8 @@ pub struct Snapshot {
     /// `table → code → row index` (reference rows keep their source order).
     ref_index: HashMap<String, HashMap<String, usize>>,
     doc_count: u32,
+    /// Forward columns (format ≥ 1.1; empty for older snapshots).
+    doc_values: Vec<DocValuesColumn>,
     cache: Mutex<PostingsCache>,
 }
 
@@ -139,7 +142,7 @@ impl Snapshot {
         if xxh3_64(table) != footer.table_xxh3 {
             return Err(Error::Corrupt("section table checksum mismatch"));
         }
-        let sections = decode_sections(table, footer.table_offset)?;
+        let sections = decode_sections(table, footer.table_offset, header.minor)?;
 
         let get = |kind| section_bytes(&map, &sections, kind, true);
         let manifest: Manifest = serde_json::from_slice(&get(SectionKind::Manifest)?.ok_or(Error::Corrupt("missing manifest"))?)
@@ -160,6 +163,11 @@ impl Snapshot {
         let terms = fst::Map::new(slice).map_err(|_| Error::Corrupt("terms fst"))?;
         let p = find(SectionKind::Postings).ok_or(Error::Corrupt("missing postings section"))?;
         let doc_count = u32::try_from(manifest.counts.documents).map_err(|_| Error::Corrupt("document count"))?;
+        let doc_values = match find(SectionKind::DocValues) {
+            Some(d) if d.codec == SectionCodec::Raw => docvalues::parse(&map, d.offset as usize, (d.offset + d.len) as usize, doc_count)?,
+            Some(_) => return Err(Error::Corrupt("doc values section must be stored raw")),
+            None => Vec::new(),
+        };
         let snap = Self {
             path: path.to_path_buf(),
             map,
@@ -177,6 +185,7 @@ impl Snapshot {
                 .collect(),
             refs,
             doc_count,
+            doc_values,
             cache: Mutex::new(PostingsCache { map: HashMap::new(), order: VecDeque::new(), bytes: 0, budget: DEFAULT_POSTINGS_CACHE }),
         };
         snap.validate_blocks()?;
@@ -201,6 +210,40 @@ impl Snapshot {
 
     pub fn doc_count(&self) -> u32 {
         self.doc_count
+    }
+
+    /// Forward column of `field`, if this snapshot stores one.
+    pub fn doc_values(&self, field: Field) -> Option<&DocValuesColumn> {
+        self.doc_values.iter().find(|c| c.field == field)
+    }
+
+    /// Counts documents of `docs` per value id of `col` (index 0: no value).
+    pub fn doc_value_counts(&self, col: &DocValuesColumn, docs: impl Iterator<Item = u32>) -> Result<Vec<u64>, Error> {
+        col.count(&self.map, docs)
+    }
+
+    /// Checks that every forward column agrees with the postings: same values as the
+    /// field's terms, and each document in the postings of value `k` has id `k`.
+    fn verify_doc_values(&self) -> Result<(), Error> {
+        for col in &self.doc_values {
+            let terms = self.prefix_terms(col.field, b"", usize::MAX);
+            if terms.len() != col.values.len() || terms.iter().zip(&col.values).any(|((t, _), v)| t != v.as_bytes()) {
+                return Err(Error::Corrupt("doc values differ from the term dictionary"));
+            }
+            let mut with_value = 0u64;
+            for (k, (_, off)) in terms.iter().enumerate() {
+                let p = postings::decode_postings(&self.map[self.postings.0..self.postings.1], *off as usize, self.doc_count)?.0;
+                if p.iter().any(|d| col.id(&self.map, d) != Some(k as u32 + 1)) {
+                    return Err(Error::Corrupt("doc values differ from postings"));
+                }
+                with_value += p.len();
+            }
+            let counts = col.count(&self.map, 0..self.doc_count)?;
+            if counts[1..].iter().sum::<u64>() != with_value {
+                return Err(Error::Corrupt("doc values differ from postings"));
+            }
+        }
+        Ok(())
     }
 
     fn entry(&self, kind: SectionKind) -> Option<SectionEntry> {
@@ -263,6 +306,7 @@ impl Snapshot {
         if companies != self.manifest.counts.companies || docs != self.manifest.counts.documents {
             return Err(Error::Corrupt("decoded counts differ from manifest"));
         }
+        self.verify_doc_values()?;
         Ok((companies, docs))
     }
 

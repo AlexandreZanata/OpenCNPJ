@@ -17,6 +17,7 @@ use opencnpj_core::varint::{self, Reader};
 use opencnpj_core::{Company, Kind, Table};
 use opencnpj_store::block::{BlockBuilder, Codecs};
 use opencnpj_store::compress::{BlockCodec, BlockCompressor, train_dictionary};
+use opencnpj_store::docvalues::{self, DocValuesBuilder};
 use opencnpj_store::format::SectionKind;
 use opencnpj_store::manifest::{ColumnSchema, Counts, Manifest, SourceFile, TableSchema};
 use opencnpj_store::postings::{Field, MAX_NAME_LEN_BUCKET, TermCollector};
@@ -634,7 +635,11 @@ pub fn build_from_partition(state: &PartitionState, cfg: &BuildConfig, log: &(dy
     let t_idx = Instant::now();
     let fst_path = tmp.join("terms.fst");
     let post_path = tmp.join("postings.bin");
-    let idx = opencnpj_store::index::merge_runs(&runs, &fst_path, &post_path)?;
+    // Forward columns come from the same term stream as the postings, so they agree by
+    // construction (and `verify` re-checks it).
+    let mut doc_values = DocValuesBuilder::new(&docvalues::FIELDS, doc_base);
+    let idx = opencnpj_store::index::merge_runs(&runs, &fst_path, &post_path, |t, d| doc_values.add_term(t, d))?;
+    let doc_values = doc_values.finish();
     counts.terms = idx.terms;
     timings.insert("merge_index".to_string(), t_idx.elapsed().as_secs_f64());
     temp_peak.fetch_max(temp_now.load(Ordering::Relaxed) + idx.fst_bytes + idx.postings_bytes, Ordering::Relaxed);
@@ -657,6 +662,9 @@ pub fn build_from_partition(state: &PartitionState, cfg: &BuildConfig, log: &(dy
     w.section(SectionKind::Rejects, &rj, true)?;
     w.section_from_file(SectionKind::Terms, &fst_path)?;
     w.section_from_file(SectionKind::Postings, &post_path)?;
+    if let Some(dv) = &doc_values {
+        w.section(SectionKind::DocValues, dv, false)?;
+    }
 
     let manifest = Manifest {
         format: "opencnpj-snapshot".into(),

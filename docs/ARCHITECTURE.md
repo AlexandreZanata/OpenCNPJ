@@ -30,7 +30,8 @@ download ─► ZIPs (+ .sha256, source-manifest.json)
                  (term, doc) pairs → sorted run file
               │
  phase C      ▼  concatenate segments (global doc ids by prefix sum), k-way merge runs into
- assemble        FST + postings, write dictionaries/manifest/section table/footer,
+ assemble        FST + postings (+ município/CNAE doc values from the same term stream),
+                 write dictionaries/manifest/section table/footer,
                  fsync, rename into place, write SHA-256 sidecar
 ```
 
@@ -69,6 +70,12 @@ Parquet and SQLite are measured as baselines instead.
 
 Ranking is computed with bitmaps too: per-field "name length" terms let the engine take
 the shortest matching names first without visiting every candidate.
+
+`group_by` on município and CNAE principal reads a forward column (one bit-packed value
+id per document, `docvalues` section) and counts the candidates in one pass: documents are
+ordered by CNPJ, so intersecting thousands of value postings with a large candidate set
+touched every Roaring container once per value. Secondary CNAE is multi-valued and keeps
+the postings path (see `docs/BENCHMARKS.md` for the measured trade-off).
 
 ### Memory-mapped, immutable snapshots
 

@@ -174,7 +174,13 @@ fn workloads(snap: &Snapshot, n: usize, seed: u64) -> Result<Vec<(&'static str, 
             )));
         }
         cats.entry("stats_uf_by_cnae").or_default().push(Work::Stats(q(None, vec![(Field::Cnae, vec![cnae])], false), Field::Uf));
-        cats.entry("stats_municipio_by_uf").or_default().push(Work::Stats(q(None, vec![(Field::Uf, vec![uf])], false), Field::Municipio));
+        for (cat, f) in [
+            ("stats_municipio_by_uf", Field::Municipio),
+            ("stats_cnae_by_uf", Field::Cnae),
+            ("stats_cnae_secundaria_by_uf", Field::CnaeSecundaria),
+        ] {
+            cats.entry(cat).or_default().push(Work::Stats(q(None, vec![(Field::Uf, vec![uf.clone()])], false), f));
+        }
     }
     for i in 0..n {
         cats.entry("name_popular").or_default().push(Work::Search(q(Some(POPULAR[i % POPULAR.len()].to_string()), vec![], false)));
@@ -182,7 +188,8 @@ fn workloads(snap: &Snapshot, n: usize, seed: u64) -> Result<Vec<(&'static str, 
     Ok(cats
         .into_iter()
         .map(|(k, mut v)| {
-            v.truncate(if k.starts_with("stats_municipio") { (n / 50).max(10) } else { n });
+            // Group-bys over a whole UF were seconds per query with postings only.
+            v.truncate(if k.ends_with("_by_uf") { (n / 50).max(10) } else { n });
             (k, v)
         })
         .collect())

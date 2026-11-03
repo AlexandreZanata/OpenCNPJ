@@ -992,6 +992,7 @@ dependencies = [
  "opencnpj-core",
  "opencnpj-store",
  "rayon",
+ "roaring",
  "serde",
  "serde_json",
  "sha2",

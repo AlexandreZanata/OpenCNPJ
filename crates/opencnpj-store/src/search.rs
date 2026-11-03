@@ -300,8 +300,10 @@ pub fn search(snap: &Snapshot, q: &Query, limits: &Limits) -> Result<SearchResul
 
 /// Counts documents per value of `group_by`, restricted to the query's candidates.
 ///
-/// High-cardinality fields (município, CNAE, natureza) need a narrowing filter: each value
-/// is one postings list to decode. Heavy analytics belong in a columnar engine (export to
+/// High-cardinality fields (município, CNAE, natureza) need a narrowing filter. Município
+/// and CNAE principal are counted in one pass over the candidates when the snapshot has
+/// forward columns (format ≥ 1.1); otherwise, and for the other fields, each value is one
+/// postings list to intersect. Heavy analytics belong in a columnar engine (export to
 /// Parquet/DuckDB), not in the request path.
 pub fn group_counts(snap: &Snapshot, q: &Query, group_by: Field, limits: &Limits) -> Result<Vec<(String, u64)>, Error> {
     let set = candidates(snap, q, limits)?.all;
@@ -309,10 +311,23 @@ pub fn group_counts(snap: &Snapshot, q: &Query, group_by: Field, limits: &Limits
     if high_cardinality && set.is_none() {
         return Err(Error::Invalid(format!("group_by={} requires q or a filter", group_by.name())));
     }
+    let mut out = match (&set, snap.doc_values(group_by)) {
+        (Some(s), Some(col)) => {
+            let counts = snap.doc_value_counts(col, s.iter())?;
+            col.values.iter().zip(&counts[1..]).filter(|(_, n)| **n > 0).map(|(v, n)| (v.clone(), *n)).collect()
+        }
+        _ => group_counts_postings(snap, set.as_ref(), group_by)?,
+    };
+    out.sort_by(|a, b| b.1.cmp(&a.1).then_with(|| a.0.cmp(&b.0)));
+    Ok(out)
+}
+
+/// Per-value postings intersection (unsorted); the reference path for every field.
+pub fn group_counts_postings(snap: &Snapshot, set: Option<&RoaringBitmap>, group_by: Field) -> Result<Vec<(String, u64)>, Error> {
     let mut out = Vec::new();
     for (value, off) in snap.prefix_terms(group_by, b"", usize::MAX) {
         let p = snap.postings_by_offset(off)?;
-        let n = match &set {
+        let n = match set {
             Some(s) => s.intersection_len(&p),
             None => p.len(),
         };
@@ -320,6 +335,5 @@ pub fn group_counts(snap: &Snapshot, q: &Query, group_by: Field, limits: &Limits
             out.push((String::from_utf8_lossy(&value).into_owned(), n));
         }
     }
-    out.sort_by(|a, b| b.1.cmp(&a.1).then_with(|| a.0.cmp(&b.0)));
     Ok(out)
 }

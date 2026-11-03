@@ -24,4 +24,5 @@ zip = { version = "9", default-features = false, features = ["deflate"] }
 flate2 = { version = "1", default-features = false, features = ["zlib-rs"] }
 
 [dev-dependencies]
+roaring.workspace = true
 tempfile.workspace = true

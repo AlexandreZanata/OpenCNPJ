@@ -1,4 +1,4 @@
-# `.ocnpj` snapshot format, version 1.0
+# `.ocnpj` snapshot format, version 1.1
 
 One immutable file per competence (monthly release) and build profile. Everything
 needed to answer queries — data, dictionaries, block directory, term dictionary and
@@ -19,7 +19,7 @@ the file size before using it; the reference reader (`opencnpj-store::reader`) d
 |-------:|-----:|-------|
 | 0 | 8 | magic `OCNPJ\0v1` |
 | 8 | 2 | format major (`1`); readers reject other majors |
-| 10 | 2 | format minor (`0`); additive changes only |
+| 10 | 2 | format minor (`1`); additive changes only |
 | 12 | 4 | flags (reserved, `0`) |
 | 16 | 8 | competence, ASCII `YYYY-MM`, NUL-padded |
 | 24 | 32 | reserved (zero) |
@@ -47,9 +47,12 @@ Each kind appears at most once. `xxh3` covers the stored (possibly compressed) b
 | 7 | `rejects` | Source lines that did not fit the layout, verbatim Latin-1 bytes (zstd) |
 | 8 | `terms` | FST (`fst` crate format) mapping term → postings offset |
 | 9 | `postings` | Postings lists |
+| 10 | `docvalues` | Forward columns for `group_by`, stored raw (1.1, optional; below) |
 
-Unknown kinds are an error in 1.0. Future minors may add kinds that 1.0 readers ignore
-only if the major version is unchanged and the manifest says so.
+A reader rejects an unknown kind unless the header's minor version is newer than its own,
+in which case the section is skipped: minor versions only add optional sections. 1.0
+readers predate this rule and reject 1.1 files (unknown kind 10); 1.1 readers open 1.0
+files, which simply have no `docvalues` section.
 
 ## Data model and blocks
 
@@ -113,6 +116,30 @@ Postings entry: `varint len, tag u8, payload` — tag 0 is a delta-varint list
 (`count`, first id, gaps), tag 1 a Roaring bitmap in the portable serialization. The
 builder writes whichever is smaller.
 
+### Doc values (section 10, format 1.1)
+
+One value id per document for single-valued, high-cardinality filter fields, so that
+`group_by` iterates the candidate documents once instead of intersecting one postings list
+per value. Stored for `municipio` (5) and `cnae` (6). `cnae_secundaria` is multi-valued
+and stays on postings. The section is stored raw (codec 0) and read from the mapping in
+place; offsets are relative to the section start.
+
+```text
+u32 n_columns, u32 doc_count            (doc_count = manifest document count)
+n_columns × 40 B: field u8, bits u8, reserved [u8; 2] (0), n_values u32,
+                  values_offset u64, values_len u64, ids_offset u64, ids_len u64
+values: n_values × (varint len, UTF-8 bytes), strictly ascending
+ids:    doc_count × bits, LSB-first (doc d at bit d·bits), then 8 zero bytes of padding
+```
+
+`bits` is the minimum width for ids `0..=n_values`. Id 0 means the document has no value;
+id `k ≥ 1` is `values[k − 1]`. `values` is exactly the field's term list, and a document
+has id `k` if and only if it is in the postings of `values[k − 1]`: the builder fills the
+column from the same term stream as the postings during the index merge, and
+`verify` checks the equivalence. A field with more than 65,535 values is not stored (its
+`group_by` uses postings). Readers validate the header, bounds, value order and lengths at
+open; an id above `n_values` is reported as corruption when read.
+
 ## Integrity
 
 * Header, section table, every section and every block carry xxh3-64 checksums.
@@ -126,3 +153,5 @@ builder writes whichever is smaller.
 * Major version change: incompatible layout. Old readers refuse the file; rebuild from
   the source ZIPs (snapshots are derived artifacts, the ZIPs are the source of truth).
 * Minor version change: new optional sections or manifest fields only.
+* 1.0 → 1.1: added `docvalues`. Readers fall back to postings when it is absent, so 1.0
+  snapshots answer `group_by` with identical results, only slower.

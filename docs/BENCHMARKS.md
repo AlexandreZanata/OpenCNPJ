@@ -299,11 +299,57 @@ names, popular names, name + UF and fuzzy on fast/balanced; prefix typeahead is 
 69–100 ms p95 with a long tail (p99 175–212 ms) from 3-letter prefixes of very frequent
 words.
 
-**Known bottleneck:** `stats?group_by=municipio` (and CNAE) takes seconds because every
-value's postings must be intersected with the candidates. It is restricted to filtered
-queries; a per-document forward column for these fields (estimated +150–220 MB) would
-turn it into a single pass and is the next optimization. Low-cardinality group-bys
-(UF, situação, porte) take ~90 ms p50.
+`stats_municipio_by_uf` in the table above was measured on format 1.0, where every
+município's postings were intersected with the candidates. Format 1.1 removed that
+bottleneck; see the next section.
+
+### Group-by with doc values (format 1.1)
+
+Format 1.1 adds a `docvalues` section (`docs/FORMAT.md`): one bit-packed value id per
+document for município (13 bits) and CNAE principal (11 bits). `group_by` on those fields
+counts the candidates in one pass instead of intersecting 5,572 / 1,343 postings lists.
+Measured with one binary (commit with this change, `--release`) on the 1.0 balanced
+snapshot (postings path: the reader falls back when the section is absent) and on a 1.1
+balanced snapshot rebuilt from the same phase-A output and verified with
+`verify --sources` (all four tables MATCH, 0 rejects, doc values cross-checked against
+postings). `bench --only stats --queries 1000`, warm, 1 thread; group-bys filtered by one
+UF use 20 sampled queries (seed 42, identical in every run), `stats_uf_by_cnae` 1,000.
+
+| category | 1.0 p50 / p95 / p99 ms | 1.0 rerun p50 / p95 / p99 ms | 1.1 p50 / p95 / p99 ms |
+|---|---:|---:|---:|
+| stats_municipio_by_uf | 2795.951 / 7228.288 / 7997.579 | 2786.513 / 7316.567 / 8149.414 | 14.591 / 80.755 / 82.788 |
+| stats_cnae_by_uf | 983.683 / 2232.179 / 2465.259 | 984.905 / 2169.640 / 2400.565 | 14.253 / 85.378 / 87.002 |
+| stats_cnae_secundaria_by_uf | 1490.838 / 3117.249 / 3414.350 | 1494.187 / 3095.618 / 3427.662 | 1498.812 / 3040.676 / 3364.706 |
+| stats_uf_by_cnae | 82.635 / 232.760 / 253.546 | — | 73.877 / 207.347 / 211.923 |
+
+Município and CNAE group-bys are ~190× / ~69× faster at p50; the p95 (~81–85 ms) is
+the largest UF (São Paulo), whose candidate bitmap the one-pass count iterates in full.
+Secondary CNAE and `stats_uf_by_cnae` (UF has 28 values) do not use doc values and did not
+change beyond run-to-run noise. Load average was 2.7–6.6 during these runs (the
+`uptime` lines in the logs); the 1.0 rerun came right after the 1.1 runs.
+
+Thread scaling on 1.1 (same workload):
+
+| category | p50 ms @1/4/16 | q/s @1/4/16 |
+|---|---:|---:|
+| stats_municipio_by_uf | 15.029 / 15.351 / 33.409 | 29 / 89 / 148 |
+| stats_cnae_by_uf | 14.209 / 15.501 / 28.838 | 29 / 89 / 146 |
+
+**Size cost:** the `docvalues` section is 221,466,852 bytes (73,809,381 documents ×
+24 bits + value lists + padding), +3.5% on the balanced file; `terms`, `postings` and
+`dictionaries` are byte-identical to the 1.0 build. The 1.1 file is 6,641,347,055 bytes,
+but 29.0 MB of the difference from the 1.0 file (6,390,868,664) is the `data` section:
+the trained zstd dictionary differed between the two builds (its sample is gathered by
+parallel workers up to a byte budget, so it depends on thread timing), not the doc
+values. Building the column runs inside the index merge: `merge_index` took 46.9 s versus
+39.7 s in the 1.0 build (different runs and load, not a controlled A/B); peak RSS of the
+from-partition rebuild was 3.58 GB.
+
+**Secondary CNAE stays on postings.** It is multi-valued: the 2026-10 snapshot has
+126,557,313 (document, secondary CNAE) pairs over 34,936,591 documents (counted from the
+postings). A list column would need ≥ 174 MB for 11-bit ids alone (126,557,313 × 11 bits,
+arithmetic, not built) plus per-document offsets — more than both single-valued columns
+together — to speed up one group-by that takes ~1.5 s today. Not adopted.
 
 ## Reproduce
 
@@ -317,6 +363,13 @@ for p in fast compact; do
      --output data/snapshots/2026-10-$p.ocnpj --report data/reports/build-2026-10-$p.json
 done
 for p in balanced fast compact; do $B verify data/snapshots/2026-10-$p.ocnpj --sources data/raw/2026-10; done
+# doc values (format 1.1): rebuild, verify, group-by before/after
+$B build --input data/raw/2026-10 --from-partition --tmp data/work/2026-10 --profile balanced \
+   --output data/snapshots/2026-10-balanced-1.1.ocnpj --report data/reports/build-2026-10-balanced-1.1.json
+$B verify data/snapshots/2026-10-balanced-1.1.ocnpj --sources data/raw/2026-10
+$B bench --snapshot data/snapshots/2026-10-balanced.ocnpj --queries 1000 --threads 1 --only stats --out data/bench/docvalues/before
+$B bench --snapshot data/snapshots/2026-10-balanced-1.1.ocnpj --queries 1000 --threads 1 --only stats --out data/bench/docvalues/after
+$B bench --snapshot data/snapshots/2026-10-balanced-1.1.ocnpj --queries 1000 --threads 1,4,16 --only stats --out data/bench/docvalues/after-threads
 scripts/experiments.sh $B data/work/2026-10 data/experiments 10   # matrix
 scripts/measure-all.sh $B data 2026-10                           # queries, cold, HTTP, baselines
 python3 -I scripts/report.py data 2026-10                         # tables in this file

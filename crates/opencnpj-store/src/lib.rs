@@ -2,6 +2,7 @@
 
 pub mod block;
 pub mod compress;
+pub mod docvalues;
 pub mod format;
 pub mod index;
 pub mod manifest;
