@@ -1,6 +1,26 @@
 [package]
 name = "opencnpj-store"
-version = "0.1.0"
-edition = "2024"
+description = "OpenCNPJ .ocnpj snapshot format: compressed columnar blocks and search indexes"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
 
 [dependencies]
+opencnpj-core.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+zstd.workspace = true
+lz4_flex = "0.11"
+fst = { workspace = true, features = ["levenshtein"] }
+roaring.workspace = true
+memmap2.workspace = true
+xxhash-rust.workspace = true
+sha2.workspace = true
+hex.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+proptest.workspace = true

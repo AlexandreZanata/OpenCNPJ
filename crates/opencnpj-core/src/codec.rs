@@ -78,6 +78,27 @@ impl ColumnCodec {
         }
     }
 
+    /// Advances past one encoded value without materializing it.
+    pub fn skip(&self, r: &mut Reader<'_>) -> Result<(), Malformed> {
+        if self.kind == Kind::Text {
+            r.lp_bytes()?;
+            return Ok(());
+        }
+        match r.varint()? {
+            TAG_EMPTY => {}
+            TAG_RAW => {
+                r.lp_bytes()?;
+            }
+            t if self.kind == Kind::CnaeList => {
+                for _ in 0..(t - TYPED).min(4096) {
+                    r.varint()?;
+                }
+            }
+            _ => {}
+        }
+        Ok(())
+    }
+
     /// Appends the decoded value to `out` (which the caller clears).
     pub fn decode(&self, r: &mut Reader<'_>, out: &mut String) -> Result<(), Malformed> {
         if self.kind == Kind::Text {

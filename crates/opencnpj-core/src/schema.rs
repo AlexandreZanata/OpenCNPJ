@@ -166,14 +166,8 @@ pub enum RefTable {
 }
 
 impl RefTable {
-    pub const ALL: [RefTable; 6] = [
-        RefTable::Cnaes,
-        RefTable::Motivos,
-        RefTable::Municipios,
-        RefTable::Naturezas,
-        RefTable::Paises,
-        RefTable::Qualificacoes,
-    ];
+    pub const ALL: [RefTable; 6] =
+        [RefTable::Cnaes, RefTable::Motivos, RefTable::Municipios, RefTable::Naturezas, RefTable::Paises, RefTable::Qualificacoes];
 
     pub fn name(self) -> &'static str {
         match self {
