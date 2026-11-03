@@ -297,8 +297,11 @@ pub fn current_snapshot(data_dir: &Path, pointer: &str) -> Option<PathBuf> {
 /// Atomically points `<data_dir>/<pointer>` at `rel`.
 pub fn set_pointer(data_dir: &Path, pointer: &str, rel: &str) -> Result<()> {
     let tmp = data_dir.join(format!(".{pointer}.tmp"));
-    std::fs::write(&tmp, format!("{rel}\n"))?;
-    std::fs::File::open(&tmp)?.sync_all()?;
+    // Sync through the writable handle: Windows refuses to flush a read-only one.
+    let mut f = std::fs::File::create(&tmp)?;
+    std::io::Write::write_all(&mut f, format!("{rel}\n").as_bytes())?;
+    f.sync_all()?;
+    drop(f);
     std::fs::rename(&tmp, data_dir.join(pointer))?;
     Ok(())
 }
