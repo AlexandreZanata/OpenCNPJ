@@ -1,0 +1,90 @@
+//! Source decoding (ISO-8859-1) and search normalization.
+//!
+//! Normalization is only used to build and query the text index. Stored values are
+//! never normalized.
+
+/// Decodes ISO-8859-1 bytes. Every byte maps to the code point of the same value, so the
+/// conversion is total and reversible.
+pub fn latin1_to_string(bytes: &[u8], out: &mut String) {
+    if bytes.is_ascii() {
+        out.push_str(std::str::from_utf8(bytes).expect("ascii is utf-8"));
+    } else {
+        out.extend(bytes.iter().map(|&b| char::from(b)));
+    }
+}
+
+/// Folds a character to its uppercase ASCII search form, or `None` for separators.
+#[inline]
+fn fold(c: char) -> Option<char> {
+    Some(match c {
+        'a'..='z' => c.to_ascii_uppercase(),
+        'A'..='Z' | '0'..='9' => c,
+        'À'..='Å' | 'à'..='å' | 'ª' => 'A',
+        'Ç' | 'ç' => 'C',
+        'È'..='Ë' | 'è'..='ë' => 'E',
+        'Ì'..='Ï' | 'ì'..='ï' => 'I',
+        'Ñ' | 'ñ' => 'N',
+        'Ò'..='Ö' | 'Ø' | 'ò'..='ö' | 'ø' | 'º' => 'O',
+        'Ù'..='Ü' | 'ù'..='ü' => 'U',
+        'Ý' | 'ý' | 'ÿ' => 'Y',
+        _ => return None,
+    })
+}
+
+/// Words that carry no search value in company names and would create huge postings.
+pub const STOPWORDS: &[&str] = &["DA", "DAS", "DE", "DI", "DO", "DOS", "E"];
+
+/// Longest indexed token, in bytes. Longer tokens are truncated (derived data only).
+pub const MAX_TOKEN: usize = 32;
+
+/// Splits text into normalized search tokens, skipping stopwords, preserving order and
+/// duplicates.
+pub fn tokenize(text: &str, mut f: impl FnMut(&str)) {
+    let mut tok = String::with_capacity(32);
+    let mut flush = |tok: &mut String| {
+        if !tok.is_empty() {
+            if !STOPWORDS.contains(&tok.as_str()) {
+                f(tok);
+            }
+            tok.clear();
+        }
+    };
+    for c in text.chars() {
+        match fold(c) {
+            Some(u) => {
+                if tok.len() < MAX_TOKEN {
+                    tok.push(u);
+                }
+            }
+            None => flush(&mut tok),
+        }
+    }
+    flush(&mut tok);
+}
+
+pub fn tokens(text: &str) -> Vec<String> {
+    let mut v = Vec::new();
+    tokenize(text, |t| v.push(t.to_string()));
+    v
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn latin1() {
+        let mut s = String::new();
+        latin1_to_string(b"S\xc3O PAULO \xe7", &mut s);
+        assert_eq!(s, "SÃO PAULO ç");
+    }
+
+    #[test]
+    fn tokenization() {
+        assert_eq!(tokens("Padaria São João & Cia. Ltda - ME"), ["PADARIA", "SAO", "JOAO", "CIA", "LTDA", "ME"]);
+        assert_eq!(tokens("BANCO DO BRASIL SA"), ["BANCO", "BRASIL", "SA"]);
+        assert_eq!(tokens("  "), Vec::<String>::new());
+        assert_eq!(tokens("WM&R"), ["WM", "R"]);
+        assert_eq!(tokens(&"X".repeat(50))[0].len(), MAX_TOKEN);
+    }
+}

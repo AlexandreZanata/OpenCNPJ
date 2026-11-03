@@ -1,85 +1,11 @@
-# Binaries (root only — do not match cmd/importer/)
-/importer
-/main
-/monitor
-*.exe
-*.exe~
-*.dll
-*.so
-*.dylib
-bin/
-dist/
-
-# Test binary
-*.test
-
-# Go coverage / profiling
-*.out
-coverage.html
-cpu.prof
-mem.prof
-
-# Dependency directories
-vendor/
-node_modules/
-
-# Node lockfiles at repo root (CI uses commitlint action; web/ has its own lockfile)
-/package-lock.json
-/npm-shrinkwrap.json
-
-# Go workspace file
-go.work
-
-# Environment variables
-.env
-.env.local
-
-# IDE
+/target/
+*.ocnpj
+*.ocnpj.tmp*
+/data/
+/bench-results/tmp/
+*.zip
+*.swp
+.DS_Store
 .idea/
 .vscode/
-.cursor/rules/_task-active.mdc
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Logs
-*.log
-
-# Database
-*.db
-*.sqlite
-
-# Imported CNPJ data (multi-GB)
-data/
-!data/.gitkeep
-
-# Archives (downloaded RFB zips live under data/)
-*.tar.gz
-*.zip
-
-# Security scan artifacts
-gosec-results.sarif
-go.list
-
-# Import / benchmark runtime state
-data/system_guard.state
-data/system_guard.log
-
-# Optional local agent overrides
-.local/
-
-# Local docker-compose tuning (host-specific RAM profile)
-docker-compose.override.yml
-
-# VPS deploy credentials (fetched locally by deploy scripts — never commit)
-opencnpj-credentials-*.txt
-.deploy-staging/
-
-# VPS — real host configs only on the server (repo ships *.example templates)
-deploy/vps/*
-!deploy/vps/README.md
-!deploy/vps/*.example
+.env

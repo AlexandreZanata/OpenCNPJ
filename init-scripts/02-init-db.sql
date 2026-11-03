@@ -1,2 +1,0 @@
--- This script runs after migrations
--- Can be used for initial data or additional setup
