@@ -124,13 +124,13 @@ impl<'a> BlockBuilder<'a> {
 /// Which rows of a company to decode.
 #[derive(Debug, Clone, Copy)]
 pub struct Select {
-    /// `Some(k)`: only the k-th establishment.
-    pub estab: Option<usize>,
+    /// `Some((start, len))`: only establishments `start..start + len` (clamped).
+    pub estabs: Option<(usize, usize)>,
     pub socios: bool,
 }
 
 impl Select {
-    pub const ALL: Select = Select { estab: None, socios: true };
+    pub const ALL: Select = Select { estabs: None, socios: true };
 }
 
 /// Parsed stream table of a raw block.
@@ -233,12 +233,10 @@ impl<'a> BlockView<'a> {
             let mut take = counts[index][t.index()] as usize;
             match t {
                 Table::Estabelecimentos => {
-                    if let Some(k) = sel.estab {
-                        if k >= take {
-                            return Err(Error::Invalid("establishment index out of range".into()));
-                        }
-                        skip += k as u64;
-                        take = 1;
+                    if let Some((start, len)) = sel.estabs {
+                        let start = start.min(take);
+                        skip += start as u64;
+                        take = len.min(take - start);
                     }
                 }
                 Table::Socios if !sel.socios => take = 0,

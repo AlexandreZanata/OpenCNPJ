@@ -172,12 +172,18 @@ fn json_response(v: Value) -> Response {
     r
 }
 
-async fn get_cnpj(State(st): State<Shared>, UrlPath(id): UrlPath<String>) -> ApiResult {
+async fn get_cnpj(State(st): State<Shared>, UrlPath(id): UrlPath<String>, UrlQuery(p): UrlQuery<HashMap<String, String>>) -> ApiResult {
     if id.len() > 32 {
         return Err(ApiError::new(StatusCode::BAD_REQUEST, "invalid_cnpj", "invalid cnpj"));
     }
+    let num = |k: &str, d: usize| p.get(k).map_or(Ok(d), |v| v.parse::<usize>().map_err(|_| ApiError::bad(format!("bad {k}"))));
+    let offset = num("estab_offset", 0)?;
+    let limit = num("estab_limit", output::DEFAULT_ESTAB_PAGE)?;
+    if limit == 0 || limit > 1000 {
+        return Err(ApiError::bad("estab_limit must be between 1 and 1000"));
+    }
     let privacy = st.privacy;
-    let v = blocking(&st, "cnpj", move |s| output::lookup_with(&s, &id, privacy)).await?;
+    let v = blocking(&st, "cnpj", move |s| output::lookup_page(&s, &id, privacy, offset, limit)).await?;
     match v {
         Some(v) => Ok(json_response(v)),
         None => Err(ApiError::new(StatusCode::NOT_FOUND, "cnpj_not_found", "cnpj not found")),

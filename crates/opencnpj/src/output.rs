@@ -92,11 +92,19 @@ pub enum LookupError {
 }
 
 pub fn lookup_with(snap: &Snapshot, id: &str, privacy: Privacy) -> Result<Option<Value>> {
+    lookup_page(snap, id, privacy, 0, DEFAULT_ESTAB_PAGE)
+}
+
+/// Establishments returned per root lookup unless asked otherwise.
+pub const DEFAULT_ESTAB_PAGE: usize = 100;
+
+/// Like [`lookup_with`]; root lookups return establishments `offset..offset + limit`.
+pub fn lookup_page(snap: &Snapshot, id: &str, privacy: Privacy, offset: usize, limit: usize) -> Result<Option<Value>> {
     let compact: String = id.chars().filter(|c| !matches!(c, '.' | '/' | '-' | ' ')).collect();
     if compact.len() == 8 {
         let basico = opencnpj_core::cnpj::parse_basico(&compact).ok_or_else(|| LookupError::Invalid("bad cnpj_basico".into()))?;
         let basico = std::str::from_utf8(&basico).expect("ascii");
-        let Some(c) = snap.company(basico)? else { return Ok(None) };
+        let Some((c, total)) = snap.company_page(basico, offset, limit)? else { return Ok(None) };
         let (empresa, socios, simples) = company_parts(snap, &c, privacy);
         let estabs: Vec<Value> = c
             .estabelecimentos
@@ -111,6 +119,8 @@ pub fn lookup_with(snap: &Snapshot, id: &str, privacy: Privacy) -> Result<Option
             "cnpj_basico": c.basico,
             "empresa": empresa,
             "estabelecimentos": estabs,
+            "total_estabelecimentos": total,
+            "estabelecimentos_offset": offset,
             "socios": socios,
             "simples": simples,
             "snapshot": snapshot_ref(snap),

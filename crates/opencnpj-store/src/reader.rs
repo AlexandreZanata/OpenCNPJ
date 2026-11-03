@@ -286,6 +286,15 @@ impl Snapshot {
         self.with_company(basico, |view, pos, counts, _| view.company(&self.codecs, pos, basico.to_string(), counts))
     }
 
+    /// Company with establishments `offset..offset + limit` only; returns the total count.
+    pub fn company_page(&self, basico: &str, offset: usize, limit: usize) -> Result<Option<(Company, usize)>, Error> {
+        self.with_company(basico, |view, pos, counts, _| {
+            let total = counts[pos][Table::Estabelecimentos.index()] as usize;
+            let sel = Select { estabs: Some((offset, limit)), socios: true };
+            Ok((view.company_select(&self.codecs, pos, basico.to_string(), counts, sel)?, total))
+        })
+    }
+
     /// Runs `f(view, position, counts, block_first_doc)` on the block holding `basico`.
     fn with_company<T>(
         &self,
@@ -336,7 +345,7 @@ impl Snapshot {
                 d += docs;
             }
             let (ci, ei, has_estab) = found.ok_or(Error::Corrupt("doc not found in its block"))?;
-            let sel = Select { estab: has_estab.then_some(ei), socios: false };
+            let sel = Select { estabs: has_estab.then_some((ei, 1)), socios: false };
             let company = view.company_select(&self.codecs, ci, keys[ci].clone(), counts, sel)?;
             out.push(DocRecord { doc, company, estab: has_estab.then_some(0) });
         }
@@ -351,7 +360,7 @@ impl Snapshot {
             let ordens = view.estab_column(&self.codecs, pos, counts, est::ORDEM)?;
             let dvs = view.estab_column(&self.codecs, pos, counts, est::DV)?;
             let Some(k) = (0..ordens.len()).find(|&k| ordens[k] == ordem && dvs[k] == dv) else { return Ok(None) };
-            let sel = Select { estab: Some(k), socios: true };
+            let sel = Select { estabs: Some((k, 1)), socios: true };
             Ok(Some((view.company_select(&self.codecs, pos, basico.to_string(), counts, sel)?, ordens.len())))
         })?;
         Ok(found.flatten())

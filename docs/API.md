@@ -13,9 +13,9 @@ reference table or the RFB layout defines them.
 
 | Method & path | Description |
 |---------------|-------------|
-| `GET /api/v1/cnpj/{cnpj}` | Establishment by 14-character CNPJ (punctuation and lowercase accepted, check digits validated, numeric or alphanumeric) with company, partners and Simples. An 8-character root returns the company with all establishments. |
+| `GET /api/v1/cnpj/{cnpj}` | Establishment by 14-character CNPJ (punctuation and lowercase accepted, check digits validated, numeric or alphanumeric) with company, partners and Simples. An 8-character root returns the company with a page of establishments (`estab_offset`, `estab_limit` ≤ 1000, default 100) and `total_estabelecimentos`. |
 | `GET /api/v1/estabelecimentos/{cnpj}` | Legacy alias of the above |
-| `GET /api/v1/empresas/{cnpj_basico}` | Company with all establishments |
+| `GET /api/v1/empresas/{cnpj_basico}` | Company with a page of establishments (same parameters) |
 | `GET /api/v1/search` | Name search and/or filters (below) |
 | `GET /api/v1/empresas/search?razao_social=` | Legacy alias: search restricted to `razao_social` |
 | `GET /api/v1/estabelecimentos/search` | Legacy alias of `/search` |
