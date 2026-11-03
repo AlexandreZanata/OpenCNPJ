@@ -5,7 +5,7 @@
 #   cnpj.sqlite  SQLite with B-tree indexes for the API lookups/filters and FTS5 over names (D)
 #
 # Usage: scripts/baselines.sh RAW_DIR OUT_DIR [zstd_level]
-# Needs: unzip, duckdb (>= 1.1), sqlite3 with FTS5. Writes OUT_DIR/baselines.json.
+# Needs: unzip, duckdb (>= 1.1), python3 whose sqlite3 module has FTS5. Writes OUT_DIR/baselines.json.
 set -euo pipefail
 
 RAW=${1:?usage: baselines.sh RAW_DIR OUT_DIR [zstd_level]}
@@ -61,8 +61,9 @@ duckdb -c "INSTALL sqlite; LOAD sqlite; ATTACH '$db' AS s (TYPE sqlite);
   CREATE TABLE s.simples AS SELECT * FROM '$OUT/parquet/simples.parquet';"
 record sqlite_load_s "$(echo "$(now) - $t0" | bc)" ""
 record sqlite_tables_bytes "$(stat -c %s "$db")" ""
+sql() { python3 -I -c 'import sqlite3,sys; c=sqlite3.connect(sys.argv[1]); c.executescript(sys.stdin.read()); c.commit()' "$db"; }
 t0=$(now)
-sqlite3 "$db" <<'SQL'
+sql <<'SQL'
 PRAGMA journal_mode=OFF; PRAGMA synchronous=OFF; PRAGMA cache_size=-2000000;
 CREATE INDEX empresas_pk ON empresas(cnpj_basico);
 CREATE INDEX estab_pk ON estabelecimentos(cnpj_basico, cnpj_ordem, cnpj_dv);
@@ -74,7 +75,7 @@ SQL
 record sqlite_btree_s "$(echo "$(now) - $t0" | bc)" ""
 record sqlite_with_btree_bytes "$(stat -c %s "$db")" ""
 t0=$(now)
-sqlite3 "$db" <<'SQL'
+sql <<'SQL'
 PRAGMA journal_mode=OFF; PRAGMA synchronous=OFF; PRAGMA cache_size=-2000000;
 CREATE VIRTUAL TABLE nomes USING fts5(razao_social, nome_fantasia, content='', tokenize='unicode61 remove_diacritics 2', prefix='2 3');
 INSERT INTO nomes(rowid, razao_social, nome_fantasia)

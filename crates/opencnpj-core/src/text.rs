@@ -62,6 +62,14 @@ pub fn tokenize(text: &str, mut f: impl FnMut(&str)) {
     flush(&mut tok);
 }
 
+/// Whether a normalized token goes into the search index. 11-digit numbers are excluded:
+/// in company names they are almost always the owner's CPF (individual entrepreneurs and
+/// MEI), so indexing them would allow looking people up by CPF (LGPD data minimization)
+/// and would cost ~17 million unique terms. The values themselves are stored unchanged.
+pub fn is_indexed_token(t: &str) -> bool {
+    !(t.len() == 11 && t.bytes().all(|b| b.is_ascii_digit()))
+}
+
 pub fn tokens(text: &str) -> Vec<String> {
     let mut v = Vec::new();
     tokenize(text, |t| v.push(t.to_string()));
@@ -86,5 +94,7 @@ mod tests {
         assert_eq!(tokens("  "), Vec::<String>::new());
         assert_eq!(tokens("WM&R"), ["WM", "R"]);
         assert_eq!(tokens(&"X".repeat(50))[0].len(), MAX_TOKEN);
+        assert!(!is_indexed_token("12345678901"));
+        assert!(is_indexed_token("1234567890") && is_indexed_token("ABCDEFGHIJK"));
     }
 }

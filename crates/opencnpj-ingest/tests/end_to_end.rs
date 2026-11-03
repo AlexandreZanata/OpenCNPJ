@@ -75,7 +75,7 @@ fn fixture(dir: &Path) -> usize {
         rec(&["22222222", "COMERCIO DE \"PEÇAS\" AUTO LTDA", "2062", "49", "500,00", "01", ""]),
         rec(&["33333333", "SEM ESTABELECIMENTO SA", "2054", "10", "1,5", "05", ""]),
         rec(&["44444444", "55555555 JOANA PEREIRA", "2135", "50", "0,00", "01", ""]),
-        rec(&["55555555", "55555555 MARIA DA SILVA", "2135", "50", "0,00", "01", ""]),
+        rec(&["55555555", "MARIA DA SILVA 12345678901", "2135", "50", "0,00", "01", ""]),
     ];
     for i in 0..300 {
         empresas.push(rec(&[&format!("4{i:07}"), &format!("MERCADO NUMERO {i} LTDA"), "2062", "49", "10,00", "01", ""]));
@@ -195,10 +195,11 @@ fn build_query_and_integrity() {
     assert_eq!(r.total, 2);
     let docs = snap.docs(&r.docs).unwrap();
     assert_eq!(docs[0].company.estabelecimentos[docs[0].estab.unwrap()][0], "0001");
-    // MEI-style names: the own-root token is resolved through the block directory.
-    assert_eq!(search::search(&snap, &q("55555555 maria "), &Limits::DEFAULT).unwrap().total, 1);
-    assert_eq!(search::search(&snap, &q("55555555 "), &Limits::DEFAULT).unwrap().total, 2);
-    assert_eq!(search::search(&snap, &q("55555555"), &Limits::DEFAULT).unwrap().total, 2);
+    // MEI-style names: CPF-like 11-digit tokens are stored but not indexed.
+    assert_eq!(snap.company("55555555").unwrap().unwrap().empresas[0][0], "MARIA DA SILVA 12345678901");
+    assert_eq!(search::search(&snap, &q("maria silva 12345678901 "), &Limits::DEFAULT).unwrap().total, 1);
+    assert!(snap.postings(Field::Razao, b"12345678901").unwrap().is_none());
+    assert_eq!(search::search(&snap, &q("55555555 "), &Limits::DEFAULT).unwrap().total, 1);
     let r = search::search(&snap, &q("mercado 17 "), &Limits::DEFAULT).unwrap();
     assert_eq!(r.total, 1);
     let mut fz = q("merkado 17 ");

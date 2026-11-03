@@ -357,15 +357,6 @@ impl Snapshot {
         Ok(found.flatten())
     }
 
-    /// Document ids of the company `basico` (its establishments, or its single document).
-    pub fn company_docs(&self, basico: &str) -> Result<Option<std::ops::Range<u32>>, Error> {
-        let e = Table::Estabelecimentos.index();
-        self.with_company(basico, |_, pos, counts, first_doc| {
-            let start = first_doc + counts[..pos].iter().map(|n| n[e].max(1)).sum::<u32>();
-            Ok(start..start + counts[pos][e].max(1))
-        })
-    }
-
     /// Postings for an exact term.
     pub fn postings(&self, field: Field, value: &[u8]) -> Result<Option<Arc<RoaringBitmap>>, Error> {
         match self.terms.get(field.term(value)) {

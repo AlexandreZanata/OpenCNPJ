@@ -12,7 +12,7 @@ use std::time::Instant;
 
 use opencnpj_core::codec::{ColumnCodec, Dictionary, parse_cnae_list};
 use opencnpj_core::schema::col;
-use opencnpj_core::text::{latin1_to_string, tokenize};
+use opencnpj_core::text::{is_indexed_token, latin1_to_string, tokenize};
 use opencnpj_core::varint::{self, Reader};
 use opencnpj_core::{Company, Kind, Table};
 use opencnpj_store::block::{BlockBuilder, Codecs};
@@ -370,10 +370,8 @@ fn emit_terms(c: &Company, doc: u32, tc: &mut TermCollector) {
     let razao = emp.map(|e| e[col::emp::RAZAO_SOCIAL].as_str()).unwrap_or("");
     let mut razao_tokens: Vec<String> = Vec::new();
     for e in &c.empresas {
-        // A name token equal to the company's own root (MEI names start with it) is not
-        // indexed: the reader resolves such tokens through the block directory instead.
         tokenize(&e[col::emp::RAZAO_SOCIAL], |t| {
-            if t != c.basico {
+            if is_indexed_token(t) {
                 razao_tokens.push(t.to_string());
             }
         });
@@ -413,7 +411,9 @@ fn emit_terms(c: &Company, doc: u32, tc: &mut TermCollector) {
         tc.add(Field::RazaoLen, razao_len.as_bytes(), d);
         let mut flen = 0usize;
         tokenize(&e[col::est::NOME_FANTASIA], |t| {
-            tc.add(Field::Fantasia, t.as_bytes(), d);
+            if is_indexed_token(t) {
+                tc.add(Field::Fantasia, t.as_bytes(), d);
+            }
             flen += 1;
         });
         if flen > 0 {

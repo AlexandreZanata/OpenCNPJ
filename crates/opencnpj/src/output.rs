@@ -179,7 +179,21 @@ pub fn index_breakdown(snap: &Snapshot) -> Value {
     for f in fields {
         let terms = snap.prefix_terms(f, b"", usize::MAX);
         let bytes: u64 = terms.iter().map(|(_, off)| snap.postings_size(*off)).sum();
-        out.insert(f.name().into(), json!({ "terms": terms.len(), "postings_bytes": bytes }));
+        // Numeric-only tokens by length (e.g. CPFs embedded in MEI names).
+        let mut numeric: BTreeMap<usize, (u64, u64)> = BTreeMap::new();
+        for (t, off) in &terms {
+            if !t.is_empty() && t.iter().all(u8::is_ascii_digit) {
+                let e = numeric.entry(t.len()).or_default();
+                e.0 += 1;
+                e.1 += snap.postings_size(*off);
+            }
+        }
+        let numeric: Map<String, Value> = numeric
+            .into_iter()
+            .filter(|(_, (n, _))| *n >= 1000)
+            .map(|(l, (n, b))| (l.to_string(), json!({"terms": n, "postings_bytes": b})))
+            .collect();
+        out.insert(f.name().into(), json!({ "terms": terms.len(), "postings_bytes": bytes, "numeric_by_len": numeric }));
     }
     Value::Object(out)
 }

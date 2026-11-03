@@ -47,6 +47,12 @@ pub struct BenchArgs {
     /// Override the prefix/fuzzy expansion budget (MiB of encoded postings).
     #[arg(long)]
     pub expansion_mib: Option<u64>,
+    /// Write the sampled workload as API URLs (one file per category) and exit.
+    #[arg(long)]
+    pub write_urls: Option<PathBuf>,
+    /// Base URL used by --write-urls.
+    #[arg(long, default_value = "http://127.0.0.1:8080")]
+    pub base_url: String,
     /// Decoded-postings cache budget in MiB.
     #[arg(long)]
     pub cache_mib: Option<usize>,
@@ -288,6 +294,25 @@ fn env_info() -> serde_json::Value {
     })
 }
 
+fn enc(s: &str) -> String {
+    s.bytes()
+        .map(|b| if b.is_ascii_alphanumeric() || b"-_.~".contains(&b) { (b as char).to_string() } else { format!("%{b:02X}") })
+        .collect()
+}
+
+fn work_url(base: &str, w: &Work) -> String {
+    let filters = |q: &Query| q.filters.iter().map(|(f, v)| format!("&{}={}", f.name(), enc(&v.join(",")))).collect::<String>();
+    match w {
+        Work::Lookup(id) => format!("{base}/api/v1/cnpj/{id}"),
+        Work::Search(q) => {
+            let text = q.text.as_deref().map(|t| format!("&q={}", enc(t))).unwrap_or_default();
+            let fuzzy = if q.fuzzy { "&fuzzy=true" } else { "" };
+            format!("{base}/api/v1/search?limit={}{text}{fuzzy}{}", q.limit, filters(q))
+        }
+        Work::Stats(q, f) => format!("{base}/api/v1/stats?group_by={}{}", f.name(), filters(q)),
+    }
+}
+
 pub fn run(a: BenchArgs) -> Result<()> {
     let mut limits = Limits::DEFAULT;
     if let Some(m) = a.expansion_mib {
@@ -305,6 +330,15 @@ pub fn run(a: BenchArgs) -> Result<()> {
     let t_w = Instant::now();
     let cats = workloads(&snap, a.queries, a.seed)?;
     eprintln!("workloads sampled in {:.1}s (open {:.1} ms)", t_w.elapsed().as_secs_f64(), open_ms);
+    if let Some(dir) = &a.write_urls {
+        std::fs::create_dir_all(dir)?;
+        for (cat, work) in &cats {
+            let urls: Vec<String> = work.iter().map(|w| work_url(&a.base_url, w)).collect();
+            std::fs::write(dir.join(format!("{cat}.txt")), urls.join("\n") + "\n")?;
+        }
+        eprintln!("wrote URL lists to {}", dir.display());
+        return Ok(());
+    }
     let mut all = Vec::new();
     for (cat, work) in &cats {
         if a.only.as_deref().is_some_and(|o| !cat.contains(o)) {
