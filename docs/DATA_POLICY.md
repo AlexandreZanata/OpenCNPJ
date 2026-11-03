@@ -55,7 +55,11 @@ publicly accessible data).
 
 Defaults and controls in this project:
 
-* No full-text index over partner names or CPFs; you cannot search people by name.
+* No full-text index over partner names; you cannot search partners by name.
+* Individual entrepreneurs and MEIs have the owner's CPF embedded in the company name
+  ("MARIA DA SILVA 12345678901"): 17.3 million such names in 2026-10. The value is stored
+  and returned unchanged, but 11-digit numeric tokens are **never indexed** and are
+  ignored in queries, so the engine cannot be used to find a person's business by CPF.
 * `serve --hide-socios` and `--hide-contacts` remove partners and phone/e-mail fields
   from every API response.
 * Bulk export is **off** unless `--enable-export`, and capped by `--export-max-rows`.

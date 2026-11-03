@@ -31,7 +31,7 @@ reference table or the RFB layout defines them.
 
 | Parameter | Meaning |
 |-----------|---------|
-| `q` | Name text, matched against `razao_social` and `nome_fantasia`. All tokens must match; the last token also matches as a prefix unless the query ends with a space. Accents and case are ignored. |
+| `q` | Name text, matched against `razao_social` and `nome_fantasia`. All tokens must match; the last token also matches as a prefix unless the query ends with a space. Accents, case and the stopwords `DA DAS DE DI DO DOS E` are ignored, and so are 11-digit numbers (CPFs are not searchable, see DATA_POLICY.md). |
 | `field` | `any` (default), `razao_social`, `nome_fantasia` |
 | `fuzzy=true` | Tokens with no exact match (≥ 4 chars) match within edit distance 1 (2 for ≥ 8 chars), bounded |
 | `uf`, `municipio`, `cnae`, `cnae_secundaria`, `situacao`, `porte`, `natureza`, `simples`, `mei`, `matriz_filial` | Filters; comma-separated values are OR-ed, different parameters AND-ed. Codes as published by RFB (`situacao=02`, `municipio=7107`, `cnae=4711302`, `simples=S`, `matriz_filial=1`). Legacy names (`cnae_fiscal_principal`, `situacao_cadastral`, …) are accepted. |

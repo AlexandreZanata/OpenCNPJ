@@ -103,7 +103,7 @@ Terms are `[field u8][value]`:
 
 | Field | Values |
 |------:|--------|
-| 1 `razao_social` | normalized tokens (uppercase ASCII, accents folded, stopwords `DA DAS DE DI DO DOS E` removed), propagated to every establishment of the company |
+| 1 `razao_social` | normalized tokens (uppercase ASCII, accents folded, stopwords `DA DAS DE DI DO DOS E` and 11-digit numbers removed), propagated to every establishment of the company |
 | 2 `nome_fantasia` | normalized tokens |
 | 3 `razao_len`, 14 `fantasia_len` | token count bucket 0..15 (ranking) |
 | 4 `uf`, 5 `municipio`, 6 `cnae`, 7 `cnae_secundaria`, 8 `situacao`, 13 `matriz_filial` | establishment values |
