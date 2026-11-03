@@ -44,6 +44,12 @@ pub struct BenchArgs {
     /// Only run categories whose name contains this string.
     #[arg(long)]
     pub only: Option<String>,
+    /// Override the prefix/fuzzy expansion budget (MiB of encoded postings).
+    #[arg(long)]
+    pub expansion_mib: Option<u64>,
+    /// Decoded-postings cache budget in MiB.
+    #[arg(long)]
+    pub cache_mib: Option<usize>,
 }
 
 #[derive(Clone)]
@@ -177,17 +183,17 @@ fn workloads(snap: &Snapshot, n: usize, seed: u64) -> Result<Vec<(&'static str, 
 }
 
 /// Executes one unit of work like the API would. Returns false when the result is empty.
-fn execute(snap: &Snapshot, w: &Work) -> Result<bool> {
+fn execute(snap: &Snapshot, w: &Work, limits: &Limits) -> Result<bool> {
     Ok(match w {
         Work::Lookup(id) => output::lookup_with(snap, id, Privacy::default())?.is_some(),
         Work::Search(qr) => {
-            let r = search::search(snap, qr, &Limits::DEFAULT)?;
+            let r = search::search(snap, qr, limits)?;
             let docs = snap.docs(&crate::sorted(&r.docs))?;
             let v = output::search_json(snap, &r, docs, false);
             std::hint::black_box(serde_json::to_vec(&v)?);
             r.total > 0
         }
-        Work::Stats(qr, f) => !search::group_counts(snap, qr, *f, &Limits::DEFAULT)?.is_empty(),
+        Work::Stats(qr, f) => !search::group_counts(snap, qr, *f, limits)?.is_empty(),
     })
 }
 
@@ -198,7 +204,7 @@ fn pct(sorted: &[f64], p: f64) -> f64 {
     sorted[((sorted.len() as f64 - 1.0) * p).round() as usize]
 }
 
-fn measure(snap: &Snapshot, cat: &str, work: &[Work], threads: usize, cache: &str) -> Result<Stats> {
+fn measure(snap: &Snapshot, cat: &str, work: &[Work], threads: usize, cache: &str, limits: &Limits) -> Result<Stats> {
     let next = AtomicUsize::new(0);
     let t0 = Instant::now();
     let results: Vec<Result<(Vec<f64>, usize)>> = std::thread::scope(|s| {
@@ -211,7 +217,7 @@ fn measure(snap: &Snapshot, cat: &str, work: &[Work], threads: usize, cache: &st
                         let i = next.fetch_add(1, Ordering::Relaxed);
                         let Some(w) = work.get(i) else { break };
                         let t = Instant::now();
-                        if !execute(snap, w)? {
+                        if !execute(snap, w, limits)? {
                             empty += 1;
                         }
                         lat.push(t.elapsed().as_secs_f64() * 1e3);
@@ -283,11 +289,18 @@ fn env_info() -> serde_json::Value {
 }
 
 pub fn run(a: BenchArgs) -> Result<()> {
+    let mut limits = Limits::DEFAULT;
+    if let Some(m) = a.expansion_mib {
+        limits.max_expansion_bytes = m << 20;
+    }
     let t_open = Instant::now();
     if a.cold {
         evict(&a.snapshot)?;
     }
     let mut snap = Snapshot::open(&a.snapshot)?;
+    if let Some(m) = a.cache_mib {
+        snap.set_postings_cache_bytes(m << 20);
+    }
     let open_ms = t_open.elapsed().as_secs_f64() * 1e3;
     let t_w = Instant::now();
     let cats = workloads(&snap, a.queries, a.seed)?;
@@ -301,14 +314,17 @@ pub fn run(a: BenchArgs) -> Result<()> {
             drop(snap);
             evict(&a.snapshot)?;
             snap = Snapshot::open(&a.snapshot)?;
-            let s = measure(&snap, cat, work, 1, "cold")?;
+            if let Some(m) = a.cache_mib {
+                snap.set_postings_cache_bytes(m << 20);
+            }
+            let s = measure(&snap, cat, work, 1, "cold", &limits)?;
             eprintln!("{cat:<24} cold  p50 {:>8.3} ms  p95 {:>8.3} ms  p99 {:>8.3} ms", s.p50_ms, s.p95_ms, s.p99_ms);
             all.push(s);
         }
         // Warm-up pass, then measured passes.
-        measure(&snap, cat, work, crate::default_threads(), "warmup")?;
+        measure(&snap, cat, work, crate::default_threads(), "warmup", &limits)?;
         for &t in &a.threads {
-            let s = measure(&snap, cat, work, t, "warm")?;
+            let s = measure(&snap, cat, work, t, "warm", &limits)?;
             eprintln!(
                 "{cat:<24} warm t={t:<2} p50 {:>8.3} ms  p95 {:>8.3} ms  p99 {:>8.3} ms  {:>9.0} q/s  empty {}",
                 s.p50_ms, s.p95_ms, s.p99_ms, s.qps, s.empty_results
@@ -332,6 +348,8 @@ pub fn run(a: BenchArgs) -> Result<()> {
         "cold_start": a.cold,
         "seed": a.seed,
         "queries_per_category": a.queries,
+        "max_expansion_bytes": limits.max_expansion_bytes,
+        "postings_cache_mib": a.cache_mib,
         "peak_rss_bytes": opencnpj_ingest::build::peak_rss(),
         "environment": env_info(),
         "methodology": "Queries sampled from the snapshot with a seeded PRNG; each query = search + fetch of up to 20 records + JSON serialization (lookups: record + JSON). Warm runs follow one untimed warm-up pass. Cold runs evict the file with posix_fadvise(DONTNEED) and reopen the snapshot before the category.",

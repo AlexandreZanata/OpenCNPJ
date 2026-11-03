@@ -118,6 +118,9 @@ struct BuildArgs {
     /// Only build buckets with id % N == 0 (deterministic sample).
     #[arg(long)]
     sample_every: Option<u32>,
+    /// Experiment: store every column as plain text (no typed codecs, no dictionaries).
+    #[arg(long)]
+    plain_columns: bool,
     /// Write the build report as JSON.
     #[arg(long)]
     report: Option<PathBuf>,
@@ -215,6 +218,7 @@ fn run_build(a: BuildArgs) -> Result<()> {
         readers: a.readers,
         keep_partition: a.keep_partition || a.from_partition,
         sample_every: a.sample_every,
+        plain_columns: a.plain_columns,
     };
     let t0 = Instant::now();
     let mut report = if a.from_partition {

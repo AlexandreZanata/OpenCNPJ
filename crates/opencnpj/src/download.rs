@@ -335,6 +335,7 @@ pub fn update(a: UpdateArgs, log: &(dyn Fn(&str) + Sync)) -> Result<()> {
         readers: 8,
         keep_partition: false,
         sample_every: None,
+        plain_columns: false,
     };
     let report = opencnpj_ingest::build::build(&cfg, log)?;
     std::fs::write(out.with_extension("build.json"), serde_json::to_vec_pretty(&report)?)?;

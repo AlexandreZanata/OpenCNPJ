@@ -11,7 +11,7 @@
 
 use std::sync::Arc;
 
-use roaring::RoaringBitmap;
+use roaring::{MultiOps, RoaringBitmap};
 
 use crate::Error;
 use crate::postings::{Field, MAX_NAME_LEN_BUCKET};
@@ -46,10 +46,13 @@ pub struct Limits {
     pub max_tokens: usize,
     /// Maximum dictionary terms examined per prefix/fuzzy token (bounds the FST walk).
     pub max_scan_terms: usize,
+    /// Encoded postings bytes one expanded token may union (most frequent terms first).
+    pub max_expansion_bytes: u64,
 }
 
 impl Limits {
-    pub const DEFAULT: Limits = Limits { max_prefix_terms: 128, max_fuzzy_terms: 32, max_tokens: 8, max_scan_terms: 20_000 };
+    pub const DEFAULT: Limits =
+        Limits { max_prefix_terms: 128, max_fuzzy_terms: 32, max_tokens: 8, max_scan_terms: 20_000, max_expansion_bytes: 8 << 20 };
 }
 
 #[derive(Debug, Clone, Default)]
@@ -84,35 +87,47 @@ pub struct Candidates {
     pub truncated: bool,
 }
 
+/// Postings of one token in one field, restricted to `restrict` (documents already
+/// required by other tokens and filters) when given. Restricting each expanded term before
+/// the union avoids materializing huge completions (`MAR` → MARIA, MARTINS, ...).
+#[allow(clippy::too_many_arguments)]
 fn token_postings(
     snap: &Snapshot,
     f: Field,
     tok: &str,
     prefix: bool,
     fuzzy: bool,
+    restrict: Option<&RoaringBitmap>,
     limits: &Limits,
     truncated: &mut bool,
 ) -> Result<RoaringBitmap, Error> {
-    let mut set = RoaringBitmap::new();
+    let mut parts: Vec<Arc<RoaringBitmap>> = Vec::new();
     if prefix {
-        let (terms, cut) = snap.prefix_terms_ranked(f, tok.as_bytes(), limits.max_prefix_terms, limits.max_scan_terms);
+        let (terms, cut) =
+            snap.prefix_terms_ranked(f, tok.as_bytes(), limits.max_prefix_terms, limits.max_scan_terms, limits.max_expansion_bytes);
         *truncated |= cut;
         for (_, off) in &terms {
-            set |= &*snap.postings_by_offset(*off)?;
+            parts.push(snap.postings_by_offset(*off)?);
         }
     } else if let Some(p) = snap.postings(f, tok.as_bytes())? {
-        set = Arc::unwrap_or_clone(p);
+        parts.push(p);
     }
     // Fuzzy adds near terms even when the token exists: a typo is often a rare real word.
     if fuzzy && tok.len() >= 4 {
         let dist = if tok.len() >= 8 { 2 } else { 1 };
-        let (terms, cut) = snap.fuzzy_terms_ranked(f, tok, dist, limits.max_fuzzy_terms, limits.max_scan_terms)?;
+        let (terms, cut) =
+            snap.fuzzy_terms_ranked(f, tok, dist, limits.max_fuzzy_terms, limits.max_scan_terms, limits.max_expansion_bytes)?;
         *truncated |= cut;
         for (_, off) in &terms {
-            set |= &*snap.postings_by_offset(*off)?;
+            parts.push(snap.postings_by_offset(*off)?);
         }
     }
-    Ok(set)
+    Ok(match (restrict, parts.len()) {
+        (_, 0) => RoaringBitmap::new(),
+        (Some(r), _) => parts.iter().map(|p| r & &**p).union(),
+        (None, 1) => Arc::unwrap_or_clone(parts.pop().expect("one part")),
+        (None, _) => parts.iter().map(|p| &**p).union(),
+    })
 }
 
 fn intersect_all(mut sets: Vec<RoaringBitmap>) -> Option<RoaringBitmap> {
@@ -159,15 +174,41 @@ pub fn candidates(snap: &Snapshot, q: &Query, limits: &Limits) -> Result<Candida
             TextField::Razao => &[Field::Razao],
             TextField::Fantasia => &[Field::Fantasia],
         };
-        // per_field[f][i]: postings of token i in field f.
+        // Exact tokens first: their intersection (with the filters) restricts the
+        // expensive prefix/fuzzy expansions that follow.
+        let expands = |i: usize| q.fuzzy || (prefix_last && i + 1 == tokens.len());
+        let mut order: Vec<usize> = (0..tokens.len()).collect();
+        order.sort_by_key(|&i| expands(i));
+        // per_field[f]: postings of each token in field f.
         let mut per_field: Vec<Vec<RoaringBitmap>> = vec![Vec::new(); fields.len()];
         let mut any: Vec<RoaringBitmap> = Vec::new();
-        for (i, tok) in tokens.iter().enumerate() {
+        let mut restrict: Option<Option<RoaringBitmap>> = None;
+        for i in order {
+            let tok = &tokens[i];
             let prefix = prefix_last && i + 1 == tokens.len();
-            let mut union = RoaringBitmap::new();
-            for (fi, &f) in fields.iter().enumerate() {
-                let p = token_postings(snap, f, tok, prefix, q.fuzzy, limits, &mut out.truncated)?;
-                union |= &p;
+            let r = if expands(i) {
+                // Computed once, before the first expansion (exact tokens come first).
+                if restrict.is_none() || q.fuzzy {
+                    let mut sets: Vec<&RoaringBitmap> = any.iter().chain(filters.as_ref()).collect();
+                    sets.sort_by_key(|b| b.len());
+                    restrict = Some(sets.split_first().map(|(first, rest)| {
+                        let mut acc = (*first).clone();
+                        for s in rest {
+                            acc &= *s;
+                        }
+                        acc
+                    }));
+                }
+                restrict.as_ref().and_then(Option::as_ref)
+            } else {
+                None
+            };
+            let mut parts = Vec::with_capacity(fields.len());
+            for &f in fields {
+                parts.push(token_postings(snap, f, tok, prefix, q.fuzzy, r, limits, &mut out.truncated)?);
+            }
+            let union = parts.iter().union();
+            for (fi, p) in parts.into_iter().enumerate() {
                 per_field[fi].push(p);
             }
             if union.is_empty() {

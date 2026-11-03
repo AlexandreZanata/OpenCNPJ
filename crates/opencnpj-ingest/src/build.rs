@@ -65,6 +65,8 @@ pub struct BuildConfig {
     pub keep_partition: bool,
     /// Only build buckets with `id % n == 0` (deterministic sample for experiments).
     pub sample_every: Option<u32>,
+    /// Store all columns as plain text (experiment: measures the typed codecs).
+    pub plain_columns: bool,
 }
 
 /// Persisted phase A result.
@@ -261,11 +263,16 @@ fn choose_dictionaries(counts: partition::DictCounts) -> Vec<Vec<Option<Vec<Stri
         .collect()
 }
 
-fn codecs_from(dicts: &[Vec<Option<Vec<String>>>]) -> Codecs {
+/// Column codecs; `plain` stores every column as text (experiment baseline).
+fn codecs_from(dicts: &[Vec<Option<Vec<String>>>], plain: bool) -> Codecs {
     let mut tables: [Vec<ColumnCodec>; 4] = Default::default();
     for t in Table::ALL {
-        tables[t.index()] =
-            t.row_columns().iter().zip(&dicts[t.index()]).map(|(c, d)| ColumnCodec::new(c.kind, d.clone().map(Dictionary::new))).collect();
+        tables[t.index()] = t
+            .row_columns()
+            .iter()
+            .zip(&dicts[t.index()])
+            .map(|(c, d)| if plain { ColumnCodec::new(Kind::Text, None) } else { ColumnCodec::new(c.kind, d.clone().map(Dictionary::new)) })
+            .collect();
     }
     Codecs { tables }
 }
@@ -535,7 +542,7 @@ fn build_bucket(
 pub fn build_from_partition(state: &PartitionState, cfg: &BuildConfig, log: &(dyn Fn(&str) + Sync)) -> Result<BuildReport, Error> {
     let tmp = &cfg.tmp;
     let profile = &cfg.profile;
-    let codecs = codecs_from(&state.dictionaries);
+    let codecs = codecs_from(&state.dictionaries, cfg.plain_columns);
     let buckets: Vec<(u32, [bool; 4])> =
         state.buckets.iter().filter(|(b, _)| cfg.sample_every.is_none_or(|n| *b % n == 0)).map(|(b, p)| (*b, *p)).collect();
     let mut timings = BTreeMap::new();
@@ -664,7 +671,7 @@ pub fn build_from_partition(state: &PartitionState, cfg: &BuildConfig, log: &(dy
                     .zip(codecs.table(*t))
                     .map(|(c, codec)| ColumnSchema {
                         name: c.name.into(),
-                        kind: c.kind,
+                        kind: codec.kind,
                         dictionary_len: codec.dict.as_ref().map(|d| d.values.len()),
                     })
                     .collect(),

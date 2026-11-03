@@ -133,6 +133,7 @@ fn build_profile(dir: &Path, profile: &str) -> (Snapshot, build::BuildReport) {
         readers: 2,
         keep_partition: false,
         sample_every: None,
+        plain_columns: false,
     };
     let report = build::build(&cfg, &|_| {}).unwrap();
     (Snapshot::open(&out).unwrap(), report)
@@ -255,4 +256,50 @@ fn corruption_is_detected() {
     }
     std::fs::write(&path, b"not a snapshot at all, definitely not").unwrap();
     assert!(Snapshot::open(&path).is_err());
+}
+
+/// Random single-byte corruptions anywhere in the file: every operation must return
+/// `Ok` or `Err`, never panic; corruption inside checksummed regions must be reported.
+#[test]
+fn random_corruption_never_panics() {
+    let dir = tempfile::tempdir().unwrap();
+    std::fs::create_dir_all(dir.path().join("2026-10")).unwrap();
+    fixture(&dir.path().join("2026-10"));
+    let (snap, _) = build_profile(dir.path(), "fast");
+    let path = snap.path().to_path_buf();
+    drop(snap);
+    let good = std::fs::read(&path).unwrap();
+    let mut seed = 0x5EED_u64;
+    let mut next = || {
+        seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+        seed >> 33
+    };
+    let mut detected = 0;
+    for _ in 0..400 {
+        let mut bad = good.clone();
+        let pos = next() as usize % bad.len();
+        bad[pos] ^= 1 << (next() % 8);
+        if next() % 8 == 0 {
+            bad.truncate(next() as usize % bad.len());
+        }
+        std::fs::write(&path, &bad).unwrap();
+        let Ok(s) = Snapshot::open(&path) else {
+            detected += 1;
+            continue;
+        };
+        let verified = s.verify(|_, _| {});
+        if verified.is_err() {
+            detected += 1;
+        }
+        let _ = s.company("11111111");
+        let _ = s.establishment("00000000", "0002", "05");
+        let q = Query { text: Some("mercado 1".into()), limit: 5, ..Default::default() };
+        if let Ok(r) = search::search(&s, &q, &Limits::DEFAULT) {
+            let _ = s.docs(&r.docs);
+        }
+        let _ = s.rejects();
+    }
+    // Every flip lands in a checksummed region except the postings bytes (validated
+    // structurally on decode), so nearly all must be detected by open or verify.
+    assert!(detected >= 300, "only {detected} of 400 corruptions detected");
 }

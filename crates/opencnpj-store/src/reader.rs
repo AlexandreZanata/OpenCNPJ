@@ -145,7 +145,7 @@ impl Snapshot {
         let manifest: Manifest = serde_json::from_slice(&get(SectionKind::Manifest)?.ok_or(Error::Corrupt("missing manifest"))?)
             .map_err(|_| Error::Corrupt("manifest json"))?;
         let blocks = BlockEntry::decode_all(&get(SectionKind::BlockDir)?.ok_or(Error::Corrupt("missing block directory"))?)?;
-        let codecs = decode_dictionaries(&get(SectionKind::Dictionaries)?.ok_or(Error::Corrupt("missing dictionaries"))?)?;
+        let codecs = decode_dictionaries(&get(SectionKind::Dictionaries)?.ok_or(Error::Corrupt("missing dictionaries"))?, &manifest)?;
         let decompressor = BlockDecompressor::new(manifest.block_codec, get(SectionKind::ZstdDict)?.as_deref());
         let refs: BTreeMap<String, Vec<[String; 2]>> = match get(SectionKind::RefTables)? {
             Some(r) => serde_json::from_slice(&r).map_err(|_| Error::Corrupt("reference tables json"))?,
@@ -416,9 +416,9 @@ impl Snapshot {
 
     /// Up to `take` terms of `field` starting with `prefix`, preferring the most frequent
     /// among the first `scan` matches. Returns the terms and whether any were left out.
-    pub fn prefix_terms_ranked(&self, field: Field, prefix: &[u8], take: usize, scan: usize) -> (TermList, bool) {
+    pub fn prefix_terms_ranked(&self, field: Field, prefix: &[u8], take: usize, scan: usize, max_bytes: u64) -> (TermList, bool) {
         let all = self.prefix_terms(field, prefix, scan);
-        rank_terms(self, all, take, scan)
+        rank_terms(self, all, take, scan, max_bytes)
     }
 
     /// Like [`Self::fuzzy_terms`], keeping the most frequent `take` of the first `scan` matches.
@@ -429,9 +429,10 @@ impl Snapshot {
         dist: u32,
         take: usize,
         scan: usize,
+        max_bytes: u64,
     ) -> Result<(TermList, bool), Error> {
         let all = self.fuzzy_terms(field, value, dist, scan)?;
-        Ok(rank_terms(self, all, take, scan))
+        Ok(rank_terms(self, all, take, scan, max_bytes))
     }
 
     /// Terms within Levenshtein distance `dist` of `value`, at most `limit`.
@@ -493,15 +494,15 @@ impl Snapshot {
     }
 }
 
-/// Most frequent terms first, at most `take` terms and `MAX_EXPANSION_BYTES` of postings
+/// Most frequent terms first, at most `take` terms and `max_bytes` of encoded postings
 /// (the first term is always kept). Bounds the work of short prefixes like `BAR`.
-fn rank_terms(snap: &Snapshot, mut terms: Vec<(Vec<u8>, u64)>, take: usize, scan: usize) -> (TermList, bool) {
+fn rank_terms(snap: &Snapshot, mut terms: Vec<(Vec<u8>, u64)>, take: usize, scan: usize, max_bytes: u64) -> (TermList, bool) {
     let n = terms.len();
     let mut sized: Vec<(u64, Vec<u8>, u64)> = terms.drain(..).map(|(t, off)| (snap.postings_size(off), t, off)).collect();
     sized.sort_by(|a, b| b.0.cmp(&a.0).then_with(|| a.1.cmp(&b.1)));
     let mut budget = 0u64;
     for (i, (size, t, off)) in sized.into_iter().enumerate() {
-        if i >= take || (i > 0 && budget + size > MAX_EXPANSION_BYTES) {
+        if i >= take || (i > 0 && budget + size > max_bytes) {
             break;
         }
         budget += size;
@@ -510,9 +511,6 @@ fn rank_terms(snap: &Snapshot, mut terms: Vec<(Vec<u8>, u64)>, take: usize, scan
     let truncated = terms.len() < n || n >= scan;
     (terms, truncated)
 }
-
-/// Encoded postings bytes one expanded token may union.
-pub const MAX_EXPANSION_BYTES: u64 = 24 << 20;
 
 fn section_bytes(map: &Mmap, sections: &[SectionEntry], kind: SectionKind, check: bool) -> Result<Option<Vec<u8>>, Error> {
     let Some(s) = sections.iter().find(|s| s.kind == kind) else { return Ok(None) };
@@ -554,11 +552,17 @@ pub fn encode_dictionaries(codecs: &Codecs) -> Vec<u8> {
     out
 }
 
-fn decode_dictionaries(b: &[u8]) -> Result<Codecs, Error> {
+/// Builds codecs from the schema embedded in the manifest (column names must match the
+/// layout this reader knows; kinds come from the file, so encodings can evolve).
+fn decode_dictionaries(b: &[u8], manifest: &Manifest) -> Result<Codecs, Error> {
     let mut r = Reader::new(b);
     let mut tables: [Vec<ColumnCodec>; 4] = Default::default();
     for t in Table::ALL {
-        for col in t.row_columns() {
+        let schema = manifest.schema.iter().find(|s| s.table == t.name()).ok_or(Error::Corrupt("table missing from manifest schema"))?;
+        if schema.columns.len() != t.row_columns().len() || schema.columns.iter().zip(t.row_columns()).any(|(a, b)| a.name != b.name) {
+            return Err(Error::Unsupported(format!("column layout of {} differs from this reader", t.name())));
+        }
+        for col in &schema.columns {
             let n = r.varint_usize()?;
             let dict = if n == 0 {
                 None

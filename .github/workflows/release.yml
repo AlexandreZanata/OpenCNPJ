@@ -1,0 +1,40 @@
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            bin: opencnpj
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            bin: opencnpj.exe
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo build --release --locked --target ${{ matrix.target }} -p opencnpj
+      - uses: actions/upload-artifact@v4
+        with:
+          name: opencnpj-${{ matrix.target }}
+          path: target/${{ matrix.target }}/release/${{ matrix.bin }}
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+      - run: |
+          for d in opencnpj-*; do (cd "$d" && sha256sum * > SHA256SUMS && tar czf "../$d.tar.gz" .); done
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: opencnpj-*.tar.gz
