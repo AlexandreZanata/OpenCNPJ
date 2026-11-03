@@ -1,4 +1,4 @@
-# `.ocnpj` snapshot format, version 1.1
+# `.ocnpj` snapshot format, version 1.2
 
 One immutable file per competence (monthly release) and build profile. Everything
 needed to answer queries — data, dictionaries, block directory, term dictionary and
@@ -19,7 +19,7 @@ the file size before using it; the reference reader (`opencnpj-store::reader`) d
 |-------:|-----:|-------|
 | 0 | 8 | magic `OCNPJ\0v1` |
 | 8 | 2 | format major (`1`); readers reject other majors |
-| 10 | 2 | format minor (`1`); additive changes only |
+| 10 | 2 | format minor (`2`); additive changes only |
 | 12 | 4 | flags (reserved, `0`) |
 | 16 | 8 | competence, ASCII `YYYY-MM`, NUL-padded |
 | 24 | 32 | reserved (zero) |
@@ -48,11 +48,13 @@ Each kind appears at most once. `xxh3` covers the stored (possibly compressed) b
 | 8 | `terms` | FST (`fst` crate format) mapping term → postings offset |
 | 9 | `postings` | Postings lists |
 | 10 | `docvalues` | Forward columns for `group_by`, stored raw (1.1, optional; below) |
+| 11 | `numeric` | Numeric columns (dates, capital) for ranges, sorting, histograms, stored raw (1.2, optional; below) |
 
 A reader rejects an unknown kind unless the header's minor version is newer than its own,
 in which case the section is skipped: minor versions only add optional sections. 1.0
 readers predate this rule and reject 1.1 files (unknown kind 10); 1.1 readers open 1.0
-files, which simply have no `docvalues` section.
+files, which simply have no `docvalues` section; 1.2 readers open 1.0 and 1.1 files
+without `numeric` (range filters and sorting then report the column as unavailable).
 
 ## Data model and blocks
 
@@ -106,11 +108,17 @@ Terms are `[field u8][value]`:
 
 | Field | Values |
 |------:|--------|
-| 1 `razao_social` | normalized tokens (uppercase ASCII, accents folded, stopwords `DA DAS DE DI DO DOS E` and 11-digit numbers removed), propagated to every establishment of the company |
+| 1 `razao_social` | normalized tokens (uppercase ASCII, accents folded, stopwords `DA DAS DE DI DO DOS E` removed; 11-digit numbers go to field 15), propagated to every establishment of the company |
 | 2 `nome_fantasia` | normalized tokens |
 | 3 `razao_len`, 14 `fantasia_len` | token count bucket 0..15 (ranking) |
 | 4 `uf`, 5 `municipio`, 6 `cnae`, 7 `cnae_secundaria`, 8 `situacao`, 13 `matriz_filial` | establishment values |
 | 9 `porte`, 10 `natureza`, 11 `simples`, 12 `mei` | company values, propagated to its establishments |
+| 15 `cpf_titular` | 11-digit numbers in `razao_social`/`nome_fantasia`: the owner's CPF in individual-entrepreneur/MEI names (1.2) |
+| 16 `socio_documento` | partner CNPJ (14 digits), or `*` + the 6 visible digits of a masked partner/representative CPF (`***123456**` → `*123456`; the all-zero mask is skipped), propagated to every establishment (1.2) |
+| 17 `motivo`, 18 `cep` (8 digits), 19 `ddd` (first phone, leading zeros removed), 20 `contato` (`email`, `telefone`) | establishment values (1.2) |
+
+Query-only aliases never stored as terms: 98 `cpf` (= 15 ∪ masked 16) and 99
+`cnae_qualquer` (= 6 ∪ 7).
 
 Postings entry: `varint len, tag u8, payload` — tag 0 is a delta-varint list
 (`count`, first id, gaps), tag 1 a Roaring bitmap in the portable serialization. The
@@ -140,6 +148,28 @@ column from the same term stream as the postings during the index merge, and
 `group_by` uses postings). Readers validate the header, bounds, value order and lengths at
 open; an id above `n_values` is reported as corruption when read.
 
+### Numeric columns (section 11, format 1.2)
+
+One optional unsigned integer per document for each of: `data_inicio_atividade` (1),
+`data_situacao_cadastral` (2), `data_opcao_simples` (3), `data_exclusao_simples` (4),
+`data_opcao_mei` (5), `data_exclusao_mei` (6), `capital_social` (7). Dates are days since
+1900-01-01 plus one; capital is cents plus one; 0 means "no value" (empty, `00000000`,
+invalid or before 1900 — the original string is always in the blocks). Company-level
+values repeat on every establishment of the company. Stored raw, read in place:
+
+```text
+u32 n_columns, u32 doc_count, u32 block_docs (1024), u32 reserved
+n_columns × 40 B: field u8, reserved [u8; 7], n_blocks u64, dir_offset u64, data_offset u64, data_len u64
+per column: n_blocks × 32 B {min u64, max u64, data_rel u64, bits u8, flags u8, reserved [u8; 6]}
+            packed data, then 8 zero bytes
+```
+
+Each block of 1,024 documents stores `value − min + 1` (0 = no value) in `bits` bits,
+LSB-first; `min`/`max` cover the present values; flag bit 0 = some document has no
+value, bit 1 = none has. Range filters skip blocks outside the range and take fully
+covered blocks without decoding. `verify` recomputes every value from the decoded rows
+and requires equality.
+
 ## Integrity
 
 * Header, section table, every section and every block carry xxh3-64 checksums.
@@ -155,3 +185,6 @@ open; an id above `n_values` is reported as corruption when read.
 * Minor version change: new optional sections or manifest fields only.
 * 1.0 → 1.1: added `docvalues`. Readers fall back to postings when it is absent, so 1.0
   snapshots answer `group_by` with identical results, only slower.
+* 1.1 → 1.2: added `numeric` and index fields 15–20. Older snapshots stay readable:
+  filters on fields 15–20 simply match nothing there, and range filters, sorting and
+  yearly histograms return an error asking for a rebuild.

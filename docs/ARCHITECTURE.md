@@ -12,7 +12,7 @@ byte layout is in [FORMAT.md](FORMAT.md).
 | `opencnpj-core` | CNPJ identifiers (numeric and alphanumeric check digits), RFB layouts, lossless field codecs, Latin-1 decoding, search normalization |
 | `opencnpj-store` | Snapshot writer/reader, columnar blocks, compression, FST + postings index, query execution |
 | `opencnpj-ingest` | ZIP streaming with limits, RFB CSV dialect parser, bucketed external sort, parallel block encoding, index merge |
-| `opencnpj` | The binary: `download`, `update`, `rollback`, `build`, `verify`, `get`, `search`, `export`, `reconstruct`, `serve`, `bench` |
+| `opencnpj` | The binary: `download`, `update`, `rollback`, `build`, `verify`, `get`, `search`, `export`, `reconstruct`, `serve`, `bench`; the public API (`api.rs`, `params.rs`), the admin suite (`admin.rs`, `admin.html`) and request metrics (`metrics.rs`) |
 
 ## Build pipeline
 
@@ -77,6 +77,21 @@ ordered by CNPJ, so intersecting thousands of value postings with a large candid
 touched every Roaring container once per value. Secondary CNAE is multi-valued and keeps
 the postings path (see `docs/BENCHMARKS.md` for the measured trade-off).
 
+### Three access structures, each for what it does best
+
+* **Postings** (FST + Roaring) answer equality and prefix filters and text tokens:
+  `uf`, `cnae` (sections and prefixes expand to term ranges), `cep`, CPF and partner
+  documents.
+* **Doc values** (one dictionary id per document, format 1.1) answer `group_by` on
+  município and CNAE in one pass over the candidates.
+* **Numeric columns** (format 1.2, 1,024-document frame-of-reference blocks with min/max)
+  answer date and capital ranges, "no value" conditions, sorting and yearly histograms.
+  Opening dates follow the CNPJ order closely, so most blocks are skipped or taken whole
+  without decoding.
+
+CNPJ prefixes need none of them: documents are stored in CNPJ order, so a prefix is a
+contiguous document range found from the block directory.
+
 ### Memory-mapped, immutable snapshots
 
 The reader maps the file and validates header, footer, section table and section
@@ -93,6 +108,16 @@ BENCHMARKS.md), so incremental maintenance (diffing 220 M rows, patching blocks 
 postings) would add complexity to save little. `update` skips the build when every
 source ZIP has the same SHA-256 as the current snapshot's manifest.
 
+## Serving and operations
+
+`serve` runs two listeners: the public API and the admin suite (dashboard + JSON API).
+CPU-bound work runs on the blocking pool behind a semaphore with a deadline; a middleware
+records every request into per-route log-scale latency histograms and a per-second ring
+buffer (`metrics.rs`), exported to the dashboard and to Prometheus. Admin jobs (verify,
+bench, download, build, update) run this binary as child processes with log files, so a
+crash or a long build never takes the server down; switching snapshots swaps an
+`Arc<Snapshot>` while in-flight requests finish on the old one.
+
 ## Profiles
 
 All profiles store identical semantic content (the integration test asserts this). They
@@ -101,5 +126,5 @@ BENCHMARKS.md.
 
 ## Not in scope (yet)
 
-Web portal, API keys/quotas (use a gateway), signed releases, GPU paths, a custom memory
+A public web portal, API keys/quotas (use a gateway), signed releases, GPU paths, a custom memory
 allocator — none showed a measured need.

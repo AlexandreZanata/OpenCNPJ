@@ -280,6 +280,12 @@ pub fn index_breakdown(snap: &Snapshot) -> Value {
             .collect();
         out.insert(f.name().into(), json!({ "terms": terms.len(), "postings_bytes": bytes, "numeric_by_len": numeric }));
     }
+    for f in opencnpj_store::numeric::NumField::ALL {
+        if let Some(c) = snap.numeric(f) {
+            let (bytes, bits) = c.stored_bytes();
+            out.insert(format!("numeric:{}", f.name()), json!({ "terms": 0, "postings_bytes": bytes, "bits_per_document": bits }));
+        }
+    }
     Value::Object(out)
 }
 

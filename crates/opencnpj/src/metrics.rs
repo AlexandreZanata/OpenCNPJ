@@ -160,7 +160,7 @@ impl Metrics {
     pub fn routes_json(&self) -> Value {
         let routes = self.routes.read().expect("lock");
         let mut v: Vec<(&String, &Arc<RouteStats>)> = routes.iter().collect();
-        v.sort_by(|a, b| b.1.count.load(Relaxed).cmp(&a.1.count.load(Relaxed)));
+        v.sort_by_key(|x| std::cmp::Reverse(x.1.count.load(Relaxed)));
         Value::Array(
             v.into_iter()
                 .map(|(r, s)| {

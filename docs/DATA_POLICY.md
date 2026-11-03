@@ -53,22 +53,28 @@ The data is made public by RFB under its legal duties, but LGPD still applies to
 who further processes it (purpose, necessity, transparency — art. 6, and art. 7 §§3–4 for
 publicly accessible data).
 
-Defaults and controls in this project:
+What the engine indexes and exposes (format 1.2), and the controls available:
 
-* No full-text index over partner names; you cannot search partners by name.
-* Individual entrepreneurs and MEIs have the owner's CPF embedded in the company name
-  ("MARIA DA SILVA 12345678901"): 17.3 million such names in 2026-10. The value is stored
-  and returned unchanged, but 11-digit numeric tokens are **never indexed** and are
-  ignored in queries, so the engine cannot be used to find a person's business by CPF.
+* **CPF search is enabled** (requested by the project owner). Individual entrepreneurs
+  and MEIs have the owner's full CPF embedded in the company name ("MARIA DA SILVA
+  12345678901") — 17.3 million such names in 2026-10. Those 11-digit numbers are indexed
+  separately (`cpf_titular`), so a CPF finds the person's businesses.
+* Partner and legal-representative CPFs are published **masked** (`***123456**`). The
+  engine indexes only the 6 visible digits; a CPF search over partners is therefore a
+  *possible* match (others can share those digits), and `/api/v1/cpf` returns the partner
+  rows so the name can be checked. The engine never reconstructs a masked CPF.
+* Partner names are not indexed for full-text search.
 * `serve --hide-socios` and `--hide-contacts` remove partners and phone/e-mail fields
   from every API response.
-* Bulk export is **off** unless `--enable-export`, and capped by `--export-max-rows`.
-* Ranked results cannot be paged deeper than `--max-offset` (default 1000); filter
-  queries page by cursor, so full enumeration requires deliberate, observable traffic.
-* Requests are bounded by `--max-concurrency` and `--timeout-ms`.
-* There is no per-client rate limiting inside the binary. Public deployments should put a
-  reverse proxy in front (e.g. nginx `limit_req`, or an API gateway with keys) and keep
-  access logs only as long as needed.
+* **No limits by default**: no authentication, export enabled without a row cap, page
+  size up to 10,000, no offset cap, no rate limiting. Only a request deadline and a
+  concurrency bound remain. The admin listener has no authentication either and can start
+  downloads and rebuilds: bind it to a private address.
+
+Before exposing this API publicly, put a gateway in front (TLS, authentication or API
+keys, per-client rate limits, access logs with short retention), consider
+`--hide-contacts`/`--hide-socios`, and restrict `/api/v1/cpf` and the `cpf` filters if
+the deployment's purpose does not require locating people's businesses by CPF.
 
 Operators are the controllers of their deployment: document the purpose, honour data
 subject requests that apply to them, and do not combine this data with other sources to

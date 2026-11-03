@@ -331,6 +331,21 @@ pub struct Range {
 }
 
 impl NumericColumn {
+    /// Bytes on disk (block directory + packed data) and the mean bits per document.
+    pub fn stored_bytes(&self) -> (usize, f64) {
+        let bytes = self.blocks.len() * DIR_LEN + (self.data.1 - self.data.0);
+        let bits: u64 = self
+            .blocks
+            .iter()
+            .enumerate()
+            .map(|(i, b)| {
+                let docs = (self.doc_count as usize - i * BLOCK_DOCS).min(BLOCK_DOCS);
+                u64::from(b.bits) * docs as u64
+            })
+            .sum();
+        (bytes, bits as f64 / f64::from(self.doc_count.max(1)))
+    }
+
     /// Stored value (0 = none) of `doc`.
     pub fn get(&self, file: &[u8], doc: u32) -> u64 {
         if doc >= self.doc_count {
