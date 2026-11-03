@@ -117,10 +117,8 @@ pub fn lookup_with(snap: &Snapshot, id: &str, privacy: Privacy) -> Result<Option
         })));
     }
     let cnpj = Cnpj::parse(&compact).map_err(|e| LookupError::Invalid(e.to_string()))?;
-    let Some(c) = snap.company(cnpj.basico())? else { return Ok(None) };
-    let Some(e) = c.estabelecimentos.iter().find(|e| e[col::est::ORDEM] == cnpj.ordem() && e[col::est::DV] == cnpj.dv()) else {
-        return Ok(None);
-    };
+    let Some((c, total)) = snap.establishment(cnpj.basico(), cnpj.ordem(), cnpj.dv())? else { return Ok(None) };
+    let e = &c.estabelecimentos[0];
     let (empresa, socios, simples) = company_parts(snap, &c, privacy);
     Ok(Some(json!({
         "cnpj": cnpj.as_str(),
@@ -130,7 +128,7 @@ pub fn lookup_with(snap: &Snapshot, id: &str, privacy: Privacy) -> Result<Option
         "empresa": empresa,
         "socios": socios,
         "simples": simples,
-        "total_estabelecimentos": c.estabelecimentos.len(),
+        "total_estabelecimentos": total,
         "snapshot": snapshot_ref(snap),
     })))
 }

@@ -1,9 +1,9 @@
 //! Read-only snapshot access.
 
-use std::collections::{BTreeMap, HashMap};
+use std::collections::{BTreeMap, HashMap, VecDeque};
 use std::fs::File;
 use std::path::{Path, PathBuf};
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
 use memmap2::Mmap;
 use opencnpj_core::codec::{ColumnCodec, Dictionary};
@@ -13,7 +13,7 @@ use roaring::RoaringBitmap;
 use xxhash_rust::xxh3::xxh3_64;
 
 use crate::Error;
-use crate::block::{BlockView, Codecs};
+use crate::block::{BlockView, Codecs, Select};
 use crate::compress::BlockDecompressor;
 use crate::format::*;
 use crate::manifest::Manifest;
@@ -48,6 +48,44 @@ pub struct Snapshot {
     /// `table → code → row index` (reference rows keep their source order).
     ref_index: HashMap<String, HashMap<String, usize>>,
     doc_count: u32,
+    cache: Mutex<PostingsCache>,
+}
+
+/// Postings smaller than this are cheap to decode and never cached.
+const CACHE_MIN_ENCODED: usize = 16 << 10;
+pub const DEFAULT_POSTINGS_CACHE: usize = 256 << 20;
+
+/// FIFO cache of decoded postings bounded by encoded bytes.
+struct PostingsCache {
+    map: HashMap<u64, (Arc<RoaringBitmap>, usize)>,
+    order: VecDeque<u64>,
+    bytes: usize,
+    budget: usize,
+}
+
+impl PostingsCache {
+    fn get(&self, off: u64) -> Option<Arc<RoaringBitmap>> {
+        self.map.get(&off).map(|e| e.0.clone())
+    }
+
+    fn insert(&mut self, off: u64, bm: Arc<RoaringBitmap>, len: usize) {
+        if len > self.budget || self.map.contains_key(&off) {
+            return;
+        }
+        self.map.insert(off, (bm, len));
+        self.order.push_back(off);
+        self.bytes += len;
+        self.evict();
+    }
+
+    fn evict(&mut self) {
+        while self.bytes > self.budget {
+            let Some(old) = self.order.pop_front() else { break };
+            if let Some((_, n)) = self.map.remove(&old) {
+                self.bytes -= n;
+            }
+        }
+    }
 }
 
 /// One search document resolved to its company and establishment.
@@ -55,7 +93,8 @@ pub struct Snapshot {
 pub struct DocRecord {
     pub doc: u32,
     pub company: Company,
-    /// Index into `company.estabelecimentos`, `None` for a company without establishments.
+    /// Index into `company.estabelecimentos` (which holds only this document's row),
+    /// `None` for a company without establishments. Partners are not decoded.
     pub estab: Option<usize>,
 }
 
@@ -132,6 +171,7 @@ impl Snapshot {
                 .collect(),
             refs,
             doc_count,
+            cache: Mutex::new(PostingsCache { map: HashMap::new(), order: VecDeque::new(), bytes: 0, budget: DEFAULT_POSTINGS_CACHE }),
         };
         snap.validate_blocks()?;
         Ok(snap)
@@ -237,6 +277,65 @@ impl Snapshot {
 
     /// Exact lookup by `cnpj_basico` (8 characters).
     pub fn company(&self, basico: &str) -> Result<Option<Company>, Error> {
+        let Some((raw, pos)) = self.locate(basico)? else { return Ok(None) };
+        let view = BlockView::parse(&raw, &self.codecs)?;
+        let keys = view.keys()?;
+        let counts = view.counts()?;
+        Ok(Some(view.company(&self.codecs, pos, keys[pos].clone(), &counts)?))
+    }
+
+    /// Resolves documents (ascending ids decompress each block once).
+    pub fn docs(&self, ids: &[u32]) -> Result<Vec<DocRecord>, Error> {
+        let mut out = Vec::with_capacity(ids.len());
+        // Parsed state of the current block: (index, raw, keys, counts).
+        let mut cur: Option<(usize, Vec<u8>, Vec<String>, Vec<[u32; 4]>)> = None;
+        for &doc in ids {
+            if doc >= self.doc_count {
+                return Err(Error::Invalid(format!("doc {doc} out of range")));
+            }
+            let bi = self.blocks.partition_point(|b| b.first_doc <= doc) - 1;
+            if cur.as_ref().map(|c| c.0) != Some(bi) {
+                let raw = self.raw_block(bi)?;
+                let view = BlockView::parse(&raw, &self.codecs)?;
+                let (keys, counts) = (view.keys()?, view.counts()?);
+                cur = Some((bi, raw, keys, counts));
+            }
+            let (_, raw, keys, counts) = cur.as_ref().expect("current block");
+            let view = BlockView::parse(raw, &self.codecs)?;
+            let mut d = self.blocks[bi].first_doc;
+            let mut found = None;
+            for (ci, n) in counts.iter().enumerate() {
+                let docs = n[Table::Estabelecimentos.index()].max(1);
+                if doc < d + docs {
+                    found = Some((ci, (doc - d) as usize, n[Table::Estabelecimentos.index()] > 0));
+                    break;
+                }
+                d += docs;
+            }
+            let (ci, ei, has_estab) = found.ok_or(Error::Corrupt("doc not found in its block"))?;
+            let sel = Select { estab: Some(ei).filter(|_| has_estab), socios: false };
+            let company = view.company_select(&self.codecs, ci, keys[ci].clone(), counts, sel)?;
+            out.push(DocRecord { doc, company, estab: has_estab.then_some(0) });
+        }
+        Ok(out)
+    }
+
+    /// Establishment lookup that decodes only the matching row (plus company rows).
+    /// Returns the company (with exactly one establishment) and its establishment count.
+    pub fn establishment(&self, basico: &str, ordem: &str, dv: &str) -> Result<Option<(Company, usize)>, Error> {
+        let Some((raw, pos)) = self.locate(basico)? else { return Ok(None) };
+        let view = BlockView::parse(&raw, &self.codecs)?;
+        let keys = view.keys()?;
+        let counts = view.counts()?;
+        let ordens = view.estab_column(&self.codecs, pos, &counts, opencnpj_core::schema::col::est::ORDEM)?;
+        let dvs = view.estab_column(&self.codecs, pos, &counts, opencnpj_core::schema::col::est::DV)?;
+        let Some(k) = (0..ordens.len()).find(|&k| ordens[k] == ordem && dvs[k] == dv) else { return Ok(None) };
+        let c = view.company_select(&self.codecs, pos, keys[pos].clone(), &counts, Select { estab: Some(k), socios: true })?;
+        Ok(Some((c, ordens.len())))
+    }
+
+    /// Block bytes and company position for `basico`.
+    fn locate(&self, basico: &str) -> Result<Option<(Vec<u8>, usize)>, Error> {
         let key = basico.as_bytes();
         if key.len() != 8 {
             return Ok(None);
@@ -249,54 +348,35 @@ impl Snapshot {
         let view = BlockView::parse(&raw, &self.codecs)?;
         let keys = view.keys()?;
         let Ok(pos) = keys.binary_search_by(|k| k.as_bytes().cmp(key)) else { return Ok(None) };
-        let counts = view.counts()?;
-        Ok(Some(view.company(&self.codecs, pos, keys[pos].clone(), &counts)?))
-    }
-
-    /// Resolves documents (ascending ids decompress each block once).
-    pub fn docs(&self, ids: &[u32]) -> Result<Vec<DocRecord>, Error> {
-        let mut out = Vec::with_capacity(ids.len());
-        let mut cache: Option<(usize, Vec<u8>)> = None;
-        for &doc in ids {
-            if doc >= self.doc_count {
-                return Err(Error::Invalid(format!("doc {doc} out of range")));
-            }
-            let bi = self.blocks.partition_point(|b| b.first_doc <= doc) - 1;
-            if cache.as_ref().map(|c| c.0) != Some(bi) {
-                cache = Some((bi, self.raw_block(bi)?));
-            }
-            let raw = &cache.as_ref().expect("cached").1;
-            let view = BlockView::parse(raw, &self.codecs)?;
-            let counts = view.counts()?;
-            let mut d = self.blocks[bi].first_doc;
-            let mut found = None;
-            for (ci, n) in counts.iter().enumerate() {
-                let docs = n[Table::Estabelecimentos.index()].max(1);
-                if doc < d + docs {
-                    found = Some((ci, (doc - d) as usize, n[Table::Estabelecimentos.index()] > 0));
-                    break;
-                }
-                d += docs;
-            }
-            let (ci, ei, has_estab) = found.ok_or(Error::Corrupt("doc not found in its block"))?;
-            let keys = view.keys()?;
-            let company = view.company(&self.codecs, ci, keys[ci].clone(), &counts)?;
-            out.push(DocRecord { doc, company, estab: has_estab.then_some(ei) });
-        }
-        Ok(out)
+        Ok(Some((raw, pos)))
     }
 
     /// Postings for an exact term.
-    pub fn postings(&self, field: Field, value: &[u8]) -> Result<Option<RoaringBitmap>, Error> {
+    pub fn postings(&self, field: Field, value: &[u8]) -> Result<Option<Arc<RoaringBitmap>>, Error> {
         match self.terms.get(field.term(value)) {
             Some(off) => Ok(Some(self.postings_at(off)?)),
             None => Ok(None),
         }
     }
 
-    fn postings_at(&self, off: u64) -> Result<RoaringBitmap, Error> {
+    fn postings_at(&self, off: u64) -> Result<Arc<RoaringBitmap>, Error> {
+        if let Some(b) = self.cache.lock().expect("lock").get(off) {
+            return Ok(b);
+        }
         let section = &self.map[self.postings.0..self.postings.1];
-        postings::decode_postings(section, off as usize, self.doc_count)
+        let (bm, len) = postings::decode_postings(section, off as usize, self.doc_count)?;
+        let bm = Arc::new(bm);
+        if len >= CACHE_MIN_ENCODED {
+            self.cache.lock().expect("lock").insert(off, bm.clone(), len);
+        }
+        Ok(bm)
+    }
+
+    /// Byte budget for decoded large postings (hot filter values, common tokens).
+    pub fn set_postings_cache_bytes(&self, bytes: usize) {
+        let mut c = self.cache.lock().expect("lock");
+        c.budget = bytes;
+        c.evict();
     }
 
     /// Terms of `field` starting with `prefix`, at most `limit` (in byte order).
@@ -322,6 +402,32 @@ impl Snapshot {
         out
     }
 
+    /// Encoded size of the postings at `off` (a proxy for term frequency), without decoding.
+    pub fn postings_size(&self, off: u64) -> u64 {
+        let section = &self.map[self.postings.0..self.postings.1];
+        section.get(off as usize..).and_then(|b| Reader::new(b).varint().ok()).unwrap_or(0)
+    }
+
+    /// Up to `take` terms of `field` starting with `prefix`, preferring the most frequent
+    /// among the first `scan` matches. Returns the terms and whether any were left out.
+    pub fn prefix_terms_ranked(&self, field: Field, prefix: &[u8], take: usize, scan: usize) -> (Vec<(Vec<u8>, u64)>, bool) {
+        let all = self.prefix_terms(field, prefix, scan);
+        rank_terms(self, all, take, scan)
+    }
+
+    /// Like [`Self::fuzzy_terms`], keeping the most frequent `take` of the first `scan` matches.
+    pub fn fuzzy_terms_ranked(
+        &self,
+        field: Field,
+        value: &str,
+        dist: u32,
+        take: usize,
+        scan: usize,
+    ) -> Result<(Vec<(Vec<u8>, u64)>, bool), Error> {
+        let all = self.fuzzy_terms(field, value, dist, scan)?;
+        Ok(rank_terms(self, all, take, scan))
+    }
+
     /// Terms within Levenshtein distance `dist` of `value`, at most `limit`.
     pub fn fuzzy_terms(&self, field: Field, value: &str, dist: u32, limit: usize) -> Result<Vec<(Vec<u8>, u64)>, Error> {
         use fst::{IntoStreamer, Streamer};
@@ -342,7 +448,7 @@ impl Snapshot {
         Ok(out)
     }
 
-    pub fn postings_by_offset(&self, off: u64) -> Result<RoaringBitmap, Error> {
+    pub fn postings_by_offset(&self, off: u64) -> Result<Arc<RoaringBitmap>, Error> {
         self.postings_at(off)
     }
 
@@ -380,6 +486,27 @@ impl Snapshot {
         Some(self.refs[table][i][1].as_str())
     }
 }
+
+/// Most frequent terms first, at most `take` terms and `MAX_EXPANSION_BYTES` of postings
+/// (the first term is always kept). Bounds the work of short prefixes like `BAR`.
+fn rank_terms(snap: &Snapshot, mut terms: Vec<(Vec<u8>, u64)>, take: usize, scan: usize) -> (Vec<(Vec<u8>, u64)>, bool) {
+    let n = terms.len();
+    let mut sized: Vec<(u64, Vec<u8>, u64)> = terms.drain(..).map(|(t, off)| (snap.postings_size(off), t, off)).collect();
+    sized.sort_by(|a, b| b.0.cmp(&a.0).then_with(|| a.1.cmp(&b.1)));
+    let mut budget = 0u64;
+    for (i, (size, t, off)) in sized.into_iter().enumerate() {
+        if i >= take || (i > 0 && budget + size > MAX_EXPANSION_BYTES) {
+            break;
+        }
+        budget += size;
+        terms.push((t, off));
+    }
+    let truncated = terms.len() < n || n >= scan;
+    (terms, truncated)
+}
+
+/// Encoded postings bytes one expanded token may union.
+pub const MAX_EXPANSION_BYTES: u64 = 24 << 20;
 
 fn section_bytes(map: &Mmap, sections: &[SectionEntry], kind: SectionKind, check: bool) -> Result<Option<Vec<u8>>, Error> {
     let Some(s) = sections.iter().find(|s| s.kind == kind) else { return Ok(None) };

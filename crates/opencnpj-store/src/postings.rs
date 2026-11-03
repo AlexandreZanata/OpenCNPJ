@@ -114,7 +114,8 @@ pub fn encode_postings(docs: &[u32], out: &mut Vec<u8>) -> Result<(), Error> {
 }
 
 /// Decodes postings at `offset` within the postings section.
-pub fn decode_postings(section: &[u8], offset: usize, max_doc: u32) -> Result<RoaringBitmap, Error> {
+/// Returns the bitmap and its encoded size.
+pub fn decode_postings(section: &[u8], offset: usize, max_doc: u32) -> Result<(RoaringBitmap, usize), Error> {
     let mut r = Reader::new(section.get(offset..).ok_or(Error::Corrupt("postings offset"))?);
     let len = r.varint_usize()?;
     let body = r.bytes(len)?;
@@ -141,7 +142,7 @@ pub fn decode_postings(section: &[u8], offset: usize, max_doc: u32) -> Result<Ro
     if bm.max().is_some_and(|m| m >= max_doc) {
         return Err(Error::Corrupt("doc id out of range"));
     }
-    Ok(bm)
+    Ok((bm, len))
 }
 
 /// Collects `(term, doc)` pairs for one bucket with interned terms (8 bytes per pair).
@@ -302,7 +303,7 @@ mod tests {
         for docs in [vec![7u32], vec![1, 5, 9, 1000], (0..50_000).step_by(3).collect::<Vec<_>>(), (10..20_000).collect()] {
             let mut buf = vec![0xAA];
             encode_postings(&docs, &mut buf).unwrap();
-            let bm = decode_postings(&buf, 1, 1 << 30).unwrap();
+            let (bm, _) = decode_postings(&buf, 1, 1 << 30).unwrap();
             assert_eq!(bm.iter().collect::<Vec<_>>(), docs);
             assert!(decode_postings(&buf, 1, *docs.last().unwrap()).is_err());
         }

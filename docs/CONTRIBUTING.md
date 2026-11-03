@@ -1,37 +1,34 @@
 # Contributing
 
-Thank you for contributing to OpenCNPJ. This project follows enterprise open-source practices: English code and docs, tests for changes, and conventional commits.
+English code, comments and docs; tests for every change; conventional commits.
 
 ## Local setup
 
 ```bash
-cp .env.example .env
-docker compose up -d postgres redis
-go run ./cmd/migrate
-make test
+rustup toolchain install stable      # MSRV is declared in Cargo.toml
+cargo test --workspace
 ```
 
-## Workflow
-
-1. Create a feature branch.
-2. Follow [COMMIT_CONVENTION.md](COMMIT_CONVENTION.md) (`type(scope): subject`, max 72 chars).
-3. Run `make test`, `make vet`, and `make lint` before opening a PR.
-4. Add unit tests for changed code; register new features in [DVT.md](DVT.md).
-
-## Fixtures
+No database or service is needed. Integration tests generate synthetic RFB-format ZIPs.
+To work with real data:
 
 ```bash
-make seed   # loads tests/fixtures (≤ 10k rows per file)
+cargo run --release -- download --dest data/raw
+cargo run --release -- build --input data/raw/2026-10 --output data/2026-10.ocnpj
 ```
 
-## Security checks
+## Before opening a PR
 
 ```bash
-./scripts/security-check.sh
+cargo fmt --all
+cargo clippy --workspace --all-targets -- -D warnings
+cargo test --workspace
 ```
 
-See [SECURITY-COMMANDS.md](SECURITY-COMMANDS.md) for tool details.
+Changes to the snapshot layout must update [FORMAT.md](FORMAT.md) and bump the format
+version (major for incompatible changes). Performance claims must come with the command
+and the raw output (see [BENCHMARKS.md](BENCHMARKS.md)).
 
-## AI-assisted changes
+## Commits
 
-Read [AGENTS.md](../AGENTS.md) and `.cursor/rules/` before using Cursor agents on this repo.
+[COMMIT_CONVENTION.md](COMMIT_CONVENTION.md): `type(scope): subject`, at most 72 characters.

@@ -170,7 +170,7 @@ fn workloads(snap: &Snapshot, n: usize, seed: u64) -> Result<Vec<(&'static str, 
     Ok(cats
         .into_iter()
         .map(|(k, mut v)| {
-            v.truncate(if k.starts_with("stats_municipio") { (n / 10).max(10) } else { n });
+            v.truncate(if k.starts_with("stats_municipio") { (n / 50).max(10) } else { n });
             (k, v)
         })
         .collect())

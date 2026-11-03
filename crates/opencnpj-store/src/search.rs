@@ -9,6 +9,8 @@
 //!   first, active establishments before others, then CNPJ order. This is exact top-k over
 //!   the whole candidate set, computed with per-bucket bitmap intersections.
 
+use std::sync::Arc;
+
 use roaring::RoaringBitmap;
 
 use crate::Error;
@@ -42,10 +44,12 @@ pub struct Limits {
     /// Maximum terms a fuzzy token expands to.
     pub max_fuzzy_terms: usize,
     pub max_tokens: usize,
+    /// Maximum dictionary terms examined per prefix/fuzzy token (bounds the FST walk).
+    pub max_scan_terms: usize,
 }
 
 impl Limits {
-    pub const DEFAULT: Limits = Limits { max_prefix_terms: 256, max_fuzzy_terms: 64, max_tokens: 8 };
+    pub const DEFAULT: Limits = Limits { max_prefix_terms: 128, max_fuzzy_terms: 32, max_tokens: 8, max_scan_terms: 20_000 };
 }
 
 #[derive(Debug, Clone, Default)]
@@ -91,20 +95,21 @@ fn token_postings(
 ) -> Result<RoaringBitmap, Error> {
     let mut set = RoaringBitmap::new();
     if prefix {
-        let terms = snap.prefix_terms(f, tok.as_bytes(), limits.max_prefix_terms + 1);
-        *truncated |= terms.len() > limits.max_prefix_terms;
-        for (_, off) in terms.iter().take(limits.max_prefix_terms) {
-            set |= snap.postings_by_offset(*off)?;
+        let (terms, cut) = snap.prefix_terms_ranked(f, tok.as_bytes(), limits.max_prefix_terms, limits.max_scan_terms);
+        *truncated |= cut;
+        for (_, off) in &terms {
+            set |= &*snap.postings_by_offset(*off)?;
         }
     } else if let Some(p) = snap.postings(f, tok.as_bytes())? {
-        set = p;
+        set = Arc::unwrap_or_clone(p);
     }
-    if set.is_empty() && fuzzy && tok.len() >= 4 {
+    // Fuzzy adds near terms even when the token exists: a typo is often a rare real word.
+    if fuzzy && tok.len() >= 4 {
         let dist = if tok.len() >= 8 { 2 } else { 1 };
-        let terms = snap.fuzzy_terms(f, tok, dist, limits.max_fuzzy_terms + 1)?;
-        *truncated |= terms.len() > limits.max_fuzzy_terms;
-        for (_, off) in terms.iter().take(limits.max_fuzzy_terms) {
-            set |= snap.postings_by_offset(*off)?;
+        let (terms, cut) = snap.fuzzy_terms_ranked(f, tok, dist, limits.max_fuzzy_terms, limits.max_scan_terms)?;
+        *truncated |= cut;
+        for (_, off) in &terms {
+            set |= &*snap.postings_by_offset(*off)?;
         }
     }
     Ok(set)
@@ -130,7 +135,7 @@ pub fn candidates(snap: &Snapshot, q: &Query, limits: &Limits) -> Result<Candida
         let mut set = RoaringBitmap::new();
         for v in values {
             if let Some(p) = snap.postings(*field, filter_value(*field, v).as_bytes())? {
-                set |= p;
+                set |= &*p;
             }
         }
         sets.push(set);
@@ -138,15 +143,17 @@ pub fn candidates(snap: &Snapshot, q: &Query, limits: &Limits) -> Result<Candida
     let filters = intersect_all(sets);
     if let Some(text) = q.text.as_deref() {
         out.has_text = true;
-        let tokens = opencnpj_core::text::tokens(text);
+        let mut tokens = opencnpj_core::text::tokens(text);
         if tokens.len() > limits.max_tokens {
-            return Err(Error::Invalid(format!("at most {} search tokens", limits.max_tokens)));
+            // Long names: the first tokens are already highly selective.
+            tokens.truncate(limits.max_tokens);
+            out.truncated = true;
         }
         if tokens.is_empty() {
             out.all = Some(RoaringBitmap::new());
             return Ok(out);
         }
-        let prefix_last = !text.ends_with(' ');
+        let prefix_last = !text.ends_with(' ') && !out.truncated;
         let fields: &[Field] = match q.text_field {
             TextField::Any => &[Field::Razao, Field::Fantasia],
             TextField::Razao => &[Field::Razao],
@@ -199,6 +206,7 @@ pub fn search(snap: &Snapshot, q: &Query, limits: &Limits) -> Result<SearchResul
         // Shortest matching name first; within a bucket, active establishments first, then
         // CNPJ order. Documents matched only across both fields come last.
         let active = snap.postings(Field::Situacao, b"02")?.unwrap_or_default();
+        let active = &*active;
         let mut emitted = RoaringBitmap::new();
         'outer: for len in (1..=MAX_NAME_LEN_BUCKET).chain(std::iter::once(0)) {
             let v = len.to_string();
@@ -206,19 +214,19 @@ pub fn search(snap: &Snapshot, q: &Query, limits: &Limits) -> Result<SearchResul
             if !c.by_razao.is_empty()
                 && let Some(p) = snap.postings(Field::RazaoLen, v.as_bytes())?
             {
-                bucket |= &c.by_razao & p;
+                bucket |= &c.by_razao & &*p;
             }
             if !c.by_fantasia.is_empty()
                 && let Some(p) = snap.postings(Field::FantasiaLen, v.as_bytes())?
             {
-                bucket |= &c.by_fantasia & p;
+                bucket |= &c.by_fantasia & &*p;
             }
             bucket -= &emitted;
             if bucket.is_empty() {
                 continue;
             }
             emitted |= &bucket;
-            let act = &bucket & &active;
+            let act = &bucket & active;
             let inact = &bucket - &act;
             for part in [act, inact] {
                 for d in part.iter() {
@@ -248,13 +256,21 @@ pub fn search(snap: &Snapshot, q: &Query, limits: &Limits) -> Result<SearchResul
 }
 
 /// Counts documents per value of `group_by`, restricted to the query's candidates.
+///
+/// High-cardinality fields (município, CNAE, natureza) need a narrowing filter: each value
+/// is one postings list to decode. Heavy analytics belong in a columnar engine (export to
+/// Parquet/DuckDB), not in the request path.
 pub fn group_counts(snap: &Snapshot, q: &Query, group_by: Field, limits: &Limits) -> Result<Vec<(String, u64)>, Error> {
     let set = candidates(snap, q, limits)?.all;
+    let high_cardinality = matches!(group_by, Field::Municipio | Field::Cnae | Field::CnaeSecundaria | Field::Natureza);
+    if high_cardinality && set.is_none() {
+        return Err(Error::Invalid(format!("group_by={} requires q or a filter", group_by.name())));
+    }
     let mut out = Vec::new();
     for (value, off) in snap.prefix_terms(group_by, b"", usize::MAX) {
         let p = snap.postings_by_offset(off)?;
         let n = match &set {
-            Some(s) => s.intersection_len(&p),
+            Some(s) => s.intersection_len(&*p),
             None => p.len(),
         };
         if n > 0 {

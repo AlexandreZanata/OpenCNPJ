@@ -121,6 +121,18 @@ impl<'a> BlockBuilder<'a> {
     }
 }
 
+/// Which rows of a company to decode.
+#[derive(Debug, Clone, Copy)]
+pub struct Select {
+    /// `Some(k)`: only the k-th establishment.
+    pub estab: Option<usize>,
+    pub socios: bool,
+}
+
+impl Select {
+    pub const ALL: Select = Select { estab: None, socios: true };
+}
+
 /// Parsed stream table of a raw block.
 pub struct BlockView<'a> {
     pub companies: usize,
@@ -176,29 +188,69 @@ impl<'a> BlockView<'a> {
 
     /// Decodes the company at `index` (skipping rows of the companies before it).
     pub fn company(&self, codecs: &Codecs, index: usize, key: String, counts: &[[u32; 4]]) -> Result<Company, Error> {
+        self.company_select(codecs, index, key, counts, Select::ALL)
+    }
+
+    /// Decodes part of the company at `index`: establishments can be limited to one row
+    /// (large companies have thousands) and partners can be skipped.
+    pub fn company_select(&self, codecs: &Codecs, index: usize, key: String, counts: &[[u32; 4]], sel: Select) -> Result<Company, Error> {
         let mut c = Company { basico: key, ..Default::default() };
         let mut s = 5;
         let mut buf = String::new();
         for t in Table::ALL {
-            let skip: u64 = counts[..index].iter().map(|n| u64::from(n[t.index()])).sum();
-            let take = counts[index][t.index()] as usize;
+            let mut skip: u64 = counts[..index].iter().map(|n| u64::from(n[t.index()])).sum();
+            let mut take = counts[index][t.index()] as usize;
+            match t {
+                Table::Estabelecimentos => {
+                    if let Some(k) = sel.estab {
+                        if k >= take {
+                            return Err(Error::Invalid("establishment index out of range".into()));
+                        }
+                        skip += k as u64;
+                        take = 1;
+                    }
+                }
+                Table::Socios if !sel.socios => take = 0,
+                _ => {}
+            }
             let cols = codecs.table(t);
             let rows = c.rows_mut(t);
             rows.resize_with(take, || Vec::with_capacity(cols.len()));
-            for (i, codec) in cols.iter().enumerate() {
-                let mut r = Reader::new(self.streams[s + i]);
-                for _ in 0..skip {
-                    codec.skip(&mut r)?;
-                }
-                for row in rows.iter_mut() {
-                    buf.clear();
-                    codec.decode(&mut r, &mut buf)?;
-                    row.push(buf.clone());
+            if take > 0 {
+                for (i, codec) in cols.iter().enumerate() {
+                    let mut r = Reader::new(self.streams[s + i]);
+                    for _ in 0..skip {
+                        codec.skip(&mut r)?;
+                    }
+                    for row in rows.iter_mut() {
+                        buf.clear();
+                        codec.decode(&mut r, &mut buf)?;
+                        row.push(buf.clone());
+                    }
                 }
             }
             s += cols.len();
         }
         Ok(c)
+    }
+
+    /// Decodes one establishment column for every establishment of the company at `index`.
+    pub fn estab_column(&self, codecs: &Codecs, index: usize, counts: &[[u32; 4]], column: usize) -> Result<Vec<String>, Error> {
+        let e = Table::Estabelecimentos.index();
+        let skip: u64 = counts[..index].iter().map(|n| u64::from(n[e])).sum();
+        let s = 5 + codecs.table(Table::Empresas).len() + column;
+        let codec = &codecs.table(Table::Estabelecimentos)[column];
+        let mut r = Reader::new(self.streams[s]);
+        for _ in 0..skip {
+            codec.skip(&mut r)?;
+        }
+        let mut out = Vec::with_capacity(counts[index][e] as usize);
+        for _ in 0..counts[index][e] {
+            let mut v = String::new();
+            codec.decode(&mut r, &mut v)?;
+            out.push(v);
+        }
+        Ok(out)
     }
 
     /// Decodes all companies.

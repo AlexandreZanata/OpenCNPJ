@@ -301,8 +301,10 @@ fn main() -> Result<()> {
             let query = to_query(&q)?;
             let t0 = Instant::now();
             let r = search::search(&snap, &query, &Limits::DEFAULT)?;
+            let t_search = t0.elapsed();
             let docs = snap.docs(&sorted(&r.docs))?;
             let el = t0.elapsed();
+            log(&format!("search {:.3} ms, fetch {:.3} ms", t_search.as_secs_f64() * 1e3, (el - t_search).as_secs_f64() * 1e3));
             let v = output::search_json(&snap, &r, docs, false);
             println!("{}", serde_json::to_string_pretty(&v)?);
             log(&format!("search took {:.3} ms", el.as_secs_f64() * 1e3));
