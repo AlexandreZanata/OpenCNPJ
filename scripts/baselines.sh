@@ -17,14 +17,24 @@ results="$OUT/baselines.tsv"
 : > "$results"
 record() { printf '%s\t%s\t%s\n' "$1" "$2" "$3" >> "$results"; }
 
-# B. Extracted CSV
-t0=$(now)
-for z in "$RAW"/*.zip; do
-  name=$(basename "$z" .zip)
-  unzip -p "$z" > "$OUT/csv/$name.csv"
-done
-record csv_extract_s "$(echo "$(now) - $t0" | bc)" ""
+# B. Extracted CSV (SKIP_EXTRACT=1 reuses OUT/csv)
+if [ "${SKIP_EXTRACT:-0}" != 1 ]; then
+  t0=$(now)
+  for z in "$RAW"/*.zip; do
+    name=$(basename "$z" .zip)
+    unzip -p "$z" > "$OUT/csv/$name.csv"
+  done
+  record csv_extract_s "$(echo "$(now) - $t0" | bc)" ""
+fi
 record csv_bytes "$(du -cb "$OUT"/csv/*.csv | tail -1 | cut -f1)" ""
+
+# DuckDB's latin-1 reader rejects some valid ISO-8859-1 bytes; transcode with iconv.
+mkdir -p "$OUT/csv-utf8"
+t0=$(now)
+for f in "$OUT"/csv/*.csv; do
+  iconv -f ISO-8859-1 -t UTF-8 "$f" > "$OUT/csv-utf8/$(basename "$f")"
+done
+record csv_to_utf8_s "$(echo "$(now) - $t0" | bc)" "iconv, needed by DuckDB"
 
 cols_empresas="cnpj_basico,razao_social,natureza_juridica,qualificacao_responsavel,capital_social,porte_empresa,ente_federativo_responsavel"
 cols_estabelecimentos="cnpj_basico,cnpj_ordem,cnpj_dv,identificador_matriz_filial,nome_fantasia,situacao_cadastral,data_situacao_cadastral,motivo_situacao_cadastral,nome_cidade_exterior,pais,data_inicio_atividade,cnae_fiscal_principal,cnae_fiscal_secundaria,tipo_logradouro,logradouro,numero,complemento,bairro,cep,uf,municipio,ddd_1,telefone_1,ddd_2,telefone_2,ddd_fax,fax,correio_eletronico,situacao_especial,data_situacao_especial"
@@ -35,7 +45,8 @@ colspec() { # "a,b,c" -> {'a':'VARCHAR','b':'VARCHAR',...}
   echo "{$(echo "$1" | tr ',' '\n' | sed "s/.*/'&':'VARCHAR'/" | paste -sd,)}"
 }
 
-# C. Parquet + ZSTD (all columns as text: same semantic content, no type coercion)
+# C. Parquet + ZSTD (all columns as text: same semantic content, no type coercion).
+# DuckDB's parallel CSV reader rejects these files (unescaped quotes), hence parallel=false.
 t0=$(now)
 for t in empresas estabelecimentos socios simples; do
   case $t in
@@ -44,7 +55,7 @@ for t in empresas estabelecimentos socios simples; do
     socios) glob="Socios*.csv"; cols=$cols_socios ;;
     simples) glob="Simples.csv"; cols=$cols_simples ;;
   esac
-  duckdb -c "SET threads=$(nproc); COPY (SELECT * FROM read_csv('$OUT/csv/$glob', delim=';', quote='\"', escape='', header=false, encoding='latin-1', strict_mode=false, columns=$(colspec "$cols"))) TO '$OUT/parquet/$t.parquet' (FORMAT parquet, COMPRESSION zstd, COMPRESSION_LEVEL $LEVEL, ROW_GROUP_SIZE 122880);"
+  duckdb -c "SET threads=$(nproc); COPY (SELECT * FROM read_csv('$OUT/csv-utf8/$glob', delim=';', quote='\"', escape='', header=false, strict_mode=false, parallel=false, columns=$(colspec "$cols"))) TO '$OUT/parquet/$t.parquet' (FORMAT parquet, COMPRESSION zstd, COMPRESSION_LEVEL $LEVEL, ROW_GROUP_SIZE 122880);"
   record "parquet_rows_$t" "$(duckdb -noheader -list -c "SELECT count(*) FROM '$OUT/parquet/$t.parquet'")" ""
 done
 record parquet_build_s "$(echo "$(now) - $t0" | bc)" "zstd level $LEVEL"
