@@ -19,6 +19,12 @@ use crate::format::*;
 use crate::manifest::Manifest;
 use crate::postings::{self, Field};
 
+/// Dictionary terms (field byte stripped) with their postings offsets.
+pub type TermList = Vec<(Vec<u8>, u64)>;
+
+/// Block index, raw bytes, keys and per-company row counts.
+type ParsedBlock = (usize, Vec<u8>, Vec<String>, Vec<[u32; 4]>);
+
 /// Byte range of the shared mapping, usable as FST storage.
 #[derive(Clone)]
 pub struct MapSlice {
@@ -288,7 +294,7 @@ impl Snapshot {
     pub fn docs(&self, ids: &[u32]) -> Result<Vec<DocRecord>, Error> {
         let mut out = Vec::with_capacity(ids.len());
         // Parsed state of the current block: (index, raw, keys, counts).
-        let mut cur: Option<(usize, Vec<u8>, Vec<String>, Vec<[u32; 4]>)> = None;
+        let mut cur: Option<ParsedBlock> = None;
         for &doc in ids {
             if doc >= self.doc_count {
                 return Err(Error::Invalid(format!("doc {doc} out of range")));
@@ -313,7 +319,7 @@ impl Snapshot {
                 d += docs;
             }
             let (ci, ei, has_estab) = found.ok_or(Error::Corrupt("doc not found in its block"))?;
-            let sel = Select { estab: Some(ei).filter(|_| has_estab), socios: false };
+            let sel = Select { estab: has_estab.then_some(ei), socios: false };
             let company = view.company_select(&self.codecs, ci, keys[ci].clone(), counts, sel)?;
             out.push(DocRecord { doc, company, estab: has_estab.then_some(0) });
         }
@@ -410,7 +416,7 @@ impl Snapshot {
 
     /// Up to `take` terms of `field` starting with `prefix`, preferring the most frequent
     /// among the first `scan` matches. Returns the terms and whether any were left out.
-    pub fn prefix_terms_ranked(&self, field: Field, prefix: &[u8], take: usize, scan: usize) -> (Vec<(Vec<u8>, u64)>, bool) {
+    pub fn prefix_terms_ranked(&self, field: Field, prefix: &[u8], take: usize, scan: usize) -> (TermList, bool) {
         let all = self.prefix_terms(field, prefix, scan);
         rank_terms(self, all, take, scan)
     }
@@ -423,7 +429,7 @@ impl Snapshot {
         dist: u32,
         take: usize,
         scan: usize,
-    ) -> Result<(Vec<(Vec<u8>, u64)>, bool), Error> {
+    ) -> Result<(TermList, bool), Error> {
         let all = self.fuzzy_terms(field, value, dist, scan)?;
         Ok(rank_terms(self, all, take, scan))
     }
@@ -489,7 +495,7 @@ impl Snapshot {
 
 /// Most frequent terms first, at most `take` terms and `MAX_EXPANSION_BYTES` of postings
 /// (the first term is always kept). Bounds the work of short prefixes like `BAR`.
-fn rank_terms(snap: &Snapshot, mut terms: Vec<(Vec<u8>, u64)>, take: usize, scan: usize) -> (Vec<(Vec<u8>, u64)>, bool) {
+fn rank_terms(snap: &Snapshot, mut terms: Vec<(Vec<u8>, u64)>, take: usize, scan: usize) -> (TermList, bool) {
     let n = terms.len();
     let mut sized: Vec<(u64, Vec<u8>, u64)> = terms.drain(..).map(|(t, off)| (snap.postings_size(off), t, off)).collect();
     sized.sort_by(|a, b| b.0.cmp(&a.0).then_with(|| a.1.cmp(&b.1)));
