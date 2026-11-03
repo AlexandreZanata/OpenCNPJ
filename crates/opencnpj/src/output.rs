@@ -201,20 +201,28 @@ pub fn cpf_lookup(snap: &Snapshot, cpf: &str, limit: usize, privacy: Privacy) ->
     let mut seen = std::collections::BTreeSet::new();
     let mut socios = Vec::new();
     let masked = format!("***{}**", &digits[3..9]);
-    for d in snap.docs(&partner.iter().collect::<Vec<_>>())? {
-        if socios.len() >= limit || !seen.insert(d.company.basico.clone()) {
-            continue;
+    // Documents of one company are contiguous: fetch in chunks until `limit` companies.
+    let ids: Vec<u32> = partner.iter().collect();
+    'chunks: for chunk in ids.chunks(64) {
+        for d in snap.docs(chunk)? {
+            if socios.len() >= limit {
+                break 'chunks;
+            }
+            if !seen.insert(d.company.basico.clone()) {
+                continue;
+            }
+            // Partners and company rows only: large companies have thousands of branches.
+            let Some((c, _)) = snap.company_page(&d.company.basico, 0, 0)? else { continue };
+            let rows: Vec<Value> = c
+                .socios
+                .iter()
+                .filter(|r| r[col::soc::DOCUMENTO] == masked || r[col::soc::REPRESENTANTE] == masked)
+                .map(|r| row_json(snap, Table::Socios, r, privacy))
+                .collect();
+            let mut v = doc_summary(snap, &d);
+            v["socios_correspondentes"] = Value::Array(rows);
+            socios.push(v);
         }
-        let Some(c) = snap.company(&d.company.basico)? else { continue };
-        let rows: Vec<Value> = c
-            .socios
-            .iter()
-            .filter(|r| r[col::soc::DOCUMENTO] == masked || r[col::soc::REPRESENTANTE] == masked)
-            .map(|r| row_json(snap, Table::Socios, r, privacy))
-            .collect();
-        let mut v = doc_summary(snap, &d);
-        v["socios_correspondentes"] = Value::Array(rows);
-        socios.push(v);
     }
     Ok(json!({
         "cpf": digits,

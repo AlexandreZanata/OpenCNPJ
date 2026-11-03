@@ -210,8 +210,8 @@ pub fn filter_pattern(field: Field, v: &str) -> Result<Pattern, Error> {
 /// Maximum dictionary terms one prefix filter may expand to.
 pub const MAX_FILTER_TERMS: usize = 500_000;
 
-/// Documents matching any of `values` in `field`.
-fn filter_set(snap: &Snapshot, field: Field, values: &[String]) -> Result<RoaringBitmap, Error> {
+/// Postings lists whose union is the documents matching any of `values` in `field`.
+fn filter_parts(snap: &Snapshot, field: Field, values: &[String]) -> Result<Vec<Arc<RoaringBitmap>>, Error> {
     let mut parts: Vec<Arc<RoaringBitmap>> = Vec::new();
     for v in values {
         let pat = filter_pattern(field, v)?;
@@ -226,7 +226,33 @@ fn filter_set(snap: &Snapshot, field: Field, values: &[String]) -> Result<Roarin
             }
         }
     }
-    Ok(parts.iter().map(|p| &**p).union())
+    Ok(parts)
+}
+
+/// Intersection of every filter, evaluated smallest first. When the running intersection
+/// is much smaller than a later filter, that filter's postings are restricted to it before
+/// their union, so a broad prefix filter (a CNAE division, a CEP prefix) does not
+/// materialize its full union.
+fn filters_intersection(snap: &Snapshot, filters: &[(Field, Vec<String>)]) -> Result<Option<RoaringBitmap>, Error> {
+    let mut groups: Vec<(u64, Vec<Arc<RoaringBitmap>>)> = Vec::with_capacity(filters.len());
+    for (field, values) in filters {
+        let parts = filter_parts(snap, *field, values)?;
+        let size = parts.iter().map(|p| p.len()).sum();
+        groups.push((size, parts));
+    }
+    groups.sort_by_key(|g| g.0);
+    let mut acc: Option<RoaringBitmap> = None;
+    for (size, parts) in groups {
+        let next = match &acc {
+            None => parts.iter().map(|p| &**p).union(),
+            Some(a) if a.is_empty() => return Ok(acc),
+            // Restricting each part pays off only when the running set is much smaller.
+            Some(a) if a.len().saturating_mul(8) < size => parts.iter().map(|p| a & &**p).union(),
+            Some(a) => a & parts.iter().map(|p| &**p).union(),
+        };
+        acc = Some(next);
+    }
+    Ok(acc)
 }
 
 /// A text query that is only a CNPJ (or a CNPJ prefix of at least 8 digits, other than
@@ -323,8 +349,8 @@ fn intersect_all(mut sets: Vec<RoaringBitmap>) -> Option<RoaringBitmap> {
 pub fn candidates(snap: &Snapshot, q: &Query, limits: &Limits) -> Result<Candidates, Error> {
     let mut out = Candidates::default();
     let mut sets: Vec<RoaringBitmap> = Vec::new();
-    for (field, values) in &q.filters {
-        sets.push(filter_set(snap, *field, values)?);
+    if let Some(f) = filters_intersection(snap, &q.filters)? {
+        sets.push(f);
     }
     let mut text = q.text.as_deref();
     let mut prefixes: Vec<&str> = q.cnpj_prefixes.iter().map(String::as_str).collect();

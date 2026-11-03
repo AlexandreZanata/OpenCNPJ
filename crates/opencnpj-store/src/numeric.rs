@@ -98,9 +98,14 @@ pub fn date_string(v: u64) -> String {
     format!("{y:04}-{m:02}-{d:02}")
 }
 
-/// Year of a [`date_value`].
+/// Year of a [`date_value`] (table lookup for 1900–2199, calendar math beyond).
 pub fn date_year(v: u64) -> i64 {
-    civil_from_days(v as i64 - 1 + days_from_civil(1900, 1, 1)).0
+    static YEARS: std::sync::OnceLock<Vec<u16>> = std::sync::OnceLock::new();
+    let t = YEARS.get_or_init(|| (0..110_000u64).map(|v| civil_from_days(v as i64 - 1 + days_from_civil(1900, 1, 1)).0 as u16).collect());
+    match t.get(v as usize) {
+        Some(&y) if v > 0 => i64::from(y),
+        _ => civil_from_days(v as i64 - 1 + days_from_civil(1900, 1, 1)).0,
+    }
 }
 
 /// `1.000,50` / `1000,50` / `1000.50` / `1000` (reais) → cents + 1; `None` when not a number.
@@ -346,6 +351,22 @@ impl NumericColumn {
         (bytes, bits as f64 / f64::from(self.doc_count.max(1)))
     }
 
+    /// Like [`Self::get`] with a 64-bit read (values up to 56 bits; wider ones fall back).
+    fn get_fast(&self, file: &[u8], doc: u32) -> u64 {
+        let b = &self.blocks[doc as usize / BLOCK_DOCS];
+        if b.flags & ALL_MISSING != 0 || b.bits == 0 {
+            return 0;
+        }
+        if b.bits > 56 {
+            return self.get(file, doc);
+        }
+        let bit = (doc as usize % BLOCK_DOCS) * b.bits as usize;
+        let at = self.data.0 + b.rel + bit / 8;
+        let w = u64::from_le_bytes(file[at..at + 8].try_into().expect("8"));
+        let x = (w >> (bit % 8)) & ((1u64 << b.bits) - 1);
+        if x == 0 { 0 } else { b.min + x - 1 }
+    }
+
     /// Stored value (0 = none) of `doc`.
     pub fn get(&self, file: &[u8], doc: u32) -> u64 {
         if doc >= self.doc_count {
@@ -360,19 +381,78 @@ impl NumericColumn {
         if x == 0 { 0 } else { b.min + x - 1 }
     }
 
-    /// Documents whose value lies in `range` (`None` = documents without a value).
+    /// Decodes block `i` into `out` (stored values, 0 = none). Uses 64-bit unaligned reads;
+    /// the 8 padding bytes after the data make every read in bounds.
+    pub fn decode_block(&self, file: &[u8], i: usize, out: &mut Vec<u64>) {
+        let b = &self.blocks[i];
+        let docs = (self.doc_count as usize - i * BLOCK_DOCS).min(BLOCK_DOCS);
+        out.clear();
+        if b.flags & ALL_MISSING != 0 || b.bits == 0 {
+            out.resize(docs, 0);
+            return;
+        }
+        let data = &file[self.data.0 + b.rel..self.data.1];
+        let bits = b.bits as usize;
+        if bits <= 56 {
+            let mask = (1u64 << bits) - 1;
+            out.extend((0..docs).map(|j| {
+                let bit = j * bits;
+                let w = u64::from_le_bytes(data[bit / 8..bit / 8 + 8].try_into().expect("8"));
+                let x = (w >> (bit % 8)) & mask;
+                if x == 0 { 0 } else { b.min + x - 1 }
+            }));
+        } else {
+            out.extend((0..docs).map(|j| {
+                let x = get_bits(data, j * bits, b.bits);
+                if x == 0 { 0 } else { b.min + x - 1 }
+            }));
+        }
+    }
+
+    /// Documents whose value lies in `range` (`None` = documents without a value),
+    /// optionally restricted to `within`. Blocks that cannot match, or that contain no
+    /// document of `within`, are skipped without decoding; fully matching blocks are taken
+    /// whole.
     pub fn select(&self, file: &[u8], range: Option<Range>, within: Option<&RoaringBitmap>) -> RoaringBitmap {
         let matches = |v: u64| match range {
             Some(r) => v != 0 && v >= r.lo && v <= r.hi,
             None => v == 0,
         };
-        if let Some(set) = within {
-            // Sparse candidates: probe each one.
-            if set.len() < u64::from(self.doc_count) / 64 {
-                return set.iter().filter(|&d| matches(self.get(file, d))).collect();
-            }
-        }
         let mut out = RoaringBitmap::new();
+        let mut vals = Vec::with_capacity(BLOCK_DOCS);
+        if let Some(set) = within.filter(|s| s.len() <= u64::from(self.doc_count) / 4) {
+            // Candidates given: probe only them. A block with many candidates is decoded
+            // once; a block with few is read value by value. Matches are appended in
+            // ascending order (Roaring's fast path).
+            let mut hits = Vec::new();
+            let mut it = set.iter().peekable();
+            while let Some(&d) = it.peek() {
+                let bi = d as usize / BLOCK_DOCS;
+                if bi >= self.blocks.len() {
+                    break;
+                }
+                let end = ((bi + 1) * BLOCK_DOCS) as u32;
+                let mut docs: Vec<u32> = Vec::new();
+                while let Some(&x) = it.peek() {
+                    if x >= end {
+                        break;
+                    }
+                    docs.push(x);
+                    it.next();
+                }
+                match self.classify(bi, range) {
+                    1 => {}
+                    2 => hits.extend_from_slice(&docs),
+                    _ if docs.len() >= 64 => {
+                        self.decode_block(file, bi, &mut vals);
+                        hits.extend(docs.into_iter().filter(|&x| matches(vals[x as usize % BLOCK_DOCS])));
+                    }
+                    _ => hits.extend(docs.into_iter().filter(|&x| matches(self.get_fast(file, x)))),
+                }
+            }
+            out.append(hits).expect("ascending");
+            return out;
+        }
         for (i, b) in self.blocks.iter().enumerate() {
             let start = (i * BLOCK_DOCS) as u32;
             let end = ((i + 1) * BLOCK_DOCS).min(self.doc_count as usize) as u32;
@@ -398,14 +478,11 @@ impl NumericColumn {
                     }
                 }
             }
-            let data = &file[self.data.0 + b.rel..self.data.1];
-            for d in start..end {
-                let x = get_bits(data, (d - start) as usize * b.bits as usize, b.bits);
-                let v = if x == 0 { 0 } else { b.min + x - 1 };
-                if matches(v) {
-                    out.insert(d);
-                }
+            if within.is_some_and(|s| s.range_cardinality(start..end) == 0) {
+                continue;
             }
+            self.decode_block(file, i, &mut vals);
+            out.append(vals.iter().enumerate().filter(|(_, v)| matches(**v)).map(|(j, _)| start + j as u32)).expect("ascending");
         }
         if let Some(set) = within {
             out &= set;
@@ -413,40 +490,129 @@ impl NumericColumn {
         out
     }
 
-    /// Up to `k` documents of `set` ordered by value (documents without a value last),
-    /// ties in document order.
-    pub fn top_k(&self, file: &[u8], set: &RoaringBitmap, k: usize, desc: bool) -> Vec<u32> {
-        let mut v: Vec<(u64, u32)> = set
-            .iter()
-            .map(|d| {
-                let x = self.get(file, d);
-                let key = match (x, desc) {
-                    (0, _) => u64::MAX,
-                    (x, true) => u64::MAX - 1 - x,
-                    (x, false) => x,
-                };
-                (key, d)
-            })
-            .collect();
-        if v.len() > k {
-            v.select_nth_unstable(k);
-            v.truncate(k);
+    /// 0 = must decode, 1 = no document of block `i` matches, 2 = all of them match.
+    fn classify(&self, i: usize, range: Option<Range>) -> u8 {
+        let b = &self.blocks[i];
+        let all_missing = b.flags & ALL_MISSING != 0;
+        let has_missing = b.flags & HAS_MISSING != 0;
+        match range {
+            Some(r) if all_missing || b.max < r.lo || b.min > r.hi => 1,
+            Some(r) if !has_missing && b.min >= r.lo && b.max <= r.hi => 2,
+            Some(_) => 0,
+            None if all_missing => 2,
+            None if !has_missing => 1,
+            None => 0,
         }
-        v.sort_unstable();
-        v.into_iter().map(|(_, d)| d).collect()
     }
 
-    /// Value histogram over `set` with `bucket(value) -> key` (values > 0 only).
+    /// Calls `f(doc, value)` for every document of `set` (ascending), decoding each touched
+    /// block once.
+    fn for_each(&self, file: &[u8], set: &RoaringBitmap, mut f: impl FnMut(u32, u64)) {
+        let mut vals = Vec::with_capacity(BLOCK_DOCS);
+        let mut cur = usize::MAX;
+        for d in set.iter() {
+            let bi = d as usize / BLOCK_DOCS;
+            if bi >= self.blocks.len() {
+                break;
+            }
+            if bi != cur {
+                self.decode_block(file, bi, &mut vals);
+                cur = bi;
+            }
+            f(d, vals[d as usize % BLOCK_DOCS]);
+        }
+    }
+
+    /// Up to `k` documents of `set` ordered by value (documents without a value last),
+    /// ties in document order. Blocks are visited from the most promising min/max bound and
+    /// the scan stops once no remaining block can beat the current k-th value.
+    pub fn top_k(&self, file: &[u8], set: &RoaringBitmap, k: usize, desc: bool) -> Vec<u32> {
+        if k == 0 {
+            return Vec::new();
+        }
+        // Sort key: smaller is better; documents without a value get u64::MAX.
+        let key = |x: u64| match (x, desc) {
+            (0, _) => u64::MAX,
+            (x, true) => u64::MAX - 1 - x,
+            (x, false) => x,
+        };
+        let mut order: Vec<(u64, usize)> = Vec::new();
+        for (i, b) in self.blocks.iter().enumerate() {
+            let start = (i * BLOCK_DOCS) as u32;
+            let end = ((i + 1) * BLOCK_DOCS).min(self.doc_count as usize) as u32;
+            if b.flags & ALL_MISSING != 0 || set.range_cardinality(start..end) == 0 {
+                continue;
+            }
+            order.push((key(if desc { b.max } else { b.min }), i));
+        }
+        order.sort_unstable();
+        let mut heap: std::collections::BinaryHeap<(u64, u32)> = std::collections::BinaryHeap::with_capacity(k + 1);
+        let mut vals = Vec::with_capacity(BLOCK_DOCS);
+        for (bound, i) in order {
+            if heap.len() == k && heap.peek().is_some_and(|w| w.0 < bound) {
+                break;
+            }
+            let start = (i * BLOCK_DOCS) as u32;
+            self.decode_block(file, i, &mut vals);
+            for (j, &v) in vals.iter().enumerate() {
+                if v == 0 {
+                    continue;
+                }
+                let item = (key(v), start + j as u32);
+                // Membership is checked only for values that would enter the heap.
+                let better = heap.len() < k || heap.peek().is_some_and(|w| item < *w);
+                if better && set.contains(item.1) {
+                    if heap.len() == k {
+                        heap.pop();
+                    }
+                    heap.push(item);
+                }
+            }
+        }
+        let mut out: Vec<(u64, u32)> = heap.into_vec();
+        out.sort_unstable();
+        let mut docs: Vec<u32> = out.into_iter().map(|(_, d)| d).collect();
+        if docs.len() < k {
+            // Documents without a value, in document order.
+            let have: RoaringBitmap = docs.iter().copied().collect();
+            let missing = self.select(file, None, Some(set)) - have;
+            docs.extend(missing.iter().take(k - docs.len()));
+        }
+        docs
+    }
+
+    /// Value histogram over `set` (all documents when `None`) with `bucket(value) -> key`
+    /// (values > 0 only).
     pub fn histogram(&self, file: &[u8], set: Option<&RoaringBitmap>, bucket: impl Fn(u64) -> i64) -> Vec<(i64, u64)> {
+        // Run-length accumulation: neighbouring documents usually share a bucket.
         let mut h = std::collections::BTreeMap::new();
+        let mut run: Option<(i64, u64)> = None;
         let mut add = |v: u64| {
-            if v != 0 {
-                *h.entry(bucket(v)).or_insert(0u64) += 1;
+            if v == 0 {
+                return;
+            }
+            let k = bucket(v);
+            match &mut run {
+                Some((rk, n)) if *rk == k => *n += 1,
+                _ => {
+                    if let Some((rk, n)) = run.replace((k, 1)) {
+                        *h.entry(rk).or_insert(0u64) += n;
+                    }
+                }
             }
         };
         match set {
-            Some(s) => s.iter().for_each(|d| add(self.get(file, d))),
-            None => (0..self.doc_count).for_each(|d| add(self.get(file, d))),
+            Some(s) => self.for_each(file, s, |_, v| add(v)),
+            None => {
+                let mut vals = Vec::with_capacity(BLOCK_DOCS);
+                for i in 0..self.blocks.len() {
+                    self.decode_block(file, i, &mut vals);
+                    vals.iter().for_each(|&v| add(v));
+                }
+            }
+        }
+        if let Some((rk, n)) = run {
+            *h.entry(rk).or_insert(0u64) += n;
         }
         h.into_iter().collect()
     }
@@ -501,6 +667,9 @@ mod tests {
         assert_eq!(date_string(date_value("20240229").unwrap()), "2024-02-29");
         assert_eq!(date_value("2024-02-29"), date_value("20240229"));
         assert_eq!(date_year(date_value("20070402").unwrap()), 2007);
+        for d in ["19000101", "19991231", "20000101", "20240229", "21991231", "22990101"] {
+            assert_eq!(date_year(date_value(d).unwrap()), d[..4].parse::<i64>().unwrap(), "{d}");
+        }
         for bad in ["00000000", "20230229", "", "18991231", "2007040", "2007-04-02x"] {
             assert_eq!(date_value(bad), None, "{bad}");
         }
