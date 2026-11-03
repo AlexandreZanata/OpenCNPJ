@@ -1,6 +1,6 @@
 //! Read-only snapshot access.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashMap};
 use std::fs::File;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
@@ -45,6 +45,8 @@ pub struct Snapshot {
     terms: fst::Map<MapSlice>,
     postings: (usize, usize),
     pub refs: BTreeMap<String, Vec<[String; 2]>>,
+    /// `table → code → row index` (reference rows keep their source order).
+    ref_index: HashMap<String, HashMap<String, usize>>,
     doc_count: u32,
 }
 
@@ -100,7 +102,7 @@ impl Snapshot {
         let blocks = BlockEntry::decode_all(&get(SectionKind::BlockDir)?.ok_or(Error::Corrupt("missing block directory"))?)?;
         let codecs = decode_dictionaries(&get(SectionKind::Dictionaries)?.ok_or(Error::Corrupt("missing dictionaries"))?)?;
         let decompressor = BlockDecompressor::new(manifest.block_codec, get(SectionKind::ZstdDict)?.as_deref());
-        let refs = match get(SectionKind::RefTables)? {
+        let refs: BTreeMap<String, Vec<[String; 2]>> = match get(SectionKind::RefTables)? {
             Some(r) => serde_json::from_slice(&r).map_err(|_| Error::Corrupt("reference tables json"))?,
             None => BTreeMap::new(),
         };
@@ -124,6 +126,10 @@ impl Snapshot {
             decompressor,
             terms,
             postings: (p.offset as usize, (p.offset + p.len) as usize),
+            ref_index: refs
+                .iter()
+                .map(|(t, rows)| (t.clone(), rows.iter().enumerate().rev().map(|(i, r)| (r[0].clone(), i)).collect()))
+                .collect(),
             refs,
             doc_count,
         };
@@ -370,8 +376,8 @@ impl Snapshot {
 
     /// Description for a reference-table code (`cnaes`, `municipios`, ...).
     pub fn label(&self, table: &str, code: &str) -> Option<&str> {
-        let rows = self.refs.get(table)?;
-        rows.binary_search_by(|r| r[0].as_str().cmp(code)).ok().map(|i| rows[i][1].as_str())
+        let i = *self.ref_index.get(table)?.get(code)?;
+        Some(self.refs[table][i][1].as_str())
     }
 }
 

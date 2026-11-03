@@ -135,7 +135,8 @@ fn workloads(snap: &Snapshot, n: usize, seed: u64) -> Result<Vec<(&'static str, 
             )));
             let mut typo: Vec<char> = toks[0].chars().collect();
             if typo.len() >= 5 {
-                typo.swap(1, 2);
+                // One substitution: edit distance 1.
+                typo[2] = if typo[2] == 'X' { 'Y' } else { 'X' };
                 let t: String = typo.into_iter().collect();
                 cats.entry("name_fuzzy").or_default().push(Work::Search(q(Some(format!("{t} {} ", toks[1])), vec![], true)));
             }

@@ -96,9 +96,10 @@ impl SnapshotWriter {
             return Err(Error::Invalid("block length does not match metadata".into()));
         }
         if let Some(last) = self.blocks.last()
-            && meta.first_key <= last.first_key {
-                return Err(Error::Invalid("blocks must be appended in ascending key order".into()));
-            }
+            && meta.first_key <= last.first_key
+        {
+            return Err(Error::Invalid("blocks must be appended in ascending key order".into()));
+        }
         let first_doc = doc_base.checked_add(meta.first_doc).ok_or_else(|| Error::Invalid("more than 2^32 documents".into()))?;
         self.blocks.push(BlockEntry {
             first_key: meta.first_key,
@@ -201,9 +202,10 @@ impl SnapshotWriter {
         fs::rename(&self.tmp.path, &self.dest)?;
         self.tmp.armed = false;
         if let Some(parent) = self.dest.parent()
-            && let Ok(d) = File::open(parent) {
-                let _ = d.sync_all();
-            }
+            && let Ok(d) = File::open(parent)
+        {
+            let _ = d.sync_all();
+        }
         Ok(Written { path: self.dest, bytes: file_len, sha256, sections: self.sections })
     }
 }

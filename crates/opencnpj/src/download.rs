@@ -156,9 +156,10 @@ async fn fetch(client: &reqwest::Client, a: &DownloadArgs, f: &RemoteFile, dir: 
     let sidecar = dir.join(format!("{}.sha256", f.name));
     if let (Ok(m), Ok(s)) = (std::fs::metadata(&dest), std::fs::read_to_string(&sidecar))
         && m.len() == f.bytes
-            && let Some(h) = s.split_whitespace().next() {
-                return Ok(h.to_string());
-            }
+        && let Some(h) = s.split_whitespace().next()
+    {
+        return Ok(h.to_string());
+    }
     let part = dir.join(format!("{}.part", f.name));
     let mut attempt = 0;
     loop {
@@ -310,17 +311,18 @@ pub fn update(a: UpdateArgs, log: &(dyn Fn(&str) + Sync)) -> Result<()> {
     let snaps = a.data_dir.join("snapshots");
     std::fs::create_dir_all(&snaps)?;
     if let Some(cur) = current_snapshot(&a.data_dir, "current")
-        && let Ok(s) = opencnpj_store::Snapshot::open(&cur) {
-            let mut old: Vec<(String, String)> = s.manifest.sources.iter().map(|f| (f.path.clone(), f.sha256.clone())).collect();
-            let mut new: Vec<(String, String)> =
-                manifest.files.iter().map(|f| (f.name.clone(), f.sha256.clone().unwrap_or_default())).collect();
-            old.sort();
-            new.sort();
-            if old == new && s.manifest.profile == a.profile {
-                log(&format!("up to date: {} already built from identical sources", cur.display()));
-                return Ok(());
-            }
+        && let Ok(s) = opencnpj_store::Snapshot::open(&cur)
+    {
+        let mut old: Vec<(String, String)> = s.manifest.sources.iter().map(|f| (f.path.clone(), f.sha256.clone())).collect();
+        let mut new: Vec<(String, String)> =
+            manifest.files.iter().map(|f| (f.name.clone(), f.sha256.clone().unwrap_or_default())).collect();
+        old.sort();
+        new.sort();
+        if old == new && s.manifest.profile == a.profile {
+            log(&format!("up to date: {} already built from identical sources", cur.display()));
+            return Ok(());
         }
+    }
     let rel = format!("snapshots/{}-{}.ocnpj", manifest.competence, a.profile);
     let out = a.data_dir.join(&rel);
     let cfg = opencnpj_ingest::build::BuildConfig {
@@ -343,9 +345,10 @@ pub fn update(a: UpdateArgs, log: &(dyn Fn(&str) + Sync)) -> Result<()> {
     }
     drop(snap);
     if let Ok(prev) = std::fs::read_to_string(a.data_dir.join("current"))
-        && prev.trim() != rel {
-            set_pointer(&a.data_dir, "previous", prev.trim())?;
-        }
+        && prev.trim() != rel
+    {
+        set_pointer(&a.data_dir, "previous", prev.trim())?;
+    }
     set_pointer(&a.data_dir, "current", &rel)?;
     log(&format!("published {rel} (sha256 {})", report.sha256));
     prune(&a.data_dir, a.keep, log)?;

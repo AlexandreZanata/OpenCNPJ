@@ -216,7 +216,9 @@ impl BlockEntry {
         if !b.len().is_multiple_of(BLOCK_ENTRY_LEN) {
             return Err(Error::Corrupt("block directory size"));
         }
-        Ok(b.as_chunks::<BLOCK_ENTRY_LEN>().0.iter()
+        Ok(b.as_chunks::<BLOCK_ENTRY_LEN>()
+            .0
+            .iter()
             .map(|c| {
                 let u32_at = |i: usize| u32::from_le_bytes(c[i..i + 4].try_into().expect("4"));
                 let u64_at = |i: usize| u64::from_le_bytes(c[i..i + 8].try_into().expect("8"));

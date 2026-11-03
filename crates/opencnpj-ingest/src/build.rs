@@ -221,12 +221,13 @@ pub fn partition(input: &Path, tmp: &Path, workers: usize, readers: usize, log: 
 fn source_hash(s: &Source) -> Result<String, Error> {
     let sidecar = s.path.with_extension("zip.sha256");
     if let (Ok(meta_zip), Ok(meta_side)) = (fs::metadata(&s.path), fs::metadata(&sidecar))
-        && meta_side.modified()? >= meta_zip.modified()? {
-            let text = fs::read_to_string(&sidecar)?;
-            if let Some(h) = text.split_whitespace().next().filter(|h| h.len() == 64) {
-                return Ok(h.to_string());
-            }
+        && meta_side.modified()? >= meta_zip.modified()?
+    {
+        let text = fs::read_to_string(&sidecar)?;
+        if let Some(h) = text.split_whitespace().next().filter(|h| h.len() == 64) {
+            return Ok(h.to_string());
         }
+    }
     source::sha256_file(&s.path)
 }
 

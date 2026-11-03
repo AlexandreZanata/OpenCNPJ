@@ -204,13 +204,15 @@ pub fn search(snap: &Snapshot, q: &Query, limits: &Limits) -> Result<SearchResul
             let v = len.to_string();
             let mut bucket = RoaringBitmap::new();
             if !c.by_razao.is_empty()
-                && let Some(p) = snap.postings(Field::RazaoLen, v.as_bytes())? {
-                    bucket |= &c.by_razao & p;
-                }
+                && let Some(p) = snap.postings(Field::RazaoLen, v.as_bytes())?
+            {
+                bucket |= &c.by_razao & p;
+            }
             if !c.by_fantasia.is_empty()
-                && let Some(p) = snap.postings(Field::FantasiaLen, v.as_bytes())? {
-                    bucket |= &c.by_fantasia & p;
-                }
+                && let Some(p) = snap.postings(Field::FantasiaLen, v.as_bytes())?
+            {
+                bucket |= &c.by_fantasia & p;
+            }
             bucket -= &emitted;
             if bucket.is_empty() {
                 continue;
