@@ -18,6 +18,7 @@ use crate::compress::BlockDecompressor;
 use crate::docvalues::{self, DocValuesColumn};
 use crate::format::*;
 use crate::manifest::Manifest;
+use crate::numeric::{self, NumField, NumericColumn};
 use crate::postings::{self, Field};
 
 /// Dictionary terms (field byte stripped) with their postings offsets.
@@ -57,6 +58,7 @@ pub struct Snapshot {
     doc_count: u32,
     /// Forward columns (format ≥ 1.1; empty for older snapshots).
     doc_values: Vec<DocValuesColumn>,
+    numeric: Vec<NumericColumn>,
     cache: Mutex<PostingsCache>,
 }
 
@@ -70,6 +72,18 @@ struct PostingsCache {
     order: VecDeque<u64>,
     bytes: usize,
     budget: usize,
+    hits: u64,
+    misses: u64,
+}
+
+/// Decoded-postings cache counters.
+#[derive(Debug, Clone, Copy, serde::Serialize)]
+pub struct CacheStats {
+    pub entries: usize,
+    pub bytes: usize,
+    pub budget: usize,
+    pub hits: u64,
+    pub misses: u64,
 }
 
 impl PostingsCache {
@@ -168,6 +182,11 @@ impl Snapshot {
             Some(_) => return Err(Error::Corrupt("doc values section must be stored raw")),
             None => Vec::new(),
         };
+        let numeric = match find(SectionKind::Numeric) {
+            Some(d) if d.codec == SectionCodec::Raw => numeric::parse(&map, d.offset as usize, (d.offset + d.len) as usize, doc_count)?,
+            Some(_) => return Err(Error::Corrupt("numeric section must be stored raw")),
+            None => Vec::new(),
+        };
         let snap = Self {
             path: path.to_path_buf(),
             map,
@@ -186,7 +205,15 @@ impl Snapshot {
             refs,
             doc_count,
             doc_values,
-            cache: Mutex::new(PostingsCache { map: HashMap::new(), order: VecDeque::new(), bytes: 0, budget: DEFAULT_POSTINGS_CACHE }),
+            numeric,
+            cache: Mutex::new(PostingsCache {
+                map: HashMap::new(),
+                order: VecDeque::new(),
+                bytes: 0,
+                budget: DEFAULT_POSTINGS_CACHE,
+                hits: 0,
+                misses: 0,
+            }),
         };
         snap.validate_blocks()?;
         Ok(snap)
@@ -215,6 +242,16 @@ impl Snapshot {
     /// Forward column of `field`, if this snapshot stores one.
     pub fn doc_values(&self, field: Field) -> Option<&DocValuesColumn> {
         self.doc_values.iter().find(|c| c.field == field)
+    }
+
+    /// Numeric column of `field`, if this snapshot stores one (format 1.2+).
+    pub fn numeric(&self, field: NumField) -> Option<&NumericColumn> {
+        self.numeric.iter().find(|c| c.field == field)
+    }
+
+    /// The mapped file, for column accessors that read in place.
+    pub fn bytes(&self) -> &[u8] {
+        &self.map
     }
 
     /// Counts documents of `docs` per value id of `col` (index 0: no value).
@@ -298,6 +335,18 @@ impl Snapshot {
                     return Err(Error::Corrupt("companies not strictly sorted"));
                 }
                 prev_key = Some(c.basico.clone());
+                if !self.numeric.is_empty() {
+                    // Numeric columns must equal the values recomputed from the rows.
+                    for (k, vals) in numeric::company_values(c).iter().enumerate() {
+                        let d = (docs + k as u64) as u32;
+                        for col in &self.numeric {
+                            let i = NumField::ALL.iter().position(|f| *f == col.field).expect("known field");
+                            if col.get(&self.map, d) != vals[i] {
+                                return Err(Error::Corrupt("numeric column differs from the stored rows"));
+                            }
+                        }
+                    }
+                }
                 docs += u64::from(c.doc_count());
             }
             companies += all.len() as u64;
@@ -396,6 +445,59 @@ impl Snapshot {
         Ok(out)
     }
 
+    /// First document of the first company whose key is `>= key` (byte order; a shorter
+    /// key compares as a prefix).
+    fn doc_lower_bound(&self, key: &[u8]) -> Result<u32, Error> {
+        let i = self.blocks.partition_point(|b| b.first_key.as_slice() < key);
+        if i == 0 {
+            return Ok(0);
+        }
+        let raw = self.raw_block(i - 1)?;
+        let view = BlockView::parse(&raw, &self.codecs)?;
+        let keys = view.keys()?;
+        let pos = keys.partition_point(|k| k.as_bytes() < key);
+        if pos == keys.len() {
+            return Ok(self.blocks.get(i).map_or(self.doc_count, |b| b.first_doc));
+        }
+        let counts = view.counts()?;
+        let e = Table::Estabelecimentos.index();
+        Ok(self.blocks[i - 1].first_doc + counts[..pos].iter().map(|n| n[e].max(1)).sum::<u32>())
+    }
+
+    /// Documents whose CNPJ starts with `prefix` (1–14 characters, punctuation ignored).
+    /// Documents are in CNPJ order, so a root prefix is one contiguous range.
+    pub fn cnpj_prefix_docs(&self, prefix: &str) -> Result<RoaringBitmap, Error> {
+        let p: String = prefix.chars().filter(char::is_ascii_alphanumeric).map(|c| c.to_ascii_uppercase()).collect();
+        let mut out = RoaringBitmap::new();
+        if p.is_empty() || p.len() > 14 {
+            return Err(Error::Invalid("cnpj prefix must have 1 to 14 characters".into()));
+        }
+        if p.len() <= 8 {
+            let lo = self.doc_lower_bound(p.as_bytes())?;
+            let mut hi_key = p.clone().into_bytes();
+            *hi_key.last_mut().expect("non-empty") += 1;
+            let hi = self.doc_lower_bound(&hi_key)?;
+            if hi > lo {
+                out.insert_range(lo..hi);
+            }
+            return Ok(out);
+        }
+        let (basico, rest) = p.split_at(8);
+        use opencnpj_core::schema::col::est;
+        let e = Table::Estabelecimentos.index();
+        let found = self.with_company(basico, |view, pos, counts, first_doc| {
+            let start = first_doc + counts[..pos].iter().map(|n| n[e].max(1)).sum::<u32>();
+            let ordens = view.estab_column(&self.codecs, pos, counts, est::ORDEM)?;
+            let dvs = view.estab_column(&self.codecs, pos, counts, est::DV)?;
+            Ok((0..ordens.len())
+                .filter(|&k| format!("{}{}", ordens[k], dvs[k]).starts_with(rest))
+                .map(|k| start + k as u32)
+                .collect::<Vec<_>>())
+        })?;
+        out.extend(found.unwrap_or_default());
+        Ok(out)
+    }
+
     /// Establishment lookup that decodes only the matching row (plus company rows).
     /// Returns the company (with exactly one establishment) and its establishment count.
     pub fn establishment(&self, basico: &str, ordem: &str, dv: &str) -> Result<Option<(Company, usize)>, Error> {
@@ -419,8 +521,13 @@ impl Snapshot {
     }
 
     fn postings_at(&self, off: u64) -> Result<Arc<RoaringBitmap>, Error> {
-        if let Some(b) = self.cache.lock().expect("lock").get(off) {
-            return Ok(b);
+        {
+            let mut c = self.cache.lock().expect("lock");
+            if let Some(b) = c.get(off) {
+                c.hits += 1;
+                return Ok(b);
+            }
+            c.misses += 1;
         }
         let section = &self.map[self.postings.0..self.postings.1];
         let (bm, len) = postings::decode_postings(section, off as usize, self.doc_count)?;
@@ -429,6 +536,18 @@ impl Snapshot {
             self.cache.lock().expect("lock").insert(off, bm.clone(), len);
         }
         Ok(bm)
+    }
+
+    pub fn cache_stats(&self) -> CacheStats {
+        let c = self.cache.lock().expect("lock");
+        CacheStats { entries: c.map.len(), bytes: c.bytes, budget: c.budget, hits: c.hits, misses: c.misses }
+    }
+
+    pub fn clear_cache(&self) {
+        let mut c = self.cache.lock().expect("lock");
+        c.map.clear();
+        c.order.clear();
+        c.bytes = 0;
     }
 
     /// Byte budget for decoded large postings (hot filter values, common tokens).

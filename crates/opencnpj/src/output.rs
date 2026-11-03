@@ -164,7 +164,81 @@ pub fn doc_summary(snap: &Snapshot, d: &DocRecord) -> Value {
             m.insert("municipio_descricao".into(), Value::String(l.into()));
         }
         m.insert("cnae_fiscal_principal".into(), get(col::est::CNAE_PRINCIPAL));
+        if let Some(l) = snap.label("cnaes", &e[col::est::CNAE_PRINCIPAL]) {
+            m.insert("cnae_fiscal_principal_descricao".into(), Value::String(l.into()));
+        }
+        m.insert("data_inicio_atividade".into(), get(col::est::DATA_INICIO));
+        m.insert("cep".into(), get(col::est::CEP));
     }
+    if let Some(emp) = c.empresas.first() {
+        m.insert("natureza_juridica".into(), Value::String(emp[col::emp::NATUREZA].clone()));
+        m.insert("porte_empresa".into(), Value::String(emp[col::emp::PORTE].clone()));
+        m.insert("capital_social".into(), Value::String(emp[col::emp::CAPITAL].clone()));
+    }
+    if let Some(sim) = c.simples.first() {
+        m.insert("opcao_simples".into(), Value::String(sim[col::sim::OPCAO_SIMPLES].clone()));
+        m.insert("opcao_mei".into(), Value::String(sim[col::sim::OPCAO_MEI].clone()));
+    }
+    v
+}
+
+/// Companies linked to a CPF: as the owner of an individual/MEI business (exact: the CPF
+/// is part of the company name) or as a partner/representative whose masked CPF shows the
+/// same 6 middle digits (`possible`: RFB publishes only those digits, so other people can
+/// share them; the partner name is returned to tell them apart).
+pub fn cpf_lookup(snap: &Snapshot, cpf: &str, limit: usize, privacy: Privacy) -> Result<Value> {
+    use opencnpj_store::postings::Field;
+    let digits: String = cpf.chars().filter(char::is_ascii_digit).collect();
+    if digits.len() != 11 {
+        bail!(LookupError::Invalid("cpf must have 11 digits".into()));
+    }
+    let owner = snap.postings(Field::Cpf, digits.as_bytes())?.map(|p| (*p).clone()).unwrap_or_default();
+    let mask = format!("*{}", &digits[3..9]);
+    let partner = snap.postings(Field::SocioDoc, mask.as_bytes())?.map(|p| (*p).clone()).unwrap_or_default();
+    let owner_ids: Vec<u32> = owner.iter().take(limit).collect();
+    let titular: Vec<Value> = snap.docs(&owner_ids)?.iter().map(|d| doc_summary(snap, d)).collect();
+    // One entry per company for partner matches.
+    let mut seen = std::collections::BTreeSet::new();
+    let mut socios = Vec::new();
+    let masked = format!("***{}**", &digits[3..9]);
+    for d in snap.docs(&partner.iter().collect::<Vec<_>>())? {
+        if socios.len() >= limit || !seen.insert(d.company.basico.clone()) {
+            continue;
+        }
+        let Some(c) = snap.company(&d.company.basico)? else { continue };
+        let rows: Vec<Value> = c
+            .socios
+            .iter()
+            .filter(|r| r[col::soc::DOCUMENTO] == masked || r[col::soc::REPRESENTANTE] == masked)
+            .map(|r| row_json(snap, Table::Socios, r, privacy))
+            .collect();
+        let mut v = doc_summary(snap, &d);
+        v["socios_correspondentes"] = Value::Array(rows);
+        socios.push(v);
+    }
+    Ok(json!({
+        "cpf": digits,
+        "titular": { "match": "exact", "total": owner.len(), "results": titular },
+        "socios": { "match": "possible", "mascara": masked, "total_documentos": partner.len(), "results": socios },
+        "nota": "titular: CPF present in the company name (individual entrepreneur / MEI). socios: RFB publishes partner CPFs masked; only the 6 middle digits are compared, so check the partner name.",
+        "snapshot": snapshot_ref(snap),
+    }))
+}
+
+/// Files a server distributes (`/downloads/<name>`): snapshots and their checksums/reports.
+pub fn distributable(dir: &std::path::Path) -> Vec<(String, u64)> {
+    let mut v: Vec<(String, u64)> = std::fs::read_dir(dir)
+        .into_iter()
+        .flatten()
+        .filter_map(|e| e.ok())
+        .filter(|e| e.file_type().is_ok_and(|t| t.is_file()))
+        .filter_map(|e| {
+            let name = e.file_name().to_string_lossy().into_owned();
+            let ok = name.ends_with(".ocnpj") || name.ends_with(".ocnpj.sha256") || name.ends_with(".build.json");
+            ok.then(|| (name, e.metadata().map_or(0, |m| m.len())))
+        })
+        .collect();
+    v.sort();
     v
 }
 
@@ -176,6 +250,7 @@ pub fn search_json(snap: &Snapshot, r: &SearchResult, docs: Vec<DocRecord>, _ful
         "total": r.total,
         "results": results,
         "expansion_truncated": r.expansion_truncated,
+        "fuzzy_used": r.fuzzy_used,
         "next_cursor": r.next_after.map(|d| d.to_string()),
         "snapshot": snapshot_ref(snap),
     })

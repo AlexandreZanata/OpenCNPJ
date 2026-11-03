@@ -105,7 +105,10 @@ fn fixture(dir: &Path) -> usize {
     }
     // A line that cannot be parsed must be kept as a reject, not dropped.
     estabs.insert(3, b"\"broken line without layout".to_vec());
-    let socios = vec![rec(&["11111111", "2", "JOÃO DA SILVA", "***123456**", "49", "20200101", "", "***000000**", "", "00", "5"])];
+    let socios = vec![
+        rec(&["11111111", "2", "JOÃO DA SILVA", "***123456**", "49", "20200101", "", "***000000**", "", "00", "5"]),
+        rec(&["22222222", "1", "PETROLEO BRASILEIRO S A PETROBRAS", "33000167000101", "22", "20210101", "", "***000000**", "", "00", "0"]),
+    ];
     let simples = vec![
         rec(&["11111111", "S", "20200101", "00000000", "N", "00000000", "00000000"]),
         rec(&["22222222", "N", "", "", "S", "20210101", "00000000"]),
@@ -392,4 +395,75 @@ fn random_corruption_never_panics() {
     // Every flip lands in a checksummed region except the postings bytes (validated
     // structurally on decode), so nearly all must be detected by open or verify.
     assert!(detected >= 300, "only {detected} of 400 corruptions detected");
+}
+
+/// Format 1.2 features: CPF and partner documents, CNPJ prefixes, CNAE hierarchy, CEP/DDD/
+/// contact filters, numeric ranges, sorting, histograms and typo tolerance.
+#[test]
+fn identity_ranges_and_hierarchies() {
+    use opencnpj_store::numeric::{NumField, Range, date_value};
+    use opencnpj_store::search::RangeFilter;
+    let dir = tempfile::tempdir().unwrap();
+    std::fs::create_dir_all(dir.path().join("2026-10")).unwrap();
+    fixture(&dir.path().join("2026-10"));
+    let (snap, _) = build_profile(dir.path(), "balanced");
+    snap.verify(|_, _| {}).unwrap();
+    let n = |q: Query| search::search(&snap, &Query { limit: 1000, ..q }, &Limits::DEFAULT).unwrap().total;
+    let f = |field: Field, v: &str| Query { filters: vec![(field, vec![v.to_string()])], ..Default::default() };
+
+    // CPF: owner (in the MEI name), masked partner, partner CNPJ; the zero mask is ignored.
+    assert_eq!(n(f(Field::Cpf, "123.456.789-01")), 1);
+    assert_eq!(n(f(Field::CpfQualquer, "12345678901")), 1);
+    assert_eq!(n(f(Field::CpfQualquer, "00012345600")), 1, "masked partner ***123456**");
+    assert_eq!(n(f(Field::SocioDoc, "33.000.167/0001-01")), 2, "both establishments of 22222222");
+    assert_eq!(n(f(Field::SocioDoc, "000000")), 0);
+    assert_eq!(n(Query { text: Some("12345678901".into()), ..Default::default() }), 1, "CPF typed in the search box");
+
+    // CNPJ prefixes: contiguous ranges, alphanumeric, and branch-level prefixes.
+    assert_eq!(n(Query { cnpj_prefixes: vec!["4000001".into()], ..Default::default() }), 10);
+    assert_eq!(n(Query { cnpj_prefixes: vec!["12abc".into()], ..Default::default() }), 1);
+    assert_eq!(n(Query { cnpj_prefixes: vec!["00.000.000/0002".into()], ..Default::default() }), 1);
+    assert_eq!(n(Query { text: Some("00.000.000".into()), ..Default::default() }), 2, "CNPJ root typed in the search box");
+
+    // CNAE: section letter, division prefix, secondary, either.
+    assert_eq!(n(f(Field::Cnae, "G")), 302);
+    assert_eq!(n(f(Field::Cnae, "64")), 2);
+    assert_eq!(n(f(Field::Cnae, "6422-1/00")), 2);
+    assert_eq!(n(f(Field::CnaeSecundaria, "4711302")), 307);
+    assert_eq!(n(f(Field::CnaeQualquer, "6422100")), 2);
+    assert!(search::filter_pattern(Field::Cnae, "Z").is_err());
+
+    // Address/contact codes.
+    assert_eq!(n(f(Field::Cep, "01310")), 307);
+    assert_eq!(n(f(Field::Cep, "01310100")), 307);
+    assert_eq!(n(f(Field::Ddd, "011")), 307);
+    assert_eq!(n(f(Field::Contato, "email")), 307);
+    assert_eq!(n(f(Field::Natureza, "21")), 2, "natureza prefix: 2135 x2");
+
+    // Numeric ranges, "no value", composites.
+    let year = |y: &str| Range { lo: date_value(&format!("{y}0101")).unwrap(), hi: date_value(&format!("{y}1231")).unwrap() };
+    let r = |field, range| Query { ranges: vec![RangeFilter { field, range }], ..Default::default() };
+    assert_eq!(n(r(NumField::InicioAtividade, Some(year("2020")))), 307);
+    assert_eq!(n(r(NumField::InicioAtividade, Some(year("2019")))), 0);
+    assert_eq!(n(r(NumField::InicioAtividade, None)), 3, "companies without establishments");
+    assert_eq!(n(r(NumField::CapitalSocial, Some(Range { lo: 100_001, hi: u64::MAX }))), 3);
+    let mei_ativo = Query { ranges: vec![RangeFilter { field: NumField::ExclusaoMei, range: None }], ..f(Field::Mei, "S") };
+    assert_eq!(n(mei_ativo), 2);
+    assert_eq!(n(r(NumField::OpcaoMei, Some(year("2021")))), 2);
+
+    // Sorting by a numeric column and yearly histograms.
+    let top =
+        search::search(&snap, &Query { sort: Some((NumField::CapitalSocial, true)), limit: 1, ..f(Field::Uf, "DF") }, &Limits::DEFAULT)
+            .unwrap();
+    assert_eq!(snap.docs(&top.docs).unwrap()[0].company.basico, "00000000");
+    let col = snap.numeric(NumField::InicioAtividade).unwrap();
+    assert_eq!(col.histogram(snap.bytes(), None, opencnpj_store::numeric::date_year), vec![(2020, 307)]);
+
+    // Typos: adjacent transposition and automatic fuzzy retry.
+    let auto = |t: &str| {
+        search::search(&snap, &Query { text: Some(t.into()), fuzzy_auto: true, limit: 5, ..Default::default() }, &Limits::DEFAULT).unwrap()
+    };
+    let r = auto("pdaaria joao ");
+    assert!(r.fuzzy_used && r.total == 1);
+    assert!(!auto("padaria joao ").fuzzy_used);
 }

@@ -33,10 +33,34 @@ pub enum Field {
     MatrizFilial = 13,
     /// Ranking bucket: token count of `nome_fantasia` (1..=15).
     FantasiaLen = 14,
+    /// 11-digit numbers in company names: the owner's CPF for individual entrepreneurs/MEI.
+    Cpf = 15,
+    /// Partner documents: full CNPJ of legal-entity partners, `*` + the 6 visible digits of
+    /// the masked CPF of natural persons and legal representatives (`***123456**`).
+    SocioDoc = 16,
+    Motivo = 17,
+    /// 8-digit CEP.
+    Cep = 18,
+    /// Area code of the first phone (leading zeros removed).
+    Ddd = 19,
+    /// `email` / `telefone`: the establishment publishes that contact.
+    Contato = 20,
+    /// Query-only: the CPF as owner (`cpf_titular`) or as a masked partner (never stored).
+    CpfQualquer = 98,
+    /// Query-only alias: main or secondary CNAE (never stored).
+    CnaeQualquer = 99,
 }
 
 impl Field {
-    pub const FILTERS: [Field; 10] = [
+    pub const FILTERS: [Field; 18] = [
+        Field::CpfQualquer,
+        Field::Cpf,
+        Field::SocioDoc,
+        Field::Motivo,
+        Field::Cep,
+        Field::Ddd,
+        Field::Contato,
+        Field::CnaeQualquer,
         Field::Uf,
         Field::Municipio,
         Field::Cnae,
@@ -65,6 +89,14 @@ impl Field {
             Field::Simples => "simples",
             Field::Mei => "mei",
             Field::MatrizFilial => "matriz_filial",
+            Field::Cpf => "cpf_titular",
+            Field::CpfQualquer => "cpf",
+            Field::SocioDoc => "socio_documento",
+            Field::Motivo => "motivo",
+            Field::Cep => "cep",
+            Field::Ddd => "ddd",
+            Field::Contato => "contato",
+            Field::CnaeQualquer => "cnae_qualquer",
         }
     }
 

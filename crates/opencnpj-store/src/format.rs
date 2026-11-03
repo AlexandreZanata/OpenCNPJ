@@ -20,7 +20,7 @@ pub const MAGIC: [u8; 8] = *b"OCNPJ\0v1";
 pub const FOOTER_MAGIC: [u8; 8] = *b"OCNPJEND";
 pub const FORMAT_MAJOR: u16 = 1;
 /// 1.1 added the optional `docvalues` section.
-pub const FORMAT_MINOR: u16 = 1;
+pub const FORMAT_MINOR: u16 = 2;
 pub const HEADER_LEN: usize = 64;
 pub const FOOTER_LEN: usize = 40;
 pub const SECTION_ENTRY_LEN: usize = 40;
@@ -43,6 +43,8 @@ pub enum SectionKind {
     Postings = 9,
     /// Forward columns for `group_by` (format 1.1, optional).
     DocValues = 10,
+    /// Numeric columns for range filters, sorting and histograms (format 1.2, optional).
+    Numeric = 11,
 }
 
 impl SectionKind {
@@ -59,6 +61,7 @@ impl SectionKind {
             8 => Terms,
             9 => Postings,
             10 => DocValues,
+            11 => Numeric,
             _ => return None,
         })
     }

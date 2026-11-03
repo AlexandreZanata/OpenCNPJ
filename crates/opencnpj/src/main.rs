@@ -1,9 +1,12 @@
 //! `opencnpj` — single binary: download, build, verify, query, serve and benchmark.
 
+mod admin;
 mod api;
 mod bench;
 mod download;
+mod metrics;
 mod output;
+mod params;
 
 use std::path::PathBuf;
 use std::time::Instant;
@@ -13,8 +16,7 @@ use clap::{Args, Parser, Subcommand};
 use opencnpj_ingest::build::{self, BuildConfig, Profile};
 use opencnpj_store::Snapshot;
 use opencnpj_store::compress::BlockCodec;
-use opencnpj_store::postings::Field;
-use opencnpj_store::search::{self, Limits, Query, TextField};
+use opencnpj_store::search::{self, Limits, Query};
 
 #[derive(Parser)]
 #[command(name = "opencnpj", version, about = "Compact, offline search engine for Brazilian CNPJ open data")]
@@ -141,7 +143,7 @@ pub struct QueryArgs {
     pub field: String,
     #[arg(long)]
     pub fuzzy: bool,
-    /// Filters, repeatable: --filter uf=SP --filter cnae=4711301
+    /// Any API parameter, repeatable: --filter uf=SP --filter cnae=47 --filter data_inicio_atividade_de=2024-01-01
     #[arg(long = "filter", value_parser = parse_filter)]
     pub filters: Vec<(String, String)>,
     #[arg(long, default_value_t = 10)]
@@ -159,30 +161,17 @@ pub fn default_threads() -> usize {
     std::thread::available_parallelism().map_or(4, |n| n.get())
 }
 
+/// CLI flags → the same parameter grammar as the HTTP API (see `params`).
 pub fn to_query(a: &QueryArgs) -> Result<Query> {
-    let mut filters: Vec<(Field, Vec<String>)> = Vec::new();
-    for (k, v) in &a.filters {
-        let f = Field::from_name(k).filter(|f| Field::FILTERS.contains(f)).with_context(|| format!("unknown filter {k}"))?;
-        let values = v.split(',').map(str::to_string).collect::<Vec<_>>();
-        match filters.iter_mut().find(|(ff, _)| *ff == f) {
-            Some((_, vs)) => vs.extend(values),
-            None => filters.push((f, values)),
-        }
+    let mut pairs: Vec<(String, String)> = a.filters.clone();
+    if let Some(q) = &a.q {
+        pairs.push(("q".into(), q.clone()));
     }
-    Ok(Query {
-        text: a.q.clone(),
-        text_field: match a.field.as_str() {
-            "any" => TextField::Any,
-            "razao" | "razao_social" => TextField::Razao,
-            "fantasia" | "nome_fantasia" => TextField::Fantasia,
-            other => bail!("unknown field {other}"),
-        },
-        filters,
-        fuzzy: a.fuzzy,
-        offset: a.offset,
-        limit: a.limit,
-        after: None,
-    })
+    pairs.push(("field".into(), a.field.clone()));
+    pairs.push(("fuzzy".into(), if a.fuzzy { "true" } else { "auto" }.into()));
+    pairs.push(("limit".into(), a.limit.to_string()));
+    pairs.push(("offset".into(), a.offset.to_string()));
+    params::parse(&pairs, params::Caps { max_limit: usize::MAX, max_offset: usize::MAX }).map_err(|e| anyhow::anyhow!(e))
 }
 
 fn log(msg: &str) {
