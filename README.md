@@ -49,9 +49,21 @@ $B rollback --data-dir data
 * **Operations**: one static binary for Linux and Windows, atomic publication, hot
   reload, timeouts, concurrency limits, Prometheus metrics, privacy switches.
 
-Measured numbers (build time, size, latency, comparison with ZIP/CSV/Parquet/SQLite and
-the legacy PostgreSQL stack) are in [docs/BENCHMARKS.md](docs/BENCHMARKS.md), with the
-commands to reproduce them.
+## Measured on the 2026-10 national release
+
+223,628,880 rows from 7.81 GB of ZIPs (28.86 GB of CSV), i7-13620H laptop, NVMe. Every
+snapshot below passed `verify --sources` (all rows reproduced exactly).
+
+| profile | snapshot (all indexes) | build | CNPJ lookup p50 / p95 (warm, 1 thread) | name search p95 |
+|---|---:|---:|---:|---:|
+| fast | 7.63 GB | ~5 min | 0.033 / 0.050 ms | 36–69 ms |
+| balanced | 6.39 GB | 9 min 6 s | 0.158 / 0.189 ms | 40–83 ms |
+| compact | 5.75 GB | ~11.7 min | 1.50 / 1.92 ms | 61–100 ms |
+
+Through HTTP, the balanced snapshot served 32.7k CNPJ lookups/s at p95 0.8 ms
+(16 connections, loopback). The legacy stack imported 217 M rows into PostgreSQL in
+27 min 9 s. Methodology, the experiment matrix, baselines and known bottlenecks are in
+[docs/BENCHMARKS.md](docs/BENCHMARKS.md).
 
 ## Documentation
 

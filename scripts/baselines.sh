@@ -36,6 +36,10 @@ for f in "$OUT"/csv/*.csv; do
 done
 record csv_to_utf8_s "$(echo "$(now) - $t0" | bc)" "iconv, needed by DuckDB"
 
+# Keep DuckDB's spill files out of the working directory and bound its memory.
+mkdir -p "$OUT/duckdb-tmp"
+DUCK="SET threads=$(nproc); SET memory_limit='${DUCKDB_MEMORY:-8GB}'; SET preserve_insertion_order=false; SET temp_directory='$OUT/duckdb-tmp';"
+
 cols_empresas="cnpj_basico,razao_social,natureza_juridica,qualificacao_responsavel,capital_social,porte_empresa,ente_federativo_responsavel"
 cols_estabelecimentos="cnpj_basico,cnpj_ordem,cnpj_dv,identificador_matriz_filial,nome_fantasia,situacao_cadastral,data_situacao_cadastral,motivo_situacao_cadastral,nome_cidade_exterior,pais,data_inicio_atividade,cnae_fiscal_principal,cnae_fiscal_secundaria,tipo_logradouro,logradouro,numero,complemento,bairro,cep,uf,municipio,ddd_1,telefone_1,ddd_2,telefone_2,ddd_fax,fax,correio_eletronico,situacao_especial,data_situacao_especial"
 cols_socios="cnpj_basico,identificador_socio,nome_socio_razao_social,cpf_cnpj_socio,qualificacao_socio,data_entrada_sociedade,pais,representante_legal,nome_do_representante,qualificacao_representante_legal,faixa_etaria"
@@ -55,7 +59,9 @@ for t in empresas estabelecimentos socios simples; do
     socios) glob="Socios*.csv"; cols=$cols_socios ;;
     simples) glob="Simples.csv"; cols=$cols_simples ;;
   esac
-  duckdb -c "SET threads=$(nproc); COPY (SELECT * FROM read_csv('$OUT/csv-utf8/$glob', delim=';', quote='\"', escape='', header=false, strict_mode=false, parallel=false, columns=$(colspec "$cols"))) TO '$OUT/parquet/$t.parquet' (FORMAT parquet, COMPRESSION zstd, COMPRESSION_LEVEL $LEVEL, ROW_GROUP_SIZE 122880);"
+  tt=$(now)
+  duckdb -c "$DUCK COPY (SELECT * FROM read_csv('$OUT/csv-utf8/$glob', delim=';', quote='\"', escape='', header=false, strict_mode=false, parallel=false, columns=$(colspec "$cols"))) TO '$OUT/parquet/$t.parquet' (FORMAT parquet, COMPRESSION zstd, COMPRESSION_LEVEL $LEVEL, ROW_GROUP_SIZE 122880);"
+  record "parquet_s_$t" "$(echo "$(now) - $tt" | bc)" ""
   record "parquet_rows_$t" "$(duckdb -noheader -list -c "SELECT count(*) FROM '$OUT/parquet/$t.parquet'")" ""
 done
 record parquet_build_s "$(echo "$(now) - $t0" | bc)" "zstd level $LEVEL"
@@ -65,7 +71,7 @@ record parquet_bytes "$(du -cb "$OUT"/parquet/*.parquet | tail -1 | cut -f1)" ""
 db="$OUT/cnpj.sqlite"
 rm -f "$db"
 t0=$(now)
-duckdb -c "INSTALL sqlite; LOAD sqlite; ATTACH '$db' AS s (TYPE sqlite);
+duckdb -c "$DUCK INSTALL sqlite; LOAD sqlite; ATTACH '$db' AS s (TYPE sqlite);
   CREATE TABLE s.empresas AS SELECT * FROM '$OUT/parquet/empresas.parquet';
   CREATE TABLE s.estabelecimentos AS SELECT * FROM '$OUT/parquet/estabelecimentos.parquet';
   CREATE TABLE s.socios AS SELECT * FROM '$OUT/parquet/socios.parquet';

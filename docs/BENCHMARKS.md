@@ -78,15 +78,56 @@ magnitude, not a controlled A/B.
 |---|---:|---|---|
 | A. official ZIPs | 7,808,752,942 | no | byte-for-byte source (keep for forensics) |
 | B. extracted CSV | 28,856,680,141 | no | `unzip` took 140 s |
-| C. Parquet + ZSTD-9 (DuckDB) | see below | scans only | all columns as text, no index |
-| D. SQLite + B-tree + FTS5 | see below | yes | indexes for the same access paths |
+| C. Parquet + ZSTD-9 (DuckDB 1.5.4) | 5,176,269,524 | scans only | all columns as text, no index |
+| D. SQLite 3.45 + B-tree + FTS5 | 37,866,299,392 | yes | tables 24.5 GB, + B-tree 7.6 GB, + FTS5 5.8 GB |
 | E. OpenCNPJ compact | 5,752,780,265 | yes | 1 MiB blocks, zstd-19 |
 | F. OpenCNPJ fast | 7,626,519,835 | yes | 4 KiB blocks, zstd-9 + dict |
 | G. OpenCNPJ balanced | 6,390,868,664 | yes | 64 KiB blocks, zstd-15 + dict |
 
 OpenCNPJ sizes include every index, dictionary and the manifest. GB figures elsewhere are decimal (10⁹).
 
-BASELINES_PLACEHOLDER
+Baselines were built from the same ZIPs by `scripts/baselines.sh` (all columns as text,
+so the semantic content matches). DuckDB parsed exactly the same row counts as OpenCNPJ
+for all four tables (70,517,438 / 73,809,379 / 28,495,961 / 50,806,102), an independent
+check of the parser. Its parallel CSV reader rejects these files (unescaped quotes) and
+its Latin-1 reader rejects some valid ISO-8859-1 bytes, so the script transcodes with
+`iconv` and reads single-threaded.
+
+| step | seconds |
+|---|---:|
+| unzip → CSV (B) | 140 |
+| iconv Latin-1 → UTF-8 (DuckDB requirement) | 73 |
+| CSV → Parquet ZSTD-9, 4 tables (C) | 234 |
+| Parquet → SQLite tables | 237 |
+| SQLite B-tree indexes (6) | 304 |
+| SQLite FTS5 over razão social + nome fantasia (74 M rows) | 677 |
+
+Lookup and name-search latency on the baselines, same sampled CNPJs and names as the
+engine benchmark, single pass:
+
+| system / workload | queries | p50 ms | p95 ms | p99 ms |
+|---|---:|---:|---:|---:|
+| SQLite: CNPJ lookup (4 indexed queries) | 300 | 19.840 | 36.165 | 48.983 |
+| SQLite: full name, FTS5 count + top 20 | 300 | 338.334 | 866.284 | 1483.943 |
+| SQLite: typeahead prefix, FTS5 count + top 20 | 300 | 46.211 | 818.031 | 1814.972 |
+| DuckDB on Parquet: CNPJ lookup (4 scans, 16 threads) | 10 | 271 (median) | — | max 285 |
+| OpenCNPJ balanced: CNPJ lookup + JSON | 500 | 0.158 | 0.189 | 0.214 |
+| OpenCNPJ balanced: full name + fetch + JSON | 500 | 16.936 | 40.443 | 57.955 |
+
+The SQLite database (37.9 GB) does not fit in the free page cache of this machine, which
+is part of its cost; `scripts/baseline_queries.py` reproduces these numbers.
+
+Reading the comparison:
+
+* **Against Parquet + ZSTD** (the strongest compression baseline, no index at all), the
+  OpenCNPJ payload is smaller in every profile (4.37 / 5.00 / 6.12 GB vs 5.18 GB) — the
+  compact *and* balanced payloads beat it — while being randomly accessible per company.
+  Including the full inverted index, compact is 11% larger than index-less Parquet.
+* **Against SQLite** with indexes for the same access paths, compact is 6.6× smaller
+  (balanced 5.9×), and balanced CNPJ lookups are ~125× faster at p50 (compact ~13×); FTS5 has no ranking by name length, no fuzzy
+  matching and costs 5.8 GB on its own.
+* **Against the ZIPs**, the searchable compact snapshot is 0.74× the size of the
+  download.
 
 The aspirational < 5 GB target was **not reached**: the smallest complete, searchable
 snapshot is 5.75 GB (compact). Payload alone is 4.37 GB; the inverted index adds
@@ -235,7 +276,22 @@ response was HTTP 200.
 | name_prefix_typeahead | 64 | 267 | 204.43 | 481.75 | 764.59 | 100.0% |
 
 Process start to `/readyz` ready: 0.12 s.
-SERVER_MEMORY_PLACEHOLDER
+
+### Server memory (balanced, `/proc/<pid>/status`)
+
+| state | VmRSS | anonymous | file-backed (mmap of the snapshot) |
+|---|---:|---:|---:|
+| idle after start | 159 MB | 106 MB | 53 MB |
+| after 10 s of CNPJ lookups (16 connections) | 238 MB | 169 MB | 69 MB |
+| after 10 s of typeahead (16 connections) | 2.78 GB (peak 2.95 GB) | 1.72 GB | 1.06 GB |
+
+Lookups need very little memory. Name search allocates large temporary bitmaps; the
+decoded-postings cache is capped at 256 MB, so most of the anonymous growth is glibc
+keeping freed memory in per-thread arenas. With `MALLOC_ARENA_MAX=2` the same load
+ended at 0.91 GB anonymous / 1.64 GB total, but that run overlapped the DuckDB baseline,
+so its throughput is not comparable. An allocator change is a follow-up that needs a
+clean A/B on an idle host. File-backed pages are the OS page cache and are reclaimable.
+
 
 Against the research goals: CNPJ lookup p95 ≤ 10 ms holds for every profile, cold or
 warm (worst: compact warm p95 1.8 ms). Common text search p95 ≤ 100 ms holds for full
