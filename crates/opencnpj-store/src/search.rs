@@ -270,7 +270,7 @@ pub fn group_counts(snap: &Snapshot, q: &Query, group_by: Field, limits: &Limits
     for (value, off) in snap.prefix_terms(group_by, b"", usize::MAX) {
         let p = snap.postings_by_offset(off)?;
         let n = match &set {
-            Some(s) => s.intersection_len(&*p),
+            Some(s) => s.intersection_len(&p),
             None => p.len(),
         };
         if n > 0 {
