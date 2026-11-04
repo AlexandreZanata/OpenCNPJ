@@ -17,8 +17,10 @@ use opencnpj_core::varint::{self, Reader};
 use opencnpj_core::{Company, Kind, Table};
 use opencnpj_store::block::{BlockBuilder, Codecs};
 use opencnpj_store::compress::{BlockCodec, BlockCompressor, train_dictionary};
+use opencnpj_store::docvalues::{self, DocValuesBuilder};
 use opencnpj_store::format::SectionKind;
 use opencnpj_store::manifest::{ColumnSchema, Counts, Manifest, SourceFile, TableSchema};
+use opencnpj_store::numeric::{self, NumField, NumericBuilder};
 use opencnpj_store::postings::{Field, MAX_NAME_LEN_BUCKET, TermCollector};
 use opencnpj_store::writer::{BlockMeta, SnapshotWriter};
 use rayon::prelude::*;
@@ -351,6 +353,8 @@ struct BucketOut {
     stats: BucketStats,
     segment: PathBuf,
     run: PathBuf,
+    /// Numeric values, `NumField::ALL.len()` u64 per document, zstd-compressed.
+    nums: PathBuf,
 }
 
 enum Mode<'a> {
@@ -365,24 +369,76 @@ fn name_len(text: &str) -> usize {
 }
 
 /// Emits all index terms for a company's documents, starting at `doc`.
+/// Partner/representative document as indexed: a 14-digit CNPJ, or `*` + the 6 visible
+/// digits of a masked CPF (`***123456**`). The all-zero mask means "no representative".
+fn socio_document(raw: &str) -> Option<String> {
+    let digits: String = raw.chars().filter(char::is_ascii_digit).collect();
+    match digits.len() {
+        14 if !raw.contains('*') => Some(digits),
+        6 if raw.contains('*') && digits != "000000" => Some(format!("*{digits}")),
+        _ => None,
+    }
+}
+
+/// CEP, DDD, motivo and published-contact terms of one establishment.
+fn establishment_terms(e: &[String]) -> Vec<(Field, String)> {
+    let mut out = Vec::new();
+    let cep: String = e[col::est::CEP].chars().filter(char::is_ascii_digit).collect();
+    if cep.len() == 8 {
+        out.push((Field::Cep, cep));
+    }
+    let ddd: String = e[col::est::DDD_1].chars().filter(char::is_ascii_digit).collect();
+    let ddd = ddd.trim_start_matches('0');
+    if !ddd.is_empty() {
+        out.push((Field::Ddd, ddd.to_string()));
+    }
+    let motivo = e[col::est::MOTIVO].trim();
+    if !motivo.is_empty() {
+        out.push((Field::Motivo, motivo.to_string()));
+    }
+    if !e[col::est::EMAIL].trim().is_empty() {
+        out.push((Field::Contato, "email".into()));
+    }
+    if !e[col::est::TELEFONE_1].trim().is_empty() || !e[col::est::TELEFONE_2].trim().is_empty() {
+        out.push((Field::Contato, "telefone".into()));
+    }
+    out
+}
+
 fn emit_terms(c: &Company, doc: u32, tc: &mut TermCollector) {
     let emp = c.empresas.first();
     let razao = emp.map(|e| e[col::emp::RAZAO_SOCIAL].as_str()).unwrap_or("");
     let mut razao_tokens: Vec<String> = Vec::new();
+    let mut company_docs: Vec<(Field, String)> = Vec::new();
     for e in &c.empresas {
         tokenize(&e[col::emp::RAZAO_SOCIAL], |t| {
             if is_indexed_token(t) {
                 razao_tokens.push(t.to_string());
+            } else {
+                // MEI/EI names end with the owner's CPF.
+                company_docs.push((Field::Cpf, t.to_string()));
             }
         });
     }
+    for s in &c.socios {
+        for i in [col::soc::DOCUMENTO, col::soc::REPRESENTANTE] {
+            if let Some(d) = socio_document(&s[i]) {
+                company_docs.push((Field::SocioDoc, d));
+            }
+        }
+    }
     razao_tokens.sort_unstable();
     razao_tokens.dedup();
+    company_docs.sort_unstable_by(|a, b| (a.0 as u8, &a.1).cmp(&(b.0 as u8, &b.1)));
+    company_docs.dedup();
     let razao_len = name_len(razao);
     let simples = c.simples.first();
     let company_terms = |tc: &mut TermCollector, d: u32| {
         for t in &razao_tokens {
             tc.add(Field::Razao, t.as_bytes(), d);
+        }
+        for (f, v) in &company_docs {
+            tc.add(*f, v.as_bytes(), d);
         }
         if let Some(e) = emp {
             for (f, i) in [(Field::Porte, col::emp::PORTE), (Field::Natureza, col::emp::NATUREZA)] {
@@ -413,9 +469,14 @@ fn emit_terms(c: &Company, doc: u32, tc: &mut TermCollector) {
         tokenize(&e[col::est::NOME_FANTASIA], |t| {
             if is_indexed_token(t) {
                 tc.add(Field::Fantasia, t.as_bytes(), d);
+            } else {
+                tc.add(Field::Cpf, t.as_bytes(), d);
             }
             flen += 1;
         });
+        for (f, v) in establishment_terms(e) {
+            tc.add(f, v.as_bytes(), d);
+        }
         if flen > 0 {
             tc.add(Field::FantasiaLen, flen.min(MAX_NAME_LEN_BUCKET as usize).to_string().as_bytes(), d);
         }
@@ -463,6 +524,8 @@ fn build_bucket(
     let mut metas = Vec::new();
     let segment = tmp.join("seg").join(format!("{bucket:06x}.seg"));
     let run = tmp.join("runs").join(format!("{bucket:06x}.run"));
+    let nums = tmp.join("runs").join(format!("{bucket:06x}.num"));
+    let mut num_values: Vec<u8> = Vec::new();
     let mut seg_file = match &mode {
         Mode::Build { .. } => Some(BufWriter::with_capacity(1 << 20, File::create(&segment)?)),
         Mode::Sample { .. } => None,
@@ -523,6 +586,11 @@ fn build_bucket(
         }
         if matches!(mode, Mode::Build { .. }) {
             emit_terms(&c, stats.docs, &mut tc);
+            for row in numeric::company_values(&c) {
+                for v in row {
+                    num_values.extend_from_slice(&v.to_le_bytes());
+                }
+            }
         }
         builder.push(&c);
         stats.companies += 1;
@@ -540,7 +608,8 @@ fn build_bucket(
         Mode::Build { .. } => {
             seg_file.take().expect("segment").into_inner().map_err(|e| Error::Io(e.into_error()))?.sync_data()?;
             tc.write_run(File::create(&run)?)?;
-            Ok(Some(BucketOut { metas, stats, segment, run }))
+            std::fs::write(&nums, zstd::bulk::compress(&num_values, 1)?)?;
+            Ok(Some(BucketOut { metas, stats, segment, run, nums }))
         }
     }
 }
@@ -634,10 +703,38 @@ pub fn build_from_partition(state: &PartitionState, cfg: &BuildConfig, log: &(dy
     let t_idx = Instant::now();
     let fst_path = tmp.join("terms.fst");
     let post_path = tmp.join("postings.bin");
-    let idx = opencnpj_store::index::merge_runs(&runs, &fst_path, &post_path)?;
+    // Forward columns come from the same term stream as the postings, so they agree by
+    // construction (and `verify` re-checks it).
+    let mut doc_values = DocValuesBuilder::new(&docvalues::FIELDS, doc_base);
+    let idx = opencnpj_store::index::merge_runs(&runs, &fst_path, &post_path, |t, d| doc_values.add_term(t, d))?;
+    let doc_values = doc_values.finish();
     counts.terms = idx.terms;
     timings.insert("merge_index".to_string(), t_idx.elapsed().as_secs_f64());
     temp_peak.fetch_max(temp_now.load(Ordering::Relaxed) + idx.fst_bytes + idx.postings_bytes, Ordering::Relaxed);
+
+    let t_num = Instant::now();
+    let num_path = tmp.join("numeric.bin");
+    {
+        let mut nb = NumericBuilder::new(&NumField::ALL);
+        let width = NumField::ALL.len();
+        for o in &outs {
+            let raw = zstd::stream::decode_all(File::open(&o.nums)?)?;
+            if raw.len() != o.stats.docs as usize * width * 8 {
+                return Err(Error::Source("numeric temp file does not match the document count".into()));
+            }
+            let mut row = vec![0u64; width];
+            for chunk in raw.chunks_exact(width * 8) {
+                for (i, v) in chunk.as_chunks::<8>().0.iter().enumerate() {
+                    row[i] = u64::from_le_bytes(*v);
+                }
+                nb.push(&row);
+            }
+        }
+        let mut f = BufWriter::new(File::create(&num_path)?);
+        nb.finish(&mut f)?;
+        f.flush()?;
+    }
+    timings.insert("numeric_columns".to_string(), t_num.elapsed().as_secs_f64());
 
     let t_fin = Instant::now();
     let dict_bytes = opencnpj_store::reader::encode_dictionaries(&codecs);
@@ -657,6 +754,10 @@ pub fn build_from_partition(state: &PartitionState, cfg: &BuildConfig, log: &(dy
     w.section(SectionKind::Rejects, &rj, true)?;
     w.section_from_file(SectionKind::Terms, &fst_path)?;
     w.section_from_file(SectionKind::Postings, &post_path)?;
+    if let Some(dv) = &doc_values {
+        w.section(SectionKind::DocValues, dv, false)?;
+    }
+    w.section_from_file(SectionKind::Numeric, &num_path)?;
 
     let manifest = Manifest {
         format: "opencnpj-snapshot".into(),
@@ -695,7 +796,9 @@ pub fn build_from_partition(state: &PartitionState, cfg: &BuildConfig, log: &(dy
     for o in &outs {
         let _ = fs::remove_file(&o.segment);
         let _ = fs::remove_file(&o.run);
+        let _ = fs::remove_file(&o.nums);
     }
+    let _ = fs::remove_file(&num_path);
     let _ = fs::remove_file(&fst_path);
     let _ = fs::remove_file(&post_path);
 

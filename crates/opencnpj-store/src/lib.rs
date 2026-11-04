@@ -2,9 +2,11 @@
 
 pub mod block;
 pub mod compress;
+pub mod docvalues;
 pub mod format;
 pub mod index;
 pub mod manifest;
+pub mod numeric;
 pub mod postings;
 pub mod reader;
 pub mod search;

@@ -2,126 +2,16 @@
 //! lookups, search, filters and corruption handling.
 
 use std::collections::BTreeMap;
-use std::io::Write;
 use std::path::Path;
 
 use opencnpj_core::Table;
 use opencnpj_ingest::build::{self, BuildConfig, Profile};
+use opencnpj_ingest::testkit::fixture;
 use opencnpj_store::Snapshot;
+use opencnpj_store::format::{self, Footer, Header, SectionKind};
 use opencnpj_store::postings::Field;
 use opencnpj_store::search::{self, Limits, Query};
-
-fn zip(dir: &Path, name: &str, member: &str, lines: &[Vec<u8>]) {
-    let f = std::fs::File::create(dir.join(name)).unwrap();
-    let mut z = zip::ZipWriter::new(f);
-    z.start_file(member, zip::write::SimpleFileOptions::default().compression_method(zip::CompressionMethod::Deflated)).unwrap();
-    for l in lines {
-        z.write_all(l).unwrap();
-        z.write_all(b"\n").unwrap();
-    }
-    z.finish().unwrap();
-}
-
-fn rec(fields: &[&str]) -> Vec<u8> {
-    // Latin-1 output, as published by RFB.
-    let s = fields.iter().map(|f| format!("\"{f}\"")).collect::<Vec<_>>().join(";");
-    s.chars().map(|c| u8::try_from(u32::from(c)).expect("latin-1 test data")).collect()
-}
-
-fn estab(basico: &str, ordem: &str, fantasia: &str, uf: &str, mun: &str, cnae: &str, sit: &str) -> Vec<u8> {
-    let base: [u8; 12] = format!("{basico}{ordem}").as_bytes().try_into().unwrap();
-    let dv = opencnpj_core::cnpj::check_digits(&base);
-    let dv = std::str::from_utf8(&dv).unwrap().to_string();
-    let matriz = if ordem == "0001" { "1" } else { "2" };
-    rec(&[
-        basico,
-        ordem,
-        &dv,
-        matriz,
-        fantasia,
-        sit,
-        "20200101",
-        "00",
-        "",
-        "",
-        "20200101",
-        cnae,
-        "4711302,4712100",
-        "RUA",
-        "DAS FLORES",
-        "10",
-        "",
-        "CENTRO",
-        "01310100",
-        uf,
-        mun,
-        "11",
-        "33334444",
-        "",
-        "",
-        "",
-        "",
-        "contato@example.com",
-        "",
-        "",
-    ])
-}
-
-fn fixture(dir: &Path) -> usize {
-    let mut empresas = vec![
-        rec(&["00000000", "BANCO DO BRASIL SA", "2038", "10", "120000000000,00", "05", ""]),
-        rec(&["11111111", "PADARIA SÃO JOÃO LTDA", "2062", "49", "1.000,00", "01", ""]),
-        rec(&["12ABC345", "EMPRESA ALFANUMÉRICA LTDA", "2062", "49", "0,00", "03", ""]),
-        rec(&["22222222", "COMERCIO DE \"PEÇAS\" AUTO LTDA", "2062", "49", "500,00", "01", ""]),
-        rec(&["33333333", "SEM ESTABELECIMENTO SA", "2054", "10", "1,5", "05", ""]),
-        rec(&["44444444", "55555555 JOANA PEREIRA", "2135", "50", "0,00", "01", ""]),
-        rec(&["55555555", "MARIA DA SILVA 12345678901", "2135", "50", "0,00", "01", ""]),
-    ];
-    for i in 0..300 {
-        empresas.push(rec(&[&format!("4{i:07}"), &format!("MERCADO NUMERO {i} LTDA"), "2062", "49", "10,00", "01", ""]));
-    }
-    let mut estabs = vec![
-        estab("00000000", "0001", "DIRECAO GERAL", "DF", "9701", "6422100", "02"),
-        estab("00000000", "0002", "AGENCIA CENTRO", "SP", "7107", "6422100", "02"),
-        estab("11111111", "0001", "PADARIA DO JOÃO", "SP", "7107", "1091102", "02"),
-        estab("12ABC345", "01DE", "", "RJ", "6001", "6201501", "02"),
-        estab("22222222", "0001", "", "MG", "4123", "4530703", "08"),
-        estab("99999999", "0001", "ORFAO SEM EMPRESA", "BA", "3849", "4711302", "02"),
-    ];
-    for i in 0..300 {
-        estabs.push(estab(
-            &format!("4{i:07}"),
-            "0001",
-            &format!("MERCADINHO {i}"),
-            if i % 2 == 0 { "SP" } else { "PR" },
-            "7107",
-            "4712100",
-            "02",
-        ));
-    }
-    // A line that cannot be parsed must be kept as a reject, not dropped.
-    estabs.insert(3, b"\"broken line without layout".to_vec());
-    let socios = vec![rec(&["11111111", "2", "JOÃO DA SILVA", "***123456**", "49", "20200101", "", "***000000**", "", "00", "5"])];
-    let simples = vec![
-        rec(&["11111111", "S", "20200101", "00000000", "N", "00000000", "00000000"]),
-        rec(&["22222222", "N", "", "", "S", "20210101", "00000000"]),
-    ];
-    zip(dir, "Empresas0.zip", "K3241.K03200Y0.D61010.EMPRECSV", &empresas);
-    zip(dir, "Estabelecimentos0.zip", "K3241.K03200Y0.D61010.ESTABELE", &estabs);
-    zip(dir, "Socios0.zip", "K3241.K03200Y0.D61010.SOCIOCSV", &socios);
-    zip(dir, "Simples.zip", "F.K03200$W.SIMPLES.CSV.D61010", &simples);
-    for (name, rows) in [
-        ("Cnaes", vec![rec(&["6422100", "Bancos múltiplos, com carteira comercial"])]),
-        ("Motivos", vec![rec(&["00", "SEM MOTIVO"])]),
-        ("Municipios", vec![rec(&["7107", "SAO PAULO"]), rec(&["6001", "RIO DE JANEIRO"])]),
-        ("Naturezas", vec![rec(&["2062", "Sociedade Empresária Limitada"])]),
-        ("Paises", vec![rec(&["105", "BRASIL"])]),
-        ("Qualificacoes", vec![rec(&["49", "Sócio-Administrador"])]),
-    ] {
-        zip(dir, &format!("{name}.zip"), &format!("F.K03200$Z.D61010.{}", name.to_uppercase()), &rows);
-    }
-    empresas.len() + estabs.len() - 1 + socios.len() + simples.len()
-}
+use roaring::RoaringBitmap;
 
 fn build_profile(dir: &Path, profile: &str) -> (Snapshot, build::BuildReport) {
     let out = dir.join(format!("{profile}.ocnpj"));
@@ -222,8 +112,9 @@ fn build_query_and_integrity() {
     )
     .unwrap();
     assert_eq!(r.total, 1);
+    // Company values are propagated: both establishments of the MEI company match.
     let r = search::search(&snap, &f(vec![(Field::Mei, vec!["S".into()])]), &Limits::DEFAULT).unwrap();
-    assert_eq!(r.total, 1);
+    assert_eq!(r.total, 2);
     let groups = search::group_counts(&snap, &Query::default(), Field::Uf, &Limits::DEFAULT).unwrap();
     assert_eq!(groups[0], ("SP".to_string(), 152));
     assert!(search::search(&snap, &Query { limit: 10, ..Default::default() }, &Limits::DEFAULT).is_err());
@@ -235,6 +126,83 @@ fn build_query_and_integrity() {
         assert_eq!(all_rows(&other), base, "profile {p} differs");
     }
     assert_eq!(snap.label("municipios", "7107"), Some("SAO PAULO"));
+}
+
+/// Rewrites a snapshot as format 1.0 would have written it: no `docvalues` section.
+fn downgrade_to_1_0(path: &Path, out: &Path) {
+    let b = std::fs::read(path).unwrap();
+    let footer = Footer::decode(&b[b.len() - format::FOOTER_LEN..]).unwrap();
+    let table = &b[footer.table_offset as usize..b.len() - format::FOOTER_LEN];
+    let mut sections = format::decode_sections(table, footer.table_offset, format::FORMAT_MINOR).unwrap();
+    assert!(sections.iter().any(|s| s.kind == SectionKind::DocValues));
+    sections.retain(|s| s.kind != SectionKind::DocValues);
+    let mut header = Header::decode(&b).unwrap();
+    header.minor = 0;
+    let table = format::encode_sections(&sections);
+    let mut o = b[..footer.table_offset as usize].to_vec();
+    o[..format::HEADER_LEN].copy_from_slice(&header.encode());
+    o.extend_from_slice(&table);
+    let file_len = (o.len() + format::FOOTER_LEN) as u64;
+    let table_xxh3 = xxhash_rust::xxh3::xxh3_64(&table);
+    o.extend_from_slice(&Footer { table_offset: footer.table_offset, table_len: table.len() as u64, table_xxh3, file_len }.encode());
+    std::fs::write(out, o).unwrap();
+}
+
+fn sorted(mut v: Vec<(String, u64)>) -> Vec<(String, u64)> {
+    v.sort();
+    v
+}
+
+#[test]
+fn doc_values_match_postings() {
+    let dir = tempfile::tempdir().unwrap();
+    std::fs::create_dir_all(dir.path().join("2026-10")).unwrap();
+    fixture(&dir.path().join("2026-10"));
+    let (snap, report) = build_profile(dir.path(), "balanced");
+    assert_eq!(snap.header.minor, format::FORMAT_MINOR);
+    assert!(report.section_bytes.contains_key("docvalues"));
+    snap.verify(|_, _| {}).unwrap();
+    for f in [Field::Municipio, Field::Cnae] {
+        assert!(snap.doc_values(f).is_some(), "{} column", f.name());
+    }
+    assert!(snap.doc_values(Field::CnaeSecundaria).is_none());
+
+    let old_path = dir.path().join("v1_0.ocnpj");
+    downgrade_to_1_0(snap.path(), &old_path);
+    let old = Snapshot::open(&old_path).unwrap();
+    assert_eq!(old.header.minor, 0);
+    assert!(old.doc_values(Field::Municipio).is_none());
+    old.verify(|_, _| {}).unwrap();
+
+    let f = |filters: Vec<(Field, Vec<String>)>| Query { filters, limit: 10, ..Default::default() };
+    let queries = [
+        f(vec![(Field::Uf, vec!["SP".into()])]),
+        f(vec![(Field::Uf, vec!["MG".into(), "PR".into()])]),
+        f(vec![(Field::Situacao, vec!["02".into()])]),
+        f(vec![(Field::Porte, vec!["05".into()])]),
+        Query { text: Some("mercad".into()), limit: 10, ..Default::default() },
+    ];
+    let all = RoaringBitmap::from_iter(0..snap.doc_count());
+    for field in [Field::Municipio, Field::Cnae] {
+        // Every document, including those without the field.
+        let col = snap.doc_values(field).unwrap();
+        let counts = snap.doc_value_counts(col, all.iter()).unwrap();
+        let by_dv: Vec<(String, u64)> = col.values.iter().cloned().zip(counts[1..].iter().copied()).collect();
+        assert_eq!(sorted(by_dv), sorted(search::group_counts_postings(&snap, Some(&all), field).unwrap()));
+        assert!(counts[0] >= 4, "documents without {}: {}", field.name(), counts[0]);
+        for q in &queries {
+            let set = search::candidates(&snap, q, &Limits::DEFAULT).unwrap().all.unwrap();
+            let fast = search::group_counts(&snap, q, field, &Limits::DEFAULT).unwrap();
+            let reference = search::group_counts_postings(&snap, Some(&set), field).unwrap();
+            assert!(!fast.is_empty());
+            assert_eq!(sorted(fast.clone()), sorted(reference), "{} {:?}", field.name(), q.filters);
+            // Older snapshots answer through postings, with the same order.
+            assert_eq!(search::group_counts(&old, q, field, &Limits::DEFAULT).unwrap(), fast);
+        }
+    }
+    let sp = search::group_counts(&snap, &queries[0], Field::Municipio, &Limits::DEFAULT).unwrap();
+    assert_eq!(sp, [("7107".to_string(), 152)]);
+    assert!(search::group_counts(&snap, &Query::default(), Field::Municipio, &Limits::DEFAULT).is_err());
 }
 
 #[test]
@@ -310,4 +278,75 @@ fn random_corruption_never_panics() {
     // Every flip lands in a checksummed region except the postings bytes (validated
     // structurally on decode), so nearly all must be detected by open or verify.
     assert!(detected >= 300, "only {detected} of 400 corruptions detected");
+}
+
+/// Format 1.2 features: CPF and partner documents, CNPJ prefixes, CNAE hierarchy, CEP/DDD/
+/// contact filters, numeric ranges, sorting, histograms and typo tolerance.
+#[test]
+fn identity_ranges_and_hierarchies() {
+    use opencnpj_store::numeric::{NumField, Range, date_value};
+    use opencnpj_store::search::RangeFilter;
+    let dir = tempfile::tempdir().unwrap();
+    std::fs::create_dir_all(dir.path().join("2026-10")).unwrap();
+    fixture(&dir.path().join("2026-10"));
+    let (snap, _) = build_profile(dir.path(), "balanced");
+    snap.verify(|_, _| {}).unwrap();
+    let n = |q: Query| search::search(&snap, &Query { limit: 1000, ..q }, &Limits::DEFAULT).unwrap().total;
+    let f = |field: Field, v: &str| Query { filters: vec![(field, vec![v.to_string()])], ..Default::default() };
+
+    // CPF: owner (in the MEI name), masked partner, partner CNPJ; the zero mask is ignored.
+    assert_eq!(n(f(Field::Cpf, "123.456.789-01")), 1);
+    assert_eq!(n(f(Field::CpfQualquer, "12345678901")), 1);
+    assert_eq!(n(f(Field::CpfQualquer, "00012345600")), 1, "masked partner ***123456**");
+    assert_eq!(n(f(Field::SocioDoc, "33.000.167/0001-01")), 2, "both establishments of 22222222");
+    assert_eq!(n(f(Field::SocioDoc, "000000")), 0);
+    assert_eq!(n(Query { text: Some("12345678901".into()), ..Default::default() }), 1, "CPF typed in the search box");
+
+    // CNPJ prefixes: contiguous ranges, alphanumeric, and branch-level prefixes.
+    assert_eq!(n(Query { cnpj_prefixes: vec!["4000001".into()], ..Default::default() }), 10);
+    assert_eq!(n(Query { cnpj_prefixes: vec!["12abc".into()], ..Default::default() }), 1);
+    assert_eq!(n(Query { cnpj_prefixes: vec!["00.000.000/0002".into()], ..Default::default() }), 1);
+    assert_eq!(n(Query { text: Some("00.000.000".into()), ..Default::default() }), 2, "CNPJ root typed in the search box");
+
+    // CNAE: section letter, division prefix, secondary, either.
+    assert_eq!(n(f(Field::Cnae, "G")), 302);
+    assert_eq!(n(f(Field::Cnae, "64")), 2);
+    assert_eq!(n(f(Field::Cnae, "6422-1/00")), 2);
+    assert_eq!(n(f(Field::CnaeSecundaria, "4711302")), 307);
+    assert_eq!(n(f(Field::CnaeQualquer, "6422100")), 2);
+    assert!(search::filter_pattern(Field::Cnae, "Z").is_err());
+
+    // Address/contact codes.
+    assert_eq!(n(f(Field::Cep, "01310")), 307);
+    assert_eq!(n(f(Field::Cep, "01310100")), 307);
+    assert_eq!(n(f(Field::Ddd, "011")), 307);
+    assert_eq!(n(f(Field::Contato, "email")), 307);
+    assert_eq!(n(f(Field::Natureza, "21")), 2, "natureza prefix: 2135 x2");
+
+    // Numeric ranges, "no value", composites.
+    let year = |y: &str| Range { lo: date_value(&format!("{y}0101")).unwrap(), hi: date_value(&format!("{y}1231")).unwrap() };
+    let r = |field, range| Query { ranges: vec![RangeFilter { field, range }], ..Default::default() };
+    assert_eq!(n(r(NumField::InicioAtividade, Some(year("2020")))), 307);
+    assert_eq!(n(r(NumField::InicioAtividade, Some(year("2019")))), 0);
+    assert_eq!(n(r(NumField::InicioAtividade, None)), 3, "companies without establishments");
+    assert_eq!(n(r(NumField::CapitalSocial, Some(Range { lo: 100_001, hi: u64::MAX }))), 3);
+    let mei_ativo = Query { ranges: vec![RangeFilter { field: NumField::ExclusaoMei, range: None }], ..f(Field::Mei, "S") };
+    assert_eq!(n(mei_ativo), 2);
+    assert_eq!(n(r(NumField::OpcaoMei, Some(year("2021")))), 2);
+
+    // Sorting by a numeric column and yearly histograms.
+    let top =
+        search::search(&snap, &Query { sort: Some((NumField::CapitalSocial, true)), limit: 1, ..f(Field::Uf, "DF") }, &Limits::DEFAULT)
+            .unwrap();
+    assert_eq!(snap.docs(&top.docs).unwrap()[0].company.basico, "00000000");
+    let col = snap.numeric(NumField::InicioAtividade).unwrap();
+    assert_eq!(col.histogram(snap.bytes(), None, opencnpj_store::numeric::date_year), vec![(2020, 307)]);
+
+    // Typos: adjacent transposition and automatic fuzzy retry.
+    let auto = |t: &str| {
+        search::search(&snap, &Query { text: Some(t.into()), fuzzy_auto: true, limit: 5, ..Default::default() }, &Limits::DEFAULT).unwrap()
+    };
+    let r = auto("pdaaria joao ");
+    assert!(r.fuzzy_used && r.total == 1);
+    assert!(!auto("padaria joao ").fuzzy_used);
 }

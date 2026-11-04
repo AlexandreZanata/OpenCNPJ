@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["crates/opencnpj-core", "crates/opencnpj-store", "crates/opencnpj-ingest", "crates/opencnpj"]
+members = ["crates/opencnpj-core", "crates/opencnpj-store", "crates/opencnpj-ingest", "crates/opencnpj", "crates/opencnpj-desktop"]
 
 [workspace.package]
 version = "0.1.0"

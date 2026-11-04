@@ -4,6 +4,182 @@ Everything here was measured on the national release **2026-10** (RFB snapshot `
 37 ZIPs, 7,808,752,942 bytes; 28,856,680,141 bytes of CSV; 223,628,880 rows). Nothing is
 extrapolated. Raw outputs (JSON/CSV/logs) are listed in [Reproduce](#reproduce).
 
+## Format 1.2: the complete database (current)
+
+Everything in this section was measured on the final binary (commit `2b68a94` plus
+docs) against `2026-10-balanced-1.2.ocnpj`: balanced profile with every index in this
+release — names, CPF (MEI/EI owners), partner documents, CNAE (principal/secundária),
+CEP, DDD, contacts, filters — plus doc values and numeric columns. The sections further
+down describe the 1.0 snapshots and the experiments that led here.
+
+### Build and integrity
+
+| | |
+|---|---|
+| Command | `opencnpj build --input raw/2026-10 --profile balanced --keep-partition` (end to end from the ZIPs) |
+| Wall time | **8 min 2 s** (phase A 40.0 s, block encoding 343 s, index merge 71 s, numeric columns 11 s) |
+| Peak RSS / temp disk | 5.95 GB / 18.3 GB |
+| File | **8,333,664,200 bytes** (SHA-256 `76f36078…6037b`) |
+| `verify --sources` | passed: all 223,628,880 rows match the ZIPs per table; every block, section and numeric value checked (4 min 41 s) |
+
+Size by section (MB) — 1.0 balanced → 1.2:
+
+| section | 1.0 | 1.2 | added |
+|---|---:|---:|---:|
+| data (blocks) | 4,999 | 5,034 | +35 (dictionary training variance) |
+| postings | 1,343 | 1,899 | +556 (CEP 203, CPF 109, partner documents 103, DDD 68, motivo 35, contacts 18) |
+| terms (FST) | 38 | 162 | +124 (17.3 M owner CPFs) |
+| docvalues | – | 222 | município + CNAE ids |
+| numeric | – | 1,007 | capital 294, opening date 136, status date 136, Simples opt-in/exclusion 120 + 120, MEI opt-in/exclusion 99 + 103 |
+| other | 11 | 11 | |
+| **total** | **6,391** | **8,334** | **+1,943** |
+
+`capital_social` costs 31.6 bits/document because a few very large values widen whole
+1,024-document blocks; patched frame-of-reference (outliers stored apart) would roughly
+halve it and is the next storage optimization.
+
+### Queries (in process, 500 sampled queries per category, seed 42)
+
+| category | p50 / p95 / p99 ms (1 thread, warm) | q/s @1 / 4 / 16 threads | cold p50 / p95 ms |
+|---|---:|---:|---:|
+| lookup_cnpj | 0.166 / 0.200 / 0.223 | 5793 / 20777 / 48317 | 0.674 / 1.289 |
+| lookup_cnpj_root | 0.156 / 0.216 / 0.297 | 5949 / 22495 / 54135 | 0.659 / 1.215 |
+| lookup_cpf (owner + masked partners) | 7.157 / 11.897 / 12.120 | 134 / 500 / 1097 | 40.263 / 84.795 |
+| filter_cnpj_prefix (6-char root prefix) | 0.912 / 1.261 / 1.333 | 1090 / 4115 / 8893 | 1.312 / 1.676 |
+| name_full | 15.646 / 36.882 / 53.469 | 58 / 190 / 379 | 22.550 / 57.934 |
+| name_popular | 14.697 / 40.159 / 65.421 | 50 / 173 / 406 | 14.832 / 62.218 |
+| name_prefix_typeahead | 13.187 / 75.735 / 176.387 | 43 / 153 / 298 | 24.075 / 87.933 |
+| name_fuzzy | 18.111 / 53.842 / 86.451 | 45 / 155 / 314 | 55.564 / 125.306 |
+| name_plus_uf | 6.384 / 22.169 / 30.800 | 117 / 428 / 959 | 29.491 / 55.870 |
+| filter_selective (município + CNAE + ativa) | 4.385 / 9.198 / 13.212 | 210 / 770 / 1801 | 14.804 / 26.267 |
+| filter_broad (UF + ativa) | 4.569 / 10.091 / 10.639 | 175 / 602 / 1059 | 7.053 / 13.657 |
+| filter_mei_active_municipio | 5.626 / 35.578 / 36.875 | 102 / 373 / 799 | 20.281 / 33.398 |
+| sort_newest_in_municipio | 8.066 / 40.295 / 42.333 | 86 / 319 / 689 | 14.241 / 65.250 |
+| filter_opened_in_year_uf | 74.959 / 171.207 / 177.770 | 12 / 43 / 87 | 77.103 / 159.877 |
+| filter_cnae_division_uf_active (CNAE principal **or** secundária by division) | 29.487 / 809.690 / 877.745 | 8 / 26 / 58 | 35.958 / 758.922 |
+| stats_municipio_by_uf | 22.663 / 90.927 / 90.927 | 32 / 77 / 105 | 45.981 / 90.249 |
+| stats_cnae_by_uf | 23.977 / 90.535 / 90.535 | 31 / 77 / 97 | 47.647 / 93.760 |
+| stats_uf_by_cnae | 86.327 / 207.438 / 212.542 | 10 / 36 / 91 | 70.841 / 207.188 |
+| stats_year_opened_by_uf | 90.640 / 236.049 / 236.049 | 9 / 24 / 39 | 90.353 / 234.255 |
+| stats_cnae_secundaria_by_uf | 2231.684 / 3361.536 / 3361.536 | 1 / 1 / 3 | 2613.117 / 3201.995 |
+
+Snapshot open: 109 ms warm, 462 ms cold. Each query includes record fetch and JSON.
+
+### HTTP (`opencnpj serve --data-dir`, oha 15 s, 16 connections, loopback)
+
+| workload | req/s | p50 ms | p95 ms | p99 ms |
+|---|---:|---:|---:|---:|
+| lookup_cnpj | 36,442 | 0.40 | 0.68 | 0.93 |
+| lookup_cnpj (64 connections) | 33,773 | 1.61 | 3.93 | 5.79 |
+| lookup_cpf | 893 | 15.59 | 36.26 | 76.13 |
+| filter_selective | 1,307 | 10.79 | 25.48 | 37.47 |
+| filter_mei_active_municipio | 540 | 16.48 | 84.14 | 234.97 |
+| sort_newest_in_municipio | 652 | 18.67 | 81.03 | 95.13 |
+| name_prefix_typeahead | 362 | 29.08 | 127.32 | 286.65 |
+| name_full | 184 | 73.82 | 175.83 | 306.45 |
+| filter_opened_in_year_uf | 76 | 191.35 | 418.08 | 545.68 |
+| stats_year_opened_by_uf | 54 | 241.58 | 542.69 | 612.29 |
+| filter_cnae_division_uf_active | 58 | 79.03 | 1,342.40 | 2,048.85 |
+
+Every response was HTTP 200. Start to `/readyz`: 0.12 s with 122 MB anonymous RSS;
+after the whole run, 4.0 GB anonymous + 3.6 GB file-backed (page cache of the mapping).
+Under concurrent name and filter load the large temporary bitmaps and the 512 MB postings
+cache dominate anonymous memory; the allocator follow-up in the 1.0 section still applies.
+
+### Optimizations measured on this database
+
+Each row compares the same category (same seed and queries) before and after one change,
+1 thread, warm:
+
+| change | category | before p95 ms | after p95 ms |
+|---|---|---:|---:|
+| numeric probe/scan by candidate count, ordered appends, single-value reads | filter_mei_active_municipio | 1,080.9 | 35.6 |
+| same | filter_opened_in_year_uf | 314.3 (p50 281.8) | 171.2 (p50 75.0) |
+| top-k by block min/max with early stop | sort_newest_in_municipio | 96.8 | 40.3 |
+| day→year table, run-length accumulation | stats_year_opened_by_uf | 533.2 | 236.0 |
+| partner companies fetched without branches, in chunks | lookup_cpf (p99) | 92.9 | 12.1 |
+| doc values for município/CNAE (format 1.1) | stats_municipio_by_uf | 2,796 (p50) | 22.7 (p50) |
+
+### Known limits of this release
+
+* `group_by=cnae_secundaria` takes 2–3 s (multi-valued; no doc values: 126.6 M
+  document/value pairs would cost ~174 MB).
+* CNAE prefixes over *secondary* CNAEs (`cnae_secundaria=47`, `cnae_qualquer=47`) union
+  ~100 large postings lists: p50 29 ms but p95 0.8 s when they miss the postings cache.
+* Name typeahead p99 ~180 ms for very frequent 3-letter prefixes.
+* The < 5 GB target remains out of reach with all 1.2 indexes (8.33 GB balanced); the
+  1.0 compact snapshot without them is 5.75 GB.
+
+## Multi-user load (accounts on)
+
+Every virtual user has its own login key (Argon2id-hashed account on the `unlimited` plan,
+so limits do not cut the run short) and its own keep-alive connection; every request goes
+through authentication, metering, usage accounting and the search log. Server and load
+generator share one 16-core / 31 GB machine (2026-11-04, national 2026-10 snapshot,
+format 1.2), so the server had less than the whole CPU. The URL mix replays 7,900 real
+queries: 3,000 CNPJ lookups (14 and 8 characters), 3,300 name searches (full, typeahead,
+name + UF, fuzzy), 1,000 filters (selective, CNPJ prefix), 500 CPF lookups, 200 MEI and
+200 sort queries, 200 stats.
+
+```bash
+opencnpj bench --snapshot S --queries 2000 --write-urls bench/urls-final      # query lists
+# load-mix.txt = the mix above, paths only, shuffled
+opencnpj accounts --data-dir D seed --count 2000 --plan unlimited --key-file bench/load-keys.txt   # 4.8 s
+opencnpj serve --data-dir D --bind 127.0.0.1:8090 --admin-bind 127.0.0.1:8091 --no-auto-update [--reuse-port] [--response-cache-mib 0]
+opencnpj loadtest --base-url http://127.0.0.1:8090 --urls bench/load-mix.txt --keys KEYS --users N --seconds S [--think-ms 1000] --out FILE
+```
+
+Raw reports: `/data/opencnpj-data/bench/load-*.json` (outside Git; summarized here).
+
+| Run | Users / keys | Pause | Requests | req/s | p50 ms | p95 ms | p99 ms | Errors | Cache |
+|---|---|---|---|---|---|---|---|---|---|
+| `load-2000u-closed` (response cache on) | 2,000 / 2,000 | none | 1,949,506 | 64,948 | 10.9 | 31.3 | 78.3 | 0 (all 200) | 1,934,240 HIT, 7,688 COALESCED, 7,578 MISS |
+| `load-2000u-closed-nocache-warm` (no response cache, keys already verified) | 2,000 / 2,000 | none | 21,425 | 600 | 5,108 | 5,898 | 6,289 | 0 (all 200) | — |
+| `load-5000u-think1s-swap4` (cache on, binary swapped at t = 25 s) | 5,000 / 5,000 | 1 s | 230,103 | 3,771 | 0.18 | 7.6 | 16,729 | 0 (all 200) | 222,085 HIT, 440 COALESCED, 7,578 MISS |
+
+Without the response cache and 2,000 users firing back to back, the mix offers far more
+nationwide searches than 16 cores compute; the separate lookup lane keeps CNPJ lookups at
+p50 5.8 ms / p99 275 ms while heavy queries queue (`load-2000u-closed-nocache-warm`, by
+type): lookup_cnpj 237/s p50 5.8 p99 275; search_text 206/s p50 5,503 p99 6,350;
+search_filters 105/s p50 5,324 p99 5,839; lookup_cpf 37/s p50 5,340; stats 15/s p50 5,927.
+
+Engine capacity per request type, no response cache, 256 users, 10 s each (keys verified):
+
+```
+lookup_cnpj                        34607 req/s  p50      6.7  p99      19.7 ms  {'200': 346221}
+name_full                            173 req/s  p50   1407.9  p99    2138.9 ms  {'200': 1972}
+name_prefix_typeahead                307 req/s  p50    741.1  p99    1770.7 ms  {'200': 3397}
+filter_selective                    1313 req/s  p50    188.0  p99     311.3 ms  {'200': 13366}
+lookup_cpf                           827 req/s  p50    300.1  p99     451.7 ms  {'200': 8491}
+stats_uf_by_cnae                      82 req/s  p50   2738.8  p99    4463.9 ms  {'200': 1034}
+sort_newest_in_municipio             711 req/s  p50    342.1  p99     689.8 ms  {'200': 7345}
+filter_mei_active_municipio          650 req/s  p50    352.1  p99     753.1 ms  {'200': 6896}
+```
+
+Zero-downtime binary swap (`load-5000u-think1s-swap4`, per-second timeline in the report).
+Instance B started with `--reuse-port` on the same ports at t = 25 s; A received SIGTERM,
+handed over 5,000 verified keys and 7,578 cached responses, served 5 s with
+`Connection: close` and drained:
+
+```
+  t=24 req   4975 err   0 p50      0.1 p99       0.3 max       0.4
+  t=25 req   5000 err   0 p50      0.2 p99       0.5 max       0.6
+  t=26 req   5000 err   0 p50      1.1 p99       9.2 max      13.3
+  t=27 req   4994 err   0 p50      0.1 p99       4.2 max       8.4
+  t=28 req   4977 err   0 p50      0.1 p99       0.3 max       0.5
+  ...
+  t=59 req   4996 err   0 p50      0.2 p99       0.5 max       0.7
+```
+
+From t = 23 s to the end: 184,770 requests, 0 errors, worst per-second p99 9.2 ms. The
+first swap test, before the handover and the drain period existed
+(`load-5000u-think1s-swap`, no timeline recorded), had 12 connection errors and a
+whole-run p95 of 7.3 s / p99 of 20.8 s, because every user's key went through Argon2 again
+on the new process. The first 22 s
+of every run are a cold boot (5,000 never-seen keys and an empty cache arriving at once):
+p99 grew to 22.6 s while keys were verified, which is why the whole-run p99 above is high.
+A cold boot happens only without a predecessor (DEPLOYMENT.md).
+
 ## Environment
 
 | | |
@@ -299,11 +475,57 @@ names, popular names, name + UF and fuzzy on fast/balanced; prefix typeahead is 
 69–100 ms p95 with a long tail (p99 175–212 ms) from 3-letter prefixes of very frequent
 words.
 
-**Known bottleneck:** `stats?group_by=municipio` (and CNAE) takes seconds because every
-value's postings must be intersected with the candidates. It is restricted to filtered
-queries; a per-document forward column for these fields (estimated +150–220 MB) would
-turn it into a single pass and is the next optimization. Low-cardinality group-bys
-(UF, situação, porte) take ~90 ms p50.
+`stats_municipio_by_uf` in the table above was measured on format 1.0, where every
+município's postings were intersected with the candidates. Format 1.1 removed that
+bottleneck; see the next section.
+
+### Group-by with doc values (format 1.1)
+
+Format 1.1 adds a `docvalues` section (`docs/FORMAT.md`): one bit-packed value id per
+document for município (13 bits) and CNAE principal (11 bits). `group_by` on those fields
+counts the candidates in one pass instead of intersecting 5,572 / 1,343 postings lists.
+Measured with one binary (commit with this change, `--release`) on the 1.0 balanced
+snapshot (postings path: the reader falls back when the section is absent) and on a 1.1
+balanced snapshot rebuilt from the same phase-A output and verified with
+`verify --sources` (all four tables MATCH, 0 rejects, doc values cross-checked against
+postings). `bench --only stats --queries 1000`, warm, 1 thread; group-bys filtered by one
+UF use 20 sampled queries (seed 42, identical in every run), `stats_uf_by_cnae` 1,000.
+
+| category | 1.0 p50 / p95 / p99 ms | 1.0 rerun p50 / p95 / p99 ms | 1.1 p50 / p95 / p99 ms |
+|---|---:|---:|---:|
+| stats_municipio_by_uf | 2795.951 / 7228.288 / 7997.579 | 2786.513 / 7316.567 / 8149.414 | 14.591 / 80.755 / 82.788 |
+| stats_cnae_by_uf | 983.683 / 2232.179 / 2465.259 | 984.905 / 2169.640 / 2400.565 | 14.253 / 85.378 / 87.002 |
+| stats_cnae_secundaria_by_uf | 1490.838 / 3117.249 / 3414.350 | 1494.187 / 3095.618 / 3427.662 | 1498.812 / 3040.676 / 3364.706 |
+| stats_uf_by_cnae | 82.635 / 232.760 / 253.546 | — | 73.877 / 207.347 / 211.923 |
+
+Município and CNAE group-bys are ~190× / ~69× faster at p50; the p95 (~81–85 ms) is
+the largest UF (São Paulo), whose candidate bitmap the one-pass count iterates in full.
+Secondary CNAE and `stats_uf_by_cnae` (UF has 28 values) do not use doc values and did not
+change beyond run-to-run noise. Load average was 2.7–6.6 during these runs (the
+`uptime` lines in the logs); the 1.0 rerun came right after the 1.1 runs.
+
+Thread scaling on 1.1 (same workload):
+
+| category | p50 ms @1/4/16 | q/s @1/4/16 |
+|---|---:|---:|
+| stats_municipio_by_uf | 15.029 / 15.351 / 33.409 | 29 / 89 / 148 |
+| stats_cnae_by_uf | 14.209 / 15.501 / 28.838 | 29 / 89 / 146 |
+
+**Size cost:** the `docvalues` section is 221,466,852 bytes (73,809,381 documents ×
+24 bits + value lists + padding), +3.5% on the balanced file; `terms`, `postings` and
+`dictionaries` are byte-identical to the 1.0 build. The 1.1 file is 6,641,347,055 bytes,
+but 29.0 MB of the difference from the 1.0 file (6,390,868,664) is the `data` section:
+the trained zstd dictionary differed between the two builds (its sample is gathered by
+parallel workers up to a byte budget, so it depends on thread timing), not the doc
+values. Building the column runs inside the index merge: `merge_index` took 46.9 s versus
+39.7 s in the 1.0 build (different runs and load, not a controlled A/B); peak RSS of the
+from-partition rebuild was 3.58 GB.
+
+**Secondary CNAE stays on postings.** It is multi-valued: the 2026-10 snapshot has
+126,557,313 (document, secondary CNAE) pairs over 34,936,591 documents (counted from the
+postings). A list column would need ≥ 174 MB for 11-bit ids alone (126,557,313 × 11 bits,
+arithmetic, not built) plus per-document offsets — more than both single-valued columns
+together — to speed up one group-by that takes ~1.5 s today. Not adopted.
 
 ## Reproduce
 
@@ -317,6 +539,13 @@ for p in fast compact; do
      --output data/snapshots/2026-10-$p.ocnpj --report data/reports/build-2026-10-$p.json
 done
 for p in balanced fast compact; do $B verify data/snapshots/2026-10-$p.ocnpj --sources data/raw/2026-10; done
+# doc values (format 1.1): rebuild, verify, group-by before/after
+$B build --input data/raw/2026-10 --from-partition --tmp data/work/2026-10 --profile balanced \
+   --output data/snapshots/2026-10-balanced-1.1.ocnpj --report data/reports/build-2026-10-balanced-1.1.json
+$B verify data/snapshots/2026-10-balanced-1.1.ocnpj --sources data/raw/2026-10
+$B bench --snapshot data/snapshots/2026-10-balanced.ocnpj --queries 1000 --threads 1 --only stats --out data/bench/docvalues/before
+$B bench --snapshot data/snapshots/2026-10-balanced-1.1.ocnpj --queries 1000 --threads 1 --only stats --out data/bench/docvalues/after
+$B bench --snapshot data/snapshots/2026-10-balanced-1.1.ocnpj --queries 1000 --threads 1,4,16 --only stats --out data/bench/docvalues/after-threads
 scripts/experiments.sh $B data/work/2026-10 data/experiments 10   # matrix
 scripts/measure-all.sh $B data 2026-10                           # queries, cold, HTTP, baselines
 python3 -I scripts/report.py data 2026-10                         # tables in this file

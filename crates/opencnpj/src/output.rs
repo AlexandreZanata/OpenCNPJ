@@ -164,7 +164,94 @@ pub fn doc_summary(snap: &Snapshot, d: &DocRecord) -> Value {
             m.insert("municipio_descricao".into(), Value::String(l.into()));
         }
         m.insert("cnae_fiscal_principal".into(), get(col::est::CNAE_PRINCIPAL));
+        if let Some(l) = snap.label("cnaes", &e[col::est::CNAE_PRINCIPAL]) {
+            m.insert("cnae_fiscal_principal_descricao".into(), Value::String(l.into()));
+        }
+        m.insert("data_inicio_atividade".into(), get(col::est::DATA_INICIO));
+        m.insert("cep".into(), get(col::est::CEP));
     }
+    if let Some(emp) = c.empresas.first() {
+        m.insert("natureza_juridica".into(), Value::String(emp[col::emp::NATUREZA].clone()));
+        m.insert("porte_empresa".into(), Value::String(emp[col::emp::PORTE].clone()));
+        m.insert("capital_social".into(), Value::String(emp[col::emp::CAPITAL].clone()));
+    }
+    if let Some(sim) = c.simples.first() {
+        m.insert("opcao_simples".into(), Value::String(sim[col::sim::OPCAO_SIMPLES].clone()));
+        m.insert("opcao_mei".into(), Value::String(sim[col::sim::OPCAO_MEI].clone()));
+    }
+    v
+}
+
+/// Companies linked to a CPF: as the owner of an individual/MEI business (exact: the CPF
+/// is part of the company name) or as a partner/representative whose masked CPF shows the
+/// same 6 middle digits (`possible`: RFB publishes only those digits, so other people can
+/// share them; the partner name is returned to tell them apart).
+pub fn cpf_lookup(snap: &Snapshot, cpf: &str, limit: usize, privacy: Privacy) -> Result<Value> {
+    use opencnpj_store::postings::Field;
+    let digits: String = cpf.chars().filter(char::is_ascii_digit).collect();
+    if digits.len() != 11 {
+        bail!(LookupError::Invalid("cpf must have 11 digits".into()));
+    }
+    let owner = snap.postings(Field::Cpf, digits.as_bytes())?.map(|p| (*p).clone()).unwrap_or_default();
+    let mask = format!("*{}", &digits[3..9]);
+    let partner = snap.postings(Field::SocioDoc, mask.as_bytes())?.map(|p| (*p).clone()).unwrap_or_default();
+    let owner_ids: Vec<u32> = owner.iter().take(limit).collect();
+    let titular: Vec<Value> = snap.docs(&owner_ids)?.iter().map(|d| doc_summary(snap, d)).collect();
+    // One entry per company for partner matches.
+    let mut seen = std::collections::BTreeSet::new();
+    let mut socios = Vec::new();
+    let masked = format!("***{}**", &digits[3..9]);
+    // Documents of one company are contiguous: fetch in chunks until `limit` companies.
+    // With --hide-socios partner relationships are not disclosed at all.
+    let ids: Vec<u32> = if privacy.hide_socios { Vec::new() } else { partner.iter().collect() };
+    'chunks: for chunk in ids.chunks(64) {
+        for d in snap.docs(chunk)? {
+            if socios.len() >= limit {
+                break 'chunks;
+            }
+            if !seen.insert(d.company.basico.clone()) {
+                continue;
+            }
+            // Partners and company rows only: large companies have thousands of branches.
+            let Some((c, _)) = snap.company_page(&d.company.basico, 0, 0)? else { continue };
+            let rows: Vec<Value> = c
+                .socios
+                .iter()
+                .filter(|r| r[col::soc::DOCUMENTO] == masked || r[col::soc::REPRESENTANTE] == masked)
+                .map(|r| row_json(snap, Table::Socios, r, privacy))
+                .collect();
+            let mut v = doc_summary(snap, &d);
+            v["socios_correspondentes"] = Value::Array(rows);
+            socios.push(v);
+        }
+    }
+    Ok(json!({
+        "cpf": digits,
+        "titular": { "match": "exact", "total": owner.len(), "results": titular },
+        "socios": if privacy.hide_socios {
+            json!({ "match": "possible", "hidden": true, "results": [] })
+        } else {
+            json!({ "match": "possible", "mascara": masked, "total_documentos": partner.len(), "results": socios })
+        },
+        "nota": "titular: CPF present in the company name (individual entrepreneur / MEI). socios: RFB publishes partner CPFs masked; only the 6 middle digits are compared, so check the partner name.",
+        "snapshot": snapshot_ref(snap),
+    }))
+}
+
+/// Files a server distributes (`/downloads/<name>`): snapshots and their checksums/reports.
+pub fn distributable(dir: &std::path::Path) -> Vec<(String, u64)> {
+    let mut v: Vec<(String, u64)> = std::fs::read_dir(dir)
+        .into_iter()
+        .flatten()
+        .filter_map(|e| e.ok())
+        .filter(|e| e.file_type().is_ok_and(|t| t.is_file()))
+        .filter_map(|e| {
+            let name = e.file_name().to_string_lossy().into_owned();
+            let ok = name.ends_with(".ocnpj") || name.ends_with(".ocnpj.sha256") || name.ends_with(".build.json");
+            ok.then(|| (name, e.metadata().map_or(0, |m| m.len())))
+        })
+        .collect();
+    v.sort();
     v
 }
 
@@ -176,6 +263,7 @@ pub fn search_json(snap: &Snapshot, r: &SearchResult, docs: Vec<DocRecord>, _ful
         "total": r.total,
         "results": results,
         "expansion_truncated": r.expansion_truncated,
+        "fuzzy_used": r.fuzzy_used,
         "next_cursor": r.next_after.map(|d| d.to_string()),
         "snapshot": snapshot_ref(snap),
     })
@@ -205,6 +293,12 @@ pub fn index_breakdown(snap: &Snapshot) -> Value {
             .collect();
         out.insert(f.name().into(), json!({ "terms": terms.len(), "postings_bytes": bytes, "numeric_by_len": numeric }));
     }
+    for f in opencnpj_store::numeric::NumField::ALL {
+        if let Some(c) = snap.numeric(f) {
+            let (bytes, bits) = c.stored_bytes();
+            out.insert(format!("numeric:{}", f.name()), json!({ "terms": 0, "postings_bytes": bytes, "bits_per_document": bits }));
+        }
+    }
     Value::Object(out)
 }
 
@@ -229,16 +323,19 @@ pub fn info(snap: &Snapshot) -> Value {
 }
 
 /// Streams documents matching `q` (CNPJ order). Returns rows written.
-pub fn export(snap: &Snapshot, q: &Query, format: &str, max: u64, out: &mut dyn Write) -> Result<u64> {
+/// One row per matching establishment (companies without establishments have no row).
+pub fn export(snap: &Snapshot, q: &Query, format: &str, max: u64, privacy: Privacy, out: &mut dyn Write) -> Result<u64> {
     let set = search::candidates(snap, q, &Limits::DEFAULT)?.all.context("export needs a query or at least one filter")?;
     let csv = match format {
         "csv" => true,
         "ndjson" => false,
         f => bail!("unknown format {f}"),
     };
+    let hidden: Vec<bool> =
+        Table::Estabelecimentos.row_columns().iter().map(|c| privacy.hide_contacts && CONTACT_COLUMNS.contains(&c.name)).collect();
     if csv {
         let mut header = vec!["cnpj", "razao_social"];
-        header.extend(Table::Estabelecimentos.row_columns().iter().map(|c| c.name));
+        header.extend(Table::Estabelecimentos.row_columns().iter().zip(&hidden).filter(|(_, h)| !**h).map(|(c, _)| c.name));
         writeln!(out, "{}", header.join(";"))?;
     }
     let mut n = 0u64;
@@ -251,10 +348,10 @@ pub fn export(snap: &Snapshot, q: &Query, format: &str, max: u64, out: &mut dyn 
             let razao = c.empresas.first().map_or("", |r| r[col::emp::RAZAO_SOCIAL].as_str());
             if csv {
                 let mut fields = vec![estab_cnpj(&c.basico, e), razao.to_string()];
-                fields.extend(e.iter().cloned());
+                fields.extend(e.iter().zip(&hidden).filter(|(_, h)| !**h).map(|(v, _)| v.clone()));
                 writeln!(out, "{}", fields.iter().map(|f| csv_quote(f)).collect::<Vec<_>>().join(";"))?;
             } else {
-                let mut v = row_json(snap, Table::Estabelecimentos, e, Privacy::default());
+                let mut v = row_json(snap, Table::Estabelecimentos, e, privacy);
                 let m = v.as_object_mut().expect("object");
                 m.insert("cnpj".into(), Value::String(estab_cnpj(&c.basico, e)));
                 m.insert("razao_social".into(), Value::String(razao.into()));

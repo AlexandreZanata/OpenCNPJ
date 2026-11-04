@@ -1,20 +1,15 @@
 //! `opencnpj` — single binary: download, build, verify, query, serve and benchmark.
 
-mod api;
-mod bench;
-mod download;
-mod output;
-
 use std::path::PathBuf;
 use std::time::Instant;
 
 use anyhow::{Context, Result, bail};
 use clap::{Args, Parser, Subcommand};
+use opencnpj::{QueryArgs, api, bench, default_threads, download, output, sorted, to_query};
 use opencnpj_ingest::build::{self, BuildConfig, Profile};
 use opencnpj_store::Snapshot;
 use opencnpj_store::compress::BlockCodec;
-use opencnpj_store::postings::Field;
-use opencnpj_store::search::{self, Limits, Query, TextField};
+use opencnpj_store::search::{self, Limits};
 
 #[derive(Parser)]
 #[command(name = "opencnpj", version, about = "Compact, offline search engine for Brazilian CNPJ open data")]
@@ -82,6 +77,10 @@ enum Cmd {
     Serve(api::ServeArgs),
     /// Reproducible query benchmark against a snapshot.
     Bench(bench::BenchArgs),
+    /// Manage accounts (users, roles, plans, keys) in the accounts database.
+    Accounts(opencnpj::accounts_cli::AccountsArgs),
+    /// Many concurrent authenticated virtual users against a running server.
+    Loadtest(opencnpj::loadtest::LoadArgs),
 }
 
 #[derive(Args)]
@@ -129,60 +128,6 @@ struct BuildArgs {
     /// Write the build report as JSON.
     #[arg(long)]
     report: Option<PathBuf>,
-}
-
-#[derive(Args, Clone, Default)]
-pub struct QueryArgs {
-    /// Name query (razão social / nome fantasia).
-    #[arg(long)]
-    pub q: Option<String>,
-    /// any | razao | fantasia
-    #[arg(long, default_value = "any")]
-    pub field: String,
-    #[arg(long)]
-    pub fuzzy: bool,
-    /// Filters, repeatable: --filter uf=SP --filter cnae=4711301
-    #[arg(long = "filter", value_parser = parse_filter)]
-    pub filters: Vec<(String, String)>,
-    #[arg(long, default_value_t = 10)]
-    pub limit: usize,
-    #[arg(long, default_value_t = 0)]
-    pub offset: usize,
-}
-
-fn parse_filter(s: &str) -> Result<(String, String), String> {
-    let (k, v) = s.split_once('=').ok_or("expected key=value")?;
-    Ok((k.to_string(), v.to_string()))
-}
-
-pub fn default_threads() -> usize {
-    std::thread::available_parallelism().map_or(4, |n| n.get())
-}
-
-pub fn to_query(a: &QueryArgs) -> Result<Query> {
-    let mut filters: Vec<(Field, Vec<String>)> = Vec::new();
-    for (k, v) in &a.filters {
-        let f = Field::from_name(k).filter(|f| Field::FILTERS.contains(f)).with_context(|| format!("unknown filter {k}"))?;
-        let values = v.split(',').map(str::to_string).collect::<Vec<_>>();
-        match filters.iter_mut().find(|(ff, _)| *ff == f) {
-            Some((_, vs)) => vs.extend(values),
-            None => filters.push((f, values)),
-        }
-    }
-    Ok(Query {
-        text: a.q.clone(),
-        text_field: match a.field.as_str() {
-            "any" => TextField::Any,
-            "razao" | "razao_social" => TextField::Razao,
-            "fantasia" | "nome_fantasia" => TextField::Fantasia,
-            other => bail!("unknown field {other}"),
-        },
-        filters,
-        fuzzy: a.fuzzy,
-        offset: a.offset,
-        limit: a.limit,
-        after: None,
-    })
 }
 
 fn log(msg: &str) {
@@ -328,7 +273,7 @@ fn main() -> Result<()> {
             let mut query = to_query(&q)?;
             query.limit = usize::MAX;
             let mut out = std::io::BufWriter::new(std::io::stdout().lock());
-            let n = output::export(&snap, &query, &format, max, &mut out)?;
+            let n = output::export(&snap, &query, &format, max, output::Privacy::default(), &mut out)?;
             log(&format!("exported {n} rows"));
             Ok(())
         }
@@ -340,12 +285,7 @@ fn main() -> Result<()> {
         }
         Cmd::Serve(a) => api::run(a),
         Cmd::Bench(a) => bench::run(a),
+        Cmd::Accounts(a) => opencnpj::accounts_cli::run(a),
+        Cmd::Loadtest(a) => opencnpj::loadtest::run(a),
     }
-}
-
-/// Ascending copy (blocks are decompressed once when ids are sorted).
-pub fn sorted(ids: &[u32]) -> Vec<u32> {
-    let mut v = ids.to_vec();
-    v.sort_unstable();
-    v
 }

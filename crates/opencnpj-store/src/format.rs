@@ -19,7 +19,8 @@ use crate::Error;
 pub const MAGIC: [u8; 8] = *b"OCNPJ\0v1";
 pub const FOOTER_MAGIC: [u8; 8] = *b"OCNPJEND";
 pub const FORMAT_MAJOR: u16 = 1;
-pub const FORMAT_MINOR: u16 = 0;
+/// 1.1 added the optional `docvalues` section.
+pub const FORMAT_MINOR: u16 = 2;
 pub const HEADER_LEN: usize = 64;
 pub const FOOTER_LEN: usize = 40;
 pub const SECTION_ENTRY_LEN: usize = 40;
@@ -40,6 +41,10 @@ pub enum SectionKind {
     Rejects = 7,
     Terms = 8,
     Postings = 9,
+    /// Forward columns for `group_by` (format 1.1, optional).
+    DocValues = 10,
+    /// Numeric columns for range filters, sorting and histograms (format 1.2, optional).
+    Numeric = 11,
 }
 
 impl SectionKind {
@@ -55,6 +60,8 @@ impl SectionKind {
             7 => Rejects,
             8 => Terms,
             9 => Postings,
+            10 => DocValues,
+            11 => Numeric,
             _ => return None,
         })
     }
@@ -133,7 +140,9 @@ pub fn encode_sections(entries: &[SectionEntry]) -> Vec<u8> {
     out
 }
 
-pub fn decode_sections(b: &[u8], file_len: u64) -> Result<Vec<SectionEntry>, Error> {
+/// Unknown kinds are skipped only in files written by a newer minor version (`minor`
+/// from the header): a minor version may add optional sections, never required ones.
+pub fn decode_sections(b: &[u8], file_len: u64, minor: u16) -> Result<Vec<SectionEntry>, Error> {
     let count = u32::from_le_bytes(b.get(..4).ok_or(Error::Corrupt("section table"))?.try_into().expect("4")) as usize;
     if count > MAX_SECTIONS || b.len() != 4 + count * SECTION_ENTRY_LEN {
         return Err(Error::Corrupt("section table size"));
@@ -142,17 +151,23 @@ pub fn decode_sections(b: &[u8], file_len: u64) -> Result<Vec<SectionEntry>, Err
     for chunk in b[4..].as_chunks::<SECTION_ENTRY_LEN>().0 {
         let u32_at = |i: usize| u32::from_le_bytes(chunk[i..i + 4].try_into().expect("4"));
         let u64_at = |i: usize| u64::from_le_bytes(chunk[i..i + 8].try_into().expect("8"));
-        let kind = SectionKind::from_u32(u32_at(0)).ok_or(Error::Corrupt("unknown section kind"))?;
+        let (offset, len) = (u64_at(8), u64_at(16));
+        let end = offset.checked_add(len).ok_or(Error::Corrupt("section overflow"))?;
+        if offset < HEADER_LEN as u64 || end > file_len {
+            return Err(Error::Corrupt("section out of bounds"));
+        }
+        let Some(kind) = SectionKind::from_u32(u32_at(0)) else {
+            if minor > FORMAT_MINOR {
+                continue;
+            }
+            return Err(Error::Corrupt("unknown section kind"));
+        };
         let codec = match u32_at(4) {
             0 => SectionCodec::Raw,
             1 => SectionCodec::Zstd,
             _ => return Err(Error::Corrupt("unknown section codec")),
         };
-        let e = SectionEntry { kind, codec, offset: u64_at(8), len: u64_at(16), raw_len: u64_at(24), xxh3: u64_at(32) };
-        let end = e.offset.checked_add(e.len).ok_or(Error::Corrupt("section overflow"))?;
-        if e.offset < HEADER_LEN as u64 || end > file_len {
-            return Err(Error::Corrupt("section out of bounds"));
-        }
+        let e = SectionEntry { kind, codec, offset, len, raw_len: u64_at(24), xxh3: u64_at(32) };
         if out.iter().any(|o: &SectionEntry| o.kind == kind) {
             return Err(Error::Corrupt("duplicate section"));
         }
@@ -253,9 +268,18 @@ mod tests {
     fn sections_bounds() {
         let e = SectionEntry { kind: SectionKind::Manifest, codec: SectionCodec::Raw, offset: 64, len: 10, raw_len: 10, xxh3: 0 };
         let b = encode_sections(&[e]);
-        assert_eq!(decode_sections(&b, 100).unwrap(), vec![e]);
-        assert!(decode_sections(&b, 70).is_err());
-        assert!(decode_sections(&b[..b.len() - 1], 100).is_err());
-        assert!(decode_sections(&encode_sections(&[e, e]), 100).is_err());
+        assert_eq!(decode_sections(&b, 100, FORMAT_MINOR).unwrap(), vec![e]);
+        assert!(decode_sections(&b, 70, FORMAT_MINOR).is_err());
+        assert!(decode_sections(&b[..b.len() - 1], 100, FORMAT_MINOR).is_err());
+        assert!(decode_sections(&encode_sections(&[e, e]), 100, FORMAT_MINOR).is_err());
+    }
+
+    #[test]
+    fn unknown_kinds_only_from_newer_minors() {
+        let e = SectionEntry { kind: SectionKind::Manifest, codec: SectionCodec::Raw, offset: 64, len: 10, raw_len: 10, xxh3: 0 };
+        let mut b = encode_sections(&[e, e]);
+        b[4 + SECTION_ENTRY_LEN..8 + SECTION_ENTRY_LEN].copy_from_slice(&99u32.to_le_bytes());
+        assert!(decode_sections(&b, 100, FORMAT_MINOR).is_err());
+        assert_eq!(decode_sections(&b, 100, FORMAT_MINOR + 1).unwrap(), vec![e]);
     }
 }

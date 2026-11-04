@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenCNPJ Admin</title>
+<style>
+:root{--bg:#f6f7f9;--panel:#fff;--fg:#1d2330;--muted:#667085;--line:#e4e7ec;--accent:#2563eb;--ok:#16a34a;--bad:#dc2626;--warn:#d97706;--chart2:#9333ea}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1218;--panel:#171b23;--fg:#e6e9ef;--muted:#98a2b3;--line:#2a303b;--accent:#60a5fa;--ok:#4ade80;--bad:#f87171;--warn:#fbbf24;--chart2:#c084fc}}
+*{box-sizing:border-box}body{margin:0;font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--fg)}
+header{display:flex;align-items:center;gap:16px;padding:12px 20px;border-bottom:1px solid var(--line);background:var(--panel);position:sticky;top:0;z-index:2}
+header h1{font-size:16px;margin:0}header .sub{color:var(--muted);font-size:12px}
+nav{display:flex;gap:4px;flex-wrap:wrap;margin-left:auto}nav button{background:none;border:1px solid transparent;color:var(--muted);padding:6px 10px;border-radius:6px;cursor:pointer;font:inherit}
+nav button.on{color:var(--fg);border-color:var(--line);background:var(--bg)}
+main{padding:20px;max-width:1400px;margin:0 auto}section{display:none}section.on{display:block}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px}
+.kpi .v{font-size:22px;font-weight:600}.kpi .l{color:var(--muted);font-size:12px}
+h2{font-size:15px;margin:0 0 10px}table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-weight:500}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+button.b,input[type=submit]{background:var(--accent);color:#fff;border:0;border-radius:6px;padding:7px 12px;cursor:pointer;font:inherit}
+button.s{background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:6px 10px;cursor:pointer;font:inherit}
+button.danger{background:var(--bad);color:#fff;border:0;border-radius:6px;padding:6px 10px;cursor:pointer}
+input,select{background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:6px 8px;font:inherit;width:100%}
+label{display:block;font-size:12px;color:var(--muted)}label input,label select{margin-top:3px}
+.form{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:12px}
+pre{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px;overflow:auto;max-height:480px;font-size:12px;white-space:pre-wrap;word-break:break-word}
+canvas{width:100%;height:220px}.row{display:flex;gap:12px;flex-wrap:wrap;align-items:end}.muted{color:var(--muted)}
+#login{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:10}#login[hidden]{display:none}
+#login form{width:min(420px,92vw)}#login p{color:var(--muted);font-size:13px}#who{font-size:12px;color:var(--muted);white-space:nowrap}
+.pill{display:inline-block;padding:1px 8px;border-radius:99px;font-size:12px;border:1px solid var(--line)}
+.pill.ok{color:var(--ok)}.pill.failed,.pill.killed{color:var(--bad)}.pill.running{color:var(--warn)}
+.bar{height:8px;background:var(--accent);border-radius:4px}.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:900px){.two{grid-template-columns:1fr}}
+a{color:var(--accent)}
+</style>
+</head>
+<body>
+<div id="login" hidden><form class="card" id="login-f"><h2>Sign in to OpenCNPJ Admin</h2>
+<p>Use the login key of a staff account (admin, moderator or analyst). The session token is kept in this tab only.</p>
+<label>Login key<input type="password" id="login-k" autocomplete="off" placeholder="ocnpj_…" required></label>
+<div class="row" style="margin-top:12px"><button class="b">Sign in</button><span class="muted" id="login-e"></span></div></form></div>
+<header><div><h1>OpenCNPJ Admin</h1><div class="sub" id="hdr">loading…</div></div>
+<nav id="nav"></nav><span id="who"></span><button class="s" id="logout" hidden>Sign out</button></header>
+<main>
+<section id="overview">
+  <div class="grid" id="kpis"></div>
+  <div class="two">
+    <div class="card"><h2>Requests per second (last 5 min)</h2><canvas id="c-rps"></canvas></div>
+    <div class="card"><h2>Mean latency, ms (last 5 min)</h2><canvas id="c-lat"></canvas></div>
+  </div>
+  <div class="card" style="margin-top:12px"><h2>Snapshot</h2><div id="snapinfo"></div></div>
+</section>
+
+<section id="routes"><div class="card"><h2>Routes (since start)</h2><table id="routes-t"></table></div></section>
+
+<section id="search">
+  <div class="card">
+    <h2>Search console <span class="muted">(runs through /admin/api/explain: plan, per-stage timings, results)</span></h2>
+    <form id="sf">
+      <div class="form">
+        <label>Name / CNPJ / CPF (q)<input name="q" placeholder="padaria sao jo"></label>
+        <label>Text field<select name="field"><option value="any">any</option><option>razao_social</option><option>nome_fantasia</option></select></label>
+        <label>Fuzzy<select name="fuzzy"><option>auto</option><option>true</option><option>false</option></select></label>
+        <label>CNPJ prefix<input name="cnpj" placeholder="33000167"></label>
+        <label>CPF (owner or partner)<input name="cpf" placeholder="11 digits"></label>
+        <label>CPF owner only<input name="cpf_titular"></label>
+        <label>Partner CNPJ/CPF<input name="socio_documento"></label>
+        <label>UF<input name="uf" placeholder="SP,RJ"></label>
+        <label>Município (code)<input name="municipio" placeholder="7107"></label>
+        <label>CNAE principal<input name="cnae" placeholder="4711302, 47, G"></label>
+        <label>CNAE secundária<input name="cnae_secundaria"></label>
+        <label>CNAE any<input name="cnae_qualquer"></label>
+        <label>Situação<select name="situacao"><option value="">any</option><option value="02">02 ativa</option><option value="08">08 baixada</option><option value="04">04 inapta</option><option value="03">03 suspensa</option><option value="01">01 nula</option></select></label>
+        <label>Porte<select name="porte"><option value="">any</option><option value="01">01 micro</option><option value="03">03 EPP</option><option value="05">05 demais</option><option value="00">00 não informado</option></select></label>
+        <label>Natureza<input name="natureza" placeholder="2135, 2*"></label>
+        <label>Matriz/filial<select name="matriz_filial"><option value="">any</option><option value="1">matriz</option><option value="2">filial</option></select></label>
+        <label>Simples<select name="simples"><option value="">any</option><option>S</option><option>N</option></select></label>
+        <label>MEI<select name="mei"><option value="">any</option><option>S</option><option>N</option></select></label>
+        <label>MEI active<select name="mei_ativo"><option value="">any</option><option value="true">yes</option></select></label>
+        <label>Simples active<select name="simples_ativo"><option value="">any</option><option value="true">yes</option></select></label>
+        <label>CEP<input name="cep" placeholder="01310 or 01310100"></label>
+        <label>DDD<input name="ddd"></label>
+        <label>Has e-mail<select name="tem_email"><option value="">any</option><option value="true">yes</option></select></label>
+        <label>Has phone<select name="tem_telefone"><option value="">any</option><option value="true">yes</option></select></label>
+        <label>Motivo<input name="motivo"></label>
+        <label>Opened from<input name="data_inicio_atividade_de" placeholder="2024-01-01"></label>
+        <label>Opened until<input name="data_inicio_atividade_ate"></label>
+        <label>Status date from<input name="data_situacao_cadastral_de"></label>
+        <label>Status date until<input name="data_situacao_cadastral_ate"></label>
+        <label>MEI opt-in from<input name="data_opcao_mei_de"></label>
+        <label>MEI opt-in until<input name="data_opcao_mei_ate"></label>
+        <label>Simples opt-in from<input name="data_opcao_simples_de"></label>
+        <label>Simples opt-in until<input name="data_opcao_simples_ate"></label>
+        <label>Capital min (R$)<input name="capital_social_min"></label>
+        <label>Capital max (R$)<input name="capital_social_max"></label>
+        <label>Sort<select name="ordenar"><option value="">relevance / CNPJ</option><option>data_inicio_atividade:desc</option><option>data_inicio_atividade:asc</option><option>capital_social:desc</option><option>data_opcao_mei:desc</option><option>data_situacao_cadastral:desc</option></select></label>
+        <label>Limit<input name="limit" value="20"></label>
+        <label>Offset<input name="offset" value="0"></label>
+      </div>
+      <div class="row"><input type="submit" value="Search"><button type="button" class="s" id="b-lookup">CNPJ lookup (q)</button><button type="button" class="s" id="b-cpf">CPF lookup (cpf)</button><button type="button" class="s" id="b-stats">Stats by UF</button><span class="muted" id="s-url"></span></div>
+    </form>
+  </div>
+  <div class="two" style="margin-top:12px">
+    <div class="card"><h2>Plan and timings</h2><div id="s-plan" class="muted">—</div></div>
+    <div class="card"><h2>Results</h2><div id="s-res" class="muted">—</div></div>
+  </div>
+  <div class="card" style="margin-top:12px"><h2>Raw response</h2><pre id="s-raw">—</pre></div>
+</section>
+
+<section id="snapshots">
+  <div class="card"><div class="row" style="justify-content:space-between"><h2>Snapshots</h2><button class="s" id="b-reload">Reload current</button></div><table id="snap-t"></table></div>
+</section>
+
+<section id="index"><div class="card"><h2>Index size by field <span class="muted" id="idx-t"></span></h2><table id="idx"></table></div></section>
+
+<section id="jobs">
+  <div class="card">
+    <h2>Start a job</h2>
+    <div class="row">
+      <label style="width:160px">Profile<select id="j-profile"><option>balanced</option><option>fast</option><option>compact</option></select></label>
+      <label style="width:160px">Month (YYYY-MM)<input id="j-month" placeholder="latest"></label>
+      <label style="width:120px">Queries<input id="j-queries" value="300"></label>
+      <button class="b" data-job="verify">Verify</button>
+      <button class="b" data-job="verify" data-sources="1">Verify vs sources</button>
+      <button class="b" data-job="bench">Benchmark</button>
+      <button class="b" data-job="download">Download</button>
+      <button class="b" data-job="build">Build</button>
+      <button class="b" data-job="update">Update (download → build → verify → publish)</button>
+    </div>
+    <p class="muted">Jobs run this binary as a child process; logs are kept in the data directory. Download/build/update need <code>--data-dir</code>.</p>
+  </div>
+  <div class="card" style="margin-top:12px"><h2>Jobs</h2><table id="jobs-t"></table></div>
+  <div class="card" style="margin-top:12px"><h2>Log <span class="muted" id="log-id"></span></h2><pre id="log">select a job</pre></div>
+</section>
+
+<section id="reports">
+  <div class="two"><div class="card"><h2>Build and benchmark reports</h2><table id="rep-t"></table></div>
+  <div class="card"><h2 id="rep-title">Report</h2><div id="rep"></div></div></div>
+</section>
+
+<section id="tuning">
+  <div class="two">
+    <div class="card"><h2>Postings cache</h2><div id="cache"></div>
+      <div class="row" style="margin-top:10px"><label style="width:180px">Budget (MiB)<input id="cache-mib"></label><button class="b" id="b-cache">Apply</button><button class="s" id="b-cache-clear">Clear</button></div></div>
+    <div class="card"><h2>Self-test benchmark</h2><p class="muted">Sampled queries per category, one warm-up pass, one thread, in this process.</p>
+      <div class="row"><label style="width:180px">Queries per category<input id="st-n" value="100"></label><button class="b" id="b-st">Run</button></div><div id="st" style="margin-top:10px"></div></div>
+  </div>
+  <div class="card" style="margin-top:12px"><h2>Configuration</h2><pre id="cfg"></pre></div>
+</section>
+</main>
+<script>
+const $=s=>document.querySelector(s), esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmtB=b=>{if(b==null)return'–';const u=['B','KB','MB','GB','TB'];let i=0;while(b>=1000&&i<4){b/=1000;i++}return b.toFixed(i?2:0)+' '+u[i]};
+const fmtN=n=>n==null?'–':Number(n).toLocaleString('en-US');const ms=v=>v==null?'–':(v<1?v.toFixed(3):v<100?v.toFixed(2):v.toFixed(0));
+const tabs={overview:'Overview',routes:'Routes',search:'Search',snapshots:'Snapshots',index:'Index',jobs:'Jobs',reports:'Reports',tuning:'Cache & tests'};
+let cur='overview';
+function show(t){cur=t;document.querySelectorAll('section').forEach(s=>s.classList.toggle('on',s.id===t));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));location.hash=t;load(t)}
+for(const[k,v]of Object.entries(tabs)){const b=document.createElement('button');b.textContent=v;b.dataset.t=k;b.onclick=()=>show(k);$('#nav').append(b)}
+let token=sessionStorage.getItem('ocnpj_token')||'';
+async function api(u,o={}){o.headers=Object.assign({},o.headers||{},token?{authorization:'Bearer '+token}:{});const r=await fetch(u,o);if(r.status===401){showLogin();throw new Error('sign in required')}const ct=r.headers.get('content-type')||'';const body=ct.includes('json')?await r.json():await r.text();if(!r.ok)throw new Error(body.message||body||r.status);return body}
+function chart(cv,pts,color){const c=cv.getContext('2d'),w=cv.width=cv.clientWidth*devicePixelRatio,h=cv.height=cv.clientHeight*devicePixelRatio;c.clearRect(0,0,w,h);
+ const max=Math.max(1e-9,...pts);c.strokeStyle=getComputedStyle(document.body).getPropertyValue('--line');c.lineWidth=1;for(let i=0;i<=4;i++){const y=h-20*devicePixelRatio-(h-30*devicePixelRatio)*i/4;c.beginPath();c.moveTo(0,y);c.lineTo(w,y);c.stroke();c.fillStyle=getComputedStyle(document.body).getPropertyValue('--muted');c.font=`${11*devicePixelRatio}px system-ui`;c.fillText((max*i/4).toPrecision(3),4,y-3)}
+ c.strokeStyle=color;c.lineWidth=2*devicePixelRatio;c.beginPath();pts.forEach((p,i)=>{const x=i/(pts.length-1||1)*w,y=h-20*devicePixelRatio-(h-30*devicePixelRatio)*p/max;i?c.lineTo(x,y):c.moveTo(x,y)});c.stroke()}
+const css=v=>getComputedStyle(document.body).getPropertyValue(v);
+async function loadOverview(){const[o,m]=await Promise.all([api('/admin/api/overview'),api('/admin/api/metrics?seconds=300')]);
+ const s=o.snapshot,ser=m.series,last=ser.slice(-11,-1),rps=last.reduce((a,x)=>a+x[1],0)/Math.max(1,last.length),c=o.cache,hit=c.hits+c.misses?c.hits/(c.hits+c.misses):0;
+ const sr=m.routes.find(r=>r.route==='/api/v1/search')||{},lr=m.routes.find(r=>r.route==='/api/v1/cnpj/{cnpj}')||{};
+ $('#hdr').textContent=`v${o.version} · competence ${s.competence} · ${fmtN(s.counts.documents)} documents · auth: ${o.config.authentication}`;
+ const k=[['Uptime',(o.uptime_s/3600).toFixed(1)+' h'],['Requests',fmtN(o.requests_total)],['Req/s (10 s)',rps.toFixed(1)],['CNPJ p95 ms',ms(lr.p95_ms)],['Search p95 ms',ms(sr.p95_ms)],['Timeouts',fmtN(o.timeouts_total)],['RSS anon',fmtB(o.process.rss_anon_bytes)],['RSS file (mmap)',fmtB(o.process.rss_file_bytes)],['CPU s',o.process.cpu_seconds.toFixed(0)],['Cache hit rate',(hit*100).toFixed(1)+'%'],['Cache used',fmtB(c.bytes)+' / '+fmtB(c.budget)],['Snapshot',fmtB(s.file_bytes)]];
+ $('#kpis').innerHTML=k.map(([l,v])=>`<div class="card kpi"><div class="v">${esc(v)}</div><div class="l">${l}</div></div>`).join('');
+ chart($('#c-rps'),ser.map(x=>x[1]),css('--accent'));chart($('#c-lat'),ser.map(x=>x[3]),css('--chart2'));
+ const sec=Object.entries(s.sections).map(([k,v])=>`<tr><td>${k}</td><td class="n">${fmtB(v)}</td></tr>`).join('');
+ $('#snapinfo').innerHTML=`<div class="two"><table><tr><th>Field</th><th>Value</th></tr><tr><td>File</td><td>${esc(s.path)}</td></tr><tr><td>SHA-256</td><td style="word-break:break-all">${esc(o.sha256)}</td></tr><tr><td>Format</td><td>${s.format_version.join('.')}</td></tr><tr><td>Profile</td><td>${esc(s.profile)} (${esc(JSON.stringify(s.block_codec))}, ${fmtB(s.block_target_bytes)} blocks)</td></tr><tr><td>Companies</td><td>${fmtN(s.counts.companies)}</td></tr><tr><td>Rows</td><td>${Object.entries(s.counts.rows).map(([a,b])=>a+': '+fmtN(b)).join('<br>')}</td></tr><tr><td>Rejected lines</td><td>${fmtN(s.counts.rejected_lines)}</td></tr><tr><td>Terms</td><td>${fmtN(s.terms)}</td></tr><tr><td>Numeric columns</td><td>${o.numeric_columns.join(', ')||'none (format &lt; 1.2)'}</td></tr></table><table><tr><th>Section</th><th class="n">Bytes</th></tr>${sec}</table></div>`}
+async function loadRoutes(){const m=await api('/admin/api/metrics?seconds=1');$('#routes-t').innerHTML='<tr><th>Route</th><th class="n">Count</th><th class="n">Mean</th><th class="n">p50</th><th class="n">p90</th><th class="n">p95</th><th class="n">p99</th><th class="n">Max (ms)</th><th class="n">4xx</th><th class="n">5xx</th></tr>'+m.routes.map(r=>`<tr><td>${esc(r.route)}</td><td class="n">${fmtN(r.count)}</td><td class="n">${ms(r.mean_ms)}</td><td class="n">${ms(r.p50_ms)}</td><td class="n">${ms(r.p90_ms)}</td><td class="n">${ms(r.p95_ms)}</td><td class="n">${ms(r.p99_ms)}</td><td class="n">${ms(r.max_ms)}</td><td class="n">${fmtN(r.status['4xx'])}</td><td class="n">${fmtN(r.status['5xx'])}</td></tr>`).join('')}
+function params(){const p=new URLSearchParams();for(const el of $('#sf').elements){if(!el.name||!el.value)continue;if(el.name==='field'&&el.value==='any')continue;if(el.name==='fuzzy'&&el.value==='auto')continue;p.append(el.name,el.value.trim())}return p}
+function resTable(results){if(!results||!results.length)return'<span class="muted">no results</span>';return'<table><tr><th>CNPJ</th><th>Name</th><th>UF/Município</th><th>CNAE</th><th>Situação</th><th>Opened</th></tr>'+results.map(r=>`<tr><td><a href="#" data-cnpj="${esc(r.cnpj||r.cnpj_basico)}">${esc(r.cnpj||r.cnpj_basico)}</a></td><td>${esc(r.razao_social)}<br><span class="muted">${esc(r.nome_fantasia)}</span></td><td>${esc(r.uf)} ${esc(r.municipio_descricao||'')}</td><td>${esc(r.cnae_fiscal_principal)}</td><td>${esc(r.situacao_cadastral_descricao||r.situacao_cadastral)}</td><td>${esc(r.data_inicio_atividade)}</td></tr>`).join('')+'</table>'}
+async function raw(u){$('#s-url').textContent=u;try{const v=await api(u);$('#s-raw').textContent=JSON.stringify(v,null,2);return v}catch(e){$('#s-raw').textContent='Error: '+e.message}}
+$('#sf').onsubmit=async e=>{e.preventDefault();const u='/admin/api/explain?'+params();const v=await raw(u);if(!v)return;const p=v.plan,t=v.timings_ms;
+ $('#s-plan').innerHTML=`<table><tr><td>Total matches</td><td class="n">${fmtN(v.result.total)}</td></tr><tr><td>Exact candidates (before fuzzy)</td><td class="n">${fmtN(p.exact_candidates)}</td></tr><tr><td>Matched by razão / fantasia</td><td class="n">${fmtN(p.matched_by_razao)} / ${fmtN(p.matched_by_fantasia)}</td></tr><tr><td>Fuzzy used</td><td class="n">${v.result.fuzzy_used}</td></tr><tr><td>Expansion truncated</td><td class="n">${p.expansion_truncated}</td></tr>${Object.entries(t).map(([k,x])=>`<tr><td>${k} ms</td><td class="n">${ms(x)}</td></tr>`).join('')}${p.filters_alone.map(f=>`<tr><td>filter ${esc(f.field)}=${esc(f.values.join(','))}</td><td class="n">${fmtN(f.documents)} docs · ${ms(f.ms)} ms</td></tr>`).join('')}${p.ranges_alone.map(f=>`<tr><td>range ${esc(f.field)}</td><td class="n">${fmtN(f.documents)} docs · ${ms(f.ms)} ms</td></tr>`).join('')}</table>`;
+ $('#s-res').innerHTML=resTable(v.result.results)};
+document.addEventListener('click',async e=>{const a=e.target.closest('[data-cnpj]');if(a){e.preventDefault();await raw('/api/v1/cnpj/'+encodeURIComponent(a.dataset.cnpj))}});
+$('#b-lookup').onclick=()=>raw('/api/v1/cnpj/'+encodeURIComponent($('#sf').q.value));
+$('#b-cpf').onclick=()=>raw('/api/v1/cpf/'+encodeURIComponent($('#sf').cpf.value||$('#sf').q.value));
+$('#b-stats').onclick=()=>{const p=params();p.delete('limit');p.delete('offset');p.set('group_by','uf');raw('/api/v1/stats?'+p)};
+async function loadSnapshots(){const v=await api('/admin/api/snapshots');$('#snap-t').innerHTML='<tr><th>File</th><th class="n">Size</th><th>SHA-256</th><th>Modified</th><th></th></tr>'+v.files.map(f=>`<tr><td>${esc(f.name)} ${f.active?'<span class="pill ok">active</span>':''}</td><td class="n">${fmtB(f.bytes)}</td><td style="word-break:break-all;font-size:11px">${esc(f.sha256||'')}</td><td>${f.modified?new Date(f.modified*1000).toLocaleString():''}</td><td><a href="/downloads/${encodeURIComponent(f.name)}">download</a> ${f.active?'':`<button class="s" data-act="${esc(f.name)}">activate</button>`}</td></tr>`).join('')}
+document.addEventListener('click',async e=>{const b=e.target.closest('[data-act]');if(!b)return;b.disabled=true;try{await api('/admin/api/snapshots/activate',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({name:b.dataset.act})})}catch(x){alert(x.message)}loadSnapshots()});
+$('#b-reload').onclick=async()=>{try{await api('/admin/api/reload',{method:'POST'})}catch(x){alert(x.message)}loadSnapshots()};
+async function loadIndex(){$('#idx').innerHTML='<tr><td class="muted">computing (full term-dictionary scan)…</td></tr>';const v=await api('/admin/api/index');const rows=Object.entries(v.fields).sort((a,b)=>b[1].postings_bytes-a[1].postings_bytes),max=Math.max(...rows.map(r=>r[1].postings_bytes));$('#idx-t').textContent=`(computed in ${ms(v.computed_ms)} ms)`;
+ $('#idx').innerHTML='<tr><th>Field</th><th class="n">Terms</th><th class="n">Postings</th><th style="width:40%"></th></tr>'+rows.map(([k,x])=>`<tr><td>${k}</td><td class="n">${fmtN(x.terms)}</td><td class="n">${fmtB(x.postings_bytes)}</td><td><div class="bar" style="width:${100*x.postings_bytes/max}%"></div></td></tr>`).join('')}
+let logJob=null;
+async function loadJobs(){const v=await api('/admin/api/jobs');$('#jobs-t').innerHTML='<tr><th>#</th><th>Kind</th><th>Status</th><th>Started</th><th class="n">Elapsed s</th><th>Args</th><th></th></tr>'+v.map(j=>`<tr><td>${j.id}</td><td>${esc(j.kind)}</td><td><span class="pill ${esc(j.status)}">${esc(j.status)}</span> ${j.exit_code??''}</td><td>${new Date(j.started*1000).toLocaleTimeString()}</td><td class="n">${j.elapsed_s.toFixed(0)}</td><td style="font-size:11px">${esc(j.args.join(' '))}</td><td><button class="s" data-log="${j.id}">log</button> ${j.status==='running'?`<button class="danger" data-kill="${j.id}">stop</button>`:''}</td></tr>`).join('');if(logJob)showLog(logJob)}
+async function showLog(id){logJob=id;$('#log-id').textContent='#'+id;try{const t=await api(`/admin/api/jobs/${id}/log?lines=300`);const el=$('#log'),bottom=el.scrollTop+el.clientHeight>=el.scrollHeight-5;el.textContent=t||'(empty)';if(bottom)el.scrollTop=el.scrollHeight}catch(e){$('#log').textContent=e.message}}
+document.addEventListener('click',async e=>{const l=e.target.closest('[data-log]');if(l)showLog(+l.dataset.log);const k=e.target.closest('[data-kill]');if(k){await api('/admin/api/jobs/'+k.dataset.kill,{method:'DELETE'});loadJobs()}
+ const j=e.target.closest('[data-job]');if(j){const body={kind:j.dataset.job,sources:!!j.dataset.sources,profile:$('#j-profile').value,queries:+$('#j-queries').value||300};if($('#j-month').value)body.month=$('#j-month').value;try{const r=await api('/admin/api/jobs',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});logJob=r.id}catch(x){alert(x.message)}loadJobs()}});
+async function loadReports(){const v=await api('/admin/api/reports');$('#rep-t').innerHTML='<tr><th>Report</th><th>Kind</th><th>Modified</th></tr>'+v.map(r=>`<tr><td><a href="#" data-rep="${esc(r.id)}">${esc(r.id.replace('__','/'))}</a></td><td>${r.kind}</td><td>${r.modified?new Date(r.modified*1000).toLocaleString():''}</td></tr>`).join('')}
+document.addEventListener('click',async e=>{const a=e.target.closest('[data-rep]');if(!a)return;e.preventDefault();const v=await api('/admin/api/reports/'+encodeURIComponent(a.dataset.rep));$('#rep-title').textContent=a.dataset.rep.replace('__','/');
+ if(v.results){$('#rep').innerHTML=`<p class="muted">${esc(v.label||'')} · ${esc(v.snapshot?.profile||'')} · ${esc(v.environment?.cpu||'')}</p><table><tr><th>Category</th><th class="n">Threads</th><th>Cache</th><th class="n">q/s</th><th class="n">p50</th><th class="n">p95</th><th class="n">p99 ms</th></tr>${v.results.map(r=>`<tr><td>${esc(r.category)}</td><td class="n">${r.threads}</td><td>${r.cache}</td><td class="n">${r.qps.toFixed(0)}</td><td class="n">${ms(r.p50_ms)}</td><td class="n">${ms(r.p95_ms)}</td><td class="n">${ms(r.p99_ms)}</td></tr>`).join('')}</table>`}
+ else if(v.section_bytes){$('#rep').innerHTML=`<table><tr><td>File</td><td>${fmtB(v.file_bytes)}</td></tr>${Object.entries(v.section_bytes).map(([k,x])=>`<tr><td>section ${k}</td><td class="n">${fmtB(x)}</td></tr>`).join('')}${Object.entries(v.timings_s).map(([k,x])=>`<tr><td>${k} s</td><td class="n">${x.toFixed(1)}</td></tr>`).join('')}<tr><td>Peak RSS</td><td class="n">${fmtB(v.peak_rss_bytes)}</td></tr><tr><td>Peak temp</td><td class="n">${fmtB(v.peak_temp_bytes)}</td></tr></table>`}
+ else $('#rep').innerHTML=`<pre>${esc(JSON.stringify(v,null,2))}</pre>`});
+async function loadTuning(){const o=await api('/admin/api/overview');const c=o.cache;$('#cache').innerHTML=`<table><tr><td>Entries</td><td class="n">${fmtN(c.entries)}</td></tr><tr><td>Used</td><td class="n">${fmtB(c.bytes)}</td></tr><tr><td>Budget</td><td class="n">${fmtB(c.budget)}</td></tr><tr><td>Hits / misses</td><td class="n">${fmtN(c.hits)} / ${fmtN(c.misses)}</td></tr></table>`;$('#cache-mib').value=Math.round(c.budget/1048576);$('#cfg').textContent=JSON.stringify(o.config,null,2)}
+$('#b-cache').onclick=async()=>{await api('/admin/api/cache',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({budget_mib:+$('#cache-mib').value})});loadTuning()};
+$('#b-cache-clear').onclick=async()=>{await api('/admin/api/cache',{method:'DELETE'});loadTuning()};
+$('#b-st').onclick=async()=>{$('#st').innerHTML='<span class="muted">running…</span>';try{const v=await api('/admin/api/selftest',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({queries:+$('#st-n').value})});$('#st').innerHTML='<table><tr><th>Category</th><th class="n">n</th><th class="n">q/s</th><th class="n">p50</th><th class="n">p95</th><th class="n">p99 ms</th><th class="n">empty</th></tr>'+v.results.map(r=>`<tr><td>${esc(r.category)}</td><td class="n">${r.queries}</td><td class="n">${r.qps.toFixed(0)}</td><td class="n">${ms(r.p50_ms)}</td><td class="n">${ms(r.p95_ms)}</td><td class="n">${ms(r.p99_ms)}</td><td class="n">${r.empty_results}</td></tr>`).join('')+'</table>'}catch(e){$('#st').textContent=e.message}};
+const loaders={overview:loadOverview,routes:loadRoutes,search:async()=>{},snapshots:loadSnapshots,index:loadIndex,jobs:loadJobs,reports:loadReports,tuning:loadTuning};
+function load(t){loaders[t]().catch(e=>console.error(e))}
+setInterval(()=>{if(['overview','routes','jobs'].includes(cur))load(cur)},2000);
+function showLogin(){$('#login').hidden=false;$('#login-k').focus()}
+async function whoami(){try{const w=await api('/admin/api/whoami');$('#who').textContent=w.user?`${w.user.username} · ${w.user.role}`:'';$('#logout').hidden=!w.user;return true}catch(e){if(e.message==='accounts disabled')return true;return false}}
+$('#login-f').onsubmit=async e=>{e.preventDefault();$('#login-e').textContent='';try{const r=await fetch('/api/v1/auth/login',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({key:$('#login-k').value.trim()})});const v=await r.json();if(!r.ok)throw new Error(v.message||r.status);token=v.token;sessionStorage.setItem('ocnpj_token',token);$('#login-k').value='';$('#login').hidden=true;await whoami();load(cur)}catch(x){$('#login-e').textContent=x.message}};
+$('#logout').onclick=async()=>{try{await fetch('/api/v1/auth/logout',{method:'POST',headers:{authorization:'Bearer '+token}})}catch(e){}token='';sessionStorage.removeItem('ocnpj_token');$('#who').textContent='';$('#logout').hidden=true;showLogin()};
+whoami();
+show(tabs[location.hash.slice(1)]?location.hash.slice(1):'overview');
+</script>
+</body>
+</html>

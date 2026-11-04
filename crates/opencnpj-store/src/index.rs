@@ -16,8 +16,14 @@ pub struct IndexStats {
     pub fst_bytes: u64,
 }
 
-/// `runs` must be ordered by `base` (document offset of their bucket).
-pub fn merge_runs(runs: &[(PathBuf, u32)], fst_path: &Path, postings_path: &Path) -> Result<IndexStats, Error> {
+/// `runs` must be ordered by `base` (document offset of their bucket). `on_term` sees every
+/// term in byte order with its global document ids (used to fill forward columns).
+pub fn merge_runs(
+    runs: &[(PathBuf, u32)],
+    fst_path: &Path,
+    postings_path: &Path,
+    mut on_term: impl FnMut(&[u8], &[u32]) -> Result<(), Error>,
+) -> Result<IndexStats, Error> {
     let mut readers = Vec::with_capacity(runs.len());
     for (path, base) in runs {
         readers.push(RunReader::new(File::open(path)?, *base)?);
@@ -53,6 +59,7 @@ pub fn merge_runs(runs: &[(PathBuf, u32)], fst_path: &Path, postings_path: &Path
                 heap.push(Reverse((ht.clone(), i)));
             }
         }
+        on_term(&term, &docs)?;
         buf.clear();
         encode_postings(&docs, &mut buf)?;
         fst.insert(&term, stats.postings_bytes).map_err(|e| Error::Invalid(e.to_string()))?;

@@ -14,8 +14,9 @@ use std::time::Instant;
 use anyhow::Result;
 use opencnpj_core::schema::col;
 use opencnpj_store::Snapshot;
+use opencnpj_store::numeric::{NumField, Range};
 use opencnpj_store::postings::Field;
-use opencnpj_store::search::{self, Limits, Query, TextField};
+use opencnpj_store::search::{self, Limits, Query, RangeFilter, TextField};
 use serde::Serialize;
 use serde_json::json;
 
@@ -63,6 +64,10 @@ enum Work {
     Lookup(String),
     Search(Query),
     Stats(Query, Field),
+    /// `/api/v1/cpf/{cpf}`: owner and masked-partner matches.
+    Cpf(String),
+    /// Yearly histogram of a date column over the query's candidates.
+    Year(Query, NumField),
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -116,7 +121,7 @@ const POPULAR: &[&str] = &[
 ];
 
 fn q(text: Option<String>, filters: Vec<(Field, Vec<String>)>, fuzzy: bool) -> Query {
-    Query { text, text_field: TextField::Any, filters, fuzzy, offset: 0, limit: 20, after: None }
+    Query { text, text_field: TextField::Any, filters, fuzzy, offset: 0, limit: 20, ..Default::default() }
 }
 
 fn workloads(snap: &Snapshot, n: usize, seed: u64) -> Result<Vec<(&'static str, Vec<Work>)>> {
@@ -173,8 +178,56 @@ fn workloads(snap: &Snapshot, n: usize, seed: u64) -> Result<Vec<(&'static str, 
                 false,
             )));
         }
-        cats.entry("stats_uf_by_cnae").or_default().push(Work::Stats(q(None, vec![(Field::Cnae, vec![cnae])], false), Field::Uf));
-        cats.entry("stats_municipio_by_uf").or_default().push(Work::Stats(q(None, vec![(Field::Uf, vec![uf])], false), Field::Municipio));
+        cats.entry("stats_uf_by_cnae").or_default().push(Work::Stats(q(None, vec![(Field::Cnae, vec![cnae.clone()])], false), Field::Uf));
+        // Features of format 1.2: identity, prefixes, CNAE hierarchy, ranges, sorting.
+        if snap.numeric(NumField::InicioAtividade).is_some() {
+            cats.entry("filter_cnpj_prefix")
+                .or_default()
+                .push(Work::Search(Query { cnpj_prefixes: vec![c.basico[..6].to_string()], ..q(None, vec![], false) }));
+            if cnae.len() >= 2 {
+                cats.entry("filter_cnae_division_uf_active").or_default().push(Work::Search(q(
+                    None,
+                    vec![
+                        (Field::CnaeQualquer, vec![cnae[..2].to_string()]),
+                        (Field::Uf, vec![uf.clone()]),
+                        (Field::Situacao, vec!["02".into()]),
+                    ],
+                    false,
+                )));
+            }
+            if let Some(v) = opencnpj_store::numeric::date_value(&e[col::est::DATA_INICIO]) {
+                let y = opencnpj_store::numeric::date_year(v);
+                let lo = opencnpj_store::numeric::date_value(&format!("{y}0101")).unwrap_or(1);
+                let hi = opencnpj_store::numeric::date_value(&format!("{y}1231")).unwrap_or(u64::MAX);
+                let range = RangeFilter { field: NumField::InicioAtividade, range: Some(Range { lo, hi }) };
+                cats.entry("filter_opened_in_year_uf")
+                    .or_default()
+                    .push(Work::Search(Query { ranges: vec![range], ..q(None, vec![(Field::Uf, vec![uf.clone()])], false) }));
+            }
+            cats.entry("filter_mei_active_municipio").or_default().push(Work::Search(Query {
+                ranges: vec![RangeFilter { field: NumField::ExclusaoMei, range: None }],
+                ..q(None, vec![(Field::Mei, vec!["S".into()]), (Field::Municipio, vec![mun.clone()])], false)
+            }));
+            cats.entry("sort_newest_in_municipio").or_default().push(Work::Search(Query {
+                sort: Some((NumField::InicioAtividade, true)),
+                ..q(None, vec![(Field::Municipio, vec![mun.clone()])], false)
+            }));
+            cats.entry("stats_year_opened_by_uf")
+                .or_default()
+                .push(Work::Year(q(None, vec![(Field::Uf, vec![uf.clone()])], false), NumField::InicioAtividade));
+            for t in &toks {
+                if t.len() == 11 && t.bytes().all(|b| b.is_ascii_digit()) {
+                    cats.entry("lookup_cpf").or_default().push(Work::Cpf(t.clone()));
+                }
+            }
+        }
+        for (cat, f) in [
+            ("stats_municipio_by_uf", Field::Municipio),
+            ("stats_cnae_by_uf", Field::Cnae),
+            ("stats_cnae_secundaria_by_uf", Field::CnaeSecundaria),
+        ] {
+            cats.entry(cat).or_default().push(Work::Stats(q(None, vec![(Field::Uf, vec![uf.clone()])], false), f));
+        }
     }
     for i in 0..n {
         cats.entry("name_popular").or_default().push(Work::Search(q(Some(POPULAR[i % POPULAR.len()].to_string()), vec![], false)));
@@ -182,7 +235,8 @@ fn workloads(snap: &Snapshot, n: usize, seed: u64) -> Result<Vec<(&'static str, 
     Ok(cats
         .into_iter()
         .map(|(k, mut v)| {
-            v.truncate(if k.starts_with("stats_municipio") { (n / 50).max(10) } else { n });
+            // Group-bys over a whole UF were seconds per query with postings only.
+            v.truncate(if k.ends_with("_by_uf") { (n / 50).max(10) } else { n });
             (k, v)
         })
         .collect())
@@ -200,6 +254,16 @@ fn execute(snap: &Snapshot, w: &Work, limits: &Limits) -> Result<bool> {
             r.total > 0
         }
         Work::Stats(qr, f) => !search::group_counts(snap, qr, *f, limits)?.is_empty(),
+        Work::Cpf(cpf) => {
+            let v = output::cpf_lookup(snap, cpf, 20, Privacy::default())?;
+            std::hint::black_box(serde_json::to_vec(&v)?);
+            v["titular"]["total"].as_u64().unwrap_or(0) > 0
+        }
+        Work::Year(qr, f) => {
+            let set = search::candidates(snap, qr, limits)?.all;
+            let col = snap.numeric(*f).ok_or_else(|| anyhow::anyhow!("no numeric column"))?;
+            !col.histogram(snap.bytes(), set.as_ref(), opencnpj_store::numeric::date_year).is_empty()
+        }
     })
 }
 
@@ -301,7 +365,24 @@ fn enc(s: &str) -> String {
 }
 
 fn work_url(base: &str, w: &Work) -> String {
-    let filters = |q: &Query| q.filters.iter().map(|(f, v)| format!("&{}={}", f.name(), enc(&v.join(",")))).collect::<String>();
+    let filters = |q: &Query| {
+        let mut s: String = q.filters.iter().map(|(f, v)| format!("&{}={}", f.name(), enc(&v.join(",")))).collect();
+        for p in &q.cnpj_prefixes {
+            s.push_str(&format!("&cnpj={}", enc(p)));
+        }
+        for r in &q.ranges {
+            let fmt =
+                |v: u64| if r.field.is_date() { opencnpj_store::numeric::date_string(v) } else { format!("{:.2}", (v - 1) as f64 / 100.0) };
+            match r.range {
+                None => s.push_str(&format!("&{}_vazio=true", r.field.name())),
+                Some(x) => s.push_str(&format!("&{0}_de={1}&{0}_ate={2}", r.field.name(), fmt(x.lo), fmt(x.hi))),
+            }
+        }
+        if let Some((f, desc)) = q.sort {
+            s.push_str(&format!("&ordenar={}:{}", f.name(), if desc { "desc" } else { "asc" }));
+        }
+        s
+    };
     match w {
         Work::Lookup(id) => format!("{base}/api/v1/cnpj/{id}"),
         Work::Search(q) => {
@@ -310,7 +391,23 @@ fn work_url(base: &str, w: &Work) -> String {
             format!("{base}/api/v1/search?limit={}{text}{fuzzy}{}", q.limit, filters(q))
         }
         Work::Stats(q, f) => format!("{base}/api/v1/stats?group_by={}{}", f.name(), filters(q)),
+        Work::Cpf(cpf) => format!("{base}/api/v1/cpf/{cpf}?limit=20"),
+        Work::Year(q, f) => format!("{base}/api/v1/stats?group_by=ano_{}{}", f.name(), filters(q)),
     }
+}
+
+/// Small in-process benchmark for the admin self-test: `n` sampled queries per category,
+/// one warm-up pass, then one thread.
+pub fn quick(snap: &Snapshot, n: usize) -> Result<serde_json::Value> {
+    let seed = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map_or(7, |d| d.as_secs());
+    let cats = workloads(snap, n, seed)?;
+    let limits = Limits::DEFAULT;
+    let mut out = Vec::new();
+    for (cat, work) in &cats {
+        measure(snap, cat, work, 1, "warmup", &limits)?;
+        out.push(measure(snap, cat, work, 1, "warm", &limits)?);
+    }
+    Ok(json!({ "seed": seed, "queries_per_category": n, "results": out }))
 }
 
 pub fn run(a: BenchArgs) -> Result<()> {

@@ -1,0 +1,33 @@
+# Caddy (free, automatic HTTPS with Let's Encrypt) in front of OpenCNPJ.
+# Replace the host names, then: sudo cp deploy/Caddyfile /etc/caddy/Caddyfile && sudo systemctl reload caddy
+
+api.example.com {
+	# The application negotiates gzip/br/zstd itself.
+	reverse_proxy 127.0.0.1:8080 {
+		header_up X-Forwarded-For {remote_host}
+		health_uri /healthz
+		health_interval 10s
+		# Retry on the other blue/green instance during an upgrade.
+		lb_try_duration 5s
+	}
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options nosniff
+		-Server
+	}
+	log {
+		output file /var/log/caddy/opencnpj.log
+		format json
+	}
+}
+
+# Admin listener: dashboard and admin API (staff login required). Restrict it to known
+# addresses, or skip this block and reach it through an SSH tunnel:
+#   ssh -L 8081:127.0.0.1:8081 server
+admin.example.com {
+	@outside not remote_ip 203.0.113.0/24
+	respond @outside 403
+	reverse_proxy 127.0.0.1:8081 {
+		header_up X-Forwarded-For {remote_host}
+	}
+}

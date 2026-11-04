@@ -1,0 +1,47 @@
+# OpenCNPJ API, blue/green instances sharing the same ports (SO_REUSEPORT).
+#
+#   sudo cp deploy/opencnpj@.service /etc/systemd/system/
+#   sudo systemctl enable --now opencnpj@blue
+#
+# Zero-downtime binary upgrade: deploy/upgrade.sh starts the other colour, waits until it
+# answers /readyz, then stops the old one (SIGTERM drains in-flight requests and flushes
+# usage counters). Snapshot updates need no restart at all: the server swaps them live.
+[Unit]
+Description=OpenCNPJ API (%i)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=opencnpj
+Group=opencnpj
+EnvironmentFile=-/etc/opencnpj/env
+ExecStart=/usr/local/bin/opencnpj serve \
+    --data-dir /var/lib/opencnpj \
+    --bind 127.0.0.1:8080 \
+    --admin-bind 127.0.0.1:8081 \
+    --public-url ${OPENCNPJ_PUBLIC_URL} \
+    --reuse-port \
+    --trust-proxy
+KillSignal=SIGTERM
+TimeoutStopSec=90
+Restart=on-failure
+RestartSec=2
+LimitNOFILE=1048576
+Nice=-5
+
+# Hardening: the service only writes its data directory.
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+ReadWritePaths=/var/lib/opencnpj
+
+[Install]
+WantedBy=multi-user.target

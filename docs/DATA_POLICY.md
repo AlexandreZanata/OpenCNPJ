@@ -53,22 +53,41 @@ The data is made public by RFB under its legal duties, but LGPD still applies to
 who further processes it (purpose, necessity, transparency — art. 6, and art. 7 §§3–4 for
 publicly accessible data).
 
-Defaults and controls in this project:
+What the engine indexes and exposes (format 1.2), and the controls available:
 
-* No full-text index over partner names; you cannot search partners by name.
-* Individual entrepreneurs and MEIs have the owner's CPF embedded in the company name
-  ("MARIA DA SILVA 12345678901"): 17.3 million such names in 2026-10. The value is stored
-  and returned unchanged, but 11-digit numeric tokens are **never indexed** and are
-  ignored in queries, so the engine cannot be used to find a person's business by CPF.
+* **CPF search is enabled** (requested by the project owner). Individual entrepreneurs
+  and MEIs have the owner's full CPF embedded in the company name ("MARIA DA SILVA
+  12345678901") — 17.3 million such names in 2026-10. Those 11-digit numbers are indexed
+  separately (`cpf_titular`), so a CPF finds the person's businesses.
+* Partner and legal-representative CPFs are published **masked** (`***123456**`). The
+  engine indexes only the 6 visible digits; a CPF search over partners is therefore a
+  *possible* match (others can share those digits), and `/api/v1/cpf` returns the partner
+  rows so the name can be checked. The engine never reconstructs a masked CPF.
+* Partner names are not indexed for full-text search.
 * `serve --hide-socios` and `--hide-contacts` remove partners and phone/e-mail fields
   from every API response.
-* Bulk export is **off** unless `--enable-export`, and capped by `--export-max-rows`.
-* Ranked results cannot be paged deeper than `--max-offset` (default 1000); filter
-  queries page by cursor, so full enumeration requires deliberate, observable traffic.
-* Requests are bounded by `--max-concurrency` and `--timeout-ms`.
-* There is no per-client rate limiting inside the binary. Public deployments should put a
-  reverse proxy in front (e.g. nginx `limit_req`, or an API gateway with keys) and keep
-  access logs only as long as needed.
+* **Accounts and limits are on by default** (`--auth required`): every data request is
+  tied to an account and metered by its plan (rate limit, daily/monthly quotas, page size,
+  export and download rights). Staff can suspend or ban accounts, and every staff action is
+  in the audit log. `--auth off` removes all of this; use it only on a private network.
+* Restrict `/api/v1/cpf` and the `cpf` filters (or use `--hide-socios`) if the
+  deployment's purpose does not require locating people's businesses by CPF.
+
+### Data about API users
+
+The accounts database (`accounts.sqlite`) holds, per user: username, e-mail address, role,
+plan, status and moderation notes; Argon2id hashes of login keys (never the keys);
+SHA-256 hashes of session and recovery tokens; per-day request counts by type; session
+IP address and user agent; and, while the `search_log` setting is on, each data request
+(time, route, query string, status, latency, client IP) for `search_log_days` days
+(default 30), after which a background task deletes it. The audit log keeps staff
+actions with the actor's address. Deleting an account removes its keys, sessions,
+recovery tokens, usage rows and search log; audit entries keep the username that was
+acted on.
+
+Query strings can contain CPFs and names typed by users: keep the retention short, turn
+`search_log` off when it is not needed, and restrict `usage.read` to staff who need it.
+Use `opencnpj accounts backup` for consistent copies and protect them like the live file.
 
 Operators are the controllers of their deployment: document the purpose, honour data
 subject requests that apply to them, and do not combine this data with other sources to

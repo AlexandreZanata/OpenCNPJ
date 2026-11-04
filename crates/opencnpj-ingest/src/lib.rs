@@ -4,6 +4,8 @@ pub mod build;
 pub mod parse;
 pub mod partition;
 pub mod source;
+#[doc(hidden)]
+pub mod testkit;
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {

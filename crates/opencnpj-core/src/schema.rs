@@ -198,6 +198,7 @@ pub mod col {
         pub const RAZAO_SOCIAL: usize = 0;
         pub const NATUREZA: usize = 1;
         pub const QUALIFICACAO: usize = 2;
+        pub const CAPITAL: usize = 3;
         pub const PORTE: usize = 4;
     }
     pub mod est {
@@ -206,21 +207,36 @@ pub mod col {
         pub const MATRIZ_FILIAL: usize = 2;
         pub const NOME_FANTASIA: usize = 3;
         pub const SITUACAO: usize = 4;
+        pub const DATA_SITUACAO: usize = 5;
         pub const MOTIVO: usize = 6;
         pub const PAIS: usize = 8;
+        pub const DATA_INICIO: usize = 9;
         pub const CNAE_PRINCIPAL: usize = 10;
         pub const CNAE_SECUNDARIA: usize = 11;
+        pub const CEP: usize = 17;
         pub const UF: usize = 18;
         pub const MUNICIPIO: usize = 19;
+        pub const DDD_1: usize = 20;
+        pub const TELEFONE_1: usize = 21;
+        pub const TELEFONE_2: usize = 23;
+        pub const EMAIL: usize = 26;
     }
     pub mod soc {
+        pub const IDENTIFICADOR: usize = 0;
+        pub const NOME: usize = 1;
+        pub const DOCUMENTO: usize = 2;
         pub const QUALIFICACAO: usize = 3;
         pub const PAIS: usize = 5;
+        pub const REPRESENTANTE: usize = 6;
         pub const QUALIFICACAO_REP: usize = 8;
     }
     pub mod sim {
         pub const OPCAO_SIMPLES: usize = 0;
+        pub const DATA_OPCAO_SIMPLES: usize = 1;
+        pub const DATA_EXCLUSAO_SIMPLES: usize = 2;
         pub const OPCAO_MEI: usize = 3;
+        pub const DATA_OPCAO_MEI: usize = 4;
+        pub const DATA_EXCLUSAO_MEI: usize = 5;
     }
 }
 
@@ -241,5 +257,16 @@ mod tests {
         assert_eq!(est[col::est::NOME_FANTASIA].name, "nome_fantasia");
         assert_eq!(Table::Empresas.row_columns()[col::emp::PORTE].name, "porte_empresa");
         assert_eq!(Table::Simples.row_columns()[col::sim::OPCAO_MEI].name, "opcao_mei");
+        assert_eq!(Table::Simples.row_columns()[col::sim::DATA_EXCLUSAO_MEI].name, "data_exclusao_mei");
+        assert_eq!(Table::Empresas.row_columns()[col::emp::CAPITAL].name, "capital_social");
+        assert_eq!(est[col::est::DATA_INICIO].name, "data_inicio_atividade");
+        assert_eq!(est[col::est::DATA_SITUACAO].name, "data_situacao_cadastral");
+        assert_eq!(est[col::est::CEP].name, "cep");
+        assert_eq!(est[col::est::DDD_1].name, "ddd_1");
+        assert_eq!(est[col::est::TELEFONE_2].name, "telefone_2");
+        assert_eq!(est[col::est::EMAIL].name, "correio_eletronico");
+        let soc = Table::Socios.row_columns();
+        assert_eq!(soc[col::soc::DOCUMENTO].name, "cpf_cnpj_socio");
+        assert_eq!(soc[col::soc::REPRESENTANTE].name, "representante_legal");
     }
 }
