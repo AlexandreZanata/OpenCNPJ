@@ -45,6 +45,7 @@ tower = { version = "0.5", features = ["limit", "timeout", "util", "load-shed"] 
 reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "stream"] }
 futures-util = "0.3"
 tempfile = "3"
+smallvec = "1"
 quick-xml = "0.41"
 rusqlite = { version = "0.40", features = ["bundled"] }
 zip = { version = "9", default-features = false, features = ["deflate"] }

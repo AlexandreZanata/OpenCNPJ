@@ -2640,8 +2640,14 @@ dependencies = [
 name = "opencnpj-query"
 version = "0.1.0"
 dependencies = [
+ "hex",
  "opencnpj-core",
+ "proptest",
  "serde",
+ "serde_json",
+ "smallvec",
+ "thiserror 2.0.21",
+ "xxhash-rust",
 ]
 
 [[package]]
