@@ -1,22 +1,15 @@
 //! `opencnpj` — single binary: download, build, verify, query, serve and benchmark.
 
-mod admin;
-mod api;
-mod bench;
-mod download;
-mod metrics;
-mod output;
-mod params;
-
 use std::path::PathBuf;
 use std::time::Instant;
 
 use anyhow::{Context, Result, bail};
 use clap::{Args, Parser, Subcommand};
+use opencnpj::{QueryArgs, api, bench, default_threads, download, output, sorted, to_query};
 use opencnpj_ingest::build::{self, BuildConfig, Profile};
 use opencnpj_store::Snapshot;
 use opencnpj_store::compress::BlockCodec;
-use opencnpj_store::search::{self, Limits, Query};
+use opencnpj_store::search::{self, Limits};
 
 #[derive(Parser)]
 #[command(name = "opencnpj", version, about = "Compact, offline search engine for Brazilian CNPJ open data")]
@@ -131,47 +124,6 @@ struct BuildArgs {
     /// Write the build report as JSON.
     #[arg(long)]
     report: Option<PathBuf>,
-}
-
-#[derive(Args, Clone, Default)]
-pub struct QueryArgs {
-    /// Name query (razão social / nome fantasia).
-    #[arg(long)]
-    pub q: Option<String>,
-    /// any | razao | fantasia
-    #[arg(long, default_value = "any")]
-    pub field: String,
-    #[arg(long)]
-    pub fuzzy: bool,
-    /// Any API parameter, repeatable: --filter uf=SP --filter cnae=47 --filter data_inicio_atividade_de=2024-01-01
-    #[arg(long = "filter", value_parser = parse_filter)]
-    pub filters: Vec<(String, String)>,
-    #[arg(long, default_value_t = 10)]
-    pub limit: usize,
-    #[arg(long, default_value_t = 0)]
-    pub offset: usize,
-}
-
-fn parse_filter(s: &str) -> Result<(String, String), String> {
-    let (k, v) = s.split_once('=').ok_or("expected key=value")?;
-    Ok((k.to_string(), v.to_string()))
-}
-
-pub fn default_threads() -> usize {
-    std::thread::available_parallelism().map_or(4, |n| n.get())
-}
-
-/// CLI flags → the same parameter grammar as the HTTP API (see `params`).
-pub fn to_query(a: &QueryArgs) -> Result<Query> {
-    let mut pairs: Vec<(String, String)> = a.filters.clone();
-    if let Some(q) = &a.q {
-        pairs.push(("q".into(), q.clone()));
-    }
-    pairs.push(("field".into(), a.field.clone()));
-    pairs.push(("fuzzy".into(), if a.fuzzy { "true" } else { "auto" }.into()));
-    pairs.push(("limit".into(), a.limit.to_string()));
-    pairs.push(("offset".into(), a.offset.to_string()));
-    params::parse(&pairs, params::Caps { max_limit: usize::MAX, max_offset: usize::MAX }).map_err(|e| anyhow::anyhow!(e))
 }
 
 fn log(msg: &str) {
@@ -330,11 +282,4 @@ fn main() -> Result<()> {
         Cmd::Serve(a) => api::run(a),
         Cmd::Bench(a) => bench::run(a),
     }
-}
-
-/// Ascending copy (blocks are decompressed once when ids are sorted).
-pub fn sorted(ids: &[u32]) -> Vec<u32> {
-    let mut v = ids.to_vec();
-    v.sort_unstable();
-    v
 }

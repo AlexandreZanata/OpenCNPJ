@@ -79,6 +79,19 @@ pub struct ServeArgs {
     pub reload_secs: u64,
 }
 
+impl ServeArgs {
+    /// Parses `serve` flags as written on the command line (tests and embedding).
+    pub fn from_flags<S: AsRef<str>>(flags: &[S]) -> Result<Self> {
+        #[derive(clap::Parser)]
+        struct Wrapper {
+            #[command(flatten)]
+            args: ServeArgs,
+        }
+        let argv = std::iter::once("serve").chain(flags.iter().map(AsRef::as_ref));
+        Ok(<Wrapper as clap::Parser>::try_parse_from(argv)?.args)
+    }
+}
+
 pub struct AppState {
     snap: RwLock<Arc<Snapshot>>,
     sha256: RwLock<Option<String>>,
