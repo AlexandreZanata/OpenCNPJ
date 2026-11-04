@@ -4,7 +4,7 @@
 pub mod catalog;
 
 /// Aggregate artifact reading and writing.
-pub mod agg {}
+pub mod agg;
 
 /// Backend selection for validated requests.
 pub mod plan {}

@@ -66,3 +66,20 @@ The output directory contains the hierarchy, sector definitions, automatic
 alias candidates, ambiguity and reachability reports, and a source manifest.
 The generated artefacts remain under `/data`. The curated sector definitions,
 legacy exceptions and catalogue manifest live in `opencnpj-insights/catalog`.
+
+## Build and verify aggregates
+
+```sh
+cargo build --release -p opencnpj-lab
+D=/data/opencnpj-data/intelligence
+S=/data/opencnpj-data/snapshots/2026-10-balanced-1.2.ocnpj
+C=$D/catalog-municipalities/2026-10/municipalities.tsv
+B=$CARGO_TARGET_DIR/release/opencnpj-intel
+"$B" agg build --snapshot "$S" --catalog "$C" --out "$D/agg/2026-10.ocagg"
+"$B" diff-agg --snapshot "$S" --catalog "$C" --agg "$D/agg/2026-10.ocagg" --sample 10000 --seed 42
+```
+
+The builder expects a verified snapshot. Select `--tables T1,T2` for a
+historical stock artefact. The comparison checks complete CNAE, UF and
+municipality marginals and queries exact engine counts for sampled cells.
+See the [aggregate format](../../docs/intelligence/AGGREGATES-FORMAT.md).

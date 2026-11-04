@@ -2598,8 +2598,17 @@ name = "opencnpj-insights"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "memmap2",
+ "opencnpj-core",
  "opencnpj-query",
  "opencnpj-store",
+ "rayon",
+ "roaring",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "xxhash-rust",
+ "zstd 0.13.4",
 ]
 
 [[package]]

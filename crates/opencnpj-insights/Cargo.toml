@@ -9,5 +9,16 @@ repository.workspace = true
 
 [dependencies]
 anyhow.workspace = true
+memmap2.workspace = true
+opencnpj-core.workspace = true
 opencnpj-query.workspace = true
 opencnpj-store.workspace = true
+rayon.workspace = true
+roaring.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+xxhash-rust.workspace = true
+zstd.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
