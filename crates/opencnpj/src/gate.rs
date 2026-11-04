@@ -120,6 +120,83 @@ impl ResponseCache {
         self.inner.invalidate_all();
     }
 
+    /// Writes every entry to `path` (handover to the next process; keys include the
+    /// snapshot identity, so entries for another snapshot are never served).
+    pub fn export(&self, path: &std::path::Path) -> anyhow::Result<usize> {
+        use std::io::Write;
+        let tmp = path.with_extension("tmp");
+        let mut w = std::io::BufWriter::new(std::fs::File::create(&tmp)?);
+        w.write_all(b"OCRC1")?;
+        let mut n = 0;
+        let field = |w: &mut std::io::BufWriter<std::fs::File>, b: &[u8]| -> std::io::Result<()> {
+            w.write_all(&u32::try_from(b.len()).unwrap_or(u32::MAX).to_le_bytes())?;
+            w.write_all(b)
+        };
+        for (k, v) in self.inner.iter() {
+            w.write_all(&k.to_le_bytes())?;
+            w.write_all(&v.status.as_u16().to_le_bytes())?;
+            w.write_all(&[u8::try_from(v.headers.len()).unwrap_or(0)])?;
+            for (name, value) in v.headers.iter().take(255) {
+                field(&mut w, name.as_str().as_bytes())?;
+                field(&mut w, value.as_bytes())?;
+            }
+            field(&mut w, v.etag.as_bytes())?;
+            field(&mut w, &v.body)?;
+            n += 1;
+        }
+        w.flush()?;
+        drop(w);
+        std::fs::rename(&tmp, path)?;
+        Ok(n)
+    }
+
+    /// Reads (and deletes) a handover file; malformed input stops the import, never panics.
+    pub async fn import(&self, path: &std::path::Path) -> anyhow::Result<usize> {
+        let p = path.to_path_buf();
+        let entries = tokio::task::spawn_blocking(move || -> anyhow::Result<Vec<(u128, Arc<Cached>)>> {
+            let data = std::fs::read(&p)?;
+            let _ = std::fs::remove_file(&p);
+            let mut out = Vec::new();
+            let mut r = data.strip_prefix(b"OCRC1").ok_or_else(|| anyhow::anyhow!("not a response cache handover"))?;
+            fn take<'a>(r: &mut &'a [u8], n: usize) -> Option<&'a [u8]> {
+                let (a, b) = (r.get(..n)?, r.get(n..)?);
+                *r = b;
+                Some(a)
+            }
+            fn field<'a>(r: &mut &'a [u8]) -> Option<&'a [u8]> {
+                let n = u32::from_le_bytes(take(r, 4)?.try_into().ok()?) as usize;
+                take(r, n)
+            }
+            let one = |r: &mut &[u8]| -> Option<(u128, Arc<Cached>)> {
+                let key = u128::from_le_bytes(take(r, 16)?.try_into().ok()?);
+                let status = StatusCode::from_u16(u16::from_le_bytes(take(r, 2)?.try_into().ok()?)).ok()?;
+                let nh = take(r, 1)?[0];
+                let mut headers = Vec::new();
+                for _ in 0..nh {
+                    let name = HeaderName::from_bytes(field(r)?).ok()?;
+                    let value = HeaderValue::from_bytes(field(r)?).ok()?;
+                    headers.push((name, value));
+                }
+                let etag = HeaderValue::from_bytes(field(r)?).ok()?;
+                let body = Bytes::copy_from_slice(field(r)?);
+                Some((key, Arc::new(Cached { status, headers, body, etag })))
+            };
+            while !r.is_empty() {
+                match one(&mut r) {
+                    Some(e) => out.push(e),
+                    None => break,
+                }
+            }
+            Ok(out)
+        })
+        .await??;
+        let n = entries.len();
+        for (k, v) in entries {
+            self.inner.insert(k, v).await;
+        }
+        Ok(n)
+    }
+
     pub fn stats(&self) -> serde_json::Value {
         json!({
             "entries": self.inner.entry_count(), "bytes": self.inner.weighted_size(), "budget": self.budget,
@@ -145,6 +222,9 @@ pub struct Gate {
     /// Bounds concurrent Argon2 verifications (19 MiB each).
     pub argon: tokio::sync::Semaphore,
     throttles: moka::sync::Cache<(IpAddr, &'static str), Arc<AtomicU32>>,
+    handover: Option<std::path::PathBuf>,
+    /// Set once this process has handed its state over: it must not take it back.
+    leaving: std::sync::atomic::AtomicBool,
     pub dropped_logs: AtomicU64,
     pub rejected_rate: AtomicU64,
     pub rejected_quota: AtomicU64,
@@ -165,8 +245,10 @@ impl Gate {
             pending: Mutex::new(HashMap::new()),
             log_tx: Mutex::new(None),
             failures: moka::sync::Cache::builder().max_capacity(1_000_000).time_to_live(Duration::from_secs(60)).build(),
-            argon: tokio::sync::Semaphore::new((crate::default_threads() / 2).max(1)),
+            argon: tokio::sync::Semaphore::new(crate::default_threads().max(2)),
             throttles: moka::sync::Cache::builder().max_capacity(1_000_000).time_to_live(Duration::from_secs(3600)).build(),
+            handover: None,
+            leaving: std::sync::atomic::AtomicBool::new(false),
             dropped_logs: AtomicU64::new(0),
             rejected_rate: AtomicU64::new(0),
             rejected_quota: AtomicU64::new(0),
@@ -372,6 +454,59 @@ impl Gate {
         }
     }
 
+    pub fn set_handover_path(&mut self, p: std::path::PathBuf) {
+        self.handover = Some(p);
+    }
+
+    fn cache_handover(&self) -> Option<std::path::PathBuf> {
+        self.handover.as_ref().map(|p| p.with_file_name(".response-cache"))
+    }
+
+    /// Imports verified keys left by a process that just stopped (no Argon2 storm after a
+    /// blue/green restart).
+    pub fn take_handover(&self) {
+        if let (Some(acc), Some(p)) = (&self.accounts, &self.handover)
+            && !self.leaving.load(Relaxed)
+            && p.exists()
+        {
+            match acc.import_verified(p) {
+                Ok(n) if n > 0 => eprintln!("imported {n} verified keys from the previous process"),
+                Err(e) => eprintln!("key handover import failed: {e:#}"),
+                _ => {}
+            }
+        }
+    }
+
+    /// Imports the response cache left by a process that just stopped.
+    pub async fn take_cache_handover(&self) {
+        if let (Some(c), Some(p)) = (&self.cache, self.cache_handover())
+            && !self.leaving.load(Relaxed)
+            && p.exists()
+        {
+            match c.import(&p).await {
+                Ok(n) => eprintln!("imported {n} cached responses from the previous process"),
+                Err(e) => eprintln!("response cache handover import failed: {e:#}"),
+            }
+        }
+    }
+
+    /// Called when shutdown starts: verified keys and cached responses go to the successor.
+    pub fn give_handover(&self) {
+        self.leaving.store(true, Relaxed);
+        if let (Some(acc), Some(p)) = (&self.accounts, &self.handover) {
+            match acc.export_verified(p) {
+                Ok(n) => eprintln!("handed {n} verified keys over to the next process"),
+                Err(e) => eprintln!("key handover export failed: {e:#}"),
+            }
+        }
+        if let (Some(c), Some(p)) = (&self.cache, self.cache_handover()) {
+            match c.export(&p) {
+                Ok(n) => eprintln!("handed {n} cached responses over to the next process"),
+                Err(e) => eprintln!("response cache handover export failed: {e:#}"),
+            }
+        }
+    }
+
     /// Writes pending usage increments to SQLite.
     pub fn flush(&self) {
         let Some(acc) = &self.accounts else { return };
@@ -391,6 +526,15 @@ impl Gate {
 
     /// Starts the search-log writer thread and the periodic usage flush / purge task.
     pub fn start_background(self: &Arc<Self>) {
+        if self.accounts.is_none() && self.handover.is_some() {
+            let g = self.clone();
+            tokio::spawn(async move {
+                loop {
+                    g.take_cache_handover().await;
+                    tokio::time::sleep(Duration::from_millis(250)).await;
+                }
+            });
+        }
         let Some(acc) = self.accounts.clone() else { return };
         let (tx, rx) = std::sync::mpsc::sync_channel::<SearchLogRow>(50_000);
         *self.log_tx.lock().unwrap_or_else(std::sync::PoisonError::into_inner) = Some(tx);
@@ -419,6 +563,19 @@ impl Gate {
                 }
             })
             .expect("spawn search-log thread");
+        if let Some(p) = self.handover.clone() {
+            let g = self.clone();
+            tokio::spawn(async move {
+                loop {
+                    if p.exists() {
+                        let g2 = g.clone();
+                        let _ = tokio::task::spawn_blocking(move || g2.take_handover()).await;
+                    }
+                    g.take_cache_handover().await;
+                    tokio::time::sleep(Duration::from_millis(250)).await;
+                }
+            });
+        }
         let g = self.clone();
         tokio::spawn(async move {
             let mut tick = 0u64;
@@ -757,6 +914,31 @@ pub async fn staff(State(st): State<Shared>, mut req: Request, next: Next) -> Re
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[tokio::test]
+    async fn response_cache_handover_roundtrip() {
+        let d = tempfile::tempdir().unwrap();
+        let path = d.path().join("rc");
+        let a = ResponseCache::new(16, 60);
+        for k in 0..50u128 {
+            let v = Arc::new(Cached {
+                status: StatusCode::OK,
+                headers: vec![(header::CONTENT_TYPE, HeaderValue::from_static("application/json"))],
+                body: Bytes::from(format!("{{\"k\":{k}}}")),
+                etag: HeaderValue::from_static("\"x\""),
+            });
+            a.inner.insert(k, v).await;
+        }
+        a.inner.run_pending_tasks().await;
+        assert_eq!(a.export(&path).unwrap(), 50);
+        let b = ResponseCache::new(16, 60);
+        assert_eq!(b.import(&path).await.unwrap(), 50);
+        assert!(!path.exists());
+        let v = b.inner.get(&7).await.unwrap();
+        assert_eq!((v.status, &v.body[..]), (StatusCode::OK, &b"{\"k\":7}"[..]));
+        std::fs::write(&path, b"OCRC1\x01\x02").unwrap();
+        assert_eq!(b.import(&path).await.unwrap(), 0, "truncated input is ignored");
+    }
 
     #[test]
     fn credentials_and_kinds() {

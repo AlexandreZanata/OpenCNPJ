@@ -86,6 +86,11 @@ pub enum AccountsCmd {
     },
     /// Print the plans.
     Plans,
+    /// Consistent online copy of the database (safe while the server runs).
+    Backup {
+        #[arg(long)]
+        out: PathBuf,
+    },
     /// Create N load-test accounts (`<prefix>00001`…) on a plan and write their keys, one
     /// per line, to a file.
     Seed {
@@ -168,6 +173,11 @@ pub fn run(a: AccountsArgs) -> Result<()> {
             let u = find(&username)?;
             acc.set_status(u.id, Status::Active, None, None, &actor)?;
             eprintln!("{} reactivated", u.username);
+            Ok(())
+        }
+        AccountsCmd::Backup { out } => {
+            acc.backup(&out)?;
+            eprintln!("backup written to {}", out.display());
             Ok(())
         }
         AccountsCmd::Plans => {

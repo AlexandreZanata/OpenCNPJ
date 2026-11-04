@@ -601,7 +601,7 @@ impl Accounts {
             db: Mutex::new(conn),
             keys: moka::sync::Cache::builder()
                 .max_capacity(1_000_000)
-                .time_to_live(Duration::from_secs(600))
+                .time_to_live(Duration::from_secs(3600))
                 .support_invalidation_closures()
                 .build(),
             sessions: moka::sync::Cache::builder()
@@ -907,6 +907,50 @@ impl Accounts {
 
     pub fn settings_cached_search_log(&self) -> bool {
         self.settings.read().map(|s| s.search_log).unwrap_or(false)
+    }
+
+    /// Hands verified keys to the process that takes over (blue/green restart): writes
+    /// `sha256(key) user key_id` lines to `path` (mode 0600). Keys are 190-bit random
+    /// secrets, so their SHA-256 reveals nothing guessable; the importer re-checks
+    /// revocation. Returns the number of entries written.
+    pub fn export_verified(&self, path: &Path) -> Result<usize> {
+        let lines: Vec<String> = self.keys.iter().map(|(h, (u, k))| format!("{} {u} {k}", hex::encode(*h))).collect();
+        let tmp = path.with_extension("tmp");
+        crate::accounts_cli::write_secret(&tmp, &(lines.join("\n") + "\n"))?;
+        std::fs::rename(&tmp, path)?;
+        Ok(lines.len())
+    }
+
+    /// Imports (and deletes) a handover file younger than a day; skips revoked keys.
+    pub fn import_verified(&self, path: &Path) -> Result<usize> {
+        let fresh = std::fs::metadata(path)
+            .and_then(|m| m.modified())
+            .ok()
+            .and_then(|t| t.elapsed().ok())
+            .is_some_and(|age| age < Duration::from_secs(86_400));
+        let text = std::fs::read_to_string(path).unwrap_or_default();
+        let _ = std::fs::remove_file(path);
+        if !fresh {
+            return Ok(0);
+        }
+        let active: std::collections::HashSet<i64> = {
+            let conn = self.conn();
+            let mut st = conn.prepare("SELECT id FROM keys WHERE revoked_at IS NULL")?;
+            st.query_map([], |r| r.get(0))?.collect::<rusqlite::Result<_>>()?
+        };
+        let mut n = 0;
+        for l in text.lines() {
+            let mut it = l.split(' ');
+            let (Some(h), Some(u), Some(k)) = (it.next(), it.next(), it.next()) else { continue };
+            let (Ok(h), Ok(u), Ok(k)) = (hex::decode(h), u.parse::<i64>(), k.parse::<i64>()) else { continue };
+            if let Ok(h) = <[u8; 32]>::try_from(h)
+                && active.contains(&k)
+            {
+                self.keys.insert(h, (u, k));
+                n += 1;
+            }
+        }
+        Ok(n)
     }
 
     /// Full verification (Argon2id). Call from a blocking thread.
@@ -1402,6 +1446,13 @@ impl Accounts {
         }))
     }
 
+    /// `VACUUM INTO`: a consistent copy taken while readers and writers keep going.
+    pub fn backup(&self, out: &Path) -> Result<()> {
+        anyhow::ensure!(!out.exists(), "{} already exists", out.display());
+        self.conn().execute("VACUUM INTO ?1", [out.to_string_lossy()])?;
+        Ok(())
+    }
+
     pub fn audit(&self, actor: &Actor, action: &str, target: Option<i64>, details: Value) {
         let target_name =
             target.and_then(|id| self.conn().query_row("SELECT username FROM users WHERE id = ?1", [id], |r| r.get::<_, String>(0)).ok());
@@ -1481,6 +1532,23 @@ mod tests {
         assert!(h.starts_with("$argon2id$v=19$m=19456,t=2,p=1$"));
         assert!(verify_secret("secret-value", &h));
         assert!(!verify_secret("secret-valuf", &h));
+    }
+
+    #[test]
+    fn verified_key_handover() {
+        let (d, a) = store();
+        let sys = Actor::system("test");
+        let (u1, k1) = a.create_user("one", "one@example.com", Role::User, None, Status::Active, &sys).unwrap();
+        let (_, k2) = a.create_user("two", "two@example.com", Role::User, None, Status::Active, &sys).unwrap();
+        a.verify_key(&k1).unwrap().unwrap();
+        a.verify_key(&k2).unwrap().unwrap();
+        let path = d.path().join("handover");
+        assert_eq!(a.export_verified(&path).unwrap(), 2);
+        let b = Accounts::open(&d.path().join("a.sqlite"), 24).unwrap();
+        b.rotate_key(u1.id, &sys).unwrap();
+        assert_eq!(b.import_verified(&path).unwrap(), 1, "revoked keys are skipped");
+        assert!(!path.exists(), "consumed");
+        assert!(b.cached_key(&k2).is_some() && b.cached_key(&k1).is_none());
     }
 
     #[test]

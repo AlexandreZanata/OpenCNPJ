@@ -36,9 +36,28 @@ pub struct LoadArgs {
     pub out: Option<PathBuf>,
 }
 
+/// Request type of a URL, for the per-type breakdown.
+fn kind(url: &str) -> &'static str {
+    let path = url.split('?').next().unwrap_or(url);
+    if path.contains("/api/v1/cnpj/") || path.contains("/api/v1/empresas/") && !path.ends_with("/search") {
+        "lookup_cnpj"
+    } else if path.contains("/api/v1/cpf/") {
+        "lookup_cpf"
+    } else if path.contains("/stats") {
+        "stats"
+    } else if url.contains("q=") || url.contains("nome=") || url.contains("razao_social=") {
+        "search_text"
+    } else {
+        "search_filters"
+    }
+}
+
 #[derive(Default)]
 struct Tally {
     lat_us: Vec<u32>,
+    by_kind: BTreeMap<&'static str, Vec<u32>>,
+    /// Second of the run → (latencies, transport errors).
+    timeline: BTreeMap<u64, (Vec<u32>, u64)>,
     status: BTreeMap<u16, u64>,
     cache: BTreeMap<String, u64>,
     errors: u64,
@@ -97,12 +116,18 @@ pub fn run(a: LoadArgs) -> Result<()> {
                             let status = r.status().as_u16();
                             let cache = r.headers().get("x-cache").and_then(|v| v.to_str().ok()).unwrap_or("none").to_string();
                             let body = r.bytes().await.map(|b| b.len()).unwrap_or(0);
-                            t.lat_us.push(u32::try_from(t0.elapsed().as_micros()).unwrap_or(u32::MAX));
+                            let us = u32::try_from(t0.elapsed().as_micros()).unwrap_or(u32::MAX);
+                            t.lat_us.push(us);
+                            t.by_kind.entry(kind(&urls[i])).or_default().push(us);
+                            t.timeline.entry(start.elapsed().as_secs()).or_default().0.push(us);
                             *t.status.entry(status).or_default() += 1;
                             *t.cache.entry(cache).or_default() += 1;
                             t.bytes += body as u64;
                         }
-                        Err(_) => t.errors += 1,
+                        Err(_) => {
+                            t.errors += 1;
+                            t.timeline.entry(start.elapsed().as_secs()).or_default().1 += 1;
+                        }
                     }
                     i = (i + 1) % urls.len();
                     if !think.is_zero() {
@@ -116,6 +141,14 @@ pub fn run(a: LoadArgs) -> Result<()> {
         for task in tasks {
             let t = task.await?;
             all.lat_us.extend(t.lat_us);
+            for (k, v) in t.by_kind {
+                all.by_kind.entry(k).or_default().extend(v);
+            }
+            for (s, (v, e)) in t.timeline {
+                let x = all.timeline.entry(s).or_default();
+                x.0.extend(v);
+                x.1 += e;
+            }
             for (k, v) in t.status {
                 *all.status.entry(k).or_default() += v;
             }
@@ -128,6 +161,16 @@ pub fn run(a: LoadArgs) -> Result<()> {
         let wall = start.elapsed().as_secs_f64();
         all.lat_us.sort_unstable();
         let n = all.lat_us.len();
+        let by_kind: serde_json::Map<String, serde_json::Value> = all
+            .by_kind
+            .iter_mut()
+            .map(|(k, v)| {
+                v.sort_unstable();
+                let row = json!({ "requests": v.len(), "requests_per_second": v.len() as f64 / wall,
+                                  "p50_ms": pct(v, 0.50), "p95_ms": pct(v, 0.95), "p99_ms": pct(v, 0.99) });
+                ((*k).to_string(), row)
+            })
+            .collect();
         anyhow::Ok(json!({
             "base_url": a.base_url, "virtual_users": a.users, "distinct_keys": keys.len().min(a.users), "urls": urls.len(),
             "seconds": wall, "think_ms": a.think_ms, "requests": n, "requests_per_second": n as f64 / wall,
@@ -136,6 +179,11 @@ pub fn run(a: LoadArgs) -> Result<()> {
                             "p99": pct(&all.lat_us, 0.99), "max": all.lat_us.last().map_or(0.0, |x| f64::from(*x) / 1000.0) },
             "status": all.status.iter().map(|(k, v)| (k.to_string(), json!(v))).collect::<serde_json::Map<_, _>>(),
             "x_cache": all.cache,
+            "by_kind": by_kind,
+            "timeline": all.timeline.iter_mut().map(|(s, (v, e))| {
+                v.sort_unstable();
+                json!({ "second": s, "requests": v.len(), "errors": e, "p50_ms": pct(v, 0.5), "p99_ms": pct(v, 0.99), "max_ms": v.last().map_or(0.0, |x| f64::from(*x) / 1000.0) })
+            }).collect::<Vec<_>>(),
         }))
     })?;
     let text = serde_json::to_string_pretty(&report)?;

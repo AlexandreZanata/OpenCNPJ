@@ -119,6 +119,10 @@ pub struct ServeArgs {
     /// Release check interval with `--auth off` (with accounts it is a setting; 0 = never).
     #[arg(long, default_value_t = 0)]
     pub auto_update_hours: i64,
+    /// On SIGTERM, keep answering for this long with `Connection: close` (clients move to
+    /// the successor cleanly), then drain.
+    #[arg(long, default_value_t = 5)]
+    pub drain_secs: u64,
 }
 
 impl ServeArgs {
@@ -138,7 +142,10 @@ pub struct AppState {
     snap: RwLock<Arc<Snapshot>>,
     sha256: RwLock<Option<String>>,
     pub args: ServeArgs,
+    /// Searches, stats, CPF lookups and exports.
     pub sem: Arc<Semaphore>,
+    /// CNPJ lookups (sub-millisecond): their own lane, so they never queue behind searches.
+    pub fast_sem: Arc<Semaphore>,
     pub metrics: Metrics,
     pub privacy: Privacy,
     /// Where `.ocnpj` files live (data dir `snapshots/`, or the served file's folder).
@@ -149,8 +156,11 @@ pub struct AppState {
     pub gate: Arc<Gate>,
     pub mailer: Option<Arc<crate::mail::Mailer>>,
     pub updater: crate::autoupdate::Updater,
-    /// Bumped on every snapshot switch (part of the response cache key).
+    /// Identity of the served snapshot (path, size, mtime): part of the response cache key,
+    /// stable across processes so cached responses can be handed over.
     generation: AtomicU64,
+    /// Set on SIGTERM: responses carry `Connection: close`.
+    pub draining: std::sync::atomic::AtomicBool,
 }
 
 impl AppState {
@@ -168,7 +178,7 @@ impl AppState {
         s.set_postings_cache_bytes(self.args.postings_cache_mib << 20);
         *self.snap.write().expect("lock") = Arc::new(s);
         *self.sha256.write().expect("lock") = read_sidecar(path);
-        self.generation.fetch_add(1, Ordering::Relaxed);
+        self.generation.store(snapshot_identity(path), Ordering::Relaxed);
         if let Some(c) = &self.gate.cache {
             c.clear();
         }
@@ -190,6 +200,21 @@ impl AppState {
 }
 
 pub type Shared = Arc<AppState>;
+
+/// Hash of a snapshot file's path, size and modification time.
+pub fn snapshot_identity(path: &Path) -> u64 {
+    let meta = std::fs::metadata(path).ok();
+    let mtime = meta
+        .as_ref()
+        .and_then(|m| m.modified().ok())
+        .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
+        .map_or(0, |d| d.as_nanos());
+    let mut h = xxhash_rust::xxh3::Xxh3::new();
+    h.update(std::fs::canonicalize(path).unwrap_or_else(|_| path.to_path_buf()).to_string_lossy().as_bytes());
+    h.update(&meta.map_or(0, |m| m.len()).to_le_bytes());
+    h.update(&mtime.to_le_bytes());
+    h.digest()
+}
 
 #[derive(Debug)]
 pub struct ApiError {
@@ -238,11 +263,27 @@ pub type ApiResult = Result<Response, ApiError>;
 
 /// Runs `f` on the blocking pool with a permit and the configured deadline.
 pub async fn blocking<T: Send + 'static>(st: &Shared, f: impl FnOnce(Arc<Snapshot>) -> Result<T> + Send + 'static) -> Result<T, ApiError> {
+    run_in_lane(st, &st.sem, f).await
+}
+
+/// Like `blocking`, on the lookup lane.
+pub async fn blocking_fast<T: Send + 'static>(
+    st: &Shared,
+    f: impl FnOnce(Arc<Snapshot>) -> Result<T> + Send + 'static,
+) -> Result<T, ApiError> {
+    run_in_lane(st, &st.fast_sem, f).await
+}
+
+async fn run_in_lane<T: Send + 'static>(
+    st: &Shared,
+    sem: &Arc<Semaphore>,
+    f: impl FnOnce(Arc<Snapshot>) -> Result<T> + Send + 'static,
+) -> Result<T, ApiError> {
     let timeout = match st.args.timeout_ms {
         0 => Duration::from_secs(86_400 * 365),
         ms => Duration::from_millis(ms),
     };
-    let permit = match tokio::time::timeout(timeout, st.sem.clone().acquire_owned()).await {
+    let permit = match tokio::time::timeout(timeout, sem.clone().acquire_owned()).await {
         Ok(Ok(p)) => p,
         _ => {
             st.metrics.overload.fetch_add(1, Ordering::Relaxed);
@@ -270,8 +311,11 @@ pub async fn blocking<T: Send + 'static>(st: &Shared, f: impl FnOnce(Arc<Snapsho
 pub async fn track(State(st): State<Shared>, req: Request, next: Next) -> Response {
     let route = req.extensions().get::<MatchedPath>().map_or_else(|| "unmatched".to_string(), |p| p.as_str().to_string());
     let t0 = Instant::now();
-    let resp = next.run(req).await;
+    let mut resp = next.run(req).await;
     st.metrics.record(&route, t0.elapsed().as_micros() as u64, resp.status().as_u16());
+    if st.draining.load(Ordering::Relaxed) {
+        resp.headers_mut().insert(header::CONNECTION, HeaderValue::from_static("close"));
+    }
     resp
 }
 
@@ -310,7 +354,7 @@ async fn get_cnpj(State(st): State<Shared>, UrlPath(id): UrlPath<String>, UrlQue
         return Err(ApiError::bad(format!("estab_limit must be between 1 and {}", st.args.max_limit)));
     }
     let privacy = st.privacy;
-    let v = blocking(&st, move |s| output::lookup_page(&s, &id, privacy, offset, limit)).await?;
+    let v = blocking_fast(&st, move |s| output::lookup_page(&s, &id, privacy, offset, limit)).await?;
     match v {
         Some(v) => Ok(json_response(v)),
         None => Err(ApiError::new(StatusCode::NOT_FOUND, "cnpj_not_found", "cnpj not found")),
@@ -741,11 +785,15 @@ pub fn state(args: ServeArgs) -> Result<Shared> {
         (Some(Arc::new(acc)), Some(Arc::new(mailer)))
     };
     let cache = (args.response_cache_mib > 0).then(|| ResponseCache::new(args.response_cache_mib, args.response_cache_ttl_secs));
-    let gate = Arc::new(Gate::new(args.auth, accounts, cache, args.trust_proxy));
+    let mut gate = Gate::new(args.auth, accounts, cache, args.trust_proxy);
+    gate.set_handover_path(base.join(".verified-keys"));
+    gate.take_handover();
+    let gate = Arc::new(gate);
     Ok(Arc::new(AppState {
         sha256: RwLock::new(read_sidecar(&path)),
         snap: RwLock::new(Arc::new(snap)),
         sem: Arc::new(Semaphore::new(args.max_concurrency.max(1))),
+        fast_sem: Arc::new(Semaphore::new(args.max_concurrency.max(1))),
         metrics: Metrics::default(),
         privacy: Privacy { hide_socios: args.hide_socios, hide_contacts: args.hide_contacts },
         snapshots_dir,
@@ -754,7 +802,8 @@ pub fn state(args: ServeArgs) -> Result<Shared> {
         gate,
         mailer,
         updater: crate::autoupdate::Updater::default(),
-        generation: AtomicU64::new(0),
+        generation: AtomicU64::new(snapshot_identity(&path)),
+        draining: std::sync::atomic::AtomicBool::new(false),
         args,
     }))
 }
@@ -867,7 +916,18 @@ pub fn run(args: ServeArgs) -> Result<()> {
         let listener = listen(args.bind, args.reuse_port)?;
         eprintln!("listening on http://{} (auth {})", args.bind, args.auth.name());
         let app = compressed(router(st.clone()), !args.no_compression);
-        axum::serve(listener, app.into_make_service_with_connect_info::<SocketAddr>()).with_graceful_shutdown(shutdown_signal()).await?;
+        let st_down = st.clone();
+        let shutdown = async move {
+            shutdown_signal().await;
+            // Hand verified keys and cached responses to the successor first, then tell
+            // clients to reconnect (they land on the successor through SO_REUSEPORT), then
+            // drain whatever is left.
+            let st3 = st_down.clone();
+            let _ = tokio::task::spawn_blocking(move || st3.gate.give_handover()).await;
+            st_down.draining.store(true, Ordering::Relaxed);
+            tokio::time::sleep(Duration::from_secs(st_down.args.drain_secs)).await;
+        };
+        axum::serve(listener, app.into_make_service_with_connect_info::<SocketAddr>()).with_graceful_shutdown(shutdown).await?;
         let st2 = st.clone();
         tokio::task::spawn_blocking(move || st2.gate.flush()).await?;
         eprintln!("usage flushed; bye");
