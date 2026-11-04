@@ -99,7 +99,12 @@ pub fn parse(pairs: &[(String, String)], caps: Caps) -> Result<Query, String> {
             "ordenar" | "sort" => {
                 let (f, dir) = v.split_once(':').unwrap_or((v, "asc"));
                 let f = NumField::from_name(f).ok_or_else(|| format!("cannot sort by {f}"))?;
-                q.sort = Some((f, matches!(dir, "desc" | "decrescente")));
+                let desc = match dir {
+                    "asc" | "crescente" => false,
+                    "desc" | "decrescente" => true,
+                    d => return Err(format!("sort direction must be asc or desc, not {d}")),
+                };
+                q.sort = Some((f, desc));
             }
             "mei_ativo" | "simples_ativo" => {
                 if truthy(v) {

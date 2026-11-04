@@ -1,7 +1,8 @@
 //! Admin suite: dashboard UI, live metrics, snapshot operations, background jobs, query
-//! explain and self-test benchmarks. Served on its own listener (`--admin-bind`) together
-//! with the public API (so the UI can call it same-origin). No authentication: bind it to
-//! a private address.
+//! explain and self-test benchmarks, plus account management (`manage.rs`) and automatic
+//! updates (`autoupdate.rs`). Served on its own listener (`--admin-bind`) together with the
+//! public API (so the UI can call it same-origin). With accounts enabled every
+//! `/admin/api/*` route needs a staff session with the route's permission (`gate::staff`).
 
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, Stdio};
@@ -105,7 +106,26 @@ impl Jobs {
         }
     }
 
+    pub fn running(&self, kind: &str) -> bool {
+        self.refresh();
+        self.list.lock().expect("lock").iter().any(|j| j.child.is_some() && j.kind == kind)
+    }
+
+    pub fn get(&self, id: u64) -> Option<Value> {
+        self.json().as_array()?.iter().find(|j| j["id"] == id).cloned()
+    }
+
+    /// Starts a job at idle CPU and I/O priority, so serving keeps its latency.
+    pub fn start_low_priority(&self, kind: &str, args: Vec<String>) -> Result<u64> {
+        self.spawn(kind, args, true)
+    }
+
     fn start(&self, kind: &str, args: Vec<String>) -> Result<u64> {
+        // Rebuilds compete with serving for CPU and disk: run them at idle priority.
+        self.spawn(kind, args, matches!(kind, "update" | "build" | "download" | "verify"))
+    }
+
+    fn spawn(&self, kind: &str, args: Vec<String>, low_priority: bool) -> Result<u64> {
         std::fs::create_dir_all(&self.dir)?;
         let mut list = self.list.lock().expect("lock");
         if list.iter().any(|j| j.child.is_some() && j.kind == kind) {
@@ -115,8 +135,12 @@ impl Jobs {
         let log = self.dir.join(format!("{}-{id:04}-{kind}.log", unix(SystemTime::now())));
         let out = std::fs::File::create(&log)?;
         let exe = std::env::current_exe()?;
-        let child =
-            Command::new(exe).args(&args).stdin(Stdio::null()).stdout(out.try_clone()?).stderr(out).spawn().context("spawning job")?;
+        let mut cmd = Command::new(exe);
+        cmd.args(&args).stdin(Stdio::null()).stdout(out.try_clone()?).stderr(out);
+        if low_priority {
+            lower_priority(&mut cmd);
+        }
+        let child = cmd.spawn().context("spawning job")?;
         list.push(Job {
             id,
             kind: kind.into(),
@@ -166,6 +190,33 @@ impl Jobs {
         }
         false
     }
+}
+
+#[cfg(unix)]
+fn lower_priority(cmd: &mut Command) {
+    use std::os::unix::process::CommandExt;
+    // SAFETY: only async-signal-safe calls (nice, ioprio_set) between fork and exec.
+    unsafe {
+        cmd.pre_exec(|| {
+            libc::nice(19);
+            #[cfg(target_os = "linux")]
+            {
+                // IOPRIO_WHO_PROCESS = 1, self = 0, IOPRIO_CLASS_IDLE = 3 << 13.
+                libc::syscall(libc::SYS_ioprio_set, 1, 0, 3 << 13);
+            }
+            Ok(())
+        });
+    }
+}
+
+#[cfg(not(any(unix, windows)))]
+fn lower_priority(_: &mut Command) {}
+
+#[cfg(windows)]
+fn lower_priority(cmd: &mut Command) {
+    use std::os::windows::process::CommandExt;
+    // IDLE_PRIORITY_CLASS
+    cmd.creation_flags(0x0000_0040);
 }
 
 fn job_args(st: &Shared, r: &JobRequest) -> Result<Vec<String>> {
@@ -292,8 +343,12 @@ async fn overview(State(st): State<Shared>) -> Json<Value> {
             "max_offset": if st.args.max_offset == usize::MAX { json!("unlimited") } else { json!(st.args.max_offset) },
             "export": !st.args.disable_export, "export_max_rows": st.args.export_max_rows,
             "hide_socios": st.args.hide_socios, "hide_contacts": st.args.hide_contacts,
-            "postings_cache_mib": st.args.postings_cache_mib, "authentication": "none",
+            "postings_cache_mib": st.args.postings_cache_mib, "authentication": st.gate.mode.name(),
+            "response_cache_mib": st.args.response_cache_mib, "compression": !st.args.no_compression,
+            "reuse_port": st.args.reuse_port, "trust_proxy": st.args.trust_proxy,
         },
+        "response_cache": st.gate.cache.as_ref().map(|c| c.stats()),
+        "gate": st.gate.stats(),
     }))
 }
 
@@ -513,9 +568,7 @@ async fn ui() -> Html<&'static str> {
 }
 
 pub fn router(st: Shared) -> Router {
-    let admin = Router::new()
-        .route("/admin", get(ui))
-        .route("/admin/", get(ui))
+    let ops = Router::new()
         .route("/admin/api/overview", get(overview))
         .route("/admin/api/metrics", get(metrics))
         .route("/admin/api/snapshots", get(snapshots))
@@ -530,6 +583,16 @@ pub fn router(st: Shared) -> Router {
         .route("/admin/api/jobs/{id}", axum::routing::delete(jobs_kill))
         .route("/admin/api/explain", get(explain))
         .route("/admin/api/selftest", post(selftest))
+        .route("/admin/api/updates", get(crate::autoupdate::status))
+        .route("/admin/api/updates/check", post(crate::autoupdate::check_now))
+        .merge(crate::manage::router());
+    // Without accounts the public router already serves /metrics.
+    let ops = if st.gate.enabled() { ops.route("/metrics", get(api::prometheus)) } else { ops };
+    let ops = ops.route_layer(middleware::from_fn_with_state(st.clone(), crate::gate::staff));
+    let admin = Router::new()
+        .route("/admin", get(ui))
+        .route("/admin/", get(ui))
+        .merge(ops)
         .layer(middleware::from_fn_with_state(st.clone(), api::track))
         .with_state(st.clone());
     admin.merge(api::router(st))

@@ -77,6 +77,10 @@ enum Cmd {
     Serve(api::ServeArgs),
     /// Reproducible query benchmark against a snapshot.
     Bench(bench::BenchArgs),
+    /// Manage accounts (users, roles, plans, keys) in the accounts database.
+    Accounts(opencnpj::accounts_cli::AccountsArgs),
+    /// Many concurrent authenticated virtual users against a running server.
+    Loadtest(opencnpj::loadtest::LoadArgs),
 }
 
 #[derive(Args)]
@@ -269,7 +273,7 @@ fn main() -> Result<()> {
             let mut query = to_query(&q)?;
             query.limit = usize::MAX;
             let mut out = std::io::BufWriter::new(std::io::stdout().lock());
-            let n = output::export(&snap, &query, &format, max, &mut out)?;
+            let n = output::export(&snap, &query, &format, max, output::Privacy::default(), &mut out)?;
             log(&format!("exported {n} rows"));
             Ok(())
         }
@@ -281,5 +285,7 @@ fn main() -> Result<()> {
         }
         Cmd::Serve(a) => api::run(a),
         Cmd::Bench(a) => bench::run(a),
+        Cmd::Accounts(a) => opencnpj::accounts_cli::run(a),
+        Cmd::Loadtest(a) => opencnpj::loadtest::run(a),
     }
 }

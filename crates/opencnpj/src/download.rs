@@ -39,6 +39,20 @@ pub struct DownloadArgs {
     pub dry_run: bool,
 }
 
+impl DownloadArgs {
+    /// Defaults as on the command line (`RFB_BASE_URL` / `RFB_SHARE_TOKEN` honoured).
+    pub fn defaults(dest: PathBuf) -> DownloadArgs {
+        #[derive(clap::Parser)]
+        struct Wrapper {
+            #[command(flatten)]
+            args: DownloadArgs,
+        }
+        let mut a = <Wrapper as clap::Parser>::parse_from(["download"]).args;
+        a.dest = dest;
+        a
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RemoteFile {
     pub name: String,

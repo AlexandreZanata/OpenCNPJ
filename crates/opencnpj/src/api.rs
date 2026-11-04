@@ -2,13 +2,13 @@
 //! Snapshots are swapped atomically: in-flight requests keep the `Arc<Snapshot>` they
 //! started with. The admin suite (`admin.rs`) is served on its own listener.
 //!
-//! This build has no authentication and no request limits by default (page size up to
-//! `--max-limit`, no offset cap, export on, no rate limiting). Put a gateway in front
-//! before exposing it publicly.
+//! Data routes pass through `gate::gate` (accounts, plans, rate limits, quotas, usage) and
+//! idempotent ones through `gate::cache` (shared response cache with request coalescing).
+//! `--auth off` restores the open, unmetered behaviour.
 
 use std::net::SocketAddr;
 use std::path::{Path, PathBuf};
-use std::sync::atomic::Ordering;
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Arc, Mutex, RwLock};
 use std::time::{Duration, Instant, SystemTime};
 
@@ -28,6 +28,7 @@ use serde_json::{Value, json};
 use tokio::io::{AsyncReadExt, AsyncSeekExt};
 use tokio::sync::Semaphore;
 
+use crate::gate::{AuthMode, Caller, Gate, ResponseCache};
 use crate::metrics::Metrics;
 use crate::output::{self, LookupError, Privacy};
 use crate::params::{self, Caps};
@@ -77,6 +78,47 @@ pub struct ServeArgs {
     /// Seconds between checks of `<data-dir>/current`.
     #[arg(long, default_value_t = 30)]
     pub reload_secs: u64,
+    /// Accounts: `required` (a key or session on every data route), `optional` (anonymous
+    /// callers get the `anonymous` plan per IP) or `off` (no accounts, no limits).
+    #[arg(long, value_enum, default_value_t = AuthMode::Required)]
+    pub auth: AuthMode,
+    /// Accounts database (default `<data-dir>/accounts.sqlite`, or next to `--snapshot`).
+    #[arg(long)]
+    pub accounts_db: Option<PathBuf>,
+    /// Base URL used in e-mailed links (default `http://<bind>`).
+    #[arg(long)]
+    pub public_url: Option<String>,
+    /// SMTP server, e.g. `smtps://user:password@smtp.example.com:465`. Without it, e-mails
+    /// are written to `<data-dir>/outbox/`.
+    #[arg(long, env = "OPENCNPJ_SMTP_URL", hide_env_values = true)]
+    pub smtp_url: Option<String>,
+    #[arg(long, env = "OPENCNPJ_MAIL_FROM", default_value = "OpenCNPJ <no-reply@localhost>")]
+    pub mail_from: String,
+    /// Session lifetime after a login, in hours.
+    #[arg(long, default_value_t = 168)]
+    pub session_hours: i64,
+    /// Shared response cache budget in MiB (0 disables it).
+    #[arg(long, default_value_t = 256)]
+    pub response_cache_mib: u64,
+    /// Maximum age of a cached response (entries also expire when the snapshot changes).
+    #[arg(long, default_value_t = 3600)]
+    pub response_cache_ttl_secs: u64,
+    /// Do not compress responses (gzip, br, zstd are negotiated by default).
+    #[arg(long)]
+    pub no_compression: bool,
+    /// Take the client address from `X-Forwarded-For` (only behind a trusted reverse proxy).
+    #[arg(long)]
+    pub trust_proxy: bool,
+    /// Bind with SO_REUSEPORT so a new process can take over the port before the old one
+    /// drains (zero-downtime restarts; Linux/BSD).
+    #[arg(long)]
+    pub reuse_port: bool,
+    /// Never check for new RFB releases.
+    #[arg(long)]
+    pub no_auto_update: bool,
+    /// Release check interval with `--auth off` (with accounts it is a setting; 0 = never).
+    #[arg(long, default_value_t = 0)]
+    pub auto_update_hours: i64,
 }
 
 impl ServeArgs {
@@ -104,6 +146,11 @@ pub struct AppState {
     pub jobs: crate::admin::Jobs,
     /// `info --index` is a full term-dictionary scan: computed once per snapshot.
     pub index_breakdown: Mutex<Option<(PathBuf, Value)>>,
+    pub gate: Arc<Gate>,
+    pub mailer: Option<Arc<crate::mail::Mailer>>,
+    pub updater: crate::autoupdate::Updater,
+    /// Bumped on every snapshot switch (part of the response cache key).
+    generation: AtomicU64,
 }
 
 impl AppState {
@@ -121,9 +168,24 @@ impl AppState {
         s.set_postings_cache_bytes(self.args.postings_cache_mib << 20);
         *self.snap.write().expect("lock") = Arc::new(s);
         *self.sha256.write().expect("lock") = read_sidecar(path);
+        self.generation.fetch_add(1, Ordering::Relaxed);
+        if let Some(c) = &self.gate.cache {
+            c.clear();
+        }
         self.metrics.reloads.fetch_add(1, Ordering::Relaxed);
         eprintln!("serving {}", path.display());
         Ok(())
+    }
+}
+
+impl AppState {
+    pub fn generation(&self) -> u64 {
+        self.generation.load(Ordering::Relaxed)
+    }
+
+    /// Re-evaluates the update schedule now (settings changed or a check was requested).
+    pub fn wake_updater(&self) {
+        self.updater.notify.notify_one();
     }
 }
 
@@ -144,6 +206,10 @@ impl ApiError {
     pub fn bad(message: impl Into<String>) -> Self {
         Self::new(StatusCode::BAD_REQUEST, "invalid_request", message)
     }
+
+    pub fn message(&self) -> &str {
+        &self.message
+    }
 }
 
 impl IntoResponse for ApiError {
@@ -155,6 +221,9 @@ impl IntoResponse for ApiError {
 
 impl From<anyhow::Error> for ApiError {
     fn from(e: anyhow::Error) -> Self {
+        if let Some(d) = e.downcast_ref::<crate::accounts::Denied>() {
+            return ApiError::new(StatusCode::from_u16(d.status).unwrap_or(StatusCode::BAD_REQUEST), d.code, d.message.clone());
+        }
         if let Some(LookupError::Invalid(m)) = e.downcast_ref::<LookupError>() {
             return ApiError::new(StatusCode::BAD_REQUEST, "invalid_document", m.clone());
         }
@@ -218,7 +287,8 @@ pub fn caps(args: &ServeArgs) -> Caps {
 
 pub fn parse_query(pairs: &[(String, String)], args: &ServeArgs, default_field: TextField, require: bool) -> Result<Query, ApiError> {
     let mut q = params::parse(pairs, caps(args)).map_err(ApiError::bad)?;
-    if default_field != TextField::Any && !pairs.iter().any(|(k, _)| k == "field") {
+    let explicit = pairs.iter().any(|(k, _)| matches!(k.as_str(), "field" | "campo" | "razao_social" | "nome_fantasia"));
+    if default_field != TextField::Any && !explicit {
         q.text_field = default_field;
     }
     if require && !params::has_criteria(&q) {
@@ -327,7 +397,11 @@ async fn stats(State(st): State<Shared>, UrlQuery(p): UrlQuery<Vec<(String, Stri
     Ok(json_response(v))
 }
 
-async fn export(State(st): State<Shared>, UrlQuery(p): UrlQuery<Vec<(String, String)>>) -> ApiResult {
+async fn export(
+    State(st): State<Shared>,
+    caller: Option<axum::Extension<Caller>>,
+    UrlQuery(p): UrlQuery<Vec<(String, String)>>,
+) -> ApiResult {
     if st.args.disable_export {
         return Err(ApiError::new(StatusCode::FORBIDDEN, "export_disabled", "export is disabled on this server"));
     }
@@ -335,7 +409,15 @@ async fn export(State(st): State<Shared>, UrlQuery(p): UrlQuery<Vec<(String, Str
     if format != "ndjson" && format != "csv" {
         return Err(ApiError::bad("format must be ndjson or csv"));
     }
-    let max = match (p.iter().find(|(k, _)| k == "max"), st.args.export_max_rows) {
+    // The caller's plan can lower the server cap.
+    let server_cap = st.args.export_max_rows;
+    let plan_cap = caller.and_then(|c| c.principal.plan.max_export_rows).map(|x| x.max(0) as u64);
+    let cap = match (server_cap, plan_cap) {
+        (0, Some(p)) => p,
+        (s, Some(p)) => s.min(p),
+        (s, None) => s,
+    };
+    let max = match (p.iter().find(|(k, _)| k == "max"), cap) {
         (Some((_, v)), cap) => v.parse::<u64>().map_err(|_| ApiError::bad("bad max"))?.min(if cap == 0 { u64::MAX } else { cap }),
         (None, 0) => u64::MAX,
         (None, cap) => cap,
@@ -346,18 +428,26 @@ async fn export(State(st): State<Shared>, UrlQuery(p): UrlQuery<Vec<(String, Str
     let permit =
         st.sem.clone().acquire_owned().await.map_err(|_| ApiError::new(StatusCode::SERVICE_UNAVAILABLE, "overloaded", "closed"))?;
     let snap = st.snapshot();
-    let (tx, rx) = tokio::sync::mpsc::channel::<Result<Vec<u8>, std::io::Error>>(8);
+    let privacy = st.privacy;
+    let (tx, mut rx) = tokio::sync::mpsc::channel::<Result<Vec<u8>, std::io::Error>>(8);
     let fmt = format.clone();
     tokio::task::spawn_blocking(move || {
         let _permit = permit;
         let mut w = ChannelWriter { tx, buf: Vec::with_capacity(1 << 16) };
-        if let Err(e) = output::export(&snap, &q, &fmt, max, &mut w) {
+        if let Err(e) = output::export(&snap, &q, &fmt, max, privacy, &mut w) {
             let _ = w.tx.blocking_send(Err(std::io::Error::other(e.to_string())));
         }
     });
-    let stream = futures_util::stream::unfold(rx, |mut rx| async move { rx.recv().await.map(|item| (item, rx)) });
+    // Query errors (bad filter values) surface before any row: answer them with a 400
+    // instead of a 200 whose stream breaks.
+    let first = rx.recv().await;
+    if let Some(Err(e)) = &first {
+        return Err(ApiError::bad(e.to_string().trim_start_matches("invalid: ").to_string()));
+    }
+    let head = futures_util::stream::iter(first);
+    let rest = futures_util::stream::unfold(rx, |mut rx| async move { rx.recv().await.map(|item| (item, rx)) });
     let ctype = if format == "csv" { "text/csv; charset=utf-8" } else { "application/x-ndjson" };
-    Ok(([(header::CONTENT_TYPE, ctype)], Body::from_stream(stream)).into_response())
+    Ok(([(header::CONTENT_TYPE, ctype)], Body::from_stream(futures_util::StreamExt::chain(head, rest))).into_response())
 }
 
 struct ChannelWriter {
@@ -553,7 +643,7 @@ async fn readyz(State(st): State<Shared>) -> Response {
     Json(json!({ "status": "ready", "competence": s.manifest.competence, "documents": s.doc_count() })).into_response()
 }
 
-async fn prometheus(State(st): State<Shared>) -> Response {
+pub async fn prometheus(State(st): State<Shared>) -> Response {
     let s = st.snapshot();
     let mut out = st.metrics.prometheus();
     let c = s.cache_stats();
@@ -562,6 +652,16 @@ async fn prometheus(State(st): State<Shared>) -> Response {
     out.push_str(&format!("opencnpj_postings_cache_bytes {}\n", c.bytes));
     out.push_str(&format!("opencnpj_postings_cache_hits_total {}\n", c.hits));
     out.push_str(&format!("opencnpj_postings_cache_misses_total {}\n", c.misses));
+    if let Some(rc) = &st.gate.cache {
+        let v = rc.stats();
+        for k in ["entries", "bytes", "hits", "misses", "coalesced", "not_modified"] {
+            out.push_str(&format!("opencnpj_response_cache_{k} {}\n", v[k]));
+        }
+    }
+    let g = st.gate.stats();
+    for k in ["rate_limited", "quota_exceeded", "auth"] {
+        out.push_str(&format!("opencnpj_rejected_total{{reason=\"{k}\"}} {}\n", g["rejected"][k]));
+    }
     let (anon, file) = crate::admin::rss();
     out.push_str(&format!("opencnpj_process_rss_anon_bytes {anon}\nopencnpj_process_rss_file_bytes {file}\n"));
     ([(header::CONTENT_TYPE, "text/plain; version=0.0.4")], out).into_response()
@@ -579,8 +679,8 @@ pub fn read_sidecar(p: &Path) -> Option<String> {
 }
 
 pub fn router(st: Shared) -> Router {
-    Router::new()
-        .route("/", get(root))
+    // Idempotent JSON routes: shared response cache (inside the gate, so hits still count).
+    let cached = Router::new()
         .route("/api/v1/cnpj/{cnpj}", get(get_cnpj))
         .route("/api/v1/estabelecimentos/{cnpj}", get(get_cnpj))
         .route("/api/v1/empresas/{basico}", get(get_cnpj))
@@ -590,19 +690,28 @@ pub fn router(st: Shared) -> Router {
         .route("/api/v1/empresas/search", get(legacy_empresas_search))
         .route("/api/v1/estabelecimentos/search", get(search_route))
         .route("/api/v1/stats", get(stats))
+        .route_layer(middleware::from_fn_with_state(st.clone(), crate::gate::cache));
+    let data = Router::new()
         .route("/api/v1/export", get(export))
+        .route("/downloads/{name}", get(download))
+        .merge(cached)
+        .route_layer(middleware::from_fn_with_state(st.clone(), crate::gate::gate));
+    let mut public = Router::new()
+        .route("/", get(root))
         .route("/api/v1/campos", get(campos))
         .route("/api/v1/snapshot", get(snapshot_info))
         .route("/api/v1/distribution", get(distribution))
-        .route("/downloads/{name}", get(download))
         .route("/api/v1/dominios", get(dominios))
         .route("/api/v1/dominios/{tabela}", get(dominio))
         .route("/healthz", get(healthz))
         .route("/health", get(healthz))
         .route("/readyz", get(readyz))
-        .route("/metrics", get(prometheus))
-        .layer(middleware::from_fn_with_state(st.clone(), track))
-        .with_state(st)
+        .merge(crate::auth_api::router());
+    if !st.gate.enabled() {
+        // With accounts, Prometheus metrics move to the admin listener.
+        public = public.route("/metrics", get(prometheus));
+    }
+    public.merge(data).layer(middleware::from_fn_with_state(st.clone(), track)).with_state(st)
 }
 
 pub fn state(args: ServeArgs) -> Result<Shared> {
@@ -620,6 +729,19 @@ pub fn state(args: ServeArgs) -> Result<Shared> {
         None => path.parent().map_or_else(|| PathBuf::from("."), Path::to_path_buf),
     };
     let jobs_dir = args.data_dir.as_ref().map_or_else(|| snapshots_dir.join("jobs"), |d| d.join("jobs"));
+    let base = args.data_dir.clone().unwrap_or_else(|| snapshots_dir.clone());
+    let (accounts, mailer) = if args.auth == AuthMode::Off {
+        (None, None)
+    } else {
+        let db = args.accounts_db.clone().unwrap_or_else(|| base.join("accounts.sqlite"));
+        let acc = crate::accounts::Accounts::open(&db, args.session_hours)?;
+        let public_url = args.public_url.clone().unwrap_or_else(|| format!("http://{}", args.bind));
+        let mailer = crate::mail::Mailer::new(args.smtp_url.as_deref(), &args.mail_from, base.join("outbox"), &public_url)?;
+        eprintln!("accounts in {} (auth {}), mail via {}", db.display(), args.auth.name(), mailer.describe());
+        (Some(Arc::new(acc)), Some(Arc::new(mailer)))
+    };
+    let cache = (args.response_cache_mib > 0).then(|| ResponseCache::new(args.response_cache_mib, args.response_cache_ttl_secs));
+    let gate = Arc::new(Gate::new(args.auth, accounts, cache, args.trust_proxy));
     Ok(Arc::new(AppState {
         sha256: RwLock::new(read_sidecar(&path)),
         snap: RwLock::new(Arc::new(snap)),
@@ -629,6 +751,10 @@ pub fn state(args: ServeArgs) -> Result<Shared> {
         snapshots_dir,
         jobs: crate::admin::Jobs::new(jobs_dir),
         index_breakdown: Mutex::new(None),
+        gate,
+        mailer,
+        updater: crate::autoupdate::Updater::default(),
+        generation: AtomicU64::new(0),
         args,
     }))
 }
@@ -657,31 +783,94 @@ async fn reload_loop(st: Shared, dir: PathBuf) {
     }
 }
 
+/// Binds a TCP listener, optionally with SO_REUSEPORT (zero-downtime restarts).
+fn listen(addr: SocketAddr, reuse_port: bool) -> Result<tokio::net::TcpListener> {
+    let sock = socket2::Socket::new(socket2::Domain::for_address(addr), socket2::Type::STREAM, Some(socket2::Protocol::TCP))?;
+    sock.set_reuse_address(true)?;
+    #[cfg(all(unix, not(any(target_os = "solaris", target_os = "illumos"))))]
+    if reuse_port {
+        sock.set_reuse_port(true)?;
+    }
+    #[cfg(not(all(unix, not(any(target_os = "solaris", target_os = "illumos")))))]
+    if reuse_port {
+        anyhow::bail!("--reuse-port is not supported on this platform");
+    }
+    sock.set_nonblocking(true)?;
+    sock.bind(&addr.into()).with_context(|| format!("binding {addr}"))?;
+    sock.listen(4096)?;
+    Ok(tokio::net::TcpListener::from_std(sock.into())?)
+}
+
+/// Gzip/brotli/zstd at the fastest level; never for snapshot downloads.
+fn compressed(app: Router, enabled: bool) -> Router {
+    use tower_http::compression::predicate::{NotForContentType, Predicate};
+    use tower_http::compression::{CompressionLayer, CompressionLevel, DefaultPredicate};
+    if !enabled {
+        return app;
+    }
+    let when = DefaultPredicate::new().and(NotForContentType::const_new("application/octet-stream"));
+    app.layer(CompressionLayer::new().quality(CompressionLevel::Fastest).compress_when(when))
+}
+
+async fn shutdown_signal() {
+    let ctrl_c = async {
+        let _ = tokio::signal::ctrl_c().await;
+    };
+    #[cfg(unix)]
+    let term = async {
+        match tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate()) {
+            Ok(mut s) => {
+                s.recv().await;
+            }
+            Err(_) => std::future::pending::<()>().await,
+        }
+    };
+    #[cfg(not(unix))]
+    let term = std::future::pending::<()>();
+    tokio::select! {
+        () = ctrl_c => {},
+        () = term => {},
+    }
+    eprintln!("shutting down: draining in-flight requests");
+}
+
 pub fn run(args: ServeArgs) -> Result<()> {
     let rt = tokio::runtime::Builder::new_multi_thread().enable_all().build()?;
     rt.block_on(async move {
         let st = state(args.clone())?;
+        st.gate.start_background();
         if let Some(dir) = args.data_dir.clone() {
             tokio::spawn(reload_loop(st.clone(), dir));
+            tokio::spawn(crate::autoupdate::run(st.clone()));
+        }
+        if let Some(acc) = st.gate.accounts.clone() {
+            let admins = tokio::task::spawn_blocking(move || {
+                acc.list_users(&crate::accounts::UserFilter { role: Some("admin".into()), ..Default::default() })
+            })
+            .await??;
+            if admins["total"] == 0 {
+                eprintln!("no admin account yet: create one with `opencnpj accounts create --role admin --username NAME --email ADDRESS`");
+            }
         }
         if !args.admin_bind.is_empty() {
             let addr: SocketAddr = args.admin_bind.parse().context("bad --admin-bind")?;
-            let admin = tokio::net::TcpListener::bind(addr).await?;
-            eprintln!("admin suite on http://{addr}/admin (no authentication)");
-            let app = crate::admin::router(st.clone());
+            let admin = listen(addr, args.reuse_port)?;
+            let auth = if st.gate.enabled() { "staff login required" } else { "no authentication" };
+            eprintln!("admin suite on http://{addr}/admin ({auth})");
+            let app = compressed(crate::admin::router(st.clone()), !args.no_compression);
             tokio::spawn(async move {
-                if let Err(e) = axum::serve(admin, app).await {
+                if let Err(e) = axum::serve(admin, app.into_make_service_with_connect_info::<SocketAddr>()).await {
                     eprintln!("admin server stopped: {e}");
                 }
             });
         }
-        let listener = tokio::net::TcpListener::bind(args.bind).await?;
-        eprintln!("listening on http://{}", args.bind);
-        axum::serve(listener, router(st))
-            .with_graceful_shutdown(async {
-                let _ = tokio::signal::ctrl_c().await;
-            })
-            .await?;
+        let listener = listen(args.bind, args.reuse_port)?;
+        eprintln!("listening on http://{} (auth {})", args.bind, args.auth.name());
+        let app = compressed(router(st.clone()), !args.no_compression);
+        axum::serve(listener, app.into_make_service_with_connect_info::<SocketAddr>()).with_graceful_shutdown(shutdown_signal()).await?;
+        let st2 = st.clone();
+        tokio::task::spawn_blocking(move || st2.gate.flush()).await?;
+        eprintln!("usage flushed; bye");
         Ok(())
     })
 }

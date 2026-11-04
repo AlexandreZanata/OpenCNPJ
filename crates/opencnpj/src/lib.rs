@@ -2,10 +2,18 @@
 //! download/update and benchmark harness. Split from `main.rs` so integration tests can
 //! drive the router in-process.
 
+pub mod accounts;
+pub mod accounts_cli;
 pub mod admin;
 pub mod api;
+pub mod auth_api;
+pub mod autoupdate;
 pub mod bench;
 pub mod download;
+pub mod gate;
+pub mod loadtest;
+pub mod mail;
+pub mod manage;
 pub mod metrics;
 pub mod output;
 pub mod params;

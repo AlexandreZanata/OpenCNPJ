@@ -27,6 +27,8 @@ label{display:block;font-size:12px;color:var(--muted)}label input,label select{m
 .form{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:12px}
 pre{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px;overflow:auto;max-height:480px;font-size:12px;white-space:pre-wrap;word-break:break-word}
 canvas{width:100%;height:220px}.row{display:flex;gap:12px;flex-wrap:wrap;align-items:end}.muted{color:var(--muted)}
+#login{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:10}#login[hidden]{display:none}
+#login form{width:min(420px,92vw)}#login p{color:var(--muted);font-size:13px}#who{font-size:12px;color:var(--muted);white-space:nowrap}
 .pill{display:inline-block;padding:1px 8px;border-radius:99px;font-size:12px;border:1px solid var(--line)}
 .pill.ok{color:var(--ok)}.pill.failed,.pill.killed{color:var(--bad)}.pill.running{color:var(--warn)}
 .bar{height:8px;background:var(--accent);border-radius:4px}.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -35,8 +37,12 @@ a{color:var(--accent)}
 </style>
 </head>
 <body>
+<div id="login" hidden><form class="card" id="login-f"><h2>Sign in to OpenCNPJ Admin</h2>
+<p>Use the login key of a staff account (admin, moderator or analyst). The session token is kept in this tab only.</p>
+<label>Login key<input type="password" id="login-k" autocomplete="off" placeholder="ocnpj_…" required></label>
+<div class="row" style="margin-top:12px"><button class="b">Sign in</button><span class="muted" id="login-e"></span></div></form></div>
 <header><div><h1>OpenCNPJ Admin</h1><div class="sub" id="hdr">loading…</div></div>
-<nav id="nav"></nav></header>
+<nav id="nav"></nav><span id="who"></span><button class="s" id="logout" hidden>Sign out</button></header>
 <main>
 <section id="overview">
   <div class="grid" id="kpis"></div>
@@ -152,7 +158,8 @@ const tabs={overview:'Overview',routes:'Routes',search:'Search',snapshots:'Snaps
 let cur='overview';
 function show(t){cur=t;document.querySelectorAll('section').forEach(s=>s.classList.toggle('on',s.id===t));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));location.hash=t;load(t)}
 for(const[k,v]of Object.entries(tabs)){const b=document.createElement('button');b.textContent=v;b.dataset.t=k;b.onclick=()=>show(k);$('#nav').append(b)}
-async function api(u,o){const r=await fetch(u,o);const ct=r.headers.get('content-type')||'';const body=ct.includes('json')?await r.json():await r.text();if(!r.ok)throw new Error(body.message||body||r.status);return body}
+let token=sessionStorage.getItem('ocnpj_token')||'';
+async function api(u,o={}){o.headers=Object.assign({},o.headers||{},token?{authorization:'Bearer '+token}:{});const r=await fetch(u,o);if(r.status===401){showLogin();throw new Error('sign in required')}const ct=r.headers.get('content-type')||'';const body=ct.includes('json')?await r.json():await r.text();if(!r.ok)throw new Error(body.message||body||r.status);return body}
 function chart(cv,pts,color){const c=cv.getContext('2d'),w=cv.width=cv.clientWidth*devicePixelRatio,h=cv.height=cv.clientHeight*devicePixelRatio;c.clearRect(0,0,w,h);
  const max=Math.max(1e-9,...pts);c.strokeStyle=getComputedStyle(document.body).getPropertyValue('--line');c.lineWidth=1;for(let i=0;i<=4;i++){const y=h-20*devicePixelRatio-(h-30*devicePixelRatio)*i/4;c.beginPath();c.moveTo(0,y);c.lineTo(w,y);c.stroke();c.fillStyle=getComputedStyle(document.body).getPropertyValue('--muted');c.font=`${11*devicePixelRatio}px system-ui`;c.fillText((max*i/4).toPrecision(3),4,y-3)}
  c.strokeStyle=color;c.lineWidth=2*devicePixelRatio;c.beginPath();pts.forEach((p,i)=>{const x=i/(pts.length-1||1)*w,y=h-20*devicePixelRatio-(h-30*devicePixelRatio)*p/max;i?c.lineTo(x,y):c.moveTo(x,y)});c.stroke()}
@@ -199,6 +206,11 @@ $('#b-st').onclick=async()=>{$('#st').innerHTML='<span class="muted">running…<
 const loaders={overview:loadOverview,routes:loadRoutes,search:async()=>{},snapshots:loadSnapshots,index:loadIndex,jobs:loadJobs,reports:loadReports,tuning:loadTuning};
 function load(t){loaders[t]().catch(e=>console.error(e))}
 setInterval(()=>{if(['overview','routes','jobs'].includes(cur))load(cur)},2000);
+function showLogin(){$('#login').hidden=false;$('#login-k').focus()}
+async function whoami(){try{const w=await api('/admin/api/whoami');$('#who').textContent=w.user?`${w.user.username} · ${w.user.role}`:'';$('#logout').hidden=!w.user;return true}catch(e){if(e.message==='accounts disabled')return true;return false}}
+$('#login-f').onsubmit=async e=>{e.preventDefault();$('#login-e').textContent='';try{const r=await fetch('/api/v1/auth/login',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({key:$('#login-k').value.trim()})});const v=await r.json();if(!r.ok)throw new Error(v.message||r.status);token=v.token;sessionStorage.setItem('ocnpj_token',token);$('#login-k').value='';$('#login').hidden=true;await whoami();load(cur)}catch(x){$('#login-e').textContent=x.message}};
+$('#logout').onclick=async()=>{try{await fetch('/api/v1/auth/logout',{method:'POST',headers:{authorization:'Bearer '+token}})}catch(e){}token='';sessionStorage.removeItem('ocnpj_token');$('#who').textContent='';$('#logout').hidden=true;showLogin()};
+whoami();
 show(tabs[location.hash.slice(1)]?location.hash.slice(1):'overview');
 </script>
 </body>
