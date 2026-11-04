@@ -24,3 +24,14 @@ geography or population.
 The neighbour graph retains links between municipalities and the districts
 represented as municipalities by IBGE. The two state operational areas in
 the boundary workbook, Lagoa Mirim and Lagoa dos Patos, are outside this graph.
+
+## CNAE and sector catalogue
+
+`catalog/sectors.toml` defines the v1 curated names, aliases and exact RFB
+subclass sets. Core sets apply to the main activity. Extended sets are
+separate and require an explicit choice. The generated ambiguity report lists
+normalized aliases shared by sectors or inconsistent with automatic matches.
+
+Legacy correspondence is descriptive. Splits, broader targets and partial
+matches retain their original RFB codes in sector definitions and counts.
+`8888888` identifies an unreported activity and has no successor or sector.

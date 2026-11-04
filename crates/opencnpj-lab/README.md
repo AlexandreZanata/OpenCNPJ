@@ -49,3 +49,20 @@ files against that manifest, reads all used TOM codes from the snapshot, and
 publishes a verified catalogue to an absent or empty destination. The output
 includes `municipalities.tsv`, `overrides.tsv`, `rfb-name-differences.tsv`, and
 a deterministic `manifest.json` identifying the snapshot, sources and outputs.
+
+## Build the CNAE and sector catalogue
+
+The offline builder uses Python 3.11 or later and the standard library.
+Use the verified WP-1.1 extraction for the RFB input.
+
+```sh
+python3 crates/opencnpj-lab/scripts/build-cnae.py \
+  --raw /data/opencnpj-data/intelligence/catalog-raw/2026-11-04/cnae \
+  --rfb /data/opencnpj-data/intelligence/catalog-rfb/2026-10-verified \
+  --out /data/opencnpj-data/intelligence/catalog-cnae/2026-10
+```
+
+The output directory contains the hierarchy, sector definitions, automatic
+alias candidates, ambiguity and reachability reports, and a source manifest.
+The generated artefacts remain under `/data`. The curated sector definitions,
+legacy exceptions and catalogue manifest live in `opencnpj-insights/catalog`.

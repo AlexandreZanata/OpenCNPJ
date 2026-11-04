@@ -1,0 +1,13 @@
+code	relation	targets	source	note
+1091100	successor	1091101	concla-2010	The old manufacturing subclass excluded direct-sale bakeries, which had their own code.
+1822900	split	1822901,1822999	concla-2010	The 2010 resolution replaced the broad finishing code with bookbinding and other finishing.
+2539000	split	2539001,2539002	concla-2010	The 2010 resolution separated machining and welding from metal treatment and coating.
+3091100	split	3091101,3091102	concla-2010	The 2010 resolution separated motorcycle manufacturing from parts manufacturing.
+3250708	broader	3292202	concla-2010;concla-2.2-notes	The current safety-accessory subclass covers medical nonwoven articles and other products.
+3312101	broader	9512600	concla-2007	CONCLA moved transmitter maintenance into the broader communications equipment repair subclass.
+3511500	split	3511501,3511502	concla-2010	The 2010 resolution separated generation from operating coordination and control.
+4721101	successor	1091102	concla-2010	The direct-sale bakery with in-house production moved to the bakery manufacturing subclass.
+4751200	split	4751201,4751202	concla-2010	The 2010 resolution distinguished equipment and supplies retail from cartridge refilling.
+8630505	broader	8630504	concla-2007	CONCLA removed the distinction based on availability of surgical procedures.
+8888888	unreported		rfb-reference	RFB records that no economic activity was reported. There is no official CNAE subclass.
+9609201	broader	9602502	concla-2010	Beauty clinics moved to the broader beauty care subclass.
