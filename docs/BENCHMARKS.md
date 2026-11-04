@@ -4,6 +4,112 @@ Everything here was measured on the national release **2026-10** (RFB snapshot `
 37 ZIPs, 7,808,752,942 bytes; 28,856,680,141 bytes of CSV; 223,628,880 rows). Nothing is
 extrapolated. Raw outputs (JSON/CSV/logs) are listed in [Reproduce](#reproduce).
 
+## Format 1.2: the complete database (current)
+
+Everything in this section was measured on the final binary (commit `2b68a94` plus
+docs) against `2026-10-balanced-1.2.ocnpj`: balanced profile with every index in this
+release — names, CPF (MEI/EI owners), partner documents, CNAE (principal/secundária),
+CEP, DDD, contacts, filters — plus doc values and numeric columns. The sections further
+down describe the 1.0 snapshots and the experiments that led here.
+
+### Build and integrity
+
+| | |
+|---|---|
+| Command | `opencnpj build --input raw/2026-10 --profile balanced --keep-partition` (end to end from the ZIPs) |
+| Wall time | **8 min 2 s** (phase A 40.0 s, block encoding 343 s, index merge 71 s, numeric columns 11 s) |
+| Peak RSS / temp disk | 5.95 GB / 18.3 GB |
+| File | **8,333,664,200 bytes** (SHA-256 `76f36078…6037b`) |
+| `verify --sources` | passed: all 223,628,880 rows match the ZIPs per table; every block, section and numeric value checked (4 min 41 s) |
+
+Size by section (MB) — 1.0 balanced → 1.2:
+
+| section | 1.0 | 1.2 | added |
+|---|---:|---:|---:|
+| data (blocks) | 4,999 | 5,034 | +35 (dictionary training variance) |
+| postings | 1,343 | 1,899 | +556 (CEP 203, CPF 109, partner documents 103, DDD 68, motivo 35, contacts 18) |
+| terms (FST) | 38 | 162 | +124 (17.3 M owner CPFs) |
+| docvalues | – | 222 | município + CNAE ids |
+| numeric | – | 1,007 | capital 294, opening date 136, status date 136, Simples opt-in/exclusion 120 + 120, MEI opt-in/exclusion 99 + 103 |
+| other | 11 | 11 | |
+| **total** | **6,391** | **8,334** | **+1,943** |
+
+`capital_social` costs 31.6 bits/document because a few very large values widen whole
+1,024-document blocks; patched frame-of-reference (outliers stored apart) would roughly
+halve it and is the next storage optimization.
+
+### Queries (in process, 500 sampled queries per category, seed 42)
+
+| category | p50 / p95 / p99 ms (1 thread, warm) | q/s @1 / 4 / 16 threads | cold p50 / p95 ms |
+|---|---:|---:|---:|
+| lookup_cnpj | 0.166 / 0.200 / 0.223 | 5793 / 20777 / 48317 | 0.674 / 1.289 |
+| lookup_cnpj_root | 0.156 / 0.216 / 0.297 | 5949 / 22495 / 54135 | 0.659 / 1.215 |
+| lookup_cpf (owner + masked partners) | 7.157 / 11.897 / 12.120 | 134 / 500 / 1097 | 40.263 / 84.795 |
+| filter_cnpj_prefix (6-char root prefix) | 0.912 / 1.261 / 1.333 | 1090 / 4115 / 8893 | 1.312 / 1.676 |
+| name_full | 15.646 / 36.882 / 53.469 | 58 / 190 / 379 | 22.550 / 57.934 |
+| name_popular | 14.697 / 40.159 / 65.421 | 50 / 173 / 406 | 14.832 / 62.218 |
+| name_prefix_typeahead | 13.187 / 75.735 / 176.387 | 43 / 153 / 298 | 24.075 / 87.933 |
+| name_fuzzy | 18.111 / 53.842 / 86.451 | 45 / 155 / 314 | 55.564 / 125.306 |
+| name_plus_uf | 6.384 / 22.169 / 30.800 | 117 / 428 / 959 | 29.491 / 55.870 |
+| filter_selective (município + CNAE + ativa) | 4.385 / 9.198 / 13.212 | 210 / 770 / 1801 | 14.804 / 26.267 |
+| filter_broad (UF + ativa) | 4.569 / 10.091 / 10.639 | 175 / 602 / 1059 | 7.053 / 13.657 |
+| filter_mei_active_municipio | 5.626 / 35.578 / 36.875 | 102 / 373 / 799 | 20.281 / 33.398 |
+| sort_newest_in_municipio | 8.066 / 40.295 / 42.333 | 86 / 319 / 689 | 14.241 / 65.250 |
+| filter_opened_in_year_uf | 74.959 / 171.207 / 177.770 | 12 / 43 / 87 | 77.103 / 159.877 |
+| filter_cnae_division_uf_active (CNAE principal **or** secundária by division) | 29.487 / 809.690 / 877.745 | 8 / 26 / 58 | 35.958 / 758.922 |
+| stats_municipio_by_uf | 22.663 / 90.927 / 90.927 | 32 / 77 / 105 | 45.981 / 90.249 |
+| stats_cnae_by_uf | 23.977 / 90.535 / 90.535 | 31 / 77 / 97 | 47.647 / 93.760 |
+| stats_uf_by_cnae | 86.327 / 207.438 / 212.542 | 10 / 36 / 91 | 70.841 / 207.188 |
+| stats_year_opened_by_uf | 90.640 / 236.049 / 236.049 | 9 / 24 / 39 | 90.353 / 234.255 |
+| stats_cnae_secundaria_by_uf | 2231.684 / 3361.536 / 3361.536 | 1 / 1 / 3 | 2613.117 / 3201.995 |
+
+Snapshot open: 109 ms warm, 462 ms cold. Each query includes record fetch and JSON.
+
+### HTTP (`opencnpj serve --data-dir`, oha 15 s, 16 connections, loopback)
+
+| workload | req/s | p50 ms | p95 ms | p99 ms |
+|---|---:|---:|---:|---:|
+| lookup_cnpj | 36,442 | 0.40 | 0.68 | 0.93 |
+| lookup_cnpj (64 connections) | 33,773 | 1.61 | 3.93 | 5.79 |
+| lookup_cpf | 893 | 15.59 | 36.26 | 76.13 |
+| filter_selective | 1,307 | 10.79 | 25.48 | 37.47 |
+| filter_mei_active_municipio | 540 | 16.48 | 84.14 | 234.97 |
+| sort_newest_in_municipio | 652 | 18.67 | 81.03 | 95.13 |
+| name_prefix_typeahead | 362 | 29.08 | 127.32 | 286.65 |
+| name_full | 184 | 73.82 | 175.83 | 306.45 |
+| filter_opened_in_year_uf | 76 | 191.35 | 418.08 | 545.68 |
+| stats_year_opened_by_uf | 54 | 241.58 | 542.69 | 612.29 |
+| filter_cnae_division_uf_active | 58 | 79.03 | 1,342.40 | 2,048.85 |
+
+Every response was HTTP 200. Start to `/readyz`: 0.12 s with 122 MB anonymous RSS;
+after the whole run, 4.0 GB anonymous + 3.6 GB file-backed (page cache of the mapping).
+Under concurrent name and filter load the large temporary bitmaps and the 512 MB postings
+cache dominate anonymous memory; the allocator follow-up in the 1.0 section still applies.
+
+### Optimizations measured on this database
+
+Each row compares the same category (same seed and queries) before and after one change,
+1 thread, warm:
+
+| change | category | before p95 ms | after p95 ms |
+|---|---|---:|---:|
+| numeric probe/scan by candidate count, ordered appends, single-value reads | filter_mei_active_municipio | 1,080.9 | 35.6 |
+| same | filter_opened_in_year_uf | 314.3 (p50 281.8) | 171.2 (p50 75.0) |
+| top-k by block min/max with early stop | sort_newest_in_municipio | 96.8 | 40.3 |
+| day→year table, run-length accumulation | stats_year_opened_by_uf | 533.2 | 236.0 |
+| partner companies fetched without branches, in chunks | lookup_cpf (p99) | 92.9 | 12.1 |
+| doc values for município/CNAE (format 1.1) | stats_municipio_by_uf | 2,796 (p50) | 22.7 (p50) |
+
+### Known limits of this release
+
+* `group_by=cnae_secundaria` takes 2–3 s (multi-valued; no doc values: 126.6 M
+  document/value pairs would cost ~174 MB).
+* CNAE prefixes over *secondary* CNAEs (`cnae_secundaria=47`, `cnae_qualquer=47`) union
+  ~100 large postings lists: p50 29 ms but p95 0.8 s when they miss the postings cache.
+* Name typeahead p99 ~180 ms for very frequent 3-letter prefixes.
+* The < 5 GB target remains out of reach with all 1.2 indexes (8.33 GB balanced); the
+  1.0 compact snapshot without them is 5.75 GB.
+
 ## Environment
 
 | | |

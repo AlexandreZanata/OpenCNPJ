@@ -64,14 +64,15 @@ $B rollback --data-dir data
 223,628,880 rows from 7.81 GB of ZIPs (28.86 GB of CSV), i7-13620H laptop, NVMe. Every
 snapshot below passed `verify --sources` (all rows reproduced exactly).
 
-| profile | snapshot (all indexes) | build | CNPJ lookup p50 / p95 (warm, 1 thread) | name search p95 |
+| snapshot | size | build (end to end) | CNPJ lookup p50 / p95 | name search p95 |
 |---|---:|---:|---:|---:|
-| fast | 7.63 GB | ~5 min | 0.033 / 0.050 ms | 36–69 ms |
-| balanced | 6.39 GB | 9 min 6 s | 0.158 / 0.189 ms | 40–83 ms |
-| compact | 5.75 GB | ~11.7 min | 1.50 / 1.92 ms | 61–100 ms |
+| **1.2 balanced** — every index: names, CPF, partners, CNAE, CEP, DDD, contacts, dates, capital | **8.33 GB** | **8 min 2 s** | 0.166 / 0.200 ms | 37–76 ms |
+| 1.0 fast (names + basic filters) | 7.63 GB | ~5 min | 0.033 / 0.050 ms | 36–69 ms |
+| 1.0 balanced | 6.39 GB | 9 min 6 s | 0.158 / 0.189 ms | 40–83 ms |
+| 1.0 compact | 5.75 GB | ~11.7 min | 1.50 / 1.92 ms | 61–100 ms |
 
-Through HTTP, the balanced snapshot served 32.7k CNPJ lookups/s at p95 0.8 ms
-(16 connections, loopback). The legacy stack imported 217 M rows into PostgreSQL in
+Through HTTP, the 1.2 snapshot served 36.4k CNPJ lookups/s at p95 0.68 ms, CPF lookups at
+893/s and selective filters at 1.3k/s (16 connections, loopback). The legacy stack imported 217 M rows into PostgreSQL in
 27 min 9 s. Methodology, the experiment matrix, baselines and known bottlenecks are in
 [docs/BENCHMARKS.md](docs/BENCHMARKS.md).
 
