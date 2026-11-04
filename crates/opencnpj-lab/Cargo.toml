@@ -20,3 +20,7 @@ opencnpj-insights.workspace = true
 
 [dev-dependencies]
 opencnpj = { path = "../opencnpj" }
+opencnpj-core.workspace = true
+opencnpj-store.workspace = true
+serde.workspace = true
+serde_json.workspace = true

@@ -2607,9 +2607,13 @@ version = "0.1.0"
 dependencies = [
  "clap",
  "opencnpj",
+ "opencnpj-core",
  "opencnpj-insights",
  "opencnpj-nlu",
  "opencnpj-query",
+ "opencnpj-store",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
