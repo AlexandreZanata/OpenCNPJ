@@ -1,5 +1,7 @@
 //! Development CLI for OpenCNPJ Intelligence artifacts and experiments.
 
+mod catalog;
+
 use clap::{CommandFactory, Parser, Subcommand, error::ErrorKind};
 
 #[derive(Parser)]
@@ -12,7 +14,10 @@ struct Cli {
 #[derive(Subcommand)]
 enum Command {
     /// Build reference catalogues.
-    Catalog,
+    Catalog {
+        #[command(subcommand)]
+        command: catalog::Command,
+    },
     /// Build aggregate artifacts.
     Agg,
     /// Compare aggregate results with engine counts.
@@ -33,9 +38,10 @@ enum Command {
     BenchAgg,
 }
 
-fn main() -> std::io::Result<()> {
-    if Cli::parse().command.is_some() {
-        Cli::command().error(ErrorKind::InvalidSubcommand, "subcommand not implemented").exit();
+fn main() -> anyhow::Result<()> {
+    match Cli::parse().command {
+        Some(Command::Catalog { command }) => catalog::run(command),
+        Some(_) => Cli::command().error(ErrorKind::InvalidSubcommand, "subcommand not implemented").exit(),
+        None => Ok(Cli::command().print_help()?),
     }
-    Cli::command().print_help()
 }

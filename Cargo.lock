@@ -2605,15 +2605,22 @@ dependencies = [
 name = "opencnpj-lab"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
+ "axum",
  "clap",
  "opencnpj",
  "opencnpj-core",
+ "opencnpj-ingest",
  "opencnpj-insights",
  "opencnpj-nlu",
  "opencnpj-query",
  "opencnpj-store",
+ "roaring",
  "serde",
  "serde_json",
+ "tempfile",
+ "tokio",
+ "tower",
 ]
 
 [[package]]
