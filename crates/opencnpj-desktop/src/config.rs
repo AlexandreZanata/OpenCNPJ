@@ -99,6 +99,8 @@ mod tests {
         move |k| m.get(k).cloned()
     }
 
+    // "/xdg" is only an absolute path on Unix hosts (Windows needs a drive or UNC prefix).
+    #[cfg(unix)]
     #[test]
     fn unix_prefers_absolute_xdg_config_home() {
         let d = config_dir_for(Platform::Unix, env(&[("XDG_CONFIG_HOME", "/xdg"), ("HOME", "/home/ana")]));
