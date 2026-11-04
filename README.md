@@ -6,7 +6,9 @@ A compact, offline search engine for the Brazilian CNPJ open data published mont
 Receita Federal. One Rust binary downloads the release, turns its 37 ZIPs (~29 GB of
 CSV, ~224 million rows) into a single compressed, indexed `.ocnpj` file, verifies it
 against the sources, and serves CNPJ lookups, name search, filters, statistics and
-exports over HTTP. No PostgreSQL, Redis or search cluster.
+exports over HTTP, with accounts, plans and quotas, an admin suite (web and native
+desktop) and automatic monthly updates without downtime. No PostgreSQL, Redis or search
+cluster.
 
 > The previous Go + PostgreSQL + Redis + React implementation is archived at tag
 > [`legacy-go-final`](docs/legacy/README.md).
@@ -22,17 +24,22 @@ $B build --input data/raw/2026-10 --output data/2026-10.ocnpj
 $B verify data/2026-10.ocnpj --sources data/raw/2026-10      # row-for-row check
 $B get data/2026-10.ocnpj 33.000.167/0001-01
 $B search data/2026-10.ocnpj --q "padaria sao jo" --filter uf=SP --limit 5
-$B serve --snapshot data/2026-10.ocnpj        # API :8080, admin http://127.0.0.1:8081/admin
-curl 'localhost:8080/api/v1/cnpj/00000000000191'
-curl 'localhost:8080/api/v1/search?cnae=G&uf=SP&data_inicio_atividade_de=2026-01-01&ordenar=data_inicio_atividade:desc'
+$B accounts --data-dir data create --username admin --email you@example.com --role admin --key-file admin.key
+$B serve --data-dir data                      # API :8080, admin http://127.0.0.1:8081/admin
+K=$(cat admin.key)
+curl -H "Authorization: Bearer $K" 'localhost:8080/api/v1/cnpj/00000000000191'
+curl -H "Authorization: Bearer $K" 'localhost:8080/api/v1/search?cnae=G&uf=SP&data_inicio_atividade_de=2026-01-01&ordenar=data_inicio_atividade:desc'
 ```
+
+Users register with a username and an e-mail address and receive their login key by
+e-mail (`POST /api/v1/auth/register`); `serve --auth off` runs without accounts.
 
 Monthly operation (download → rebuild only if sources changed → verify → atomic switch,
 previous snapshot kept for rollback):
 
 ```bash
 $B update --data-dir data --profile balanced
-$B serve --data-dir data          # picks up data/current automatically
+$B serve --data-dir data          # picks up data/current automatically, and checks RFB for new releases
 $B rollback --data-dir data
 ```
 
@@ -50,10 +57,18 @@ $B rollback --data-dir data
   matriz/filial, CEP prefix, DDD, published e-mail/phone; date and capital ranges
   (opening, status, Simples/MEI opt-in and exclusion); sorting by date or capital;
   exact counts, statistics per field or per year, streaming export.
-* **API + admin suite**: no-auth, no-limit HTTP API with snapshot distribution
-  (resumable downloads); an admin dashboard with live latency histograms, query explain
-  with per-stage timings, snapshot switching, cache control, self-test benchmarks and
-  background jobs (download, build, verify, update, benchmark).
+* **Accounts**: one login key per user (Argon2id), registration and key recovery by
+  e-mail, sessions, roles (admin, moderator, analyst, user) with permissions, suspension
+  and bans, plans with rate limits and daily/monthly quotas, per-user usage and search
+  log, audit log ([docs/ACCOUNTS.md](docs/ACCOUNTS.md)).
+* **API + admin suite**: HTTP API with snapshot distribution (resumable downloads); a web
+  dashboard and a native desktop app (`opencnpj-admin`, Linux and Windows) with live
+  latency histograms, user management and moderation, plans, usage, logs, query explain,
+  snapshot switching, cache control, self-test benchmarks and background jobs.
+* **Serving at scale**: shared response cache with request coalescing and ETags,
+  compression, separate lanes for lookups and heavy queries; 5,000 simultaneous
+  authenticated users at p99 under 1 ms in steady state on one machine; binary upgrades
+  and monthly data updates without dropping a request ([docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)).
 * **Integrity**: checksums on every block and section, SHA-256 of sources and snapshot,
   strict bounds checks; corrupted or truncated files are rejected.
 * **Operations**: one static binary for Linux and Windows, atomic publication, hot
@@ -83,6 +98,9 @@ Through HTTP, the 1.2 snapshot served 36.4k CNPJ lookups/s at p95 0.68 ms, CPF l
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Pipeline, crates, design decisions |
 | [docs/FORMAT.md](docs/FORMAT.md) | `.ocnpj` byte layout, codecs, index, compatibility |
 | [docs/API.md](docs/API.md) | HTTP endpoints, parameters, limits, legacy migration |
+| [docs/ACCOUNTS.md](docs/ACCOUNTS.md) | Keys, recovery, roles, plans, quotas, admin API |
+| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Production setup, capacity, zero-downtime updates and upgrades |
+| [crates/opencnpj-desktop](crates/opencnpj-desktop/README.md) | Native admin app: build, run, install |
 | [docs/BENCHMARKS.md](docs/BENCHMARKS.md) | Methodology, results, experiments, Pareto front |
 | [docs/DATA_POLICY.md](docs/DATA_POLICY.md) | Provenance, chain of trust, LGPD |
 | [docs/legacy/](docs/legacy/README.md) | Archived implementation and how to restore it |

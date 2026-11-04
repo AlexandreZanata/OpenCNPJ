@@ -110,6 +110,76 @@ Each row compares the same category (same seed and queries) before and after one
 * The < 5 GB target remains out of reach with all 1.2 indexes (8.33 GB balanced); the
   1.0 compact snapshot without them is 5.75 GB.
 
+## Multi-user load (accounts on)
+
+Every virtual user has its own login key (Argon2id-hashed account on the `unlimited` plan,
+so limits do not cut the run short) and its own keep-alive connection; every request goes
+through authentication, metering, usage accounting and the search log. Server and load
+generator share one 16-core / 31 GB machine (2026-11-04, national 2026-10 snapshot,
+format 1.2), so the server had less than the whole CPU. The URL mix replays 7,900 real
+queries: 3,000 CNPJ lookups (14 and 8 characters), 3,300 name searches (full, typeahead,
+name + UF, fuzzy), 1,000 filters (selective, CNPJ prefix), 500 CPF lookups, 200 MEI and
+200 sort queries, 200 stats.
+
+```bash
+opencnpj bench --snapshot S --queries 2000 --write-urls bench/urls-final      # query lists
+# load-mix.txt = the mix above, paths only, shuffled
+opencnpj accounts --data-dir D seed --count 2000 --plan unlimited --key-file bench/load-keys.txt   # 4.8 s
+opencnpj serve --data-dir D --bind 127.0.0.1:8090 --admin-bind 127.0.0.1:8091 --no-auto-update [--reuse-port] [--response-cache-mib 0]
+opencnpj loadtest --base-url http://127.0.0.1:8090 --urls bench/load-mix.txt --keys KEYS --users N --seconds S [--think-ms 1000] --out FILE
+```
+
+Raw reports: `/data/opencnpj-data/bench/load-*.json` (outside Git; summarized here).
+
+| Run | Users / keys | Pause | Requests | req/s | p50 ms | p95 ms | p99 ms | Errors | Cache |
+|---|---|---|---|---|---|---|---|---|---|
+| `load-2000u-closed` (response cache on) | 2,000 / 2,000 | none | 1,949,506 | 64,948 | 10.9 | 31.3 | 78.3 | 0 (all 200) | 1,934,240 HIT, 7,688 COALESCED, 7,578 MISS |
+| `load-2000u-closed-nocache-warm` (no response cache, keys already verified) | 2,000 / 2,000 | none | 21,425 | 600 | 5,108 | 5,898 | 6,289 | 0 (all 200) | — |
+| `load-5000u-think1s-swap4` (cache on, binary swapped at t = 25 s) | 5,000 / 5,000 | 1 s | 230,103 | 3,771 | 0.18 | 7.6 | 16,729 | 0 (all 200) | 222,085 HIT, 440 COALESCED, 7,578 MISS |
+
+Without the response cache and 2,000 users firing back to back, the mix offers far more
+nationwide searches than 16 cores compute; the separate lookup lane keeps CNPJ lookups at
+p50 5.8 ms / p99 275 ms while heavy queries queue (`load-2000u-closed-nocache-warm`, by
+type): lookup_cnpj 237/s p50 5.8 p99 275; search_text 206/s p50 5,503 p99 6,350;
+search_filters 105/s p50 5,324 p99 5,839; lookup_cpf 37/s p50 5,340; stats 15/s p50 5,927.
+
+Engine capacity per request type, no response cache, 256 users, 10 s each (keys verified):
+
+```
+lookup_cnpj                        34607 req/s  p50      6.7  p99      19.7 ms  {'200': 346221}
+name_full                            173 req/s  p50   1407.9  p99    2138.9 ms  {'200': 1972}
+name_prefix_typeahead                307 req/s  p50    741.1  p99    1770.7 ms  {'200': 3397}
+filter_selective                    1313 req/s  p50    188.0  p99     311.3 ms  {'200': 13366}
+lookup_cpf                           827 req/s  p50    300.1  p99     451.7 ms  {'200': 8491}
+stats_uf_by_cnae                      82 req/s  p50   2738.8  p99    4463.9 ms  {'200': 1034}
+sort_newest_in_municipio             711 req/s  p50    342.1  p99     689.8 ms  {'200': 7345}
+filter_mei_active_municipio          650 req/s  p50    352.1  p99     753.1 ms  {'200': 6896}
+```
+
+Zero-downtime binary swap (`load-5000u-think1s-swap4`, per-second timeline in the report).
+Instance B started with `--reuse-port` on the same ports at t = 25 s; A received SIGTERM,
+handed over 5,000 verified keys and 7,578 cached responses, served 5 s with
+`Connection: close` and drained:
+
+```
+  t=24 req   4975 err   0 p50      0.1 p99       0.3 max       0.4
+  t=25 req   5000 err   0 p50      0.2 p99       0.5 max       0.6
+  t=26 req   5000 err   0 p50      1.1 p99       9.2 max      13.3
+  t=27 req   4994 err   0 p50      0.1 p99       4.2 max       8.4
+  t=28 req   4977 err   0 p50      0.1 p99       0.3 max       0.5
+  ...
+  t=59 req   4996 err   0 p50      0.2 p99       0.5 max       0.7
+```
+
+From t = 23 s to the end: 184,770 requests, 0 errors, worst per-second p99 9.2 ms. The
+first swap test, before the handover and the drain period existed
+(`load-5000u-think1s-swap`, no timeline recorded), had 12 connection errors and a
+whole-run p95 of 7.3 s / p99 of 20.8 s, because every user's key went through Argon2 again
+on the new process. The first 22 s
+of every run are a cold boot (5,000 never-seen keys and an empty cache arriving at once):
+p99 grew to 22.6 s while keys were verified, which is why the whole-run p99 above is high.
+A cold boot happens only without a predecessor (DEPLOYMENT.md).
+
 ## Environment
 
 | | |

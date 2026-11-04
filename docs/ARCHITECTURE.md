@@ -118,6 +118,23 @@ bench, download, build, update) run this binary as child processes with log file
 crash or a long build never takes the server down; switching snapshots swaps an
 `Arc<Snapshot>` while in-flight requests finish on the old one.
 
+Data routes pass through two middlewares (`gate.rs`). The gate resolves the credential
+(a verified key is cached by its SHA-256, so Argon2 runs once per key per hour; session
+tokens are SHA-256 lookups), checks the account status and plan, takes a token from the
+caller's bucket and a unit from its daily and monthly counters (all in memory), and after
+the response records usage into a map that a background task writes to SQLite every five
+seconds in one transaction; search-log rows go through a bounded channel to a writer
+thread. The response cache (moka, W-TinyLFU, weighted by bytes) sits inside the gate:
+identical concurrent requests are coalesced into one computation, keys include the
+snapshot identity, and `ETag`/`If-None-Match` saves the body entirely. CNPJ lookups and
+heavy queries (searches, stats, CPF, export) run behind separate concurrency lanes.
+
+On SIGTERM a process writes its verified keys and cached responses to the data directory
+for its successor, answers with `Connection: close` for `--drain-secs`, then drains; with
+`--reuse-port` both processes share the listening sockets, so an upgrade drops no request
+(DEPLOYMENT.md). Accounts, roles, plans and moderation live in `accounts.rs`
+(`docs/ACCOUNTS.md`), the admin API in `manage.rs`, release checks in `autoupdate.rs`.
+
 ## Profiles
 
 All profiles store identical semantic content (the integration test asserts this). They
@@ -126,5 +143,5 @@ BENCHMARKS.md.
 
 ## Not in scope (yet)
 
-A public web portal, API keys/quotas (use a gateway), signed releases, GPU paths, a custom memory
-allocator — none showed a measured need.
+A public web portal, billing, signed releases, GPU paths, a custom memory allocator —
+none showed a measured need.

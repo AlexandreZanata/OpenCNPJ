@@ -8,14 +8,24 @@ opencnpj serve --data-dir data --bind 0.0.0.0:8080 --admin-bind 127.0.0.1:8081
 With `--data-dir`, the server follows `<data-dir>/current` (written by `opencnpj update`
 and by the admin "activate" action) and can run admin jobs.
 
-**This build has no authentication and no request limits by default**: page size up to
-10,000, no offset limit, export enabled with no row cap, no rate limiting. Only a 60 s
-per-request deadline and a concurrency bound (4 × cores) remain, both configurable.
-Keep the admin listener on a private address, and put a gateway in front before exposing
-the public API (see [DATA_POLICY.md](DATA_POLICY.md)).
+**Accounts are on by default** (`--auth required`): data routes need a login key or a
+session token (`Authorization: Bearer …`), and each account is metered by its plan (rate
+limit, daily and monthly quotas, page size, export, downloads). Registration, login,
+recovery by e-mail, roles, moderation and the admin API are in
+[ACCOUNTS.md](ACCOUNTS.md); production setup and capacity in [DEPLOYMENT.md](DEPLOYMENT.md).
+`--auth optional` serves anonymous callers under the `anonymous` plan (per IP);
+`--auth off` restores the open, unmetered behaviour.
 
-All responses are JSON. Errors keep the legacy shape:
-`{"error": "cnpj_not_found", "message": "cnpj not found", "code": 404}`.
+JSON endpoints return JSON; `/healthz` and `/health` return `ok`, `/metrics` Prometheus
+text, `/api/v1/export` NDJSON or CSV, `/downloads/*` the raw file. Errors keep the legacy
+shape: `{"error": "cnpj_not_found", "message": "cnpj not found", "code": 404}`.
+
+Data responses carry `X-Cache: HIT | MISS | COALESCED` and an `ETag` (send it back in
+`If-None-Match` for a `304`); with accounts, also `X-RateLimit-Limit/Remaining` and
+`X-Quota-Daily-*` / `X-Quota-Monthly-*`. Refusals: `401 unauthenticated |
+invalid_credentials`, `403 account_suspended | account_banned | plan_forbids_export |
+plan_forbids_downloads`, `400 limit_exceeds_plan`, `429 rate_limited | quota_exceeded`
+(with `Retry-After`).
 Values are the exact strings from the source; codes get a `*_descricao` sibling when a
 reference table or the RFB layout defines them.
 
@@ -30,20 +40,25 @@ reference table or the RFB layout defines them.
 | `GET /api/v1/search` (alias `/api/v1/busca`) | Name/CNPJ/CPF search and filters (below) |
 | `GET /api/v1/empresas/search?razao_social=` | Legacy alias: search restricted to `razao_social` |
 | `GET /api/v1/estabelecimentos/search` | Legacy alias of `/search` |
-| `GET /api/v1/stats?group_by=` | Counts per value of a filter field, or per year with `group_by=ano_<date column>`, restricted by the same parameters as `/search` |
-| `GET /api/v1/export?format=ndjson\|csv&max=` | Streaming export of every match (same parameters as `/search`) |
+| `GET /api/v1/stats?group_by=` (default `uf`) | Counts per value of a filter field, or per year with `group_by=ano_<date column>`, restricted by the same parameters as `/search` |
+| `GET /api/v1/export?format=ndjson\|csv&max=` | Streaming export, one row per matching **establishment** (same parameters as `/search`; companies without establishments match searches but have no row). Invalid parameters answer `400` before any row is sent. Rows are capped by `--export-max-rows` and by the caller's plan. |
 | `GET /api/v1/campos` | Machine-readable list of every parameter, filter, range and sort option |
 | `GET /api/v1/snapshot` | Competence, counts, section sizes, sources with SHA-256, snapshot SHA-256 |
 | `GET /api/v1/distribution` | Snapshot files offered for download, with sizes and SHA-256 |
 | `GET /downloads/{file}` | Download a snapshot / checksum / build report (supports `Range`, resumable) |
 | `GET /api/v1/dominios`, `/api/v1/dominios/{tabela}` | Reference tables (`cnaes`, `municipios`, `naturezas`, `paises`, `qualificacoes`, `motivos`) |
+| `GET /` | Service name, version and endpoint list |
 | `GET /healthz`, `/health`, `/readyz` | Liveness / readiness |
-| `GET /metrics` | Prometheus: per-route request counts, latency histograms, status classes, cache, RSS |
+| `GET /metrics` | Prometheus: per-route request counts, latency histograms, status classes, caches, rejections, RSS. On the public listener only with `--auth off`; otherwise on the admin listener (staff login). |
+| `/api/v1/auth/*` | Register, login, logout, profile, key rotation, recovery — see [ACCOUNTS.md](ACCOUNTS.md) |
+
+Public without a credential: `/`, health routes, `/campos`, `/dominios*`, `/snapshot`,
+`/distribution` and `/api/v1/auth/*`. Every other route above is a data route.
 
 ## Search parameters
 
 Comma-separated values of one parameter are OR-ed; different (or repeated) parameters
-are AND-ed. Responses include `total` (exact), `results`, `fuzzy_used`,
+are AND-ed, except `cnpj`, whose repeated values are OR-ed like commas. Responses include `total` (exact), `results`, `fuzzy_used`,
 `expansion_truncated`, `next_cursor` and `took_ms`.
 
 | Parameter | Meaning |
@@ -63,10 +78,10 @@ are AND-ed. Responses include `total` (exact), `results`, `fuzzy_used`,
 | `cep` | 8 digits or a prefix (`01310`) |
 | `ddd` | Area code of the first phone |
 | `contato`, `tem_email`, `tem_telefone` | `contato=email\|telefone`; aliases `tem_email=true`, `tem_telefone=true` |
-| `<column>_de`, `<column>_ate` | Inclusive range on `data_inicio_atividade`, `data_situacao_cadastral`, `data_opcao_simples`, `data_exclusao_simples`, `data_opcao_mei`, `data_exclusao_mei` (dates `YYYY-MM-DD`, `YYYYMMDD` or a year) and `capital_social` (reais; `_min`/`_max` also accepted) |
+| `<column>_de`, `<column>_ate` (aliases `_min`, `_max`) | Inclusive range on `data_inicio_atividade`, `data_situacao_cadastral`, `data_opcao_simples`, `data_exclusao_simples`, `data_opcao_mei`, `data_exclusao_mei` (dates `YYYY-MM-DD`, `YYYYMMDD` or a year) and `capital_social` (reais). Repeated bounds: the tightest wins |
 | `<column>_vazio=true` | Documents without a value in that column (e.g. never excluded) |
-| `ordenar` | `<column>:asc\|desc` (e.g. `data_inicio_atividade:desc` = newest first). Default: relevance for text, CNPJ order for filters |
-| `limit`, `offset` | Page size (≤ `--max-limit`, default 20) and offset (no limit by default) |
+| `ordenar` | `<column>:asc\|desc` (also `crescente`/`decrescente`; any other direction is a 400; e.g. `data_inicio_atividade:desc` = newest first). Default: relevance for text, CNPJ order for filters |
+| `limit`, `offset` | Page size (≤ `--max-limit` and the plan's `max_page_size`, default 20) and offset (no limit by default). `/api/v1/cpf/{cpf}?limit=` clamps instead of rejecting |
 | `cursor` | Filter-only queries: `next_cursor` from the previous page |
 
 Ranking for text queries: shortest matching name first (by token count of the field that
@@ -96,13 +111,26 @@ curl -o snap.ocnpj -C - 'localhost:8080/downloads/2026-10-balanced-1.2.ocnpj'
 | `--max-limit`, `--max-offset` | 10000, unlimited | Page size and depth |
 | `--disable-export`, `--export-max-rows` | export on, 0 = unlimited | Bulk streaming |
 | `--postings-cache-mib` | 512 | Decoded postings kept in memory |
-| `--hide-socios`, `--hide-contacts` | off | Data minimization |
+| `--hide-socios`, `--hide-contacts` | off | Data minimization: removes partners (including CPF partner matches) and phone/e-mail columns from lookups, searches and exports |
 | `--reload-secs` | 30 | Poll interval for `<data-dir>/current` |
+| `--auth` | `required` | `required`, `optional` (anonymous plan per IP) or `off` |
+| `--accounts-db` | `<data-dir>/accounts.sqlite` | Accounts database |
+| `--public-url`, `--smtp-url` (`OPENCNPJ_SMTP_URL`), `--mail-from` | `http://<bind>`, outbox, `no-reply@localhost` | E-mail links and delivery (no SMTP: `<data-dir>/outbox/*.eml`) |
+| `--session-hours` | 168 | Session lifetime after a login |
+| `--response-cache-mib`, `--response-cache-ttl-secs` | 256, 3600 | Shared response cache (0 disables) |
+| `--no-compression` | off | gzip/br/zstd are negotiated by default (never for downloads) |
+| `--trust-proxy` | off | Client address from `X-Forwarded-For` (behind Caddy/nginx) |
+| `--reuse-port`, `--drain-secs` | off, 5 | Zero-downtime restarts: see [DEPLOYMENT.md](DEPLOYMENT.md) |
+| `--no-auto-update`, `--auto-update-hours` | updates on (setting), 0 | Automatic RFB release updates |
 
 ## Admin suite (`http://<admin-bind>/admin`)
 
-A single-page dashboard (no external assets) plus a JSON API, on its own listener with
-**no authentication**:
+A single-page dashboard (no external assets) plus a JSON API, on its own listener. With
+accounts on, the page asks for a staff login key and every `/admin/api/*` route checks the
+caller's role permissions; account management, moderation, plans, usage, the search log,
+the audit log, settings and update status are documented in [ACCOUNTS.md](ACCOUNTS.md).
+The same API drives the native desktop app (`crates/opencnpj-desktop`, binary
+`opencnpj-admin`):
 
 | Tab / endpoint | What it does |
 |----------------|--------------|
@@ -126,7 +154,7 @@ A single-page dashboard (no external assets) plus a JSON API, on its own listene
 | `POST /api/v1/export/csv`, `/export/phones` | `GET /api/v1/export` (`tem_telefone=true` for phone lists) |
 | `GET /api/v1/stats/uf`, `/stats/cnae`, `/analytics/summary` | `GET /api/v1/stats?group_by=uf|cnae|...` |
 | `GET /api/v1/lookup/*` (typeahead) | `GET /api/v1/dominios/{tabela}`, `GET /api/v1/search?q=` |
-| API keys, quotas | Not part of the engine; use a gateway |
+| API keys, quotas | Built in: single login key per user, plans with rate limits and quotas ([ACCOUNTS.md](ACCOUNTS.md)) |
 | Admin panel | `/admin` on the admin listener (metrics, operations, jobs) |
 | `GET /health`, `/readyz`, `/metrics` | Same paths (+ `/healthz`) |
 

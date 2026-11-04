@@ -20,9 +20,12 @@ Send either credential as `Authorization: Bearer <key or token>`. `X-API-Key: <k
 accepted. A user has at most one active key ("chave única"); issuing a new one revokes the old
 one.
 
-Argon2 runs once per key per process: a verified key is remembered by its SHA-256 for ten
-minutes, so the hot path costs a hash and a map lookup. Revoking a key, or suspending or
-banning a user, takes effect immediately.
+Argon2 runs once per key per hour: a verified key is remembered by its SHA-256, so the
+hot path costs a hash and a map lookup, and on a restart the stopping process hands the
+remembered digests to its successor (DEPLOYMENT.md). Revoking a key, or suspending or
+banning a user, takes effect immediately in the server that does it; a key rotated from
+the command line while a server runs stops working there within the hour (use the admin
+API for immediate effect). Session tokens are SHA-256 lookups and never need Argon2.
 
 ## Account lifecycle
 
@@ -181,5 +184,10 @@ opencnpj accounts --data-dir DATA set-role --username ana --role moderator
 opencnpj accounts --data-dir DATA rotate-key --username ana
 ```
 
-`create` and `rotate-key` print the key once. These commands work on the SQLite file directly,
-with or without a running server.
+```bash
+opencnpj accounts --data-dir DATA backup --out accounts-2026-11-04.sqlite   # consistent copy while running
+opencnpj accounts --data-dir DATA seed --count 5000 --plan pro --key-file keys.txt   # load-test accounts
+```
+
+`create` and `rotate-key` print the key once (or write it to `--key-file`, mode 0600).
+These commands work on the SQLite file directly, with or without a running server.

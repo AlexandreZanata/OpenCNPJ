@@ -66,15 +66,28 @@ What the engine indexes and exposes (format 1.2), and the controls available:
 * Partner names are not indexed for full-text search.
 * `serve --hide-socios` and `--hide-contacts` remove partners and phone/e-mail fields
   from every API response.
-* **No limits by default**: no authentication, export enabled without a row cap, page
-  size up to 10,000, no offset cap, no rate limiting. Only a request deadline and a
-  concurrency bound remain. The admin listener has no authentication either and can start
-  downloads and rebuilds: bind it to a private address.
+* **Accounts and limits are on by default** (`--auth required`): every data request is
+  tied to an account and metered by its plan (rate limit, daily/monthly quotas, page size,
+  export and download rights). Staff can suspend or ban accounts, and every staff action is
+  in the audit log. `--auth off` removes all of this; use it only on a private network.
+* Restrict `/api/v1/cpf` and the `cpf` filters (or use `--hide-socios`) if the
+  deployment's purpose does not require locating people's businesses by CPF.
 
-Before exposing this API publicly, put a gateway in front (TLS, authentication or API
-keys, per-client rate limits, access logs with short retention), consider
-`--hide-contacts`/`--hide-socios`, and restrict `/api/v1/cpf` and the `cpf` filters if
-the deployment's purpose does not require locating people's businesses by CPF.
+### Data about API users
+
+The accounts database (`accounts.sqlite`) holds, per user: username, e-mail address, role,
+plan, status and moderation notes; Argon2id hashes of login keys (never the keys);
+SHA-256 hashes of session and recovery tokens; per-day request counts by type; session
+IP address and user agent; and, while the `search_log` setting is on, each data request
+(time, route, query string, status, latency, client IP) for `search_log_days` days
+(default 30), after which a background task deletes it. The audit log keeps staff
+actions with the actor's address. Deleting an account removes its keys, sessions,
+recovery tokens, usage rows and search log; audit entries keep the username that was
+acted on.
+
+Query strings can contain CPFs and names typed by users: keep the retention short, turn
+`search_log` off when it is not needed, and restrict `usage.read` to staff who need it.
+Use `opencnpj accounts backup` for consistent copies and protect them like the live file.
 
 Operators are the controllers of their deployment: document the purpose, honour data
 subject requests that apply to them, and do not combine this data with other sources to
