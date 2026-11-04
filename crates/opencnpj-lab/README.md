@@ -32,3 +32,20 @@ CNAE codes, including codes absent from the reference tables. Each row gives
 the count of distinct documents for its field and code. `uf_distribution` is
 a JSON object keyed by the indexed UF. The empty key counts documents with
 no indexed UF. A document can contribute to several secondary CNAE rows.
+
+## Build the municipality catalogue
+
+```sh
+cargo build --release -p opencnpj-lab
+"$CARGO_TARGET_DIR/release/opencnpj-intel" catalog municipalities \
+  --snapshot /data/opencnpj-data/snapshots/2026-10-balanced-1.2.ocnpj \
+  --raw /data/opencnpj-data/intelligence/catalog-raw/2026-11-04 \
+  --out /data/opencnpj-data/intelligence/catalog-municipalities/2026-10
+```
+
+The raw directory contains `manifest.json` with URLs, sizes, SHA-256 hashes
+and usage notes for the Tesouro and IBGE files. The command checks the raw
+files against that manifest, reads all used TOM codes from the snapshot, and
+publishes a verified catalogue to an absent or empty destination. The output
+includes `municipalities.tsv`, `overrides.tsv`, `rfb-name-differences.tsv`, and
+a deterministic `manifest.json` identifying the snapshot, sources and outputs.

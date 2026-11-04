@@ -2597,6 +2597,7 @@ dependencies = [
 name = "opencnpj-insights"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "opencnpj-query",
  "opencnpj-store",
 ]
@@ -2615,12 +2616,15 @@ dependencies = [
  "opencnpj-nlu",
  "opencnpj-query",
  "opencnpj-store",
+ "quick-xml",
  "roaring",
+ "rusqlite",
  "serde",
  "serde_json",
  "tempfile",
  "tokio",
  "tower",
+ "zip",
 ]
 
 [[package]]

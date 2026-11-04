@@ -1,7 +1,7 @@
 //! Data assets, query execution and answer rendering.
 
 /// Reference catalogue loading.
-pub mod catalog {}
+pub mod catalog;
 
 /// Aggregate artifact reading and writing.
 pub mod agg {}

@@ -16,18 +16,21 @@ path = "src/main.rs"
 anyhow.workspace = true
 clap.workspace = true
 opencnpj-core.workspace = true
+opencnpj-ingest.workspace = true
 opencnpj-query.workspace = true
 opencnpj-nlu.workspace = true
 opencnpj-insights.workspace = true
 opencnpj-store.workspace = true
+quick-xml.workspace = true
 roaring.workspace = true
+rusqlite.workspace = true
+serde.workspace = true
 serde_json.workspace = true
 tempfile.workspace = true
+zip.workspace = true
 
 [dev-dependencies]
 axum.workspace = true
 opencnpj = { path = "../opencnpj" }
-opencnpj-ingest.workspace = true
-serde.workspace = true
 tokio.workspace = true
 tower.workspace = true

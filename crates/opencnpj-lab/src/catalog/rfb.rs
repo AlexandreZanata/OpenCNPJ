@@ -44,7 +44,7 @@ fn output(dir: &Path, name: &str) -> Result<BufWriter<File>> {
     Ok(BufWriter::new(File::create(&path).with_context(|| format!("create {}", path.display()))?))
 }
 
-fn write_cell(writer: &mut impl Write, value: &str) -> std::io::Result<()> {
+pub(super) fn write_cell(writer: &mut impl Write, value: &str) -> std::io::Result<()> {
     if value.contains(['\t', '\r', '\n', '"']) {
         write!(writer, "\"{}\"", value.replace('"', "\"\""))
     } else {
