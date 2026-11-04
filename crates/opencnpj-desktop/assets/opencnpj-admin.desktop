@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=OpenCNPJ Admin
+GenericName=OpenCNPJ server administration
+Comment=Manage accounts, plans, usage and operations of an OpenCNPJ server
+Exec=opencnpj-admin
+Icon=opencnpj-admin
+Terminal=false
+Categories=Development;Network;Utility;
+Keywords=OpenCNPJ;CNPJ;admin;API;
+StartupWMClass=opencnpj-admin
+StartupNotify=true

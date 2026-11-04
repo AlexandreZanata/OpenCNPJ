@@ -1,0 +1,27 @@
+[package]
+name = "opencnpj-desktop"
+description = "Native desktop admin application for the OpenCNPJ server"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "opencnpj-admin"
+path = "src/main.rs"
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+# OpenGL (glow) renderer only; X11 and Wayland libraries are loaded at runtime.
+eframe = { version = "0.33.3", default-features = false, features = ["default_fonts", "glow", "wayland", "x11"] }
+egui_extras = { version = "0.33.3", default-features = false }
+egui_plot = "0.34.1"
+# Same major as eframe's winit: enables `wayland-dlopen` (no libwayland-dev needed to build)
+# and client-side decorations on Wayland compositors without server-side decorations.
+winit = { version = "0.30.12", default-features = false, features = ["rwh_06", "x11", "wayland", "wayland-dlopen", "wayland-csd-adwaita"] }
+ureq = { version = "3.1", default-features = false, features = ["rustls", "gzip"] }
+
+[dev-dependencies]
+tempfile.workspace = true

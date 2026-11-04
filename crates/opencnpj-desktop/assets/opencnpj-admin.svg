@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 64 64">
+  <title>OpenCNPJ Admin</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#458ffa"/>
+      <stop offset="1" stop-color="#1c4fd9"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="60" height="60" rx="13" fill="url(#bg)"/>
+  <g stroke="#ffffff" stroke-linecap="round" fill="none">
+    <g stroke-width="5.2" opacity="0.85">
+      <line x1="13" y1="18" x2="39" y2="18"/>
+      <line x1="13" y1="27" x2="33" y2="27"/>
+      <line x1="13" y1="36" x2="27" y2="36"/>
+    </g>
+    <circle cx="38" cy="37" r="11" stroke-width="6.4"/>
+    <line x1="46.5" y1="45.5" x2="53" y2="52" stroke-width="7.2"/>
+  </g>
+</svg>
