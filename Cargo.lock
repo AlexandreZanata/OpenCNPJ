@@ -2594,6 +2594,42 @@ dependencies = [
 ]
 
 [[package]]
+name = "opencnpj-insights"
+version = "0.1.0"
+dependencies = [
+ "opencnpj-query",
+ "opencnpj-store",
+]
+
+[[package]]
+name = "opencnpj-lab"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "opencnpj",
+ "opencnpj-insights",
+ "opencnpj-nlu",
+ "opencnpj-query",
+]
+
+[[package]]
+name = "opencnpj-nlu"
+version = "0.1.0"
+dependencies = [
+ "fst",
+ "opencnpj-core",
+ "opencnpj-query",
+]
+
+[[package]]
+name = "opencnpj-query"
+version = "0.1.0"
+dependencies = [
+ "opencnpj-core",
+ "serde",
+]
+
+[[package]]
 name = "opencnpj-store"
 version = "0.1.0"
 dependencies = [

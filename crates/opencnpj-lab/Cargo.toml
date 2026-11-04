@@ -1,0 +1,22 @@
+[package]
+name = "opencnpj-lab"
+description = "Build and evaluation tools for OpenCNPJ Intelligence"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+
+[[bin]]
+name = "opencnpj-intel"
+path = "src/main.rs"
+
+[dependencies]
+clap.workspace = true
+opencnpj-query.workspace = true
+opencnpj-nlu.workspace = true
+opencnpj-insights.workspace = true
+
+[dev-dependencies]
+opencnpj = { path = "../opencnpj" }
