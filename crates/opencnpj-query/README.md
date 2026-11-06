@@ -12,6 +12,11 @@ filters, clips date ranges to the data range and reconciles geographic
 filters using the supplied catalogue context. It returns presentation order
 separately so a reordered comparison can share a cache entry.
 
+`validate::validate(request, &capabilities)` returns a `ValidRequest` or the
+issues found (`Missing`, `Ambiguous`, `Impossible`) with complete IR options
+for the clarification. `ValidRequest` has a private constructor, so execution
+can only receive requests that passed validation.
+
 `codec::encode` and `decode` use the version byte, stable enum tags and
 unsigned LEB128 integers. Set encodings must be sorted and unique. Catalogue
 versions and the aggregate identity invalidate cache keys when data changes.

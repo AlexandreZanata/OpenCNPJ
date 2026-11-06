@@ -20,6 +20,14 @@ impl Competence {
         (1..=12).contains(&month).then_some(())?;
         Some(Self(offset.checked_add(u16::from(month - 1))?))
     }
+
+    pub fn year(self) -> u16 {
+        2000 + self.0 / 12
+    }
+
+    pub fn month(self) -> u8 {
+        1 + (self.0 % 12) as u8
+    }
 }
 
 impl fmt::Display for Competence {
@@ -40,10 +48,11 @@ impl Day {
     }
 }
 
-impl fmt::Display for Day {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+impl Day {
+    /// Calendar components, or `None` for the missing-day sentinel and out-of-range values.
+    pub fn to_ymd(self) -> Option<(u16, u8, u8)> {
         if self.0 == 0 || self.0 > year_start(10_000) {
-            return write!(f, "day({})", self.0);
+            return None;
         }
         let mut year = 1900 + (self.0 - 1) / 365;
         while year_start(year) >= self.0 {
@@ -55,7 +64,16 @@ impl fmt::Display for Day {
             day -= u32::from(month_days(year, month));
             month += 1;
         }
-        write!(f, "{year:04}-{month:02}-{day:02}")
+        Some((year as u16, month, day as u8))
+    }
+}
+
+impl fmt::Display for Day {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self.to_ymd() {
+            Some((year, month, day)) => write!(f, "{year:04}-{month:02}-{day:02}"),
+            None => write!(f, "day({})", self.0),
+        }
     }
 }
 
@@ -157,6 +175,10 @@ macro_rules! flags {
 
             pub const fn contains(self, flag: $flag) -> bool {
                 self.0 & Self::only(flag).0 != 0
+            }
+
+            pub const fn is_empty(self) -> bool {
+                self.0 == 0
             }
 
             pub fn iter(self) -> impl Iterator<Item = $flag> {
@@ -325,17 +347,33 @@ pub enum Op {
 }
 
 impl Op {
-    fn default_status(&self) -> StatusSet {
-        let metric = match self {
-            Self::Count { metric } | Self::Compare { metric, .. } | Self::Rank { metric, .. } | Self::Breakdown { metric, .. } => *metric,
-            Self::Trend { metric, .. } => Metric::Flow(*metric),
-            Self::List { .. } => Metric::Stock,
-            Self::Lookup { .. } | Self::Meta { .. } => return StatusSet::ALL,
-        };
-        match metric {
-            Metric::Flow(FlowMetric::Closures) => StatusSet::only(Status::Closed),
-            Metric::Flow(_) => StatusSet::ALL,
-            _ => StatusSet::only(Status::Active),
+    /// Metric used by this operation, with the implicit stock of `List`.
+    pub fn metric(&self) -> Option<Metric> {
+        match self {
+            Self::Count { metric } | Self::Compare { metric, .. } | Self::Rank { metric, .. } | Self::Breakdown { metric, .. } => {
+                Some(*metric)
+            }
+            Self::Trend { metric, .. } => Some(Metric::Flow(*metric)),
+            Self::List { .. } => Some(Metric::Stock),
+            Self::Lookup { .. } | Self::Meta { .. } => None,
+        }
+    }
+
+    /// Dimension this operation aggregates over, when it has one.
+    pub fn dimension(&self) -> Option<Dim> {
+        match self {
+            Self::Compare { dim, .. } | Self::Rank { dim, .. } | Self::Breakdown { dim, .. } => Some(*dim),
+            _ => None,
+        }
+    }
+
+    /// Status filter implied by the operation when the caller did not pin one (D-02).
+    pub fn default_status(&self) -> StatusSet {
+        match self.metric() {
+            Some(Metric::Flow(FlowMetric::Closures)) => StatusSet::only(Status::Closed),
+            Some(Metric::Flow(_)) => StatusSet::ALL,
+            Some(_) => StatusSet::only(Status::Active),
+            None => StatusSet::ALL,
         }
     }
 }

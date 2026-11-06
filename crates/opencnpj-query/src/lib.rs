@@ -7,7 +7,7 @@ pub mod ir;
 pub mod codec;
 
 /// Validation against execution capabilities.
-pub mod validate {}
+pub mod validate;
 
 /// Textual representation of requests.
 pub mod print;
