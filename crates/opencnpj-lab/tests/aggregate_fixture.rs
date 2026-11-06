@@ -1,11 +1,16 @@
 use std::{
     collections::{BTreeMap, BTreeSet},
-    fs::File,
-    path::Path,
+    fs::{self, File},
+    io::{Read, Write},
+    path::{Path, PathBuf},
     process::Command,
 };
 
 use opencnpj_core::schema::col;
+use opencnpj_ingest::{
+    build::{self, BuildConfig, Profile},
+    testkit,
+};
 use opencnpj_insights::{
     agg::{ActiveDetail, Aggregate, Cell, Key, MUNICIPALITY_MISSING, Section, Table, UF_MISSING, flow_bucket, stock_detail, uf_id},
     catalog::municipalities::{Geography, Municipality, MunicipalityCatalogue, Place, fold_name},
@@ -16,7 +21,7 @@ use opencnpj_store::Snapshot;
 #[test]
 fn aggregates_match_decoded_rows_and_engine() {
     let directory = tempfile::tempdir_in(env!("CARGO_TARGET_TMPDIR")).unwrap();
-    let (snapshot_path, _) = opencnpj_ingest::testkit::build_fixture(directory.path(), "balanced");
+    let snapshot_path = build_fixture_with_br(directory.path());
     let snapshot = Snapshot::open(&snapshot_path).unwrap();
     let mut toms = BTreeSet::new();
     for (tom, _) in snapshot.field_values(opencnpj_store::postings::Field::Municipio).unwrap() {
@@ -58,6 +63,8 @@ fn aggregates_match_decoded_rows_and_engine() {
     run(&["diff-agg", "--sample", "10000", "--seed", "42"], &snapshot_path, &catalogue_path, "--agg", &aggregate_path);
 
     let aggregate = Aggregate::open(&aggregate_path).unwrap();
+    assert_eq!(aggregate.get(Section::Uf(Table::T2), 28).unwrap(), 1);
+    assert_eq!(aggregate.get(Section::Uf(Table::T1), 28).unwrap(), 0);
     let mut expected: BTreeMap<Section, BTreeMap<u64, u64>> = BTreeMap::new();
     let mut add = |section: Section, key: u64| *expected.entry(section).or_default().entry(key).or_default() += 1;
     let ids = (0..snapshot.doc_count()).collect::<Vec<_>>();
@@ -133,6 +140,46 @@ fn aggregates_match_decoded_rows_and_engine() {
             }
         }
     }
+}
+
+fn build_fixture_with_br(directory: &Path) -> PathBuf {
+    let input = directory.join("2026-10");
+    fs::create_dir(&input).unwrap();
+    testkit::fixture(&input);
+    let zip_path = input.join("Estabelecimentos0.zip");
+    let (name, data) = {
+        let mut zip = zip::ZipArchive::new(File::open(&zip_path).unwrap()).unwrap();
+        let mut member = zip.by_index(0).unwrap();
+        let mut data = Vec::new();
+        member.read_to_end(&mut data).unwrap();
+        (member.name().unwrap().into_owned(), data)
+    };
+    let from = b"\"MG\";\"4123\"";
+    let offset = data.windows(from.len()).position(|bytes| bytes == from).unwrap();
+    let mut zip = zip::ZipWriter::new(File::create(zip_path).unwrap());
+    zip.start_file(name, zip::write::SimpleFileOptions::default()).unwrap();
+    zip.write_all(&data[..offset]).unwrap();
+    zip.write_all(b"\"BR\";\"4123\"").unwrap();
+    zip.write_all(&data[offset + from.len()..]).unwrap();
+    zip.finish().unwrap();
+    let output = directory.join("balanced.ocnpj");
+    build::build(
+        &BuildConfig {
+            input,
+            output: output.clone(),
+            tmp: directory.join("work"),
+            competence: "2026-10".into(),
+            profile: Profile::preset("balanced").unwrap(),
+            workers: 4,
+            readers: 2,
+            keep_partition: false,
+            sample_every: None,
+            plain_columns: false,
+        },
+        &|_| {},
+    )
+    .unwrap();
+    output
 }
 
 fn run(arguments: &[&str], snapshot: &Path, catalogue: &Path, out_flag: &str, out: &Path) {

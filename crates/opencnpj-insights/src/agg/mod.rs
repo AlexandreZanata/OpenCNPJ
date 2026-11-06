@@ -16,7 +16,7 @@ pub const MUNICIPALITY_MISSING: u16 = u16::MAX;
 
 const UFS: &[&str] = &[
     "AC", "AL", "AM", "AP", "BA", "CE", "DF", "ES", "GO", "MA", "MG", "MS", "MT", "PA", "PB", "PE", "PI", "PR", "RJ", "RN", "RO", "RR",
-    "RS", "SC", "SE", "SP", "TO", "EX",
+    "RS", "SC", "SE", "SP", "TO", "EX", "BR",
 ];
 
 pub fn uf_id(code: &str) -> Option<UfId> {

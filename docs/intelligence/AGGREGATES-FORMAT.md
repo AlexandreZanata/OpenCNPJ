@@ -64,7 +64,9 @@ CNAE uses the exact raw seven-digit subclass and has value zero when absent.
 Municipality uses the dense catalogue ID with `65535` reserved for missing.
 UF uses the snapshot's indexed UF, so an establishment whose municipality's
 official UF differs still contributes to the same UF as the engine. UF IDs
-are alphabetic by abbreviation with EX appended and `31` for missing.
+assign the federative abbreviations alphabetically to `0..=26`. `27` is
+`EX` and `28` preserves the literal historical source value `BR`.
+`29` and `30` are unassigned. `31` represents a missing UF.
 
 | Table | Grain | Detail |
 |---|---|---|
