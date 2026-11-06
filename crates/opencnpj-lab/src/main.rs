@@ -2,6 +2,7 @@
 
 mod aggregate;
 mod catalog;
+mod eval;
 mod query;
 mod synth;
 
@@ -42,12 +43,12 @@ enum Command {
     Lang,
     /// Train experimental classifiers.
     Train,
-    /// Evaluate interpreters on labelled sets.
-    Eval,
+    /// Evaluate predictions on a frozen labelled set.
+    Eval(eval::EvalArgs),
     /// Benchmark question interpretation.
-    BenchNlu,
+    BenchNlu(eval::BenchNluArgs),
     /// Benchmark aggregate query execution.
-    BenchAgg,
+    BenchAgg(query::DiffArgs),
 }
 
 fn main() -> anyhow::Result<()> {
@@ -59,6 +60,9 @@ fn main() -> anyhow::Result<()> {
         Some(Command::BenchExec(args)) => query::bench(args),
         Some(Command::RemoteCount(args)) => query::remote_count(args),
         Some(Command::Synth(args)) => synth::run(args),
+        Some(Command::Eval(args)) => eval::run_eval(args),
+        Some(Command::BenchNlu(args)) => eval::run_bench_nlu(args),
+        Some(Command::BenchAgg(args)) => query::bench(args),
         Some(_) => Cli::command().error(ErrorKind::InvalidSubcommand, "subcommand not implemented").exit(),
         None => Ok(Cli::command().print_help()?),
     }
