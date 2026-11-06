@@ -767,3 +767,161 @@ mod tests {
         assert_eq!(metrics.negation_errors, 1);
     }
 }
+
+#[cfg(test)]
+mod sets {
+    use std::collections::{BTreeMap, BTreeSet};
+
+    use opencnpj_insights::agg;
+    use opencnpj_query::validate::{self, Capabilities};
+    use serde::Deserialize;
+    use sha2::{Digest, Sha256};
+
+    use super::*;
+
+    const ADV: &str = include_str!("../eval/adv.jsonl");
+    const OOD: &str = include_str!("../eval/ood.jsonl");
+    const INFORMAL: &str = include_str!("../eval/h-informal.jsonl");
+    const DIALOGUES: &str = include_str!("../eval/dialogues.jsonl");
+    const CONTEXT: &str = include_str!("../eval/context.json");
+    const CARD: &str = include_str!("../eval/DATASET-CARD.md");
+
+    #[derive(Deserialize)]
+    struct ContextFile {
+        municipalities: BTreeMap<u16, String>,
+        sectors: BTreeMap<u16, Vec<u32>>,
+        sector_count: u16,
+        catalogue_versions: CatalogueVersions,
+    }
+
+    #[derive(Deserialize)]
+    struct Dialogue {
+        id: String,
+        turns: Vec<DialogueTurn>,
+    }
+
+    #[derive(Deserialize)]
+    struct DialogueTurn {
+        gold: Gold,
+    }
+
+    fn parse<T: serde::de::DeserializeOwned>(text: &str) -> Vec<T> {
+        text.lines().filter(|line| !line.trim().is_empty()).map(|line| serde_json::from_str(line).expect("set line")).collect()
+    }
+
+    fn sha(text: &str) -> String {
+        let digest = Sha256::digest(text.as_bytes());
+        digest.iter().map(|byte| format!("{byte:02x}")).collect()
+    }
+
+    fn validation_caps(context: &ContextFile) -> Capabilities {
+        let mut competences = Vec::new();
+        let (mut year, mut month) = (2024, 11);
+        for _ in 0..24 {
+            competences.push(Competence::from_year_month(year, month).unwrap());
+            month += 1;
+            if month == 13 {
+                month = 1;
+                year += 1;
+            }
+        }
+        Capabilities {
+            current: Competence(321),
+            competences,
+            flow_days: Day(1)..=Day(46305),
+            populations: vec![PopulationRef::IbgeCensus(2022), PopulationRef::IbgeEstimate(2025)],
+            catalogue_versions: context.catalogue_versions,
+            sector_count: context.sector_count,
+            geography: true,
+            list_limit: 100,
+        }
+    }
+
+    fn validate_ir(item: &Item, context: &CanonicalContext<'_>, caps: &Capabilities) {
+        let ir = item.gold.ir.as_ref().unwrap_or_else(|| panic!("{} lacks the executable IR", item.id));
+        let request: Request = serde_json::from_value(ir.clone()).unwrap_or_else(|error| panic!("{} IR: {error}", item.id));
+        let canonical = request.canonicalize(context).unwrap_or_else(|error| panic!("{} canonical: {error:?}", item.id)).0;
+        validate::validate(canonical, caps).unwrap_or_else(|issues| panic!("{} invalid: {issues:?}", item.id));
+        if let Some(intent) = &item.gold.intent {
+            assert_eq!(intent_of(ir).as_deref(), Some(intent.as_str()), "{} intent", item.id);
+        }
+    }
+
+    #[test]
+    fn frozen_sets_validate_and_cover_rules() {
+        let context_file: ContextFile = serde_json::from_str(CONTEXT).expect("context");
+        let municipality_ufs = context_file
+            .municipalities
+            .iter()
+            .filter_map(|(id, uf)| agg::uf_id(uf).map(|uf| (MunicipalityId(*id), uf)))
+            .collect::<BTreeMap<_, _>>();
+        let sector_cnaes = context_file
+            .sectors
+            .iter()
+            .map(|(id, cnaes)| (SectorId(*id), SmallSet::new(cnaes.iter().map(|code| CnaeCode::Subclass(*code)))))
+            .collect::<BTreeMap<_, _>>();
+        let context =
+            CanonicalContext { first_day: Day(1), last_day: Day(46305), municipality_ufs: &municipality_ufs, sector_cnaes: &sector_cnaes };
+        let caps = validation_caps(&context_file);
+        let mut rules: BTreeMap<String, usize> = BTreeMap::new();
+        let mut traps: BTreeMap<String, usize> = BTreeMap::new();
+        let mut ids = BTreeSet::new();
+        for (name, text, minimum) in [("adv", ADV, 300), ("ood", OOD, 400), ("informal", INFORMAL, 200)] {
+            let items: Vec<Item> = parse(text);
+            assert!(items.len() >= minimum, "{name} size {}", items.len());
+            for item in &items {
+                assert!(ids.insert(item.id.clone()), "duplicate {}", item.id);
+                match item.gold.decision.as_str() {
+                    "execute" | "execute_with_note" => validate_ir(item, &context, &caps),
+                    "clarify" | "reject" => assert!(item.gold.ir.is_none(), "{} must not carry an IR", item.id),
+                    other => panic!("{} decision {other}", item.id),
+                }
+                for rule in &item.rules {
+                    *rules.entry(rule.clone()).or_default() += 1;
+                }
+                if let Some(trap) = item.meta.get("trap").and_then(serde_json::Value::as_str) {
+                    *traps.entry(trap.into()).or_default() += 1;
+                }
+            }
+            if name == "ood" {
+                assert!(items.iter().all(|item| item.gold.decision == "reject"), "OOD must reject");
+            }
+        }
+        for rule in (1..=14).map(|index| format!("SR-{index:02}")) {
+            assert!(rules.get(&rule).copied().unwrap_or(0) >= 5, "rule {rule} coverage");
+        }
+        for trap in ["abertas", "menos", "grandes", "fecharam", "crescendo", "mais"] {
+            assert!(traps.get(trap).copied().unwrap_or(0) >= 5, "trap {trap} coverage");
+        }
+
+        let dialogues: Vec<Dialogue> = parse(DIALOGUES);
+        assert!(dialogues.len() >= 60, "dialogues {}", dialogues.len());
+        for dialogue in &dialogues {
+            assert!(dialogue.turns.len() >= 2, "{} turns", dialogue.id);
+            for turn in &dialogue.turns {
+                if turn.gold.decision == "execute" || turn.gold.decision == "execute_with_note" {
+                    let item = Item {
+                        id: dialogue.id.clone(),
+                        text: String::new(),
+                        gold: turn.gold.clone(),
+                        meta: serde_json::Value::Null,
+                        rules: Vec::new(),
+                        context: None,
+                    };
+                    validate_ir(&item, &context, &caps);
+                }
+            }
+        }
+
+        for (name, text) in [
+            ("adv.jsonl", ADV),
+            ("ood.jsonl", OOD),
+            ("h-informal.jsonl", INFORMAL),
+            ("dialogues.jsonl", DIALOGUES),
+            ("context.json", CONTEXT),
+        ] {
+            let digest = sha(text);
+            assert!(CARD.contains(&digest), "{name} SHA-256 not in the dataset card");
+        }
+    }
+}
