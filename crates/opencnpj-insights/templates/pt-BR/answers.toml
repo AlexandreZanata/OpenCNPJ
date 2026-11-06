@@ -1,0 +1,169 @@
+# pt-BR answer templates. Placeholders are filled from the result and provenance.
+
+["count.stock.scalar.first"]
+variants = ["Segundo a base da Receita Federal de {competence:month_year}, {place} tem {value:int} {unit:plural(value)} {status:adj(value)} de {sector:label}.", "{place} tem {value:int} {unit:plural(value)} {status:adj(value)} de {sector:label}, segundo a Receita Federal de {competence:month_year}."]
+
+["count.stock.scalar.followup"]
+variants = ["{place_em_cap}: {value:int} {unit:plural(value)} {status:adj(value)}."]
+
+["count.flow.scalar.first"]
+variants = ["Entre {from:month_year} e {to:month_year}, {place} registrou {value:int} {flow} de {sector:label}."]
+
+["count.flow.scalar.followup"]
+variants = ["{place_em_cap}: {value:int} {flow}."]
+
+["count.active_change.scalar.first"]
+variants = ["Entre {from:month_year} e {to:month_year}, o estoque de {sector:label} {place_em} variou {value:int} {unit:plural(value)}."]
+
+["count.active_change.scalar.followup"]
+variants = ["{place_em_cap}: {value:int} {unit:plural(value)}."]
+
+["count.per10k.ratio.first"]
+variants = ["Em {competence:month_year}, {place} tinha {value:dec1} {sector:label_plural} ativas por dez mil habitantes (população {population:int}, {population_year})."]
+
+["count.per10k.ratio.followup"]
+variants = ["{place_em_cap}: {value:dec1} por dez mil habitantes."]
+
+["count.inhabitants_per.ratio.first"]
+variants = ["Em {competence:month_year}, {place} tinha {value:dec1} habitantes por {sector:label} ativa (população {population:int})."]
+
+["count.inhabitants_per.ratio.followup"]
+variants = ["{place_em_cap}: {value:dec1} habitantes por {sector:label}."]
+
+["count.share.ratio.first"]
+variants = ["Em {competence:month_year}, a participação de {sector:label} em {place} foi {value:dec1}%."]
+
+["count.share.ratio.followup"]
+variants = ["{place_em_cap}: {value:dec1}%."]
+
+["compare.stock.rows.first"]
+variants = ["Entre {a.place} e {b.place}, {a.place} tem {a.value:int} contra {b.value:int} em {b.place} ({diff_pct:pct1} {diff_dir})."]
+
+["compare.stock.rows.followup"]
+variants = ["Em {a.place} contra {b.place}: {diff_pct:pct1} {diff_dir}."]
+
+["compare.flow.rows.first"]
+variants = ["Entre {a.place} e {b.place}, {a.place} registra {a.value:int} {flow}, contra {b.value:int} em {b.place} ({diff_pct:pct1} {diff_dir})."]
+
+["compare.flow.rows.followup"]
+variants = ["Em {a.place} contra {b.place}: {diff_pct:pct1} {diff_dir}."]
+
+["compare.active_change.rows.first"]
+variants = ["Entre {a.place} e {b.place}, a variação em {a.place} foi {a.value:int}, contra {b.value:int} em {b.place} ({diff_pct:pct1} {diff_dir})."]
+
+["compare.active_change.rows.followup"]
+variants = ["Em {a.place} contra {b.place}: {diff_pct:pct1} {diff_dir}."]
+
+["compare.per10k.rows.first"]
+variants = ["Em {competence:month_year}, {a.place} tinha {a.value:dec1} {sector:label_plural} ativas por dez mil habitantes, contra {b.value:dec1} em {b.place} ({diff_pct:pct1} {diff_dir})."]
+
+["compare.per10k.rows.followup"]
+variants = ["Em {a.place} contra {b.place}: {diff_pct:pct1} {diff_dir}."]
+
+["compare.inhabitants_per.rows.first"]
+variants = ["Em {competence:month_year}, {a.place} tinha {a.value:dec1} habitantes por {sector:label}, contra {b.value:dec1} em {b.place} ({diff_pct:pct1} {diff_dir})."]
+
+["compare.inhabitants_per.rows.followup"]
+variants = ["Em {a.place} contra {b.place}: {diff_pct:pct1} {diff_dir}."]
+
+["compare.share.rows.first"]
+variants = ["{a.place} concentra {a.share:pct1} de {sector:label_plural}, contra {b.share:pct1} em {b.place}."]
+
+["compare.share.rows.followup"]
+variants = ["Em {a.place} contra {b.place}: {diff_pct:pct1} {diff_dir}."]
+
+["rank.stock.rows.first"]
+variants = ["Os maiores valores de {metric_label} {place_em} foram {r1}, {r2} e {r3}."]
+
+["rank.stock.rows.followup"]
+variants = ["Os primeiros são {r1}, {r2} e {r3}."]
+
+["rank.flow.rows.first"]
+variants = ["Os maiores valores de {metric_label} entre {from:month_year} e {to:month_year} foram {r1}, {r2} e {r3}."]
+
+["rank.flow.rows.followup"]
+variants = ["Os primeiros são {r1}, {r2} e {r3}."]
+
+["rank.active_change.rows.first"]
+variants = ["Entre {from:month_year} e {to:month_year}, as maiores variações de ativos {place_em} foram {r1}, {r2} e {r3}."]
+
+["rank.active_change.rows.followup"]
+variants = ["Os primeiros são {r1}, {r2} e {r3}."]
+
+["rank.per10k.rows.first"]
+variants = ["As maiores concentrações de {sector:label_plural} por dez mil habitantes {place_em} foram {r1}, {r2} e {r3}."]
+
+["rank.per10k.rows.followup"]
+variants = ["Os primeiros são {r1}, {r2} e {r3}."]
+
+["rank.inhabitants_per.rows.first"]
+variants = ["Os locais com mais habitantes por {sector:label} ativa {place_em} foram {r1}, {r2} e {r3}."]
+
+["rank.inhabitants_per.rows.followup"]
+variants = ["Os primeiros são {r1}, {r2} e {r3}."]
+
+["rank.share.rows.first"]
+variants = ["As maiores participações de {sector:label_plural} {place_em} foram {r1}, {r2} e {r3}."]
+
+["rank.share.rows.followup"]
+variants = ["Os primeiros são {r1}, {r2} e {r3}."]
+
+["breakdown.stock.rows.first"]
+variants = ["A distribuição de {metric_label} {place_em} tem {n:int} grupos; os maiores são {top}."]
+
+["breakdown.stock.rows.followup"]
+variants = ["Os maiores grupos são {top}."]
+
+["breakdown.flow.rows.first"]
+variants = ["A distribuição de {metric_label} entre {from:month_year} e {to:month_year} tem {n:int} grupos; os maiores são {top}."]
+
+["breakdown.flow.rows.followup"]
+variants = ["Os maiores grupos são {top}."]
+
+["breakdown.active_change.rows.first"]
+variants = ["A distribuição da {metric_label} {place_em} tem {n:int} grupos; os maiores são {top}."]
+
+["breakdown.active_change.rows.followup"]
+variants = ["Os maiores grupos são {top}."]
+
+["breakdown.per10k.rows.first"]
+variants = ["A distribuição de {metric_label} {place_em} tem {n:int} grupos; os maiores são {top}."]
+
+["breakdown.per10k.rows.followup"]
+variants = ["Os maiores grupos são {top}."]
+
+["breakdown.inhabitants_per.rows.first"]
+variants = ["A distribuição de {metric_label} {place_em} tem {n:int} grupos; os maiores são {top}."]
+
+["breakdown.inhabitants_per.rows.followup"]
+variants = ["Os maiores grupos são {top}."]
+
+["breakdown.share.rows.first"]
+variants = ["A distribuição de {metric_label} {place_em} tem {n:int} grupos; os maiores são {top}."]
+
+["breakdown.share.rows.followup"]
+variants = ["Os maiores grupos são {top}."]
+
+["trend.flow.rows.first"]
+variants = ["De {from:month_year} a {to:month_year}, {place} passou de {first:int} para {last:int} {flow} ({change_pct:pct1})."]
+
+["trend.flow.rows.followup"]
+variants = ["De {from:month_year} a {to:month_year}: {first:int} a {last:int}."]
+
+["list.stock.records.first"]
+variants = ["Encontrei {total:int} {unit} {status} de {sector:label} {place_em}. Mostrando {n:int}."]
+
+["list.stock.records.followup"]
+variants = ["Mostrando {n:int} de {total:int}."]
+
+["lookup.none.company.first"]
+variants = ["{name} ({cnpj}) — situação {status}."]
+
+["meta.none.text.first"]
+variants = ["Dados da Receita Federal de {competence:month_year}; snapshot {snapshot_sha256}; catálogos {catalogue}."]
+
+["clarify.none.clarify.first"]
+variants = ["{question}"]
+
+["reject.none.reject.first"]
+variants = ["{reason}"]

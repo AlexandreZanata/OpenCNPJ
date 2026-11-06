@@ -13,4 +13,4 @@ pub mod plan;
 pub mod execute;
 
 /// Answer blocks, provenance and templates.
-pub mod render {}
+pub mod render;
