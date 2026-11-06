@@ -7,10 +7,10 @@ pub mod catalog;
 pub mod agg;
 
 /// Backend selection for validated requests.
-pub mod plan {}
+pub mod plan;
 
 /// Aggregate execution, engine lowering and engine adapters.
-pub mod execute {}
+pub mod execute;
 
 /// Answer blocks, provenance and templates.
 pub mod render {}

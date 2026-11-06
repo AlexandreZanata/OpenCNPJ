@@ -2,6 +2,7 @@
 
 mod aggregate;
 mod catalog;
+mod query;
 
 use clap::{CommandFactory, Parser, Subcommand, error::ErrorKind};
 
@@ -28,6 +29,12 @@ enum Command {
     DiffAgg(aggregate::DiffArgs),
     /// Execute a query written in the intermediate language.
     Run,
+    /// Execute the golden IR set with aggregates and the engine and compare the results.
+    DiffExec(query::DiffArgs),
+    /// Benchmark aggregate and engine execution on the golden set.
+    BenchExec(query::DiffArgs),
+    /// Count the golden set through a running engine API.
+    RemoteCount(query::RemoteArgs),
     /// Generate synthetic evaluation data.
     Synth,
     /// Compile language packs.
@@ -47,6 +54,9 @@ fn main() -> anyhow::Result<()> {
         Some(Command::Catalog { command }) => catalog::run(command),
         Some(Command::Agg { command }) => aggregate::run(command),
         Some(Command::DiffAgg(args)) => aggregate::diff(args),
+        Some(Command::DiffExec(args)) => query::diff(args),
+        Some(Command::BenchExec(args)) => query::bench(args),
+        Some(Command::RemoteCount(args)) => query::remote_count(args),
         Some(_) => Cli::command().error(ErrorKind::InvalidSubcommand, "subcommand not implemented").exit(),
         None => Ok(Cli::command().print_help()?),
     }
