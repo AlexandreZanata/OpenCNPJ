@@ -3,6 +3,7 @@
 mod aggregate;
 mod catalog;
 mod query;
+mod synth;
 
 use clap::{CommandFactory, Parser, Subcommand, error::ErrorKind};
 
@@ -36,7 +37,7 @@ enum Command {
     /// Count the golden set through a running engine API.
     RemoteCount(query::RemoteArgs),
     /// Generate synthetic evaluation data.
-    Synth,
+    Synth(synth::Args),
     /// Compile language packs.
     Lang,
     /// Train experimental classifiers.
@@ -57,6 +58,7 @@ fn main() -> anyhow::Result<()> {
         Some(Command::DiffExec(args)) => query::diff(args),
         Some(Command::BenchExec(args)) => query::bench(args),
         Some(Command::RemoteCount(args)) => query::remote_count(args),
+        Some(Command::Synth(args)) => synth::run(args),
         Some(_) => Cli::command().error(ErrorKind::InvalidSubcommand, "subcommand not implemented").exit(),
         None => Ok(Cli::command().print_help()?),
     }

@@ -1,0 +1,710 @@
+# pt-BR synthetic families. Templates alternate between two synthetic authors.
+
+[[family]]
+id = "count.stock.sector_place"
+op = "count"
+metric = "stock"
+slots = ["sector", "place", "status"]
+status = "active?"
+place = "municipality"
+sector = true
+authors = ["synth-a", "synth-b"]
+templates = ["{quant} {sector.plural} {exist} {place.prep}", "qual o número de {sector.plural} {status?} {place.prep}", "{place} tem {quant} {sector.plural}", "me diz {quant} {sector.plural} t{place.prep}", "conta pra mim {sector.art_plural} {sector.plural} {place.de}", "existem muit{sector.art_plural} {sector.plural} {place.prep}", "tem {quant} {sector.plural} {status?} {place.prep}", "gostaria de saber {quant} {sector.plural} {exist} {place.prep}"]
+
+[[family]]
+id = "count.stock.sector_br"
+op = "count"
+metric = "stock"
+slots = ["sector"]
+status = "active?"
+place = "any"
+sector = true
+authors = ["synth-a", "synth-b"]
+templates = ["{quant} {sector.plural} {exist} no Brasil", "qual o número de {sector.plural} no país", "me diz {quant} {sector.plural} {exist} no Brasil", "no Brasil, {quant} {sector.plural} {status?}", "quero saber o total de {sector.plural} no Brasil", "{quant} {sector.plural} {exist} no território nacional", "conta {sector.art_plural} {sector.plural} do Brasil", "tem {quant} {sector.plural} no Brasil hoje"]
+
+[[family]]
+id = "count.stock.place_br"
+op = "count"
+metric = "stock"
+slots = ["place"]
+status = "active?"
+place = "municipality"
+sector = false
+authors = ["synth-a", "synth-b"]
+templates = ["quantas empresas {exist} {place.prep}", "qual o número de estabelecimentos {place.prep}", "me diz quantas empresas t{place.prep}", "quantos estabelecimentos ativos {exist} {place.prep}", "conta os estabelecimentos {place.de}", "existem quantas empresas {place.prep}", "quero o total de estabelecimentos {place.prep}", "quantas empresas {status?} t{place.prep}"]
+
+[[family]]
+id = "count.stock.status"
+op = "count"
+metric = "stock"
+slots = ["sector", "place", "status"]
+status = "closed"
+place = "municipality"
+sector = true
+authors = ["synth-a", "synth-b"]
+templates = ["{quant} {sector.plural} {status?} {exist} {place.prep}", "qual o número de {sector.plural} {status?} {place.prep}", "me diz {quant} {sector.plural} {status?} t{place.prep}", "tem {quant} {sector.plural} {status?} {place.prep}", "conta {sector.art_plural} {sector.plural} {status?} {place.de}", "{quant} {sector.plural} {exist} {status?} {place.prep}", "quero saber {quant} {sector.plural} {status?} {exist} {place.prep}", "existem {sector.plural} {status?} {place.prep}"]
+
+[[family]]
+id = "count.stock.porte"
+op = "count"
+metric = "stock"
+slots = ["sector", "place", "porte"]
+status = "active?"
+place = "municipality"
+sector = true
+authors = ["synth-a", "synth-b"]
+templates = ["{quant} {sector.plural} de porte {porte} {exist} {place.prep}", "qual o número de {sector.plural} {porte} {place.prep}", "me diz {quant} {sector.plural} {porte} t{place.prep}", "tem {quant} {sector.plural} {porte} {place.prep}", "conta {sector.art_plural} {sector.plural} {porte} {place.de}", "{quant} {sector.plural} {porte} {status?} {exist} {place.prep}", "quero saber o total de {sector.plural} {porte} {place.prep}", "existem {sector.plural} {porte} {place.prep}"]
+
+[[family]]
+id = "count.stock.mei"
+op = "count"
+metric = "stock"
+slots = ["sector", "place", "mei"]
+status = "active?"
+place = "municipality"
+sector = true
+authors = ["synth-a", "synth-b"]
+templates = ["{quant} {sector.plural} de MEI {exist} {place.prep}", "qual o número de {sector.plural} MEI {place.prep}", "me diz {quant} {sector.plural} MEI t{place.prep}", "tem {quant} {sector.plural} MEI {place.prep}", "conta {sector.art_plural} {sector.plural} MEI {place.de}", "{quant} {sector.plural} MEI {exist} {place.prep}", "quero o total de {sector.plural} MEI {place.prep}", "existem {sector.plural} MEI {place.prep}"]
+
+[[family]]
+id = "count.stock.density"
+op = "count"
+metric = "per10k"
+slots = ["sector", "place"]
+status = "active?"
+place = "municipality"
+sector = true
+authors = ["synth-a", "synth-b"]
+templates = ["qual a densidade de {sector.plural} por dez mil habitantes {place.prep}", "{quant} {sector.plural} por dez mil habitantes t{place.prep}", "me diz a densidade de {sector.plural} {place.prep}", "tem {quant} {sector.plural} por dez mil habitantes {place.prep}", "qual a concentração de {sector.plural} por habitante {place.prep}", "quero a densidade de {sector.plural} {place.prep}", "{quant} {sector.plural} por dez mil pessoas {exist} {place.prep}", "mostra a densidade de {sector.plural} {place.de}"]
+
+[[family]]
+id = "count.stock.change"
+op = "count"
+metric = "active_change"
+slots = ["sector", "place", "period"]
+status = "active?"
+place = "municipality"
+sector = true
+authors = ["synth-a", "synth-b"]
+templates = ["{quant} {sector.plural} a mais {exist} {place.prep} desde {month}", "qual a variação de {sector.plural} {place.prep} desde {month}", "me diz quanto cresceu o número de {sector.plural} {place.prep}", "{quant} {sector.plural} {exist} a mais {place.prep} em relação a {month}", "como variou o estoque de {sector.plural} {place.prep} desde {month}", "quero a mudança no número de {sector.plural} {place.prep}", "{quant} {sector.plural} foram abertas ou fechadas {place.prep} desde {month}", "mostra a evolução do estoque de {sector.plural} {place.prep} desde {month}"]
+
+[[family]]
+id = "count.stock.share"
+op = "count"
+metric = "share"
+slots = ["sector", "place"]
+status = "active?"
+place = "municipality"
+sector = true
+authors = ["synth-a", "synth-b"]
+templates = ["qual a participação de {sector.plural} {place.prep}", "que fatia do total de estabeleciment{sector.art_plural} {sector.plural} representa {place.prep}", "me diz a participação de {sector.plural} {place.prep}", "quantos por cento dos estabelecimentos {place.de} são {sector.plural}", "qual o percentual de {sector.plural} {place.prep}", "como {sector.plural} se distribuem {place.prep}", "qual a fatia de {sector.plural} no total {place.de}", "mostra a participação de {sector.plural} {place.de}"]
+
+[[family]]
+id = "count.flow.reg"
+op = "count"
+metric = "flow:registrations"
+slots = ["sector", "place", "period"]
+status = "any"
+place = "municipality"
+sector = true
+authors = ["synth-a", "synth-b"]
+templates = ["{quant} {sector.plural} abriram {place.prep} {period}", "qual o número de {sector.plural} abertas {place.prep} {period}", "me diz {quant} {sector.plural} abriram {place.prep} {period}", "{quant} {sector.plural} foram abertas {place.prep} {period}", "conta {sector.art_plural} {sector.plural} que abriram {place.prep} {period}", "existem registros de {sector.plural} {place.prep} {period}", "quero o total de {sector.plural} abertas {place.prep} {period}", "quantas nov{sector.art_plural} {sector.plural} surgiram {place.prep} {period}"]
+
+[[family]]
+id = "count.flow.close"
+op = "count"
+metric = "flow:closures"
+slots = ["sector", "place", "period"]
+status = "closed"
+place = "municipality"
+sector = true
+authors = ["synth-a", "synth-b"]
+templates = ["{quant} {sector.plural} abriram {place.prep} {period}", "qual o número de {sector.plural} abertas {place.prep} {period}", "me diz {quant} {sector.plural} abriram {place.prep} {period}", "{quant} {sector.plural} foram abertas {place.prep} {period}", "conta {sector.art_plural} {sector.plural} que abriram {place.prep} {period}", "existem registros de {sector.plural} {place.prep} {period}", "quero o total de {sector.plural} abertas {place.prep} {period}", "quantas nov{sector.art_plural} {sector.plural} surgiram {place.prep} {period}"]
+
+[[family]]
+id = "count.flow.net"
+op = "count"
+metric = "flow:net_registrations"
+slots = ["sector", "place", "period"]
+status = "any"
+place = "municipality"
+sector = true
+authors = ["synth-a", "synth-b"]
+templates = ["{quant} {sector.plural} abriram {place.prep} {period}", "qual o número de {sector.plural} abertas {place.prep} {period}", "me diz {quant} {sector.plural} abriram {place.prep} {period}", "{quant} {sector.plural} foram abertas {place.prep} {period}", "conta {sector.art_plural} {sector.plural} que abriram {place.prep} {period}", "existem registros de {sector.plural} {place.prep} {period}", "quero o total de {sector.plural} abertas {place.prep} {period}", "quantas nov{sector.art_plural} {sector.plural} surgiram {place.prep} {period}"]
+
+[[family]]
+id = "count.flow.mei_in"
+op = "count"
+metric = "flow:mei_opt_ins"
+slots = ["sector", "place", "period"]
+status = "any"
+place = "municipality"
+sector = true
+authors = ["synth-a", "synth-b"]
+templates = ["{quant} {sector.plural} abriram {place.prep} {period}", "qual o número de {sector.plural} abertas {place.prep} {period}", "me diz {quant} {sector.plural} abriram {place.prep} {period}", "{quant} {sector.plural} foram abertas {place.prep} {period}", "conta {sector.art_plural} {sector.plural} que abriram {place.prep} {period}", "existem registros de {sector.plural} {place.prep} {period}", "quero o total de {sector.plural} abertas {place.prep} {period}", "quantas nov{sector.art_plural} {sector.plural} surgiram {place.prep} {period}"]
+
+[[family]]
+id = "count.flow.mei_out"
+op = "count"
+metric = "flow:mei_exits"
+slots = ["sector", "place", "period"]
+status = "any"
+place = "municipality"
+sector = true
+authors = ["synth-a", "synth-b"]
+templates = ["{quant} {sector.plural} abriram {place.prep} {period}", "qual o número de {sector.plural} abertas {place.prep} {period}", "me diz {quant} {sector.plural} abriram {place.prep} {period}", "{quant} {sector.plural} foram abertas {place.prep} {period}", "conta {sector.art_plural} {sector.plural} que abriram {place.prep} {period}", "existem registros de {sector.plural} {place.prep} {period}", "quero o total de {sector.plural} abertas {place.prep} {period}", "quantas nov{sector.art_plural} {sector.plural} surgiram {place.prep} {period}"]
+
+[[family]]
+id = "count.flow.period"
+op = "count"
+metric = "flow:registrations"
+slots = ["sector", "place", "n"]
+status = "any"
+place = "municipality"
+sector = true
+authors = ["synth-a", "synth-b"]
+templates = ["{quant} {sector.plural} abriram {place.prep} {period}", "qual o número de {sector.plural} abertas {place.prep} {period}", "me diz {quant} {sector.plural} abriram {place.prep} {period}", "{quant} {sector.plural} foram abertas {place.prep} {period}", "conta {sector.art_plural} {sector.plural} que abriram {place.prep} {period}", "existem registros de {sector.plural} {place.prep} {period}", "quero o total de {sector.plural} abertas {place.prep} {period}", "quantas nov{sector.art_plural} {sector.plural} surgiram {place.prep} {period}"]
+
+[[family]]
+id = "compare.stock.places"
+op = "compare"
+metric = "stock"
+slots = ["sector", "place", "place2"]
+status = "active?"
+place = "municipality"
+sector = true
+dim = "municipality"
+authors = ["synth-a", "synth-b"]
+templates = ["compare {sector.plural} {place.prep} e {place2.prep}", "qual {place} tem mais {sector.plural}: {place} ou {place2}", "me diz se {place} ou {place2} tem mais {sector.plural}", "compare o número de {sector.plural} entre {place} e {place2}", "qual a diferença de {sector.plural} entre {place} e {place2}", "{place} e {place2}: qual tem mais {sector.plural}", "quero comparar {sector.plural} {place.de} com {place2.de}", "{place.prep} ou {place2.prep}, onde há mais {sector.plural}"]
+
+[[family]]
+id = "compare.stock.sectors"
+op = "compare"
+metric = "stock"
+slots = ["sector", "sector2", "place"]
+status = "active?"
+place = "municipality"
+sector = true
+dim = "sector"
+authors = ["synth-a", "synth-b"]
+templates = ["compare {sector} e {sector2} {place.prep}", "qual tem mais estabelecimentos {place.prep}: {sector} ou {sector2}", "me diz se {sector} ou {sector2} tem mais unidades {place.prep}", "compare o número de {sector} com {sector2} {place.prep}", "qual a diferença entre {sector} e {sector2} {place.prep}", "{sector} e {sector2}: qual tem mais {place.prep}", "quero comparar {sector} com {sector2} {place.prep}", "{place.prep}, há mais {sector} ou {sector2}"]
+
+[[family]]
+id = "compare.per10k.places"
+op = "compare"
+metric = "per10k"
+slots = ["sector", "place", "place2"]
+status = "active?"
+place = "municipality"
+sector = true
+dim = "municipality"
+authors = ["synth-a", "synth-b"]
+templates = ["compare {sector.plural} {place.prep} e {place2.prep}", "qual {place} tem mais {sector.plural}: {place} ou {place2}", "me diz se {place} ou {place2} tem mais {sector.plural}", "compare o número de {sector.plural} entre {place} e {place2}", "qual a diferença de {sector.plural} entre {place} e {place2}", "{place} e {place2}: qual tem mais {sector.plural}", "quero comparar {sector.plural} {place.de} com {place2.de}", "{place.prep} ou {place2.prep}, onde há mais {sector.plural}"]
+
+[[family]]
+id = "compare.change.places"
+op = "compare"
+metric = "active_change"
+slots = ["sector", "place", "place2", "period"]
+status = "active?"
+place = "municipality"
+sector = true
+dim = "municipality"
+authors = ["synth-a", "synth-b"]
+templates = ["compare {sector.plural} {place.prep} e {place2.prep}", "qual {place} tem mais {sector.plural}: {place} ou {place2}", "me diz se {place} ou {place2} tem mais {sector.plural}", "compare o número de {sector.plural} entre {place} e {place2}", "qual a diferença de {sector.plural} entre {place} e {place2}", "{place} e {place2}: qual tem mais {sector.plural}", "quero comparar {sector.plural} {place.de} com {place2.de}", "{place.prep} ou {place2.prep}, onde há mais {sector.plural}"]
+
+[[family]]
+id = "compare.flow.places"
+op = "compare"
+metric = "flow:registrations"
+slots = ["sector", "place", "place2", "period"]
+status = "any"
+place = "municipality"
+sector = true
+dim = "municipality"
+authors = ["synth-a", "synth-b"]
+templates = ["compare {sector.plural} {place.prep} e {place2.prep}", "qual {place} tem mais {sector.plural}: {place} ou {place2}", "me diz se {place} ou {place2} tem mais {sector.plural}", "compare o número de {sector.plural} entre {place} e {place2}", "qual a diferença de {sector.plural} entre {place} e {place2}", "{place} e {place2}: qual tem mais {sector.plural}", "quero comparar {sector.plural} {place.de} com {place2.de}", "{place.prep} ou {place2.prep}, onde há mais {sector.plural}"]
+
+[[family]]
+id = "compare.share.sectors"
+op = "compare"
+metric = "share"
+slots = ["sector", "sector2", "place"]
+status = "active?"
+place = "municipality"
+sector = true
+dim = "sector"
+authors = ["synth-a", "synth-b"]
+templates = ["compare {sector} e {sector2} {place.prep}", "qual tem mais estabelecimentos {place.prep}: {sector} ou {sector2}", "me diz se {sector} ou {sector2} tem mais unidades {place.prep}", "compare o número de {sector} com {sector2} {place.prep}", "qual a diferença entre {sector} e {sector2} {place.prep}", "{sector} e {sector2}: qual tem mais {place.prep}", "quero comparar {sector} com {sector2} {place.prep}", "{place.prep}, há mais {sector} ou {sector2}"]
+
+[[family]]
+id = "rank.stock.municipality"
+op = "rank"
+metric = "stock"
+slots = ["sector", "uf", "k"]
+status = "active?"
+place = "uf"
+sector = true
+dim = "municipality"
+authors = ["synth-a", "synth-b"]
+templates = ["quais municípios têm mais {sector.plural} {uf.prep}", "qual o ranking de municípios com mais {sector.plural} {uf.prep}", "me diz os municípios com mais {sector.plural} {uf.prep}", "onde há mais {sector.plural} {uf.prep}", "lista os municípios {uf.prep} por número de {sector.plural}", "quais são os maiores municípios {uf.prep} em {sector.plural}", "quero o top {k} de municípios com {sector.plural} {uf.prep}", "mostra os municípios com mais {sector.plural} {uf.prep}"]
+
+[[family]]
+id = "rank.stock.uf"
+op = "rank"
+metric = "stock"
+slots = ["sector", "k"]
+status = "active?"
+place = "any"
+sector = true
+dim = "uf"
+authors = ["synth-a", "synth-b"]
+templates = ["quais estados têm mais {sector.plural}", "qual o ranking de estados com mais {sector.plural}", "me diz os estados com mais {sector.plural}", "onde há mais {sector.plural} no Brasil", "lista as UFs por número de {sector.plural}", "quais são os maiores estados em {sector.plural}", "quero o top {k} de estados com {sector.plural}", "mostra os estados com mais {sector.plural}"]
+
+[[family]]
+id = "rank.stock.sector"
+op = "rank"
+metric = "stock"
+slots = ["place", "k"]
+status = "active?"
+place = "municipality"
+sector = false
+dim = "sector"
+authors = ["synth-a", "synth-b"]
+templates = ["quais setores têm mais estabelecimentos {place.prep}", "qual o ranking de setores {place.prep}", "me diz os setores com mais estabelecimentos {place.prep}", "onde há mais empresas {place.prep}", "lista os setores {place.prep} por número de estabelecimentos", "quais são os maiores setores {place.prep}", "quero o top {k} de setores {place.prep}", "mostra os setores com mais estabelecimentos {place.prep}"]
+
+[[family]]
+id = "rank.change.uf"
+op = "rank"
+metric = "active_change"
+slots = ["sector", "period", "k"]
+status = "active?"
+place = "any"
+sector = true
+dim = "uf"
+authors = ["synth-a", "synth-b"]
+templates = ["quais setores ganharam mais estabelecimentos desde {month}", "qual o ranking de setores que mais cresceram desde {month}", "me diz os setores que mais cresceram desde {month}", "onde houve mais aumento de estabelecimentos desde {month}", "lista os setores por variação desde {month}", "quais setores mais cresceram no período desde {month}", "quero o top {k} de setores que mais cresceram", "mostra os setores com maior aumento de estabelecimentos desde {month}"]
+
+[[family]]
+id = "rank.change.sector"
+op = "rank"
+metric = "active_change"
+slots = ["place", "period", "k"]
+status = "active?"
+place = "municipality"
+sector = false
+dim = "sector"
+authors = ["synth-a", "synth-b"]
+templates = ["quais setores ganharam mais estabelecimentos desde {month}", "qual o ranking de setores que mais cresceram desde {month}", "me diz os setores que mais cresceram desde {month}", "onde houve mais aumento de estabelecimentos desde {month}", "lista os setores por variação desde {month}", "quais setores mais cresceram no período desde {month}", "quero o top {k} de setores que mais cresceram", "mostra os setores com maior aumento de estabelecimentos desde {month}"]
+
+[[family]]
+id = "rank.per10k.municipality"
+op = "rank"
+metric = "per10k"
+slots = ["sector", "uf", "k"]
+status = "active?"
+place = "uf"
+sector = true
+dim = "municipality"
+authors = ["synth-a", "synth-b"]
+templates = ["quais municípios têm mais {sector.plural} por dez mil habitantes {uf.prep}", "qual o ranking de densidade de {sector.plural} {uf.prep}", "me diz os municípios com mais {sector.plural} por habitante {uf.prep}", "onde há mais {sector.plural} por dez mil habitantes {uf.prep}", "lista os municípios {uf.de} por densidade de {sector.plural}", "quais são os maiores em densidade de {sector.plural} {uf.prep}", "quero o top {k} de densidade de {sector.plural} {uf.prep}", "mostra os municípios com mais {sector.plural} por pessoa {uf.prep}"]
+
+[[family]]
+id = "rank.inhabitants.municipality"
+op = "rank"
+metric = "inhabitants_per"
+slots = ["sector", "uf", "k"]
+status = "active?"
+place = "uf"
+sector = true
+dim = "municipality"
+authors = ["synth-a", "synth-b"]
+templates = ["quais municípios têm mais habitantes por {sector} {uf.prep}", "qual o ranking de habitantes por {sector} {uf.prep}", "me diz os municípios com mais habitantes por {sector} {uf.prep}", "onde há mais habitantes por {sector} {uf.prep}", "lista os municípios {uf.de} por habitantes por {sector}", "quais são os maiores em habitantes por {sector} {uf.prep}", "quero o top {k} de habitantes por {sector} {uf.prep}", "mostra os municípios com mais habitantes por {sector}"]
+
+[[family]]
+id = "rank.share.sector"
+op = "rank"
+metric = "share"
+slots = ["place", "k"]
+status = "active?"
+place = "municipality"
+sector = false
+dim = "sector"
+authors = ["synth-a", "synth-b"]
+templates = ["quais setores têm mais estabelecimentos {place.prep}", "qual o ranking de setores {place.prep}", "me diz os setores com mais estabelecimentos {place.prep}", "onde há mais empresas {place.prep}", "lista os setores {place.prep} por número de estabelecimentos", "quais são os maiores setores {place.prep}", "quero o top {k} de setores {place.prep}", "mostra os setores com mais estabelecimentos {place.prep}"]
+
+[[family]]
+id = "breakdown.porte"
+op = "breakdown"
+metric = "stock"
+slots = ["sector", "place"]
+status = "active?"
+place = "municipality"
+sector = true
+dim = "porte"
+authors = ["synth-a", "synth-b"]
+templates = ["distribuição de {sector.plural} por {dim} {place.prep}", "qual a distribuição de {sector.plural} por {dim} {place.prep}", "me diz a distribuição de {sector.plural} por {dim} {place.prep}", "como se distribuem {sector.art_plural} {sector.plural} por {dim} {place.prep}", "quero ver {sector.plural} por {dim} {place.prep}", "mostra a quebra de {sector.plural} por {dim} {place.prep}", "qual o perfil de {sector.plural} por {dim} {place.prep}", "separa {sector.art_plural} {sector.plural} por {dim} {place.prep}"]
+
+[[family]]
+id = "breakdown.status"
+op = "breakdown"
+metric = "stock"
+slots = ["sector", "place"]
+status = "active?"
+place = "municipality"
+sector = true
+dim = "status"
+authors = ["synth-a", "synth-b"]
+templates = ["distribuição de {sector.plural} por {dim} {place.prep}", "qual a distribuição de {sector.plural} por {dim} {place.prep}", "me diz a distribuição de {sector.plural} por {dim} {place.prep}", "como se distribuem {sector.art_plural} {sector.plural} por {dim} {place.prep}", "quero ver {sector.plural} por {dim} {place.prep}", "mostra a quebra de {sector.plural} por {dim} {place.prep}", "qual o perfil de {sector.plural} por {dim} {place.prep}", "separa {sector.art_plural} {sector.plural} por {dim} {place.prep}"]
+
+[[family]]
+id = "breakdown.mei"
+op = "breakdown"
+metric = "stock"
+slots = ["sector", "place"]
+status = "active?"
+place = "municipality"
+sector = true
+dim = "mei"
+authors = ["synth-a", "synth-b"]
+templates = ["distribuição de {sector.plural} por {dim} {place.prep}", "qual a distribuição de {sector.plural} por {dim} {place.prep}", "me diz a distribuição de {sector.plural} por {dim} {place.prep}", "como se distribuem {sector.art_plural} {sector.plural} por {dim} {place.prep}", "quero ver {sector.plural} por {dim} {place.prep}", "mostra a quebra de {sector.plural} por {dim} {place.prep}", "qual o perfil de {sector.plural} por {dim} {place.prep}", "separa {sector.art_plural} {sector.plural} por {dim} {place.prep}"]
+
+[[family]]
+id = "breakdown.head"
+op = "breakdown"
+metric = "stock"
+slots = ["sector", "place"]
+status = "active?"
+place = "municipality"
+sector = true
+dim = "head_office"
+authors = ["synth-a", "synth-b"]
+templates = ["distribuição de {sector.plural} por {dim} {place.prep}", "qual a distribuição de {sector.plural} por {dim} {place.prep}", "me diz a distribuição de {sector.plural} por {dim} {place.prep}", "como se distribuem {sector.art_plural} {sector.plural} por {dim} {place.prep}", "quero ver {sector.plural} por {dim} {place.prep}", "mostra a quebra de {sector.plural} por {dim} {place.prep}", "qual o perfil de {sector.plural} por {dim} {place.prep}", "separa {sector.art_plural} {sector.plural} por {dim} {place.prep}"]
+
+[[family]]
+id = "breakdown.share.porte"
+op = "breakdown"
+metric = "share"
+slots = ["sector", "place"]
+status = "active?"
+place = "municipality"
+sector = true
+dim = "porte"
+authors = ["synth-a", "synth-b"]
+templates = ["qual a participação por {dim} {place.prep}", "como se distribui a participação por {dim} {place.prep}", "me diz a fatia de cada {dim} {place.prep}", "quero a participação por {dim} {place.prep}", "mostra o percentual por {dim} {place.prep}", "qual a divisão percentual por {dim} {place.prep}", "como cada {dim} participa do total {place.prep}", "separa o total {place.de} por {dim} em percentual"]
+
+[[family]]
+id = "breakdown.flow"
+op = "breakdown"
+metric = "flow:registrations"
+slots = ["sector", "place", "period"]
+status = "any"
+place = "municipality"
+sector = true
+dim = "uf"
+authors = ["synth-a", "synth-b"]
+templates = ["distribuição de {sector.plural} por {dim} {place.prep}", "qual a distribuição de {sector.plural} por {dim} {place.prep}", "me diz a distribuição de {sector.plural} por {dim} {place.prep}", "como se distribuem {sector.art_plural} {sector.plural} por {dim} {place.prep}", "quero ver {sector.plural} por {dim} {place.prep}", "mostra a quebra de {sector.plural} por {dim} {place.prep}", "qual o perfil de {sector.plural} por {dim} {place.prep}", "separa {sector.art_plural} {sector.plural} por {dim} {place.prep}"]
+
+[[family]]
+id = "trend.reg"
+op = "trend"
+metric = "flow:registrations"
+slots = ["sector", "place", "period"]
+status = "any"
+place = "municipality"
+sector = true
+grain = "month"
+authors = ["synth-a", "synth-b"]
+templates = ["como evoluíram {sector.art_plural} {sector.plural} {place.prep} {period}", "qual a evolução de {sector.plural} {place.prep} {period}", "me diz a tendência de {sector.plural} {place.prep} {period}", "mostra a série de {sector.plural} {place.prep} {period}", "quero a evolução mensal de {sector.plural} {place.prep}", "como variou {sector.plural} {place.prep} {period}", "qual o histórico de {sector.plural} {place.prep} {period}", "acompanha a evolução de {sector.plural} {place.prep}"]
+
+[[family]]
+id = "trend.close"
+op = "trend"
+metric = "flow:closures"
+slots = ["sector", "place", "period"]
+status = "any"
+place = "municipality"
+sector = true
+grain = "month"
+authors = ["synth-a", "synth-b"]
+templates = ["como evoluíram {sector.art_plural} {sector.plural} {place.prep} {period}", "qual a evolução de {sector.plural} {place.prep} {period}", "me diz a tendência de {sector.plural} {place.prep} {period}", "mostra a série de {sector.plural} {place.prep} {period}", "quero a evolução mensal de {sector.plural} {place.prep}", "como variou {sector.plural} {place.prep} {period}", "qual o histórico de {sector.plural} {place.prep} {period}", "acompanha a evolução de {sector.plural} {place.prep}"]
+
+[[family]]
+id = "trend.net"
+op = "trend"
+metric = "flow:net_registrations"
+slots = ["sector", "place", "period"]
+status = "any"
+place = "municipality"
+sector = true
+grain = "month"
+authors = ["synth-a", "synth-b"]
+templates = ["como evoluíram {sector.art_plural} {sector.plural} {place.prep} {period}", "qual a evolução de {sector.plural} {place.prep} {period}", "me diz a tendência de {sector.plural} {place.prep} {period}", "mostra a série de {sector.plural} {place.prep} {period}", "quero a evolução mensal de {sector.plural} {place.prep}", "como variou {sector.plural} {place.prep} {period}", "qual o histórico de {sector.plural} {place.prep} {period}", "acompanha a evolução de {sector.plural} {place.prep}"]
+
+[[family]]
+id = "trend.mei_in"
+op = "trend"
+metric = "flow:mei_opt_ins"
+slots = ["sector", "place", "period"]
+status = "any"
+place = "municipality"
+sector = true
+grain = "month"
+authors = ["synth-a", "synth-b"]
+templates = ["como evoluíram {sector.art_plural} {sector.plural} {place.prep} {period}", "qual a evolução de {sector.plural} {place.prep} {period}", "me diz a tendência de {sector.plural} {place.prep} {period}", "mostra a série de {sector.plural} {place.prep} {period}", "quero a evolução mensal de {sector.plural} {place.prep}", "como variou {sector.plural} {place.prep} {period}", "qual o histórico de {sector.plural} {place.prep} {period}", "acompanha a evolução de {sector.plural} {place.prep}"]
+
+[[family]]
+id = "trend.mei_out"
+op = "trend"
+metric = "flow:mei_exits"
+slots = ["sector", "place", "period"]
+status = "any"
+place = "municipality"
+sector = true
+grain = "month"
+authors = ["synth-a", "synth-b"]
+templates = ["como evoluíram {sector.art_plural} {sector.plural} {place.prep} {period}", "qual a evolução de {sector.plural} {place.prep} {period}", "me diz a tendência de {sector.plural} {place.prep} {period}", "mostra a série de {sector.plural} {place.prep} {period}", "quero a evolução mensal de {sector.plural} {place.prep}", "como variou {sector.plural} {place.prep} {period}", "qual o histórico de {sector.plural} {place.prep} {period}", "acompanha a evolução de {sector.plural} {place.prep}"]
+
+[[family]]
+id = "trend.year"
+op = "trend"
+metric = "flow:registrations"
+slots = ["sector", "place", "period"]
+status = "any"
+place = "municipality"
+sector = true
+grain = "year"
+authors = ["synth-a", "synth-b"]
+templates = ["como evoluíram {sector.art_plural} {sector.plural} {place.prep} {period}", "qual a evolução de {sector.plural} {place.prep} {period}", "me diz a tendência de {sector.plural} {place.prep} {period}", "mostra a série de {sector.plural} {place.prep} {period}", "quero a evolução mensal de {sector.plural} {place.prep}", "como variou {sector.plural} {place.prep} {period}", "qual o histórico de {sector.plural} {place.prep} {period}", "acompanha a evolução de {sector.plural} {place.prep}"]
+
+[[family]]
+id = "list.sector_place"
+op = "list"
+metric = "stock"
+slots = ["sector", "place"]
+status = "active?"
+place = "municipality"
+sector = true
+authors = ["synth-a", "synth-b"]
+templates = ["liste {sector.art_plural} {sector.plural} {place.prep}", "quais são {sector.art_plural} {sector.plural} {place.de}", "me mostra {sector.art_plural} {sector.plural} {place.prep}", "lista os estabelecimentos de {sector.plural} {place.prep}", "quero ver {sector.art_plural} {sector.plural} {place.de}", "mostra as empresas de {sector} {place.prep}", "quais {sector.plural} existem {place.prep}", "encontre {sector.art_plural} {sector.plural} {place.de}"]
+
+[[family]]
+id = "list.status"
+op = "list"
+metric = "stock"
+slots = ["sector", "place"]
+status = "closed"
+place = "municipality"
+sector = true
+authors = ["synth-a", "synth-b"]
+templates = ["liste {sector.art_plural} {sector.plural} {status?} {place.prep}", "quais são {sector.art_plural} {sector.plural} {status?} {place.de}", "me mostra {sector.art_plural} {sector.plural} {status?} {place.prep}", "lista os estabelecimentos de {sector.plural} {status?} {place.prep}", "quero ver {sector.art_plural} {sector.plural} {status?} {place.de}", "mostra as empresas de {sector} {status?} {place.prep}", "quais {sector.plural} {status?} existem {place.prep}", "encontre {sector.art_plural} {sector.plural} {status?} {place.de}"]
+
+[[family]]
+id = "list.contact"
+op = "list"
+metric = "stock"
+slots = ["sector", "place", "contact"]
+status = "active?"
+place = "municipality"
+sector = true
+authors = ["synth-a", "synth-b"]
+templates = ["liste {sector.art_plural} {sector.plural} com telefone {place.prep}", "quais {sector.plural} têm contato {place.prep}", "me mostra {sector.art_plural} {sector.plural} com telefone ou e-mail {place.prep}", "lista os estabelecimentos de {sector.plural} com contato {place.prep}", "quero {sector.art_plural} {sector.plural} {place.de} com telefone", "mostra {sector.plural} que tenham e-mail {place.prep}", "quais {sector.plural} têm telefone {place.prep}", "encontre {sector.plural} com contato {place.prep}"]
+
+[[family]]
+id = "list.capital"
+op = "list"
+metric = "stock"
+slots = ["sector", "place", "capital"]
+status = "active?"
+place = "municipality"
+sector = true
+authors = ["synth-a", "synth-b"]
+templates = ["liste {sector.art_plural} {sector.plural} por capital {place.prep}", "quais {sector.plural} têm maior capital {place.prep}", "me mostra {sector.art_plural} {sector.plural} com capital acima de {money} {place.prep}", "lista os estabelecimentos de {sector.plural} por capital {place.prep}", "quero {sector.art_plural} {sector.plural} {place.de} ordenadas por capital", "mostra {sector.plural} com capital alto {place.prep}", "quais {sector.plural} têm mais capital {place.prep}", "encontre {sector.plural} por capital {place.prep}"]
+
+[[family]]
+id = "list.head"
+op = "list"
+metric = "stock"
+slots = ["sector", "place"]
+status = "active?"
+place = "municipality"
+sector = true
+authors = ["synth-a", "synth-b"]
+templates = ["liste só as matrizes de {sector.plural} {place.prep}", "quais matrizes de {sector.plural} existem {place.prep}", "me mostra as matrizes de {sector.plural} {place.prep}", "lista as sedes de {sector.plural} {place.prep}", "quero só matrizes de {sector} {place.prep}", "mostra as matrizes de {sector.plural} {place.de}", "quais são as matrizes de {sector.plural} {place.prep}", "encontre as sedes de {sector.plural} {place.prep}"]
+
+[[family]]
+id = "lookup.cnpj"
+op = "lookup"
+metric = "stock"
+slots = ["cnpj"]
+status = "any"
+place = "municipality"
+sector = false
+authors = ["synth-a", "synth-b"]
+templates = ["consulte o CNPJ {cnpj}", "me dá os dados do CNPJ {cnpj}", "o que você sabe sobre o CNPJ {cnpj}", "qual a situação do CNPJ {cnpj}", "mostra o cadastro do CNPJ {cnpj}", "quero informações do CNPJ {cnpj}", "consulta cadastral do CNPJ {cnpj}", "dados da empresa com CNPJ {cnpj}"]
+
+[[family]]
+id = "meta.sources"
+op = "meta"
+metric = "stock"
+slots = ["topic"]
+status = "any"
+place = "municipality"
+sector = false
+authors = ["synth-a", "synth-b"]
+templates = ["quais são as fontes dos dados", "de onde vêm os dados", "qual a competência da base", "como você calcula os números", "qual a metodologia usada", "qual o snapshot utilizado", "quais catálogos são usados", "explique a metodologia"]
+
+[[family]]
+id = "meta.method"
+op = "meta"
+metric = "stock"
+slots = ["topic"]
+status = "any"
+place = "municipality"
+sector = false
+authors = ["synth-a", "synth-b"]
+templates = ["qual a metodologia usada", "qual o snapshot utilizado", "quais catálogos são usados", "explique a metodologia", "quais são as fontes dos dados", "de onde vêm os dados", "qual a competência da base", "como você calcula os números"]
+
+[[family]]
+id = "dialogue.followup_place"
+op = "dialogue"
+metric = "stock"
+slots = ["place2"]
+status = "active?"
+place = "municipality"
+sector = true
+authors = ["synth-a", "synth-b"]
+templates = ["compare {sector.plural} {place.prep} e {place2.prep}", "qual {place} tem mais {sector.plural}: {place} ou {place2}", "me diz se {place} ou {place2} tem mais {sector.plural}", "compare o número de {sector.plural} entre {place} e {place2}", "qual a diferença de {sector.plural} entre {place} e {place2}", "{place} e {place2}: qual tem mais {sector.plural}", "quero comparar {sector.plural} {place.de} com {place2.de}", "{place.prep} ou {place2.prep}, onde há mais {sector.plural}"]
+
+[[family]]
+id = "dialogue.followup_sector"
+op = "dialogue"
+metric = "stock"
+slots = ["sector2"]
+status = "active?"
+place = "municipality"
+sector = true
+authors = ["synth-a", "synth-b"]
+templates = ["compare {sector} e {sector2} {place.prep}", "qual tem mais estabelecimentos {place.prep}: {sector} ou {sector2}", "me diz se {sector} ou {sector2} tem mais unidades {place.prep}", "compare o número de {sector} com {sector2} {place.prep}", "qual a diferença entre {sector} e {sector2} {place.prep}", "{sector} e {sector2}: qual tem mais {place.prep}", "quero comparar {sector} com {sector2} {place.prep}", "{place.prep}, há mais {sector} ou {sector2}"]
+
+[[family]]
+id = "dialogue.correction_status"
+op = "dialogue"
+metric = "stock"
+slots = ["sector", "place", "status"]
+status = "closed"
+place = "municipality"
+sector = true
+authors = ["synth-a", "synth-b"]
+templates = ["{quant} {sector.plural} {status?} {exist} {place.prep}", "qual o número de {sector.plural} {status?} {place.prep}", "me diz {quant} {sector.plural} {status?} t{place.prep}", "tem {quant} {sector.plural} {status?} {place.prep}", "conta {sector.art_plural} {sector.plural} {status?} {place.de}", "{quant} {sector.plural} {exist} {status?} {place.prep}", "quero saber {quant} {sector.plural} {status?} {exist} {place.prep}", "existem {sector.plural} {status?} {place.prep}"]
+
+[[family]]
+id = "dialogue.add_filter"
+op = "dialogue"
+metric = "stock"
+slots = ["sector", "place", "status"]
+status = "active?"
+place = "municipality"
+sector = true
+authors = ["synth-a", "synth-b"]
+templates = ["{quant} {sector.plural} {status?} {exist} {place.prep}", "qual o número de {sector.plural} {status?} {place.prep}", "me diz {quant} {sector.plural} {status?} t{place.prep}", "tem {quant} {sector.plural} {status?} {place.prep}", "conta {sector.art_plural} {sector.plural} {status?} {place.de}", "{quant} {sector.plural} {exist} {status?} {place.prep}", "quero saber {quant} {sector.plural} {status?} {exist} {place.prep}", "existem {sector.plural} {status?} {place.prep}"]
+
+[[family]]
+id = "dialogue.remove_filter"
+op = "dialogue"
+metric = "stock"
+slots = ["sector", "place"]
+status = "active?"
+place = "municipality"
+sector = true
+authors = ["synth-a", "synth-b"]
+templates = ["{quant} {sector.plural} {exist} {place.prep}", "qual o número de {sector.plural} {status?} {place.prep}", "{place} tem {quant} {sector.plural}", "me diz {quant} {sector.plural} t{place.prep}", "conta pra mim {sector.art_plural} {sector.plural} {place.de}", "existem muit{sector.art_plural} {sector.plural} {place.prep}", "tem {quant} {sector.plural} {status?} {place.prep}", "gostaria de saber {quant} {sector.plural} {exist} {place.prep}"]
+
+[[family]]
+id = "dialogue.answer_clarification"
+op = "dialogue"
+metric = "stock"
+slots = ["sector", "place"]
+status = "active?"
+place = "municipality"
+sector = true
+authors = ["synth-a", "synth-b"]
+templates = ["{quant} {sector.plural} {exist} {place.prep}", "qual o número de {sector.plural} {status?} {place.prep}", "{place} tem {quant} {sector.plural}", "me diz {quant} {sector.plural} t{place.prep}", "conta pra mim {sector.art_plural} {sector.plural} {place.de}", "existem muit{sector.art_plural} {sector.plural} {place.prep}", "tem {quant} {sector.plural} {status?} {place.prep}", "gostaria de saber {quant} {sector.plural} {exist} {place.prep}"]
+
+[[family]]
+id = "dialogue.compare_focus"
+op = "dialogue"
+metric = "stock"
+slots = ["sector", "place", "place2"]
+status = "active?"
+place = "municipality"
+sector = true
+dim = "municipality"
+authors = ["synth-a", "synth-b"]
+templates = ["compare {sector.plural} {place.prep} e {place2.prep}", "qual {place} tem mais {sector.plural}: {place} ou {place2}", "me diz se {place} ou {place2} tem mais {sector.plural}", "compare o número de {sector.plural} entre {place} e {place2}", "qual a diferença de {sector.plural} entre {place} e {place2}", "{place} e {place2}: qual tem mais {sector.plural}", "quero comparar {sector.plural} {place.de} com {place2.de}", "{place.prep} ou {place2.prep}, onde há mais {sector.plural}"]
+
+[[family]]
+id = "dialogue.refer_result"
+op = "dialogue"
+metric = "stock"
+slots = ["sector", "place"]
+status = "active?"
+place = "municipality"
+sector = true
+authors = ["synth-a", "synth-b"]
+templates = ["{quant} {sector.plural} {exist} {place.prep}", "qual o número de {sector.plural} {status?} {place.prep}", "{place} tem {quant} {sector.plural}", "me diz {quant} {sector.plural} t{place.prep}", "conta pra mim {sector.art_plural} {sector.plural} {place.de}", "existem muit{sector.art_plural} {sector.plural} {place.prep}", "tem {quant} {sector.plural} {status?} {place.prep}", "gostaria de saber {quant} {sector.plural} {exist} {place.prep}"]
+
+[[family]]
+id = "reject.people"
+op = "reject"
+metric = "stock"
+slots = ["sector", "place"]
+status = "any"
+place = "municipality"
+sector = true
+authors = ["synth-a", "synth-b"]
+templates = ["quais são os sócios da empresa {place}", "me mostra os sócios de uma empresa", "quem são os proprietários das empresas {place.de}", "lista os sócios das empresas {place.de}", "quero os nomes dos sócios", "quais sócios aparecem nas empresas {place.de}", "mostra os sócios de {sector.plural} {place.de}", "dados pessoais dos sócios das empresas"]
+
+[[family]]
+id = "reject.ood"
+op = "reject"
+metric = "stock"
+slots = ["place"]
+status = "any"
+place = "municipality"
+sector = false
+authors = ["synth-a", "synth-b"]
+templates = ["qual o clima {place.prep}", "vai chover {place.prep}", "qual a temperatura {place.de}", "como está o tempo {place.prep}", "qual o resultado do jogo de hoje", "quem ganhou a eleição", "qual a cotação do dólar", "me conta uma piada"]
+
+[[family]]
+id = "reject.revenue"
+op = "reject"
+metric = "stock"
+slots = ["sector", "place"]
+status = "any"
+place = "municipality"
+sector = true
+authors = ["synth-a", "synth-b"]
+templates = ["qual o faturamento de {sector.plural} {place.de}", "quanto as empresas {place.de} faturam", "qual a receita de {sector.plural} {place.de}", "me diz o faturamento médio {place.prep}", "qual o lucro das empresas {place.de}", "quanto fatura {sector.um} {sector} {place.prep}", "qual o volume de vendas de {sector.plural}", "mostra o faturamento por setor {place.prep}"]
+
+[[family]]
+id = "reject.employees"
+op = "reject"
+metric = "stock"
+slots = ["sector", "place"]
+status = "any"
+place = "municipality"
+sector = true
+authors = ["synth-a", "synth-b"]
+templates = ["quantos funcionários têm {sector.art_plural} {sector.plural} {place.de}", "qual o número de empregados {place.prep}", "me diz quantas pessoas trabalham n{sector.art_plural} {sector.plural}", "qual o porte de funcionários das empresas {place.de}", "quantos empregados tem {sector.um} {sector} {place.prep}", "mostra o número de trabalhadores por setor", "quero saber o quadro de funcionários de {sector.plural}", "qual o total de empregados das empresas {place.de}"]
+
+[[family]]
+id = "reject.opportunity"
+op = "reject"
+metric = "stock"
+slots = ["sector", "place"]
+status = "any"
+place = "municipality"
+sector = true
+authors = ["synth-a", "synth-b"]
+templates = ["onde é melhor abrir {sector.um} {sector}", "qual a melhor cidade para {sector.um} {sector}", "me recomenda um lugar para abrir {sector}", "onde há menos concorrência para {sector}", "qual o melhor mercado para {sector} {place.prep}", "vale a pena abrir {sector.um} {sector} {place.prep}", "qual cidade tem mais oportunidade para {sector}", "onde devo investir em {sector}"]
