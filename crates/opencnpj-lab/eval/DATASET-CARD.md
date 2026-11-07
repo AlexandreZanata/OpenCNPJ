@@ -7,16 +7,19 @@ against the committed catalogues (`opencnpj-insights/catalog/municipalities.tsv`
 After editing a file, refresh the rows below with
 `UPDATE_CARD=1 cargo test -p opencnpj-lab frozen_sets`.
 
-Status: AI-drafted. These sets do not meet WP-3.3, which requires sets written by people
-who never saw the generator or the grammar. They must not be used for the WP-5.1
-decision. See results/2026-11-07-review.md.
+Status: AI-drafted. Items with `meta.origin = "claude-review-draft"` were written by hand
+by the reviewing model on 2026-11-07 (not by the generator or its templates); the rest
+come from the removed script. Sizes and rule/trap coverage now meet WP-3.3
+(`wp_3_3_acceptance`), but WP-3.3 also requires sets written by people who never saw the
+generator or the grammar, so these sets must still not be used for the WP-5.1 decision.
+See results/2026-11-07-review.md and results/2026-11-07-reviewer-tasks.md.
 
 | File | Items | SHA-256 |
 |---|---|---|
-| adv.jsonl | 235 | f064dd7a6e1367732d16c217bf6b1a862dfd5750b4d1719da12fd26971e31e12 |
+| adv.jsonl | 304 | 3d714467537db22f20855ce148f010234fe72eb78a31cbdb623733eb703a5c0b |
 | ood.jsonl | 400 | c3eafa0206e53cd908de5ee71d81a5f7a6de4015f35c11b6036af207f158eb92 |
-| h-informal.jsonl | 80 | f908c37a78b08f818cf3d0c2d629e9104487cf4c99ec552c220c97e21eec0fce |
-| dialogues.jsonl | 48 | 3b1d89e24d308120decbdac9177a7113417a3484f1083efe18b7f63b4fcbb1b5 |
+| h-informal.jsonl | 202 | 13a32a64716d91c0de8d79823d1e1328b5792d68b3207a90bfac99c3d6f1be7c |
+| dialogues.jsonl | 60 | 58e3a50e851ba5b6d01e5a4e29f582f52cd69580294ca518be466bb62838f5cb |
 
 ## Schemas
 

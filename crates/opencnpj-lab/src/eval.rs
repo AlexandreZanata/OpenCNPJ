@@ -1050,7 +1050,7 @@ mod sets {
     }
 
     #[test]
-    #[ignore = "WP-3.3 not met: the sets must be rewritten by people (review 2026-11-07)"]
+    #[ignore = "WP-3.3 sizes and coverage met on 2026-11-07, but the sets are AI-drafted; run with --include-ignored until people rewrite them"]
     fn wp_3_3_acceptance() {
         let mut rules: BTreeMap<String, usize> = BTreeMap::new();
         let mut traps: BTreeMap<String, usize> = BTreeMap::new();
