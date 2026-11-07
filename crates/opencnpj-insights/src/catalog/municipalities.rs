@@ -47,6 +47,20 @@ pub struct MunicipalityCatalogue {
 }
 
 impl MunicipalityCatalogue {
+    /// The population reference this catalogue holds by default: the latest IBGE estimate
+    /// loaded, or the 2022 census when no estimate is present. Defaults must come from here,
+    /// never from a hard-coded year.
+    pub fn default_population(&self) -> opencnpj_query::ir::PopulationRef {
+        self.rows()
+            .iter()
+            .filter_map(|row| match &row.place {
+                Place::Municipality(geo) => Some(geo.estimate_year),
+                Place::Abroad => None,
+            })
+            .max()
+            .map_or(opencnpj_query::ir::PopulationRef::IbgeCensus(2022), opencnpj_query::ir::PopulationRef::IbgeEstimate)
+    }
+
     pub fn load(path: &Path) -> Result<Self> {
         let tsv = fs::read_to_string(path).with_context(|| format!("read {}", path.display()))?;
         let mut lines = tsv.lines();

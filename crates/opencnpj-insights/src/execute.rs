@@ -45,7 +45,13 @@ impl AggregateSet {
                 if competence == current.manifest().competence {
                     continue;
                 }
-                historical.insert(competence, Aggregate::open(&path)?);
+                let aggregate = Aggregate::open(&path)?;
+                // The file name picks the competence; the manifest must agree, or a renamed
+                // file would answer for the wrong month.
+                if aggregate.manifest().competence != competence {
+                    bail!("{} declares competence {} in its manifest", path.display(), aggregate.manifest().competence);
+                }
+                historical.insert(competence, aggregate);
             }
         }
         Ok(Self { current, history: historical })
@@ -208,7 +214,7 @@ impl Filters {
             ActivityFilter::Cnae { codes, .. } => Some(codes.iter().filter_map(cnae_pattern).collect()),
         };
         let status = scope.status.unwrap_or_else(|| request.op.default_status());
-        let population_ref = scope.place_population.map(|_| scope.population_ref.unwrap_or_else(|| population_reference(request)));
+        let population_ref = scope.place_population.map(|_| scope.population_ref.unwrap_or_else(|| population_reference(request, context)));
         Ok(Self {
             municipalities,
             ufs,
@@ -259,7 +265,8 @@ impl Filters {
         }
         if let Some((low, high)) = self.population {
             let Some(row) = context.municipalities.get(key.municipality.0) else { return false };
-            let Some(population) = population_of(row, self.population_ref.unwrap_or(PopulationRef::IbgeEstimate(2025))) else {
+            let Some(population) = population_of(row, self.population_ref.unwrap_or_else(|| context.municipalities.default_population()))
+            else {
                 return false;
             };
             if !(u64::from(low)..=u64::from(high)).contains(&u64::from(population)) {
@@ -290,19 +297,21 @@ fn section_of(cnae: u32) -> u8 {
         41..=43 => b'F',
         45..=47 => b'G',
         49..=53 => b'H',
-        55 => b'I',
-        56 => b'J',
-        58..=63 => b'K',
-        64 => b'L',
-        65..=66 => b'M',
-        68 => b'N',
-        69..=75 => b'O',
-        77..=82 => b'P',
-        84 => b'Q',
-        85 => b'R',
-        86..=88 => b'S',
-        90..=93 => b'T',
-        _ => b'U',
+        55..=56 => b'I',
+        58..=63 => b'J',
+        64..=66 => b'K',
+        68 => b'L',
+        69..=75 => b'M',
+        77..=82 => b'N',
+        84 => b'O',
+        85 => b'P',
+        86..=88 => b'Q',
+        90..=93 => b'R',
+        94..=96 => b'S',
+        97 => b'T',
+        99 => b'U',
+        // Divisions that do not exist in CNAE 2.x.
+        _ => b'?',
     }
 }
 
@@ -368,11 +377,13 @@ fn haversine(a: &Geography, b: &Geography) -> f64 {
     2.0 * EARTH_KM * h.sqrt().asin()
 }
 
+/// Population of the exact reference asked for. A year the catalogue does not hold has no
+/// population (answers used to say "estimativa 2025" while dividing by the 2026 estimate).
 pub fn population_of(row: &Municipality, reference: PopulationRef) -> Option<u32> {
     match (&row.place, reference) {
-        (Place::Municipality(geo), PopulationRef::IbgeCensus(_)) => geo.census_2022,
-        (Place::Municipality(geo), PopulationRef::IbgeEstimate(_)) => Some(geo.population_estimate),
-        (Place::Abroad, _) => None,
+        (Place::Municipality(geo), PopulationRef::IbgeCensus(2022)) => geo.census_2022,
+        (Place::Municipality(geo), PopulationRef::IbgeEstimate(year)) if year == geo.estimate_year => Some(geo.population_estimate),
+        _ => None,
     }
 }
 
@@ -543,6 +554,14 @@ fn bucket_in(bucket: u32, period: opencnpj_query::ir::DayRange) -> bool {
     flow_bounds(bucket).is_some_and(|(start, end)| start >= from && end <= to)
 }
 
+/// The stock table of the competence the request asks about. Stock answers for a past
+/// competence ("ativas em dezembro de 2025") must come from that month's aggregates, never
+/// from the current ones; flows always come from the current artifact (09-DATA-ASSETS.md §4).
+fn stock_aggregate<'a>(request: &ValidRequest, aggregates: &'a AggregateSet) -> Result<&'a Aggregate> {
+    let competence = request.time.competence;
+    aggregates.get(competence).with_context(|| format!("no aggregates for competence {competence}"))
+}
+
 fn metric_count(
     request: &ValidRequest,
     filters: &Filters,
@@ -551,7 +570,7 @@ fn metric_count(
     context: &ExecContext<'_>,
 ) -> Result<i64> {
     match metric {
-        Metric::Stock | Metric::Share => Ok(i64::try_from(stock_count(aggregates.current(), filters, context)?)?),
+        Metric::Stock | Metric::Share => Ok(i64::try_from(stock_count(stock_aggregate(request, aggregates)?, filters, context)?)?),
         Metric::Flow(flow) => {
             let Some(Period::Days(period)) = request.time.period else { bail!("flow needs a day period") };
             flow_count(aggregates.current(), filters, period, flow, context)
@@ -589,8 +608,17 @@ fn scalar(
     }
 }
 
-fn group_keys(dim: Dim, table: Table, key: Key, context: &ExecContext<'_>) -> Vec<u64> {
+/// Group keys of one cell. A dimension the table does not carry is an error, never a guess:
+/// the flow tables' detail field is a month bucket, not a status or head-office code.
+fn group_keys(dim: Dim, table: Table, key: Key, context: &ExecContext<'_>) -> Result<Vec<u64>> {
+    let stock = matches!(table, Table::T1 | Table::T2);
     match dim {
+        Dim::Status | Dim::HeadOffice if !stock => bail!("{table:?} has no {dim:?} dimension"),
+        Dim::Porte | Dim::Mei if table != Table::T1 => bail!("{table:?} has no {dim:?} dimension"),
+        Dim::Year | Dim::Month => bail!("{dim:?} groups come from the flow buckets"),
+        _ => {}
+    }
+    Ok(match dim {
         Dim::Municipality => (key.municipality.0 != MUNICIPALITY_MISSING).then_some(u64::from(key.municipality.0)).into_iter().collect(),
         Dim::Uf => (key.uf.0 != UF_MISSING).then_some(u64::from(key.uf.0)).into_iter().collect(),
         Dim::Region(level) => context
@@ -630,8 +658,8 @@ fn group_keys(dim: Dim, table: Table, key: Key, context: &ExecContext<'_>) -> Ve
             let code = ActiveDetail::unpack(key.detail).mei;
             (1..=2).contains(&code).then_some(u64::from(code - 1)).into_iter().collect()
         }
-        Dim::Year | Dim::Month | Dim::Porte | Dim::Mei => Vec::new(),
-    }
+        Dim::Year | Dim::Month | Dim::Porte | Dim::Mei => unreachable!("rejected above"),
+    })
 }
 
 fn group_stock(aggregate: &Aggregate, filters: &Filters, dim: Dim, context: &ExecContext<'_>) -> Result<BTreeMap<u64, i64>> {
@@ -639,7 +667,7 @@ fn group_stock(aggregate: &Aggregate, filters: &Filters, dim: Dim, context: &Exe
     let mut map = BTreeMap::new();
     for_each_cell(aggregate, table, filters, |key, count| {
         if stock_matches(table, key, filters, context) {
-            for group in group_keys(dim, table, key, context) {
+            for group in group_keys(dim, table, key, context)? {
                 *map.entry(group).or_default() += i64::try_from(count)?;
             }
         }
@@ -665,7 +693,7 @@ fn group_flow(
             }
             let groups = match grain {
                 Some(grain) => flow_group_key(grain, key.detail).into_iter().collect(),
-                None => group_keys(dim, table, key, context),
+                None => group_keys(dim, table, key, context)?,
             };
             for group in groups {
                 *map.entry(group).or_default() += sign * i64::try_from(count)?;
@@ -716,7 +744,7 @@ fn metric_rows(
 ) -> Result<(BTreeMap<u64, i64>, BTreeMap<u64, u64>)> {
     match metric {
         Metric::Stock | Metric::Share | Metric::Per10k(_) | Metric::InhabitantsPer(_) => {
-            let counts = group_stock(aggregates.current(), filters, dim, context)?;
+            let counts = group_stock(stock_aggregate(request, aggregates)?, filters, dim, context)?;
             let (values, bases) = ratio_rows(request, filters, metric, dim, counts, aggregates, context)?;
             Ok((values, bases))
         }
@@ -803,10 +831,10 @@ fn member_population(key: u64, dim: Dim, filters: &Filters, context: &ExecContex
     member_population_for(context.municipalities, key, dim, filters.municipalities.as_ref(), filters.ufs.as_ref(), reference)
 }
 
-fn population_reference(request: &ValidRequest) -> PopulationRef {
+fn population_reference(request: &ValidRequest, context: &ExecContext<'_>) -> PopulationRef {
     match request.op.metric() {
         Some(Metric::Per10k(reference) | Metric::InhabitantsPer(reference)) => reference,
-        _ => request.scope.population_ref.unwrap_or(PopulationRef::IbgeEstimate(2025)),
+        _ => request.scope.population_ref.unwrap_or_else(|| context.municipalities.default_population()),
     }
 }
 
@@ -836,7 +864,7 @@ fn compare(
         let base = match bases.get(&key) {
             Some(base) => *base,
             None if matches!(metric, Metric::Per10k(_) | Metric::InhabitantsPer(_)) => {
-                member_population(key, dim, filters, context, population_reference(request))
+                member_population(key, dim, filters, context, population_reference(request, context))
             }
             None => 0,
         };
@@ -878,8 +906,13 @@ fn rank(
     let (values, bases) = metric_rows(request, filters, metric, dim, aggregates, context)?;
     let mut rows: Vec<Row> =
         values.into_iter().map(|(key, value)| Row { key, value, base: bases.get(&key).copied().unwrap_or(0) }).collect();
-    if let Metric::ActiveChange { pct: true } = metric {
-        rows.retain(|row| row.base >= u64::from(min_base));
+    match metric {
+        Metric::ActiveChange { pct: true } => rows.retain(|row| row.base >= u64::from(min_base)),
+        // Members without population (EX, abroad, missing IBGE rows) have no density: ranking
+        // them with a substituted denominator put "abroad" first with an infinite value.
+        Metric::Per10k(_) => rows.retain(|row| row.base > 0),
+        Metric::InhabitantsPer(_) => rows.retain(|row| row.base > 0 && row.value > 0),
+        _ => {}
     }
     let ratio = matches!(metric, Metric::Per10k(_) | Metric::InhabitantsPer(_) | Metric::Share | Metric::ActiveChange { pct: true });
     rows.sort_by(|a, b| {
@@ -905,4 +938,45 @@ fn trend(request: &ValidRequest, filters: &Filters, grain: Grain, aggregates: &A
     let Some(Period::Days(period)) = request.time.period else { bail!("trend needs a day period") };
     let values = group_flow(aggregates.current(), filters, period, flow, Dim::Month, Some(grain), context)?;
     Ok(Value::Rows(values.into_iter().map(|(key, value)| Row { key, value, base: 0 }).collect()))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::section_of;
+
+    /// CNAE 2.x sections as the engine defines them (`opencnpj-store/src/search.rs`,
+    /// `cnae_section`), written letter → divisions so the check is independent of `section_of`.
+    const SECTIONS: [(u8, u32, u32); 21] = [
+        (b'A', 1, 3),
+        (b'B', 5, 9),
+        (b'C', 10, 33),
+        (b'D', 35, 35),
+        (b'E', 36, 39),
+        (b'F', 41, 43),
+        (b'G', 45, 47),
+        (b'H', 49, 53),
+        (b'I', 55, 56),
+        (b'J', 58, 63),
+        (b'K', 64, 66),
+        (b'L', 68, 68),
+        (b'M', 69, 75),
+        (b'N', 77, 82),
+        (b'O', 84, 84),
+        (b'P', 85, 85),
+        (b'Q', 86, 88),
+        (b'R', 90, 93),
+        (b'S', 94, 96),
+        (b'T', 97, 97),
+        (b'U', 99, 99),
+    ];
+
+    #[test]
+    fn sections_match_the_engine() {
+        for division in 1..=99u32 {
+            let expected = SECTIONS.iter().find(|(_, a, b)| (*a..=*b).contains(&division)).map_or(b'?', |(letter, _, _)| *letter);
+            assert_eq!(section_of(division * 100_000 + 1), expected, "division {division}");
+        }
+        // Restaurants (5611-2/01) are lodging and food (I), not information (J).
+        assert_eq!(section_of(5_611_201), b'I');
+    }
 }

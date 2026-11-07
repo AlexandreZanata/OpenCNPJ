@@ -2,7 +2,7 @@
   "annual_net_registrations": {
     "blocks": [
       {
-        "text": "De janeiro de 2025 a outubro de 2026, a região passou de 187 para 107 saldo de registros (-42,8%).",
+        "text": "De janeiro de 2025 a outubro de 2026, na região Nordeste, o saldo entre registros e baixas de estabelecimentos passou de 187 para 107 (-42,8%).",
         "type": "text"
       },
       {
@@ -47,11 +47,10 @@
       },
       {
         "items": [
-          "Atividade: todas as atividades",
+          "Atividade: todas",
           "Situação cadastral: nula, ativa, suspensa, inapta e baixada",
           "Unidade: estabelecimento (CNPJ completo)",
-          "População: IBGE estimativa 2025",
-          "Período: 01/01/2025 a 11/10/2026"
+          "Período: de 01/01/2025 a 11/10/2026"
         ],
         "type": "methodology"
       },
@@ -154,7 +153,7 @@
     "timing_us": {
       "render": 0
     },
-    "understood": "estabelecimentos · todas as atividades · a região · RFB 2026-10"
+    "understood": "estabelecimentos · todas as atividades · a região Nordeste · RFB 2026-10"
   },
   "breakdown_porte": {
     "blocks": [
@@ -204,10 +203,9 @@
       },
       {
         "items": [
-          "Atividade: todas as atividades",
+          "Atividade: todas",
           "Situação cadastral: ativa",
-          "Unidade: estabelecimento (CNPJ completo)",
-          "População: IBGE estimativa 2025"
+          "Unidade: estabelecimento (CNPJ completo)"
         ],
         "type": "methodology"
       },
@@ -291,20 +289,20 @@
   "closed_stock_filter": {
     "blocks": [
       {
-        "text": "Mato Grosso tem 187 estabelecimentos baixados de todas as atividades, segundo a Receita Federal de outubro de 2026.",
+        "text": "Mato Grosso tem 187 estabelecimentos baixados, segundo a Receita Federal de outubro de 2026.",
         "type": "text"
       },
       {
-        "label": "Estabelecimentos ativos",
+        "label": "Estabelecimentos baixados",
         "type": "kpi",
         "value": "187"
       },
       {
         "items": [
-          "Atividade: todas as atividades",
+          "Atividade: todas",
           "Situação cadastral: baixada",
           "Unidade: estabelecimento (CNPJ completo)",
-          "População: IBGE estimativa 2025"
+          "Data da situação cadastral: de 01/01/2025 a 31/12/2025"
         ],
         "type": "methodology"
       },
@@ -401,10 +399,10 @@
       },
       {
         "items": [
-          "Atividade: CNAEs 4721-1/02",
+          "Atividade: CNAE 4721-1/02 (CNAE principal ou secundária)",
           "Situação cadastral: ativa",
           "Unidade: estabelecimento (CNPJ completo)",
-          "População: IBGE estimativa 2025"
+          "Data de início de atividade: de 01/01/2026 a 11/10/2026"
         ],
         "type": "methodology"
       },
@@ -417,6 +415,15 @@
           }
         ],
         "type": "sources"
+      },
+      {
+        "items": [
+          {
+            "id": "C-SECT",
+            "text": "Atividade principal ou secundária: CNAE 4721-1/02."
+          }
+        ],
+        "type": "caveats"
       }
     ],
     "decision": "execute",
@@ -496,21 +503,20 @@
   "cnpjs_registrados_2025_mato_grosso": {
     "blocks": [
       {
-        "text": "Entre janeiro de 2025 e dezembro de 2025, Mato Grosso registrou 42 registros de todas as atividades.",
+        "text": "Entre janeiro de 2025 e dezembro de 2025, Mato Grosso teve 42 estabelecimentos registrados com início de atividade no período.",
         "type": "text"
       },
       {
-        "label": "registros",
+        "label": "Registros com início de atividade",
         "type": "kpi",
         "value": "42"
       },
       {
         "items": [
-          "Atividade: todas as atividades",
+          "Atividade: todas",
           "Situação cadastral: nula, ativa, suspensa, inapta e baixada",
           "Unidade: estabelecimento (CNPJ completo)",
-          "População: IBGE estimativa 2025",
-          "Período: 01/01/2025 a 31/12/2025"
+          "Período: de 01/01/2025 a 31/12/2025"
         ],
         "type": "methodology"
       },
@@ -614,7 +620,7 @@
   "compare_bakeries_pharmacies": {
     "blocks": [
       {
-        "text": "Entre padarias e farmácias, padarias tem 187 contra 147 em farmácias (27,2% mais).",
+        "text": "Padarias: 187 estabelecimentos ativos; farmácias: 147 (27,2% a mais).",
         "type": "text"
       },
       {
@@ -668,10 +674,9 @@
       },
       {
         "items": [
-          "Atividade: todas as atividades",
+          "Atividade: todas",
           "Situação cadastral: ativa",
-          "Unidade: estabelecimento (CNPJ completo)",
-          "População: IBGE estimativa 2025"
+          "Unidade: estabelecimento (CNPJ completo)"
         ],
         "type": "methodology"
       },
@@ -763,7 +768,7 @@
   "compare_density_sorriso_sinop": {
     "blocks": [
       {
-        "text": "Em outubro de 2026, Sinop (MT) tinha 18,7 padarias ativas por dez mil habitantes, contra 14,7 em Sorriso (MT) (27,2% mais).",
+        "text": "Estabelecimentos ativos de padaria por dez mil habitantes em outubro de 2026 — Sinop (MT): 18,7; Sorriso (MT): 14,7 (27,2% a mais; população: IBGE estimativa 2026).",
         "type": "text"
       },
       {
@@ -817,10 +822,10 @@
       },
       {
         "items": [
-          "Atividade: padarias",
+          "Atividade: padarias (CNAE principal)",
           "Situação cadastral: ativa",
           "Unidade: estabelecimento (CNPJ completo)",
-          "População: IBGE estimativa 2025"
+          "População: IBGE estimativa 2026"
         ],
         "type": "methodology"
       },
@@ -838,7 +843,7 @@
         "items": [
           {
             "id": "C-DENS",
-            "text": "Densidade por habitante não indica, sozinha, oportunidade de mercado. População: IBGE estimativa 2025."
+            "text": "Densidade por habitante não indica, sozinha, oportunidade de mercado. População: IBGE estimativa 2026."
           },
           {
             "id": "C-SECT",
@@ -863,7 +868,7 @@
         ],
         "metric": {
           "per10k": {
-            "ibge_estimate": 2025
+            "ibge_estimate": 2026
           }
         }
       },
@@ -943,7 +948,7 @@
   "compare_sorriso_com_sinop": {
     "blocks": [
       {
-        "text": "Entre Sinop (MT) e Sorriso (MT), Sinop (MT) tem 187 contra 147 em Sorriso (MT) (27,2% mais).",
+        "text": "Sinop (MT): 187 estabelecimentos ativos de padaria; Sorriso (MT): 147 (27,2% a mais).",
         "type": "text"
       },
       {
@@ -997,10 +1002,9 @@
       },
       {
         "items": [
-          "Atividade: padarias",
+          "Atividade: padarias (CNAE principal)",
           "Situação cadastral: ativa",
-          "Unidade: estabelecimento (CNPJ completo)",
-          "População: IBGE estimativa 2025"
+          "Unidade: estabelecimento (CNPJ completo)"
         ],
         "type": "methodology"
       },
@@ -1115,20 +1119,20 @@
   "density_census_mt": {
     "blocks": [
       {
-        "text": "Em outubro de 2026, Mato Grosso tinha 18,7 farmácias ativas por dez mil habitantes (população 100.000, 2025).",
+        "text": "Em outubro de 2026, Mato Grosso tem 18,7 estabelecimentos ativos de farmácia por dez mil habitantes (população de 100.000, IBGE Censo 2022).",
         "type": "text"
       },
       {
-        "label": "Por dez mil habitantes",
+        "label": "Estabelecimentos ativos por dez mil habitantes",
         "type": "kpi",
         "value": "18,7"
       },
       {
         "items": [
-          "Atividade: farmácias",
+          "Atividade: farmácias (CNAE principal)",
           "Situação cadastral: ativa",
           "Unidade: estabelecimento (CNPJ completo)",
-          "População: IBGE estimativa 2025"
+          "População: IBGE Censo 2022"
         ],
         "type": "methodology"
       },
@@ -1146,7 +1150,7 @@
         "items": [
           {
             "id": "C-DENS",
-            "text": "Densidade por habitante não indica, sozinha, oportunidade de mercado. População: IBGE estimativa 2025."
+            "text": "Densidade por habitante não indica, sozinha, oportunidade de mercado. População: IBGE Censo 2022."
           },
           {
             "id": "C-SECT",
@@ -1257,10 +1261,9 @@
       },
       {
         "items": [
-          "Atividade: farmácias",
+          "Atividade: farmácias (CNAE principal)",
           "Situação cadastral: ativa",
-          "Unidade: estabelecimento (CNPJ completo)",
-          "População: IBGE estimativa 2025"
+          "Unidade: estabelecimento (CNPJ completo)"
         ],
         "type": "methodology"
       },
@@ -1371,21 +1374,20 @@
   "empresas_abertas_2025_mt": {
     "blocks": [
       {
-        "text": "Entre janeiro de 2025 e dezembro de 2025, Mato Grosso registrou 42 registros de todas as atividades.",
+        "text": "Entre janeiro de 2025 e dezembro de 2025, Mato Grosso teve 42 estabelecimentos registrados com início de atividade no período.",
         "type": "text"
       },
       {
-        "label": "registros",
+        "label": "Registros com início de atividade",
         "type": "kpi",
         "value": "42"
       },
       {
         "items": [
-          "Atividade: todas as atividades",
+          "Atividade: todas",
           "Situação cadastral: nula, ativa, suspensa, inapta e baixada",
           "Unidade: estabelecimento (CNPJ completo)",
-          "População: IBGE estimativa 2025",
-          "Período: 01/01/2025 a 31/12/2025"
+          "Período: de 01/01/2025 a 31/12/2025"
         ],
         "type": "methodology"
       },
@@ -1489,7 +1491,7 @@
   "estavam_ativas_2025_mt": {
     "blocks": [
       {
-        "text": "Mato Grosso tem 187 estabelecimentos ativos de todas as atividades, segundo a Receita Federal de outubro de 2026.",
+        "text": "Mato Grosso tem 187 estabelecimentos ativos, segundo a Receita Federal de dezembro de 2025.",
         "type": "text"
       },
       {
@@ -1499,17 +1501,16 @@
       },
       {
         "items": [
-          "Atividade: todas as atividades",
+          "Atividade: todas",
           "Situação cadastral: ativa",
-          "Unidade: estabelecimento (CNPJ completo)",
-          "População: IBGE estimativa 2025"
+          "Unidade: estabelecimento (CNPJ completo)"
         ],
         "type": "methodology"
       },
       {
         "items": [
           {
-            "competence": "2026-10",
+            "competence": "2025-12",
             "name": "Receita Federal — Dados Abertos do CNPJ",
             "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
           }
@@ -1586,7 +1587,7 @@
   "exclusions": {
     "blocks": [
       {
-        "text": "Mato Grosso e São Paulo tem 187 estabelecimentos ativos de todas as atividades, segundo a Receita Federal de outubro de 2026.",
+        "text": "Mato Grosso e São Paulo, exceto Cuiabá (MT), São Paulo e farmácias têm 187 estabelecimentos ativos, segundo a Receita Federal de outubro de 2026.",
         "type": "text"
       },
       {
@@ -1596,10 +1597,10 @@
       },
       {
         "items": [
-          "Atividade: todas as atividades",
+          "Atividade: todas",
           "Situação cadastral: ativa",
           "Unidade: estabelecimento (CNPJ completo)",
-          "População: IBGE estimativa 2025"
+          "Excluídos: Cuiabá (MT), São Paulo e farmácias"
         ],
         "type": "methodology"
       },
@@ -1695,7 +1696,7 @@
     "timing_us": {
       "render": 0
     },
-    "understood": "estabelecimentos · todas as atividades · Mato Grosso e São Paulo · RFB 2026-10"
+    "understood": "estabelecimentos · todas as atividades · Mato Grosso e São Paulo, exceto Cuiabá (MT), São Paulo e farmácias · RFB 2026-10"
   },
   "fabricacao_de_paes_sorriso": {
     "blocks": [
@@ -1710,10 +1711,9 @@
       },
       {
         "items": [
-          "Atividade: CNAEs 1091-1/01",
+          "Atividade: CNAE 1091-1/01 (CNAE principal)",
           "Situação cadastral: ativa",
-          "Unidade: estabelecimento (CNPJ completo)",
-          "População: IBGE estimativa 2025"
+          "Unidade: estabelecimento (CNPJ completo)"
         ],
         "type": "methodology"
       },
@@ -1726,6 +1726,15 @@
           }
         ],
         "type": "sources"
+      },
+      {
+        "items": [
+          {
+            "id": "C-SECT",
+            "text": "Atividade principal: CNAE 1091-1/01."
+          }
+        ],
+        "type": "caveats"
       }
     ],
     "decision": "execute",
@@ -1816,10 +1825,9 @@
       },
       {
         "items": [
-          "Atividade: farmácias",
+          "Atividade: farmácias (CNAE principal)",
           "Situação cadastral: ativa",
-          "Unidade: estabelecimento (CNPJ completo)",
-          "População: IBGE estimativa 2025"
+          "Unidade: estabelecimento (CNPJ completo)"
         ],
         "type": "methodology"
       },
@@ -1930,7 +1938,7 @@
   "head_offices_legal_nature": {
     "blocks": [
       {
-        "text": "Segundo a base da Receita Federal de outubro de 2026, Mato Grosso tem 187 matrizes ativas de todas as atividades.",
+        "text": "Segundo a base da Receita Federal de outubro de 2026, Mato Grosso tem 187 matrizes ativas.",
         "type": "text"
       },
       {
@@ -1940,10 +1948,13 @@
       },
       {
         "items": [
-          "Atividade: todas as atividades",
+          "Atividade: todas",
           "Situação cadastral: ativa",
           "Unidade: matriz",
-          "População: IBGE estimativa 2025"
+          "Excluindo MEI",
+          "Somente optantes pelo Simples",
+          "Porte: microempresa",
+          "Natureza jurídica: grupo 2 e 2062"
         ],
         "type": "methodology"
       },
@@ -2040,7 +2051,7 @@
   "largest_capital_with_contact": {
     "blocks": [
       {
-        "text": "Encontrei 20 estabelecimentos ativos de todas as atividades em Mato Grosso. Mostrando 1.",
+        "text": "Encontrei 20 estabelecimentos ativos em Mato Grosso. Mostrando 1.",
         "type": "text"
       },
       {
@@ -2060,10 +2071,11 @@
       },
       {
         "items": [
-          "Atividade: todas as atividades",
+          "Atividade: todas",
           "Situação cadastral: ativa",
           "Unidade: estabelecimento (CNPJ completo)",
-          "População: IBGE estimativa 2025"
+          "Capital social: a partir de R$ 50.000.000",
+          "Com telefone e e-mail publicados"
         ],
         "type": "methodology"
       },
@@ -2182,10 +2194,9 @@
       },
       {
         "items": [
-          "Atividade: todas as atividades",
+          "Atividade: todas",
           "Situação cadastral: nula, ativa, suspensa, inapta e baixada",
-          "Unidade: estabelecimento (CNPJ completo)",
-          "População: IBGE estimativa 2025"
+          "Unidade: estabelecimento (CNPJ completo)"
         ],
         "type": "methodology"
       },
@@ -2290,10 +2301,9 @@
       },
       {
         "items": [
-          "Atividade: todas as atividades",
+          "Atividade: todas",
           "Situação cadastral: nula, ativa, suspensa, inapta e baixada",
-          "Unidade: estabelecimento (CNPJ completo)",
-          "População: IBGE estimativa 2025"
+          "Unidade: estabelecimento (CNPJ completo)"
         ],
         "type": "methodology"
       },
@@ -2398,10 +2408,9 @@
       },
       {
         "items": [
-          "Atividade: todas as atividades",
+          "Atividade: todas",
           "Situação cadastral: nula, ativa, suspensa, inapta e baixada",
-          "Unidade: estabelecimento (CNPJ completo)",
-          "População: IBGE estimativa 2025"
+          "Unidade: estabelecimento (CNPJ completo)"
         ],
         "type": "methodology"
       },
@@ -2484,21 +2493,20 @@
   "mei_opt_ins": {
     "blocks": [
       {
-        "text": "Entre janeiro de 2025 e dezembro de 2025, Mato Grosso registrou 42 adesões ao MEI de todas as atividades.",
+        "text": "Entre janeiro de 2025 e dezembro de 2025, Mato Grosso teve 42 adesões ao MEI.",
         "type": "text"
       },
       {
-        "label": "adesões ao MEI",
+        "label": "Adesões ao MEI",
         "type": "kpi",
         "value": "42"
       },
       {
         "items": [
-          "Atividade: todas as atividades",
+          "Atividade: todas",
           "Situação cadastral: nula, ativa, suspensa, inapta e baixada",
           "Unidade: estabelecimento (CNPJ completo)",
-          "População: IBGE estimativa 2025",
-          "Período: 01/01/2025 a 31/12/2025"
+          "Período: de 01/01/2025 a 31/12/2025"
         ],
         "type": "methodology"
       },
@@ -2598,10 +2606,9 @@
       },
       {
         "items": [
-          "Atividade: todas as atividades",
+          "Atividade: todas",
           "Situação cadastral: nula, ativa, suspensa, inapta e baixada",
-          "Unidade: estabelecimento (CNPJ completo)",
-          "População: IBGE estimativa 2025"
+          "Unidade: estabelecimento (CNPJ completo)"
         ],
         "type": "methodology"
       },
@@ -2684,7 +2691,7 @@
   "monthly_closures": {
     "blocks": [
       {
-        "text": "De abril de 2026 a outubro de 2026, Mato Grosso passou de 187 para 107 baixas (-42,8%).",
+        "text": "De abril de 2026 a outubro de 2026, em Mato Grosso, o número de baixas de estabelecimentos passou de 187 para 107 (-42,8%).",
         "type": "text"
       },
       {
@@ -2729,11 +2736,10 @@
       },
       {
         "items": [
-          "Atividade: todas as atividades",
+          "Atividade: todas",
           "Situação cadastral: baixada",
           "Unidade: estabelecimento (CNPJ completo)",
-          "População: IBGE estimativa 2025",
-          "Período: 12/04/2026 a 11/10/2026"
+          "Período: de 12/04/2026 a 11/10/2026"
         ],
         "type": "methodology"
       },
@@ -2835,7 +2841,7 @@
   "near_sinop_km": {
     "blocks": [
       {
-        "text": "Segundo a base da Receita Federal de outubro de 2026, a região de Sinop (MT) tem 187 estabelecimentos ativos de todas as atividades.",
+        "text": "Segundo a base da Receita Federal de outubro de 2026, a região de Sinop (MT) tem 187 estabelecimentos ativos.",
         "type": "text"
       },
       {
@@ -2845,10 +2851,10 @@
       },
       {
         "items": [
-          "Atividade: todas as atividades",
+          "Atividade: todas",
           "Situação cadastral: ativa",
           "Unidade: estabelecimento (CNPJ completo)",
-          "População: IBGE estimativa 2025"
+          "Região: municípios com sede a até 100 km de Sinop (MT)"
         ],
         "type": "methodology"
       },
@@ -2947,10 +2953,9 @@
       },
       {
         "items": [
-          "Atividade: padarias",
+          "Atividade: padarias (CNAE principal)",
           "Situação cadastral: ativa",
-          "Unidade: estabelecimento (CNPJ completo)",
-          "População: IBGE estimativa 2025"
+          "Unidade: estabelecimento (CNPJ completo)"
         ],
         "type": "methodology"
       },
@@ -3071,10 +3076,9 @@
       },
       {
         "items": [
-          "Atividade: padarias",
+          "Atividade: padarias (CNAE principal)",
           "Situação cadastral: ativa",
-          "Unidade: estabelecimento (CNPJ completo)",
-          "População: IBGE estimativa 2025"
+          "Unidade: estabelecimento (CNPJ completo)"
         ],
         "type": "methodology"
       },
@@ -3185,7 +3189,7 @@
   "rank_change_percent": {
     "blocks": [
       {
-        "text": "Entre julho de 2026 e outubro de 2026, as maiores variações de ativos no Brasil foram Mato Grosso (187,0%), Paraná (147,0%) e São Paulo (107,0%).",
+        "text": "Entre julho de 2026 e outubro de 2026, as menores variações de estabelecimentos ativos no Brasil foram: Mato Grosso (187,0%), Paraná (147,0%) e São Paulo (107,0%).",
         "type": "text"
       },
       {
@@ -3230,10 +3234,9 @@
       },
       {
         "items": [
-          "Atividade: todas as atividades",
+          "Atividade: todas",
           "Situação cadastral: ativa",
           "Unidade: estabelecimento (CNPJ completo)",
-          "População: IBGE estimativa 2025",
           "Base mínima: 30"
         ],
         "type": "methodology"
@@ -3335,7 +3338,7 @@
   "rank_cnae_section": {
     "blocks": [
       {
-        "text": "Os maiores valores de estabelecimentos ativos no Brasil foram G (187), H (147) e I (107).",
+        "text": "Os maiores números de estabelecimentos ativos no Brasil são: G (187), H (147) e I (107).",
         "type": "text"
       },
       {
@@ -3380,10 +3383,9 @@
       },
       {
         "items": [
-          "Atividade: CNAEs H, 49, 492 e 99008",
+          "Atividade: CNAEs H, 49, 492 e 99008 (CNAE principal)",
           "Situação cadastral: ativa",
-          "Unidade: estabelecimento (CNPJ completo)",
-          "População: IBGE estimativa 2025"
+          "Unidade: estabelecimento (CNPJ completo)"
         ],
         "type": "methodology"
       },
@@ -3396,6 +3398,15 @@
           }
         ],
         "type": "sources"
+      },
+      {
+        "items": [
+          {
+            "id": "C-SECT",
+            "text": "Atividade principal: CNAE H, 49, 492 e 99008."
+          }
+        ],
+        "type": "caveats"
       }
     ],
     "decision": "execute",
@@ -3481,12 +3492,12 @@
     "timing_us": {
       "render": 0
     },
-    "understood": "estabelecimentos · CNAE H, 49, 492 e 99008 · o Brasil · RFB 2026-10"
+    "understood": "estabelecimentos · CNAEs H, 49, 492 e 99008 · o Brasil · RFB 2026-10"
   },
   "rank_inhabitants_minimum": {
     "blocks": [
       {
-        "text": "Os locais com mais habitantes por farmácia ativa em Mato Grosso foram Sinop (MT) (0,0), Cuiabá (MT) (0,0) e Sorriso (MT) (0,0).",
+        "text": "Os locais com mais habitantes por estabelecimento ativo de farmácia em Mato Grosso são: Sinop (MT) (534,8), Cuiabá (MT) (680,3) e Sorriso (MT) (934,6) (população: IBGE estimativa 2026).",
         "type": "text"
       },
       {
@@ -3494,15 +3505,15 @@
         "series": [
           {
             "label": "Sinop (MT)",
-            "value": 0.00187
+            "value": 534.75935828877
           },
           {
             "label": "Cuiabá (MT)",
-            "value": 0.00147
+            "value": 680.2721088435375
           },
           {
             "label": "Sorriso (MT)",
-            "value": 0.00107
+            "value": 934.5794392523364
           }
         ],
         "type": "chart"
@@ -3515,15 +3526,15 @@
         "rows": [
           [
             "Sinop (MT)",
-            "0,0"
+            "534,8"
           ],
           [
             "Cuiabá (MT)",
-            "0,0"
+            "680,3"
           ],
           [
             "Sorriso (MT)",
-            "0,0"
+            "934,6"
           ]
         ],
         "total": null,
@@ -3531,10 +3542,11 @@
       },
       {
         "items": [
-          "Atividade: farmácias",
+          "Atividade: farmácias (CNAE principal)",
           "Situação cadastral: ativa",
           "Unidade: estabelecimento (CNPJ completo)",
-          "População: IBGE estimativa 2025"
+          "Municípios com população de 30.000 habitantes a 50.000 habitantes",
+          "População: IBGE estimativa 2026"
         ],
         "type": "methodology"
       },
@@ -3552,7 +3564,7 @@
         "items": [
           {
             "id": "C-DENS",
-            "text": "Densidade por habitante não indica, sozinha, oportunidade de mercado. População: IBGE estimativa 2025."
+            "text": "Densidade por habitante não indica, sozinha, oportunidade de mercado. População: IBGE estimativa 2026."
           },
           {
             "id": "C-SECT",
@@ -3571,7 +3583,7 @@
         "kind": "rank",
         "metric": {
           "inhabitants_per": {
-            "ibge_estimate": 2025
+            "ibge_estimate": 2026
           }
         },
         "min_base": 30
@@ -3623,7 +3635,7 @@
           "to": 50000
         },
         "population_ref": {
-          "ibge_estimate": 2025
+          "ibge_estimate": 2026
         },
         "porte": [
           "unreported",
@@ -3661,7 +3673,7 @@
   "rank_sector_change_mt": {
     "blocks": [
       {
-        "text": "Entre abril de 2026 e outubro de 2026, as maiores variações de ativos em Mato Grosso foram padarias (187), farmácias (147) e 3 (107).",
+        "text": "Entre abril de 2026 e outubro de 2026, as maiores variações de estabelecimentos ativos em Mato Grosso foram: padarias (187), farmácias (147) e setor sem rótulo (id 3) (107).",
         "type": "text"
       },
       {
@@ -3676,7 +3688,7 @@
             "value": 147.0
           },
           {
-            "label": "3",
+            "label": "setor sem rótulo (id 3)",
             "value": 107.0
           }
         ],
@@ -3697,7 +3709,7 @@
             "147"
           ],
           [
-            "3",
+            "setor sem rótulo (id 3)",
             "107"
           ]
         ],
@@ -3706,10 +3718,9 @@
       },
       {
         "items": [
-          "Atividade: todas as atividades",
+          "Atividade: todas",
           "Situação cadastral: ativa",
-          "Unidade: estabelecimento (CNPJ completo)",
-          "População: IBGE estimativa 2025"
+          "Unidade: estabelecimento (CNPJ completo)"
         ],
         "type": "methodology"
       },
@@ -3805,20 +3816,20 @@
   "sem_filiais": {
     "blocks": [
       {
-        "text": "o Brasil tem 187 estabelecimentos ativos de todas as atividades, segundo a Receita Federal de outubro de 2026.",
+        "text": "O Brasil tem 187 matrizes ativas, segundo a Receita Federal de outubro de 2026.",
         "type": "text"
       },
       {
-        "label": "Estabelecimentos ativos",
+        "label": "Matrizes ativas",
         "type": "kpi",
         "value": "187"
       },
       {
         "items": [
-          "Atividade: todas as atividades",
+          "Atividade: todas",
           "Situação cadastral: ativa",
           "Unidade: estabelecimento (CNPJ completo)",
-          "População: IBGE estimativa 2025"
+          "Somente matrizes"
         ],
         "type": "methodology"
       },
@@ -3893,12 +3904,12 @@
     "timing_us": {
       "render": 0
     },
-    "understood": "estabelecimentos · todas as atividades · o Brasil · RFB 2026-10"
+    "understood": "matrizes · todas as atividades · o Brasil · RFB 2026-10"
   },
   "sinop_vs_sorriso": {
     "blocks": [
       {
-        "text": "Entre Sinop (MT) e Sorriso (MT), Sinop (MT) tem 187 contra 147 em Sorriso (MT) (27,2% mais).",
+        "text": "Sinop (MT): 187 estabelecimentos ativos de padaria; Sorriso (MT): 147 (27,2% a mais).",
         "type": "text"
       },
       {
@@ -3952,10 +3963,9 @@
       },
       {
         "items": [
-          "Atividade: padarias",
+          "Atividade: padarias (CNAE principal)",
           "Situação cadastral: ativa",
-          "Unidade: estabelecimento (CNPJ completo)",
-          "População: IBGE estimativa 2025"
+          "Unidade: estabelecimento (CNPJ completo)"
         ],
         "type": "methodology"
       },
@@ -4070,20 +4080,20 @@
   "so_filiais": {
     "blocks": [
       {
-        "text": "o Brasil tem 187 estabelecimentos ativos de todas as atividades, segundo a Receita Federal de outubro de 2026.",
+        "text": "O Brasil tem 187 filiais ativas, segundo a Receita Federal de outubro de 2026.",
         "type": "text"
       },
       {
-        "label": "Estabelecimentos ativos",
+        "label": "Filiais ativas",
         "type": "kpi",
         "value": "187"
       },
       {
         "items": [
-          "Atividade: todas as atividades",
+          "Atividade: todas",
           "Situação cadastral: ativa",
           "Unidade: estabelecimento (CNPJ completo)",
-          "População: IBGE estimativa 2025"
+          "Somente filiais"
         ],
         "type": "methodology"
       },
@@ -4158,12 +4168,12 @@
     "timing_us": {
       "render": 0
     },
-    "understood": "estabelecimentos · todas as atividades · o Brasil · RFB 2026-10"
+    "understood": "filiais · todas as atividades · o Brasil · RFB 2026-10"
   },
   "sorriso": {
     "blocks": [
       {
-        "text": "Sorriso (MT) tem 187 estabelecimentos ativos de todas as atividades, segundo a Receita Federal de outubro de 2026.",
+        "text": "Sorriso (MT) tem 187 estabelecimentos ativos, segundo a Receita Federal de outubro de 2026.",
         "type": "text"
       },
       {
@@ -4173,10 +4183,9 @@
       },
       {
         "items": [
-          "Atividade: todas as atividades",
+          "Atividade: todas",
           "Situação cadastral: ativa",
-          "Unidade: estabelecimento (CNPJ completo)",
-          "População: IBGE estimativa 2025"
+          "Unidade: estabelecimento (CNPJ completo)"
         ],
         "type": "methodology"
       },
@@ -4260,7 +4269,7 @@
   "sorriso_e_regiao": {
     "blocks": [
       {
-        "text": "Segundo a base da Receita Federal de outubro de 2026, a região de Sorriso (MT) tem 187 estabelecimentos ativos de todas as atividades.",
+        "text": "Segundo a base da Receita Federal de outubro de 2026, a região de Sorriso (MT) tem 187 estabelecimentos ativos.",
         "type": "text"
       },
       {
@@ -4270,10 +4279,10 @@
       },
       {
         "items": [
-          "Atividade: todas as atividades",
+          "Atividade: todas",
           "Situação cadastral: ativa",
           "Unidade: estabelecimento (CNPJ completo)",
-          "População: IBGE estimativa 2025"
+          "Região: Sorriso (MT) e municípios vizinhos (até 1 nível de vizinhança)"
         ],
         "type": "methodology"
       },
@@ -4370,10 +4379,9 @@
       },
       {
         "items": [
-          "Atividade: padarias e farmácias",
+          "Atividade: padarias e farmácias (CNAE principal)",
           "Situação cadastral: ativa",
-          "Unidade: estabelecimento (CNPJ completo)",
-          "População: IBGE estimativa 2025"
+          "Unidade: estabelecimento (CNPJ completo)"
         ],
         "type": "methodology"
       },

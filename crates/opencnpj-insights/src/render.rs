@@ -38,6 +38,8 @@ pub struct Labels {
     pub municipalities: BTreeMap<u16, MunicipalityLabel>,
     pub sectors: BTreeMap<u16, SectorLabel>,
     pub ufs: BTreeMap<u8, String>,
+    /// Region display names ("Centro-Oeste", "Região imediata de Sinop"), keyed by region id.
+    pub regions: BTreeMap<u16, String>,
 }
 
 #[derive(Debug, Clone)]
@@ -156,14 +158,14 @@ pub fn render(input: RenderInput<'_>) -> Result<Answer, RenderError> {
     let mut values = base_placeholders(request, &input);
     fill_payload(request, &input, &mut values)?;
     let seed = xxhash_rust::xxh3::xxh3_64(&opencnpj_query::codec::encode(request));
-    let text = templates.render(&key, seed, &values)?;
+    let text = capitalize(&templates.render(&key, seed, &values)?);
     let mut blocks = vec![Block::Text { text }];
     payload_blocks(request, &input, &mut blocks)?;
     blocks.push(Block::Methodology { items: methodology(request, &input) });
     blocks.push(Block::Sources {
         items: vec![Source {
             name: "Receita Federal — Dados Abertos do CNPJ".into(),
-            competence: input.provenance.competence.to_string(),
+            competence: request.time.competence.to_string(),
             snapshot_sha256: input.provenance.snapshot_sha256.clone(),
         }],
     });
@@ -211,6 +213,11 @@ pub fn reject(reason: &str, suggestions: Vec<String>, query: &ValidRequest) -> A
 
 fn template_key(request: &opencnpj_query::ir::Request, payload: &Payload<'_>, followup: bool) -> Result<String, RenderError> {
     let turn = if followup { "followup" } else { "first" };
+    if let Payload::Value(Value::Rows(rows)) = payload
+        && rows.is_empty()
+    {
+        return Ok(format!("empty.none.rows.{turn}"));
+    }
     let metric = metric_kind(request);
     let shape = match (&request.op, payload) {
         (Op::Count { .. }, Payload::Value(Value::Scalar { .. })) => "scalar",
@@ -251,33 +258,51 @@ fn metric_kind(request: &opencnpj_query::ir::Request) -> &'static str {
 }
 
 fn base_placeholders(request: &opencnpj_query::ir::Request, input: &RenderInput<'_>) -> BTreeMap<&'static str, String> {
+    // Only values that exist are inserted: a template that names a missing value fails with
+    // `MissingPlaceholder` instead of rendering a blank.
     let mut values = BTreeMap::new();
     let (unit_singular, unit_plural) = unit(request);
     let (status_singular, status_plural) = status_adjective(request);
     let (sector_singular, sector_plural) = sector_label(request, input.labels);
-    for key in schema("") {
-        values.insert(key, String::new());
-    }
     values.insert("place", place_label(request, input.labels));
+    let plural_subject = place_count(request) > 1;
+    values.insert("have", if plural_subject { "têm" } else { "tem" }.into());
+    values.insert("had", if plural_subject { "tiveram" } else { "teve" }.into());
     let place_em = place_em(request, input.labels);
     values.insert("place_em_cap", capitalize(&place_em));
     values.insert("place_em", place_em);
     values.insert("sector:label", sector_singular);
     values.insert("sector:label_plural", sector_plural);
     values.insert("unit", unit_plural.clone());
-    values.insert("unit:plural(value)", unit_plural.clone());
+    values.insert("unit:singular", unit_singular);
+    values.insert("unit:plural(value)", unit_plural);
     values.insert("status", status_plural.clone());
-    values.insert("status:adj(value)", status_plural.clone());
+    values.insert("status:singular", status_singular);
+    values.insert("status:adj(value)", status_plural);
     values.insert("metric_label", metric_label(request));
-    values.insert("flow", flow_label(request).into());
-    values.insert("competence:month_year", month_year(input.provenance.competence));
+    // The activity is named once, and not at all when it is everything or when the sectors
+    // are the members being compared ("padarias: 187; farmácias: 147").
+    let compared_sectors = matches!(request.op, Op::Compare { dim: Dim::Sector, .. } | Op::Rank { dim: Dim::Sector, .. });
+    let any_activity = matches!(request.scope.activity, opencnpj_query::ir::ActivityFilter::Any);
+    let (sector_one, sector_many) = (values["sector:label"].clone(), values["sector:label_plural"].clone());
+    values.insert("of_activity", if any_activity || compared_sectors { String::new() } else { format!(" de {sector_one}") });
+    values.insert("in_activity", if any_activity || compared_sectors { String::new() } else { format!(" em {sector_many}") });
+    values.insert("trend_subject", trend_subject(request, &values["of_activity"]));
+    values.insert("flow", flow_phrase(request, 2));
+    values.insert("competence:month_year", month_year(request.time.competence));
     values.insert("snapshot_sha256", input.provenance.snapshot_sha256.clone());
     values.insert(
         "catalogue",
         format!("municípios {} e setores {}", input.provenance.municipality_catalogue, input.provenance.sector_catalogue),
     );
-    values.insert("min_base:int", min_base(request).to_string());
-    let _ = (unit_singular, status_singular);
+    if let Some(reference) = population_ref(request, input.provenance) {
+        values.insert("population_source", population_label(reference));
+    }
+    if let Op::Rank { dir, .. } = request.op {
+        let ascending = dir == opencnpj_query::ir::Dir::Asc;
+        values.insert("dir_most", if ascending { "menores" } else { "maiores" }.into());
+        values.insert("dir_more", if ascending { "menos" } else { "mais" }.into());
+    }
     values
 }
 
@@ -288,29 +313,38 @@ fn fill_payload(
 ) -> Result<(), RenderError> {
     let (unit_singular, unit_plural) = unit(request);
     let (status_singular, status_plural) = status_adjective(request);
-    values.insert("from:date", period_date(request, true).unwrap_or_default());
-    values.insert("to:date", period_date(request, false).unwrap_or_default());
-    values.insert("from:month_year", period_month(request, true).unwrap_or_default());
-    values.insert("to:month_year", period_month(request, false).unwrap_or_default());
+    if let Some(text) = period_date(request, true) {
+        values.insert("from:date", text);
+    }
+    if let Some(text) = period_date(request, false) {
+        values.insert("to:date", text);
+    }
+    if let Some(text) = period_month(request, true) {
+        values.insert("from:month_year", text);
+    }
+    if let Some(text) = period_month(request, false) {
+        values.insert("to:month_year", text);
+    }
     match &input.payload {
         Payload::Value(Value::Scalar { value }) => {
             values.insert("value:int", int(*value));
             values.insert("value:dec1", decimal1(*value as f64));
             values.insert("unit:plural(value)", pluralize(*value, &unit_singular, &unit_plural).into());
             values.insert("status:adj(value)", pluralize(*value, &status_singular, &status_plural).into());
+            values.insert("flow", flow_phrase(request, *value));
         }
         Payload::Value(Value::Ratio { num, den }) => {
-            let value = display_ratio(request, *num, *den);
+            // No denominator (missing population, zero establishments): there is no number to
+            // show, and inventing one (0,0 or the raw count) would break SR-11.
+            let value = display_ratio(request, *num, *den).ok_or(RenderError::InvalidPayload("ratio without a denominator"))?;
             values.insert("value:dec1", decimal1(value));
-            values.insert("value:int", int(i64::try_from(*num).unwrap_or(i64::MAX)));
-            let population = match request.op.metric() {
-                Some(Metric::Per10k(_)) => *den,
-                Some(Metric::InhabitantsPer(_)) => *num,
-                _ => 0,
-            };
-            values.insert("population:int", int(i64::try_from(population).unwrap_or(i64::MAX)));
-            if let Some(reference) = input.provenance.population {
-                values.insert("population_year", population_year(reference).to_string());
+            values.insert("value:int", int_u(*num));
+            if let Some(population) = match request.op.metric() {
+                Some(Metric::Per10k(_)) => Some(*den),
+                Some(Metric::InhabitantsPer(_)) => Some(*num),
+                _ => None,
+            } {
+                values.insert("population:int", int_u(population));
             }
             values.insert("unit:plural(value)", pluralize(2, &unit_singular, &unit_plural).into());
             values.insert("status:adj(value)", pluralize(2, &status_singular, &status_plural).into());
@@ -319,56 +353,36 @@ fn fill_payload(
             let dim = request.op.dimension();
             let labels: Vec<String> = rows.iter().map(|row| row_label(request, row.key, dim, input.labels)).collect();
             let displays: Vec<String> = rows.iter().map(|row| row_value(request, *row)).collect();
-            if let Some((label, value)) = labels.first().zip(displays.first()) {
-                values.insert("r1", format!("{label} ({value})"));
-                values.insert("top", format!("{label} ({value})"));
-            }
-            if let Some((label, value)) = labels.get(1).zip(displays.get(1)) {
-                values.insert("r2", format!("{label} ({value})"));
-            }
-            if let Some((label, value)) = labels.get(2).zip(displays.get(2)) {
-                values.insert("r3", format!("{label} ({value})"));
-            }
             values.insert("n:int", rows.len().to_string());
             values.insert("top", list(&labels.iter().take(3).zip(displays.iter()).map(|(l, v)| format!("{l} ({v})")).collect::<Vec<_>>()));
             if matches!(request.op, Op::Compare { .. }) && rows.len() >= 2 {
                 let (a, b) = (rows[0], rows[1]);
-                let a_display = row_value(request, a);
-                let b_display = row_value(request, b);
                 let a_metric = metric_value(request, a);
                 let b_metric = metric_value(request, b);
-                let diff = a_metric - b_metric;
                 values.insert("a.place", labels[0].clone());
                 values.insert("b.place", labels[1].clone());
-                values.insert("a.value:int", a_display.clone());
-                values.insert("a.value:dec1", decimal1(a_metric));
-                values.insert("a.share:pct1", pct1(a_metric));
-                values.insert("b.value:int", b_display.clone());
-                values.insert("b.value:dec1", decimal1(b_metric));
-                values.insert("b.share:pct1", pct1(b_metric));
-                values.insert("diff_pct:pct1", if b_metric == 0.0 { "—".into() } else { pct1(diff / b_metric.abs() * 100.0) });
-                values.insert(
-                    "diff_dir",
-                    if diff > 0.0 {
-                        "mais"
-                    } else if diff < 0.0 {
-                        "menos"
-                    } else {
-                        "igual"
-                    }
-                    .into(),
-                );
+                values.insert("a.value:int", displays[0].clone());
+                values.insert("a.value:dec1", a_metric.map_or_else(|| NO_DATA.into(), decimal1));
+                values.insert("a.share:pct1", a_metric.map_or_else(|| NO_DATA.into(), pct1));
+                values.insert("b.value:int", displays[1].clone());
+                values.insert("b.value:dec1", b_metric.map_or_else(|| NO_DATA.into(), decimal1));
+                values.insert("b.share:pct1", b_metric.map_or_else(|| NO_DATA.into(), pct1));
+                values.insert("diff", difference_text(a_metric, b_metric));
             }
-            if matches!(request.op, Op::Trend { .. }) && !rows.is_empty() {
-                let first = rows.first().map_or(0, |row| row.value);
-                let last = rows.last().map_or(0, |row| row.value);
+            if matches!(request.op, Op::Trend { .. })
+                && let (Some(first), Some(last)) = (rows.first(), rows.last())
+            {
+                let (first, last) = (first.value, last.value);
                 values.insert("first:int", int(first));
                 values.insert("last:int", int(last));
-                values.insert("change_pct:pct1", if first == 0 { "—".into() } else { pct1((last - first) as f64 * 100.0 / first as f64) });
+                values.insert(
+                    "change_pct:pct1",
+                    if first == 0 { "variação percentual indefinida".into() } else { pct1((last - first) as f64 * 100.0 / first as f64) },
+                );
             }
         }
         Payload::Records { total, page, rows } => {
-            values.insert("total:int", int(i64::try_from(*total).unwrap_or(i64::MAX)));
+            values.insert("total:int", int_u(*total));
             values.insert("n:int", rows.len().to_string());
             values.insert("page:int", page.to_string());
             values.insert("unit:plural(value)", pluralize(2, &unit_singular, &unit_plural).into());
@@ -378,7 +392,7 @@ fn fill_payload(
             for (key, value) in fields {
                 match key.as_str() {
                     "cnpj" => values.insert("cnpj", value.clone()),
-                    "name" | "razao_social" => values.insert("name", value.clone()),
+                    "name" | "razao_social" => values.insert("name", mask_cpf(value)),
                     "status" | "situacao" => values.insert("status", value.clone()),
                     _ => None,
                 };
@@ -395,7 +409,8 @@ fn payload_blocks(request: &opencnpj_query::ir::Request, input: &RenderInput<'_>
             blocks.push(Block::Kpi { label: kpi_label(request), value: int(*value) });
         }
         Payload::Value(Value::Ratio { num, den }) => {
-            blocks.push(Block::Kpi { label: kpi_label(request), value: decimal1(display_ratio(request, *num, *den)) });
+            let value = display_ratio(request, *num, *den).ok_or(RenderError::InvalidPayload("ratio without a denominator"))?;
+            blocks.push(Block::Kpi { label: kpi_label(request), value: decimal1(value) });
         }
         Payload::Value(Value::Rows(rows)) => {
             let dim = request.op.dimension();
@@ -405,24 +420,26 @@ fn payload_blocks(request: &opencnpj_query::ir::Request, input: &RenderInput<'_>
             if matches!(request.op, Op::Compare { .. }) && rows.len() >= 2 {
                 let a_metric = metric_value(request, rows[0]);
                 let b_metric = metric_value(request, rows[1]);
-                let diff = a_metric - b_metric;
+                let diff = a_metric.zip(b_metric).map(|(a, b)| (a - b, b));
                 blocks.push(Block::Comparison {
                     members: rows
                         .iter()
                         .map(|row| ComparisonMember {
                             label: row_label(request, row.key, dim, input.labels),
                             value: row_value(request, *row),
-                            base: (row.base != 0).then(|| int(i64::try_from(row.base).unwrap_or(i64::MAX))),
+                            base: (row.base != 0).then(|| int_u(row.base)),
                         })
                         .collect(),
-                    difference_abs: decimal1(diff),
-                    difference_pct: (b_metric != 0.0).then(|| pct1(diff / b_metric.abs() * 100.0)),
+                    difference_abs: diff.map_or_else(|| NO_DATA.into(), |(d, _)| decimal1(d)),
+                    difference_pct: diff.filter(|(_, b)| *b != 0.0).map(|(d, b)| pct1(d / b.abs() * 100.0)),
                 });
             }
+            // Rows without a value (no denominator) stay in the table as "sem dado" but are
+            // not drawn: a chart point needs a number.
             let chart = labels
                 .iter()
                 .zip(rows.iter())
-                .map(|(label, row)| ChartPoint { label: label.clone(), value: ratio_value(request, *row) })
+                .filter_map(|(label, row)| metric_value(request, *row).map(|value| ChartPoint { label: label.clone(), value }))
                 .collect::<Vec<_>>();
             if matches!(request.op, Op::Trend { .. }) {
                 blocks.push(Block::Chart { kind: ChartKind::Line, series: chart });
@@ -432,49 +449,83 @@ fn payload_blocks(request: &opencnpj_query::ir::Request, input: &RenderInput<'_>
             blocks.push(Block::Table { columns: vec![column_label(dim, request), "Valor".into()], rows: table_rows, total: None });
         }
         Payload::Records { total, page, rows } => {
-            blocks.push(Block::Records { columns: vec!["CNPJ".into(), "Nome".into()], rows: rows.clone(), total: *total, page: *page });
+            // SR-14 / D-05: owner CPFs embedded in MEI/EI names are masked; the CNPJ column is kept.
+            let rows = rows
+                .iter()
+                .map(|row| row.iter().enumerate().map(|(i, cell)| if i == 0 { cell.clone() } else { mask_cpf(cell) }).collect())
+                .collect();
+            blocks.push(Block::Records { columns: vec!["CNPJ".into(), "Nome".into()], rows, total: *total, page: *page });
         }
-        Payload::Company { fields } => blocks.push(Block::Company { fields: fields.clone() }),
+        Payload::Company { fields } => blocks.push(Block::Company {
+            fields: fields.iter().map(|(key, value)| (key.clone(), if key == "cnpj" { value.clone() } else { mask_cpf(value) })).collect(),
+        }),
         Payload::Meta { .. } => {}
     }
     Ok(())
 }
 
-fn display_ratio(request: &opencnpj_query::ir::Request, num: u64, den: u64) -> f64 {
+/// Shown where a ratio has no denominator; never replaced by a made-up number (SR-11).
+const NO_DATA: &str = "sem dado";
+
+fn display_ratio(request: &opencnpj_query::ir::Request, num: u64, den: u64) -> Option<f64> {
     if den == 0 {
-        return 0.0;
+        return None;
     }
-    match request.op.metric() {
+    Some(match request.op.metric() {
         Some(Metric::Per10k(_)) => num as f64 * 10_000.0 / den as f64,
         Some(Metric::InhabitantsPer(_)) => num as f64 / den as f64,
         Some(Metric::Share) => num as f64 * 100.0 / den as f64,
         _ => num as f64 / den as f64,
-    }
+    })
 }
 
-fn metric_value(request: &opencnpj_query::ir::Request, row: Row) -> f64 {
+/// The value as displayed: per 10k, inhabitants per establishment, percent for shares and
+/// percent changes, the count otherwise. `None` when a ratio has no denominator.
+fn metric_value(request: &opencnpj_query::ir::Request, row: Row) -> Option<f64> {
     match request.op.metric() {
         Some(Metric::Per10k(_) | Metric::InhabitantsPer(_) | Metric::Share) => ratio_value(request, row),
-        Some(Metric::ActiveChange { pct: true }) if row.base > 0 => row.value as f64 / row.base as f64,
-        _ => row.value as f64,
+        Some(Metric::ActiveChange { pct: true }) => (row.base > 0).then(|| row.value as f64 * 100.0 / row.base as f64),
+        _ => Some(row.value as f64),
     }
 }
 
-fn ratio_value(request: &opencnpj_query::ir::Request, row: Row) -> f64 {
+fn ratio_value(request: &opencnpj_query::ir::Request, row: Row) -> Option<f64> {
+    if row.base == 0 {
+        return None;
+    }
+    let (value, base) = (row.value as f64, row.base as f64);
     match request.op.metric() {
-        Some(Metric::Per10k(_)) if row.base > 0 => row.value as f64 * 10_000.0 / row.base as f64,
-        Some(Metric::InhabitantsPer(_)) if row.base > 0 => row.value as f64 / row.base as f64,
-        Some(Metric::Share) if row.base > 0 => row.value as f64 * 100.0 / row.base as f64,
-        _ => row.value as f64,
+        Some(Metric::Per10k(_)) => Some(value * 10_000.0 / base),
+        Some(Metric::InhabitantsPer(_)) => Some(value / base),
+        Some(Metric::Share) => Some(value * 100.0 / base),
+        _ => Some(value),
     }
 }
 
 fn row_value(request: &opencnpj_query::ir::Request, row: Row) -> String {
+    let Some(value) = metric_value(request, row) else { return NO_DATA.into() };
     match request.op.metric() {
-        Some(Metric::Per10k(_) | Metric::InhabitantsPer(_)) => decimal1(ratio_value(request, row)),
-        Some(Metric::Share) => pct1(ratio_value(request, row)),
-        Some(Metric::ActiveChange { pct: true }) if row.base > 0 => pct1(row.value as f64 * 100.0 / row.base as f64),
+        Some(Metric::Per10k(_) | Metric::InhabitantsPer(_)) => decimal1(value),
+        Some(Metric::Share | Metric::ActiveChange { pct: true }) => pct1(value),
         _ => int(row.value),
+    }
+}
+
+/// "12,3% a mais" / "12,3% a menos" relative to the second member.
+fn difference_text(a: Option<f64>, b: Option<f64>) -> String {
+    match (a, b) {
+        (Some(a), Some(b)) if b != 0.0 => {
+            let pct = (a - b) / b.abs() * 100.0;
+            if pct.abs() < 0.05 {
+                "valores iguais".into()
+            } else if pct > 0.0 {
+                format!("{} a mais", pct1(pct))
+            } else {
+                format!("{} a menos", pct1(-pct))
+            }
+        }
+        (Some(a), Some(b)) if a == b => "valores iguais".into(),
+        _ => "sem comparação percentual".into(),
     }
 }
 
@@ -486,7 +537,9 @@ fn row_label(request: &opencnpj_query::ir::Request, key: u64, dim: Option<Dim>, 
             .map(|label| format!("{} ({})", label.name, label.uf))
             .unwrap_or_else(|| key.to_string()),
         Some(Dim::Uf) => labels.ufs.get(&(key as u8)).cloned().unwrap_or_else(|| key.to_string()),
-        Some(Dim::Sector) => labels.sectors.get(&(key as u16)).map(|label| label.plural.clone()).unwrap_or_else(|| key.to_string()),
+        Some(Dim::Sector) => {
+            labels.sectors.get(&(key as u16)).map_or_else(|| format!("setor sem rótulo (id {key})"), |label| label.plural.clone())
+        }
         Some(Dim::Cnae(level)) => cnae_key_label(level, key),
         Some(Dim::Porte) => match key {
             0 => "Não informado".into(),
@@ -515,7 +568,10 @@ fn row_label(request: &opencnpj_query::ir::Request, key: u64, dim: Option<Dim>, 
                 "MEI".into()
             }
         }
-        Some(Dim::Region(_)) | Some(Dim::Year) => key.to_string(),
+        Some(Dim::Region(_)) => {
+            u16::try_from(key).ok().and_then(|id| labels.regions.get(&id)).cloned().unwrap_or_else(|| format!("região {key}"))
+        }
+        Some(Dim::Year) => key.to_string(),
         Some(Dim::Month) => month_label(key),
         None => match request.op {
             Op::Trend { grain, .. } => match grain {
@@ -564,51 +620,140 @@ fn understood(request: &opencnpj_query::ir::Request, input: &RenderInput<'_>) ->
 }
 
 fn kpi_label(request: &opencnpj_query::ir::Request) -> String {
+    let (unit_singular, unit_plural) = unit(request);
+    let (status_singular, status_plural) = status_adjective(request);
     match request.op.metric() {
-        Some(Metric::Flow(_)) => flow_label(request).into(),
-        Some(Metric::Per10k(_)) => "Por dez mil habitantes".into(),
-        Some(Metric::InhabitantsPer(_)) => "Habitantes por estabelecimento".into(),
-        Some(Metric::ActiveChange { .. }) => "Variação de ativos".into(),
+        Some(Metric::Flow(_)) => capitalize(flow_label(request)),
+        Some(Metric::Per10k(_)) => capitalize(&format!("{unit_plural} {status_plural} por dez mil habitantes")),
+        Some(Metric::InhabitantsPer(_)) => format!("Habitantes por {unit_singular} {status_singular}"),
+        Some(Metric::ActiveChange { .. }) => capitalize(&format!("variação de {unit_plural} {status_plural}")),
         Some(Metric::Share) => "Participação".into(),
-        _ => {
-            if request.unit == opencnpj_query::ir::Unit::HeadOffices {
-                "Matrizes ativas".into()
-            } else {
-                "Estabelecimentos ativos".into()
-            }
-        }
+        _ => capitalize(&format!("{unit_plural} {status_plural}")),
     }
 }
 
 fn metric_label(request: &opencnpj_query::ir::Request) -> String {
+    let (unit_singular, unit_plural) = unit(request);
+    let (status_singular, status_plural) = status_adjective(request);
     match request.op.metric() {
         Some(Metric::Flow(_)) => flow_label(request).into(),
-        Some(Metric::Per10k(_)) => "estabelecimentos ativos por dez mil habitantes".into(),
-        Some(Metric::InhabitantsPer(_)) => "habitantes por estabelecimento ativo".into(),
-        Some(Metric::ActiveChange { .. }) => "variação de estabelecimentos ativos".into(),
+        Some(Metric::Per10k(_)) => format!("{unit_plural} {status_plural} por dez mil habitantes"),
+        Some(Metric::InhabitantsPer(_)) => format!("habitantes por {unit_singular} {status_singular}"),
+        Some(Metric::ActiveChange { .. }) => format!("variação de {unit_plural} {status_plural}"),
         Some(Metric::Share) => "participação".into(),
-        _ => "estabelecimentos ativos".into(),
+        _ => format!("{unit_plural} {status_plural}"),
     }
 }
 
+fn trend_subject(request: &opencnpj_query::ir::Request, of_activity: &str) -> String {
+    let (_, unit_plural) = unit(request);
+    match request.op.metric() {
+        Some(Metric::Flow(FlowMetric::Registrations)) => {
+            format!("o número de {unit_plural}{of_activity} registrados com início de atividade")
+        }
+        Some(Metric::Flow(FlowMetric::Closures)) => format!("o número de baixas de {unit_plural}{of_activity}"),
+        Some(Metric::Flow(FlowMetric::NetRegistrations)) => format!("o saldo entre registros e baixas de {unit_plural}{of_activity}"),
+        Some(Metric::Flow(FlowMetric::MeiOptIns)) => format!("o número de adesões ao MEI{of_activity}"),
+        Some(Metric::Flow(FlowMetric::MeiExits)) => format!("o número de saídas do MEI{of_activity}"),
+        _ => format!("o número de {unit_plural}{of_activity}"),
+    }
+}
+
+/// Short name of a flow metric (KPI labels, metric labels).
 fn flow_label(request: &opencnpj_query::ir::Request) -> &'static str {
     match request.op.metric() {
-        Some(Metric::Flow(FlowMetric::Registrations)) => "registros",
+        Some(Metric::Flow(FlowMetric::Registrations)) => "registros com início de atividade",
         Some(Metric::Flow(FlowMetric::Closures)) => "baixas",
-        Some(Metric::Flow(FlowMetric::NetRegistrations)) => "saldo de registros",
+        Some(Metric::Flow(FlowMetric::NetRegistrations)) => "saldo entre registros e baixas",
         Some(Metric::Flow(FlowMetric::MeiOptIns)) => "adesões ao MEI",
         Some(Metric::Flow(FlowMetric::MeiExits)) => "saídas do MEI",
         _ => "",
     }
 }
 
-fn place_em(request: &opencnpj_query::ir::Request, labels: &Labels) -> String {
-    match &request.scope.place {
-        PlaceFilter::Any => "no Brasil".into(),
-        PlaceFilter::Region(_) => "na região".into(),
-        PlaceFilter::Near { .. } => format!("na {}", &place_label(request, labels)[2..]),
-        _ => format!("em {}", place_label(request, labels)),
+/// What follows the number in a flow sentence: registrations are cadastral starts of
+/// activity, never physical openings (SR-01); closures are baixas (SR-04).
+fn flow_phrase(request: &opencnpj_query::ir::Request, value: i64) -> String {
+    let (unit_singular, unit_plural) = unit(request);
+    let one = value.unsigned_abs() == 1;
+    let unit = if one { unit_singular } else { unit_plural.clone() };
+    let feminine = unit_feminine(request);
+    match request.op.metric() {
+        Some(Metric::Flow(FlowMetric::Registrations)) => {
+            let registered = match (feminine, one) {
+                (true, true) => "registrada",
+                (true, false) => "registradas",
+                (false, true) => "registrado",
+                (false, false) => "registrados",
+            };
+            format!("{unit} {registered} com início de atividade no período")
+        }
+        Some(Metric::Flow(FlowMetric::Closures)) => format!("{} de {unit_plural}", if one { "baixa" } else { "baixas" }),
+        Some(Metric::Flow(FlowMetric::NetRegistrations)) => format!("como saldo entre registros e baixas de {unit_plural}"),
+        Some(Metric::Flow(FlowMetric::MeiOptIns)) => (if one { "adesão ao MEI" } else { "adesões ao MEI" }).into(),
+        Some(Metric::Flow(FlowMetric::MeiExits)) => (if one { "saída do MEI" } else { "saídas do MEI" }).into(),
+        _ => unit,
     }
+}
+
+/// Preposition + article for a UF name ("no Paraná", "na Bahia", "em Mato Grosso").
+fn uf_em(name: &str) -> String {
+    let prep = match name {
+        "Bahia" | "Paraíba" => "na",
+        "Acre"
+        | "Amapá"
+        | "Amazonas"
+        | "Ceará"
+        | "Distrito Federal"
+        | "Espírito Santo"
+        | "Maranhão"
+        | "Pará"
+        | "Paraná"
+        | "Piauí"
+        | "Rio de Janeiro"
+        | "Rio Grande do Norte"
+        | "Rio Grande do Sul"
+        | "Tocantins" => "no",
+        _ => "em",
+    };
+    format!("{prep} {name}")
+}
+
+fn place_em(request: &opencnpj_query::ir::Request, labels: &Labels) -> String {
+    let base = match &request.scope.place {
+        PlaceFilter::Any => "no Brasil".into(),
+        PlaceFilter::Region(id) => {
+            labels.regions.get(&id.0).map_or_else(|| format!("na região {}", id.0), |name| format!("na região {name}"))
+        }
+        PlaceFilter::Near { center, .. } => labels
+            .municipalities
+            .get(&center.0)
+            .map_or_else(|| "na região do município".into(), |label| format!("na região de {} ({})", label.name, label.uf)),
+        PlaceFilter::Ufs(ids) if ids.len() == 1 => uf_em(&labels.ufs.get(&ids[0].0).cloned().unwrap_or_else(|| ids[0].0.to_string())),
+        _ => format!("em {}", place_names(request, labels)),
+    };
+    format!("{base}{}", exclusion_suffix(request, labels))
+}
+
+fn place_count(request: &opencnpj_query::ir::Request) -> usize {
+    match &request.scope.place {
+        PlaceFilter::Municipalities(ids) => ids.len(),
+        PlaceFilter::Ufs(ids) => ids.len(),
+        _ => 1,
+    }
+}
+
+/// ", exceto Cuiabá (MT) e farmácias" — exclusions are part of what was counted (SR-13).
+fn exclusion_suffix(request: &opencnpj_query::ir::Request, labels: &Labels) -> String {
+    let exclude = &request.scope.exclude;
+    let mut names: Vec<String> = exclude
+        .municipalities
+        .iter()
+        .map(|id| labels.municipalities.get(&id.0).map_or_else(|| id.0.to_string(), |label| format!("{} ({})", label.name, label.uf)))
+        .collect();
+    names.extend(exclude.ufs.iter().map(|uf| labels.ufs.get(&uf.0).cloned().unwrap_or_else(|| uf.0.to_string())));
+    names.extend(exclude.sectors.iter().map(|id| labels.sectors.get(&id.0).map_or_else(|| id.0.to_string(), |label| label.plural.clone())));
+    if names.is_empty() { String::new() } else { format!(", exceto {}", list(&names)) }
 }
 
 fn capitalize(text: &str) -> String {
@@ -620,6 +765,10 @@ fn capitalize(text: &str) -> String {
 }
 
 fn place_label(request: &opencnpj_query::ir::Request, labels: &Labels) -> String {
+    format!("{}{}", place_names(request, labels), exclusion_suffix(request, labels))
+}
+
+fn place_names(request: &opencnpj_query::ir::Request, labels: &Labels) -> String {
     match &request.scope.place {
         PlaceFilter::Municipalities(ids) => list(
             &ids.iter()
@@ -635,7 +784,9 @@ fn place_label(request: &opencnpj_query::ir::Request, labels: &Labels) -> String
         PlaceFilter::Ufs(ids) => {
             list(&ids.iter().map(|uf| labels.ufs.get(&uf.0).cloned().unwrap_or_else(|| uf.0.to_string())).collect::<Vec<_>>())
         }
-        PlaceFilter::Region(_) => "a região".into(),
+        PlaceFilter::Region(id) => {
+            labels.regions.get(&id.0).map_or_else(|| format!("a região {}", id.0), |name| format!("a região {name}"))
+        }
         PlaceFilter::Near { center, .. } => labels
             .municipalities
             .get(&center.0)
@@ -660,7 +811,8 @@ fn sector_label(request: &opencnpj_query::ir::Request, labels: &Labels) -> (Stri
         }
         opencnpj_query::ir::ActivityFilter::Cnae { codes, .. } => {
             let values = codes.iter().map(cnae_label).collect::<Vec<_>>();
-            (format!("CNAE {}", list(&values)), format!("CNAEs {}", list(&values)))
+            let prefix = if values.len() == 1 { "CNAE" } else { "CNAEs" };
+            (format!("{prefix} {}", list(&values)), format!("{prefix} {}", list(&values)))
         }
         opencnpj_query::ir::ActivityFilter::Any => ("todas as atividades".into(), "todas as atividades".into()),
     }
@@ -679,16 +831,33 @@ fn cnae_label(code: &CnaeCode) -> String {
     }
 }
 
+/// The counted unit as read in the answer: a head-office or branch filter on establishments
+/// is part of what was counted, so it is named ("filiais"), not hidden in the methodology.
 fn unit(request: &opencnpj_query::ir::Request) -> (String, String) {
-    match request.unit {
-        opencnpj_query::ir::Unit::Establishments => ("estabelecimento".into(), "estabelecimentos".into()),
-        opencnpj_query::ir::Unit::HeadOffices => ("matriz".into(), "matrizes".into()),
+    match (request.unit, request.scope.head_office) {
+        (opencnpj_query::ir::Unit::HeadOffices, _) | (_, Tri::Yes) => ("matriz".into(), "matrizes".into()),
+        (_, Tri::No) => ("filial".into(), "filiais".into()),
+        (_, Tri::Any) => ("estabelecimento".into(), "estabelecimentos".into()),
     }
 }
 
+fn unit_feminine(request: &opencnpj_query::ir::Request) -> bool {
+    request.unit == opencnpj_query::ir::Unit::HeadOffices || request.scope.head_office != Tri::Any
+}
+
 fn status_adjective(request: &opencnpj_query::ir::Request) -> (String, String) {
-    let status = request.scope.status.unwrap_or_else(|| request.op.default_status()).iter().next();
-    let feminine = request.unit == opencnpj_query::ir::Unit::HeadOffices;
+    let set = request.scope.status.unwrap_or_else(|| request.op.default_status());
+    if set == opencnpj_query::ir::StatusSet::ALL {
+        let phrase = "em qualquer situação cadastral".to_string();
+        return (phrase.clone(), phrase);
+    }
+    if set.iter().count() > 1 {
+        // Several statuses: name them instead of picking the first one.
+        let phrase = format!("nas situações {}", list(&set.iter().map(status_name).collect::<Vec<_>>()));
+        return (phrase.clone(), phrase);
+    }
+    let status = set.iter().next();
+    let feminine = unit_feminine(request);
     let (singular, plural) = match status {
         Some(Status::Closed) => {
             if feminine {
@@ -730,13 +899,26 @@ fn status_adjective(request: &opencnpj_query::ir::Request) -> (String, String) {
 }
 
 fn pluralize<'a>(n: i64, singular: &'a str, plural: &'a str) -> &'a str {
-    if n == 1 { singular } else { plural }
+    if n.unsigned_abs() == 1 { singular } else { plural }
 }
 
 fn methodology(request: &opencnpj_query::ir::Request, input: &RenderInput<'_>) -> Vec<String> {
+    // Every filter that changes the count is listed, so the reader can see exactly what was
+    // counted (filters missing here were the cause of answers that read as unfiltered).
+    let scope = &request.scope;
     let mut items = Vec::new();
-    items.push(format!("Atividade: {}", sector_label(request, input.labels).1));
-    let status = request.scope.status.unwrap_or_else(|| request.op.default_status());
+    let cnae_scope = match &scope.activity {
+        opencnpj_query::ir::ActivityFilter::Sectors { scope, .. } | opencnpj_query::ir::ActivityFilter::Cnae { scope, .. } => Some(*scope),
+        opencnpj_query::ir::ActivityFilter::Any => None,
+    };
+    items.push(match cnae_scope {
+        Some(opencnpj_query::ir::CnaeScope::Any) => {
+            format!("Atividade: {} (CNAE principal ou secundária)", sector_label(request, input.labels).1)
+        }
+        Some(opencnpj_query::ir::CnaeScope::Main) => format!("Atividade: {} (CNAE principal)", sector_label(request, input.labels).1),
+        None => "Atividade: todas".into(),
+    });
+    let status = scope.status.unwrap_or_else(|| request.op.default_status());
     items.push(format!("Situação cadastral: {}", list(&status.iter().map(status_name).collect::<Vec<_>>())));
     items.push(format!(
         "Unidade: {}",
@@ -745,13 +927,81 @@ fn methodology(request: &opencnpj_query::ir::Request, input: &RenderInput<'_>) -
             opencnpj_query::ir::Unit::HeadOffices => "matriz",
         }
     ));
-    if let Some(reference) = input.provenance.population {
+    match scope.head_office {
+        Tri::Yes => items.push("Somente matrizes".into()),
+        Tri::No => items.push("Somente filiais".into()),
+        Tri::Any => {}
+    }
+    match scope.mei {
+        Tri::Yes => items.push("Somente MEI".into()),
+        Tri::No => items.push("Excluindo MEI".into()),
+        Tri::Any => {}
+    }
+    match scope.simples {
+        Tri::Yes => items.push("Somente optantes pelo Simples".into()),
+        Tri::No => items.push("Excluindo optantes pelo Simples".into()),
+        Tri::Any => {}
+    }
+    if scope.porte != opencnpj_query::ir::PorteSet::ALL {
+        items.push(format!("Porte: {}", list(&scope.porte.iter().map(porte_name).collect::<Vec<_>>())));
+    }
+    if !scope.natureza.is_empty() {
+        let codes = scope
+            .natureza
+            .iter()
+            .map(|code| match code {
+                opencnpj_query::ir::NaturezaCode::Group(group) => format!("grupo {group}"),
+                opencnpj_query::ir::NaturezaCode::Code(code) => format!("{code:04}"),
+            })
+            .collect::<Vec<_>>();
+        items.push(format!("Natureza jurídica: {}", list(&codes)));
+    }
+    if let Some(range) = scope.opened {
+        items.push(format!("Data de início de atividade: {}", day_range(range)));
+    }
+    if let Some(range) = scope.status_date {
+        items.push(format!("Data da situação cadastral: {}", day_range(range)));
+    }
+    if let Some(range) = scope.capital {
+        let reais = |cents: u64| format!("R$ {}", int_u(cents / 100));
+        items.push(format!("Capital social: {}", bounds(range.from.map(reais), range.to.map(reais))));
+    }
+    if let Some(range) = scope.place_population {
+        let people = |n: u32| format!("{} habitantes", int_u(u64::from(n)));
+        items.push(format!("Municípios com população {}", bounds(range.from.map(people), range.to.map(people))));
+    }
+    if let PlaceFilter::Near { center, rule } = &scope.place {
+        let name = input
+            .labels
+            .municipalities
+            .get(&center.0)
+            .map_or_else(|| "o município".into(), |label| format!("{} ({})", label.name, label.uf));
+        items.push(match rule {
+            opencnpj_query::ir::NearRule::Neighbours(depth) => {
+                format!(
+                    "Região: {name} e municípios vizinhos (até {} {} de vizinhança)",
+                    depth,
+                    if *depth == 1 { "nível" } else { "níveis" }
+                )
+            }
+            opencnpj_query::ir::NearRule::WithinKm(km) => format!("Região: municípios com sede a até {km} km de {name}"),
+        });
+    }
+    let excluded = exclusion_suffix(request, input.labels);
+    if let Some(names) = excluded.strip_prefix(", exceto ") {
+        items.push(format!("Excluídos: {names}"));
+    }
+    match scope.contact {
+        opencnpj_query::ir::ContactNeed::Phone => items.push("Com telefone publicado".into()),
+        opencnpj_query::ir::ContactNeed::Email => items.push("Com e-mail publicado".into()),
+        opencnpj_query::ir::ContactNeed::Both => items.push("Com telefone e e-mail publicados".into()),
+        opencnpj_query::ir::ContactNeed::Any => {}
+    }
+    if let Some(reference) = population_ref(request, input.provenance) {
         items.push(format!("População: {}", population_label(reference)));
     }
-    if let Some(Period::Days(days)) = request.time.period
-        && let (Some(from), Some(to)) = (days.from, days.to)
-    {
-        items.push(format!("Período: {} a {}", date(from), date(to)));
+    if let Some(Period::Days(days)) = request.time.period {
+        items.push(format!("Período: {}", day_range(days)));
     }
     if matches!(request.op, Op::Rank { metric: Metric::ActiveChange { pct: true }, .. }) {
         items.push(format!("Base mínima: {}", min_base(request)));
@@ -775,7 +1025,7 @@ fn caveats(request: &opencnpj_query::ir::Request, input: &RenderInput<'_>) -> Ve
             });
     }
     if (matches!(metric, Some(Metric::Per10k(_) | Metric::InhabitantsPer(_))) || request.scope.place_population.is_some())
-        && let Some(reference) = input.provenance.population
+        && let Some(reference) = population_ref(request, input.provenance)
     {
         items.push(Caveat {
             id: "C-DENS",
@@ -794,9 +1044,15 @@ fn caveats(request: &opencnpj_query::ir::Request, input: &RenderInput<'_>) -> Ve
             text: "Contei estabelecimentos (cada CNPJ completo). Para contar só sedes, peça ‘só matrizes’.".into(),
         });
     }
-    if let opencnpj_query::ir::ActivityFilter::Sectors { cnaes, .. } = &request.scope.activity {
-        let codes = cnaes.iter().map(cnae_label).collect::<Vec<_>>();
-        items.push(Caveat { id: "C-SECT", text: format!("Atividade principal: CNAE {}.", list(&codes)) });
+    if let opencnpj_query::ir::ActivityFilter::Sectors { cnaes: codes, scope, .. }
+    | opencnpj_query::ir::ActivityFilter::Cnae { codes, scope } = &request.scope.activity
+    {
+        let codes = codes.iter().map(cnae_label).collect::<Vec<_>>();
+        let which = match scope {
+            opencnpj_query::ir::CnaeScope::Main => "Atividade principal",
+            opencnpj_query::ir::CnaeScope::Any => "Atividade principal ou secundária",
+        };
+        items.push(Caveat { id: "C-SECT", text: format!("{which}: CNAE {}.", list(&codes)) });
     }
     if let Some(Period::Days(days)) = request.time.period
         && days.to == Some(input.provenance.anchor)
@@ -898,10 +1154,64 @@ fn population_label(reference: PopulationRef) -> String {
     }
 }
 
-fn population_year(reference: PopulationRef) -> u16 {
-    match reference {
-        PopulationRef::IbgeCensus(year) | PopulationRef::IbgeEstimate(year) => year,
+/// The population the numbers were divided by: the one named in the metric, else (for
+/// population filters) the request's reference, else the provenance default. `None` when
+/// the answer does not use population at all.
+fn population_ref(request: &opencnpj_query::ir::Request, provenance: &Provenance) -> Option<PopulationRef> {
+    match request.op.metric() {
+        Some(Metric::Per10k(reference) | Metric::InhabitantsPer(reference)) => Some(reference),
+        _ if request.scope.place_population.is_some() => request.scope.population_ref.or(provenance.population),
+        _ => None,
     }
+}
+
+fn porte_name(porte: opencnpj_query::ir::Porte) -> String {
+    match porte {
+        opencnpj_query::ir::Porte::Unreported => "não informado",
+        opencnpj_query::ir::Porte::Micro => "microempresa",
+        opencnpj_query::ir::Porte::Small => "empresa de pequeno porte",
+        opencnpj_query::ir::Porte::Other => "demais",
+    }
+    .into()
+}
+
+fn day_range(range: opencnpj_query::ir::DayRange) -> String {
+    bounds(range.from.map(date), range.to.map(date))
+}
+
+fn bounds(from: Option<String>, to: Option<String>) -> String {
+    match (from, to) {
+        (Some(from), Some(to)) => format!("de {from} a {to}"),
+        (Some(from), None) => format!("a partir de {from}"),
+        (None, Some(to)) => format!("até {to}"),
+        (None, None) => "sem limite".into(),
+    }
+}
+
+/// Masks 11-digit runs (owner CPFs embedded in MEI/EI names) as `***.456.789-**`, keeping
+/// the six digits RFB itself publishes for partners. Longer digit runs (CNPJs) are kept.
+fn mask_cpf(text: &str) -> String {
+    let chars: Vec<char> = text.chars().collect();
+    let mut out = String::with_capacity(text.len());
+    let mut i = 0;
+    while i < chars.len() {
+        if chars[i].is_ascii_digit() {
+            let start = i;
+            while i < chars.len() && chars[i].is_ascii_digit() {
+                i += 1;
+            }
+            let run: String = chars[start..i].iter().collect();
+            if run.len() == 11 {
+                out.push_str(&format!("***.{}.{}-**", &run[3..6], &run[6..9]));
+            } else {
+                out.push_str(&run);
+            }
+        } else {
+            out.push(chars[i]);
+            i += 1;
+        }
+    }
+    out
 }
 
 fn list(items: &[String]) -> String {
@@ -914,7 +1224,13 @@ fn list(items: &[String]) -> String {
 }
 
 fn int(value: i64) -> String {
-    let digits = value.unsigned_abs().to_string();
+    let grouped = int_u(value.unsigned_abs());
+    if value < 0 { format!("-{grouped}") } else { grouped }
+}
+
+/// pt-BR thousands grouping for unsigned values (no clamping to `i64::MAX`).
+fn int_u(value: u64) -> String {
+    let digits = value.to_string();
     let mut grouped = String::new();
     for (index, ch) in digits.chars().enumerate() {
         if index > 0 && (digits.len() - index).is_multiple_of(3) {
@@ -922,11 +1238,21 @@ fn int(value: i64) -> String {
         }
         grouped.push(ch);
     }
-    if value < 0 { format!("-{grouped}") } else { grouped }
+    grouped
 }
 
+/// One decimal, pt-BR separators ("12.345,6"); non-finite values are never printed.
 fn decimal1(value: f64) -> String {
-    format!("{value:.1}").replace('.', ",")
+    if !value.is_finite() {
+        return NO_DATA.into();
+    }
+    let tenths = (value.abs() * 10.0).round();
+    if tenths > u64::MAX as f64 {
+        return NO_DATA.into();
+    }
+    let tenths = tenths as u64;
+    let sign = if value < 0.0 && tenths != 0 { "-" } else { "" };
+    format!("{sign}{},{}", int_u(tenths / 10), tenths % 10)
 }
 
 fn pct1(value: f64) -> String {
@@ -1003,6 +1329,9 @@ pub fn supported_keys() -> Vec<String> {
         keys.push(format!("trend.flow.rows.{turn}"));
         keys.push(format!("list.stock.records.{turn}"));
     }
+    for turn in ["first", "followup"] {
+        keys.push(format!("empty.none.rows.{turn}"));
+    }
     keys.push("lookup.none.company.first".into());
     keys.push("meta.none.text.first".into());
     keys.push("clarify.none.clarify.first".into());
@@ -1031,7 +1360,16 @@ pub fn schema(_key: &str) -> Vec<&'static str> {
         "value:int",
         "value:dec1",
         "population:int",
-        "population_year",
+        "population_source",
+        "unit:singular",
+        "status:singular",
+        "have",
+        "had",
+        "dir_most",
+        "dir_more",
+        "of_activity",
+        "in_activity",
+        "trend_subject",
         "a.place",
         "a.value:int",
         "a.value:dec1",
@@ -1040,13 +1378,8 @@ pub fn schema(_key: &str) -> Vec<&'static str> {
         "b.value:int",
         "b.value:dec1",
         "b.share:pct1",
-        "diff_pct:pct1",
-        "diff_dir",
-        "r1",
-        "r2",
-        "r3",
+        "diff",
         "n:int",
-        "min_base:int",
         "top",
         "first:int",
         "last:int",
@@ -1158,7 +1491,7 @@ mod tests {
             current: competence(2026, 10),
             competences,
             flow_days: day(2025, 1, 1)..=day(2026, 10, 11),
-            populations: vec![PopulationRef::IbgeCensus(2022), PopulationRef::IbgeEstimate(2025)],
+            populations: vec![PopulationRef::IbgeCensus(2022), PopulationRef::IbgeEstimate(2026)],
             catalogue_versions: CatalogueVersions { municipalities: 202610, sectors: 1 },
             sector_count: 2,
             geography: true,
@@ -1179,6 +1512,7 @@ mod tests {
                 (2, SectorLabel { singular: "farmácia".into(), plural: "farmácias".into(), feminine: true }),
             ]),
             ufs: BTreeMap::from([(12, "Mato Grosso".into()), (25, "São Paulo".into()), (17, "Paraná".into())]),
+            regions: BTreeMap::from([(3, "Norte".into()), (4, "Nordeste".into()), (5, "Centro-Oeste".into())]),
         }
     }
 
@@ -1189,7 +1523,7 @@ mod tests {
             snapshot_sha256: "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b".into(),
             municipality_catalogue: 202610,
             sector_catalogue: 1,
-            population: Some(PopulationRef::IbgeEstimate(2025)),
+            population: Some(PopulationRef::IbgeEstimate(2026)),
         }
     }
 
@@ -1252,14 +1586,16 @@ mod tests {
     }
 
     fn row(metric: Metric, key: u64, index: i64) -> Row {
-        let value = 187 - index * 40;
-        let base = match metric {
-            Metric::Per10k(_) | Metric::InhabitantsPer(_) => 100_000,
-            Metric::Share => 1000,
-            Metric::ActiveChange { pct: true } => 100,
-            _ => 0,
-        };
-        Row { key, value, base }
+        let count = 187 - index * 40;
+        // Same layout as the executor (`execute::ratio_rows`): Per10k = count over population,
+        // InhabitantsPer = population over count.
+        match metric {
+            Metric::Per10k(_) => Row { key, value: count, base: 100_000 },
+            Metric::InhabitantsPer(_) => Row { key, value: 100_000, base: count as u64 },
+            Metric::Share => Row { key, value: count, base: 1000 },
+            Metric::ActiveChange { pct: true } => Row { key, value: count, base: 100 },
+            _ => Row { key, value: count, base: 0 },
+        }
     }
 
     fn list_payload() -> (u64, u16, Vec<Vec<String>>) {
@@ -1337,6 +1673,117 @@ mod tests {
     }
 
     #[test]
+    fn formatters_handle_edges() {
+        assert_eq!(decimal1(12_345.64), "12.345,6");
+        assert_eq!(decimal1(-0.01), "0,0");
+        assert_eq!(decimal1(-1234.56), "-1.234,6");
+        assert_eq!(decimal1(f64::NAN), NO_DATA);
+        assert_eq!(decimal1(f64::INFINITY), NO_DATA);
+        assert_eq!(int_u(u64::MAX), "18.446.744.073.709.551.615");
+        assert_eq!(pluralize(-1, "estabelecimento", "estabelecimentos"), "estabelecimento");
+        assert_eq!(uf_em("Paraná"), "no Paraná");
+        assert_eq!(uf_em("Bahia"), "na Bahia");
+        assert_eq!(uf_em("Mato Grosso"), "em Mato Grosso");
+    }
+
+    #[test]
+    fn cpf_embedded_in_names_is_masked() {
+        assert_eq!(mask_cpf("MARIA DA SILVA 12345678901"), "MARIA DA SILVA ***.456.789-**");
+        assert_eq!(mask_cpf("33000167000101"), "33000167000101");
+        assert_eq!(mask_cpf("PADARIA 2025 LTDA"), "PADARIA 2025 LTDA");
+    }
+
+    #[test]
+    fn missing_values_fail_instead_of_rendering_blanks() {
+        let templates = Templates::parse("[\"k\"]\nvariants = [\"{place} {value:int}\"]").unwrap();
+        let values = BTreeMap::from([("place", "Sinop (MT)".to_string())]);
+        assert_eq!(templates.render("k", 0, &values), Err(RenderError::MissingPlaceholder("value:int".into())));
+    }
+
+    fn case(name: &str) -> ValidRequest {
+        golden().into_iter().find(|(case, _)| case == name).unwrap_or_else(|| panic!("no golden case {name}")).1
+    }
+
+    fn texts(answer: &Answer) -> String {
+        serde_json::to_string(&answer.blocks).unwrap()
+    }
+
+    // Expected strings are written by hand (not derived from the renderer's own helpers).
+    #[test]
+    fn population_source_comes_from_the_metric() {
+        let answer = render_case(&case("density_census_mt"));
+        let all = texts(&answer);
+        assert!(all.contains("IBGE Censo 2022"), "{all}");
+        assert!(!all.contains("estimativa 2025"), "{all}");
+        let closures = texts(&render_case(&case("closed_stock_filter")));
+        assert!(!closures.contains("População"), "{closures}");
+    }
+
+    #[test]
+    fn rank_direction_is_rendered() {
+        let answer = render_case(&case("rank_change_percent"));
+        let Block::Text { text } = &answer.blocks[0] else { panic!() };
+        assert!(text.contains("menores variações"), "{text}");
+    }
+
+    #[test]
+    fn filters_are_visible() {
+        let closed = render_case(&case("closed_stock_filter"));
+        let all = texts(&closed);
+        assert!(all.contains("Estabelecimentos baixados"), "{all}");
+        assert!(all.contains("Data da situação cadastral: de 01/01/2025 a 31/12/2025"), "{all}");
+        let branches = texts(&render_case(&case("so_filiais")));
+        assert!(branches.contains("Somente filiais"), "{branches}");
+        let excluded = render_case(&case("exclusions"));
+        let Block::Text { text } = &excluded.blocks[0] else { panic!() };
+        assert!(text.contains("exceto"), "{text}");
+        assert!(texts(&excluded).contains("Excluídos:"));
+    }
+
+    #[test]
+    fn missing_denominators_never_become_numbers() {
+        let request = case("density_census_mt");
+        let value = Value::Ratio { num: 187, den: 0 };
+        let labels = labels();
+        let provenance = provenance();
+        let result = render(RenderInput {
+            request: &request,
+            payload: Payload::Value(&value),
+            provenance: &provenance,
+            labels: &labels,
+            followup: false,
+            notice: None,
+            suggestions: Vec::new(),
+            unit_inferred: false,
+            timing_us: BTreeMap::new(),
+        });
+        assert_eq!(result, Err(RenderError::InvalidPayload("ratio without a denominator")));
+        let rank = Row { key: 5067, value: 187, base: 0 };
+        let per10k = Request {
+            op: Op::Rank {
+                dim: Dim::Municipality,
+                metric: Metric::Per10k(PopulationRef::IbgeCensus(2022)),
+                dir: Dir::Desc,
+                k: 3,
+                min_base: 0,
+            },
+            ..request.as_request().clone()
+        };
+        assert_eq!(row_value(&per10k, rank), NO_DATA);
+    }
+
+    #[test]
+    fn registrations_are_not_called_openings() {
+        for (name, request) in golden() {
+            if !matches!(request.as_request().op.metric(), Some(Metric::Flow(FlowMetric::Registrations))) {
+                continue;
+            }
+            let all = texts(&render_case(&request)).to_lowercase();
+            assert!(!all.contains("abri") && !all.contains("abertura das portas"), "{name}: {all}");
+        }
+    }
+
+    #[test]
     fn template_lints_pass() {
         let templates = Templates::embedded();
         assert!(lint_templates(&templates).is_empty(), "{:?}", lint_templates(&templates));
@@ -1399,6 +1846,7 @@ mod tests {
             let provenance = provenance();
             add_source(&mut allowed, &provenance.competence.to_string());
             add_source(&mut allowed, &month_year(provenance.competence));
+            add_source(&mut allowed, &month_year(request.as_request().time.competence));
             add_source(&mut allowed, &provenance.anchor.to_string());
             add_source(&mut allowed, &date(provenance.anchor));
             add_source(&mut allowed, &provenance.snapshot_sha256);
@@ -1441,6 +1889,18 @@ mod tests {
                 }
                 _ => {}
             }
+            let scope = &request.as_request().scope;
+            for range in [scope.opened, scope.status_date].into_iter().flatten() {
+                for day in [range.from, range.to].into_iter().flatten() {
+                    add_source(&mut allowed, &date(day));
+                }
+            }
+            // The IR keeps capital in cents; answers show reais.
+            if let Some(capital) = request.as_request().scope.capital {
+                for cents in [capital.from, capital.to].into_iter().flatten() {
+                    add_source(&mut allowed, &(cents / 100).to_string());
+                }
+            }
             let value = payload(request.as_request());
             add_value(&mut allowed, request.as_request(), &value);
             let json = serde_json::to_value(&answer).unwrap();
@@ -1454,57 +1914,77 @@ mod tests {
         }
     }
 
+    /// The displayed value of a row, computed here from the formulas in 08-RESPONSES.md
+    /// rather than with the renderer's own helpers, so the test is not circular.
+    fn expected_value(request: &Request, value: i64, base: u64) -> Option<f64> {
+        let (v, b) = (value as f64, base as f64);
+        match request.op.metric() {
+            Some(Metric::Per10k(_)) => (base > 0).then(|| v * 10_000.0 / b),
+            Some(Metric::InhabitantsPer(_)) => (base > 0).then(|| v / b),
+            Some(Metric::Share | Metric::ActiveChange { pct: true }) => (base > 0).then(|| v * 100.0 / b),
+            _ => Some(v),
+        }
+    }
+
+    fn add_number(allowed: &mut BTreeSet<String>, value: f64) {
+        // One decimal, both signs, comma or point: any of these spellings is the same number.
+        let text = format!("{:.1}", value.abs());
+        add_source(allowed, &text);
+        add_source(allowed, &format!("{}", value.abs().round() as i64));
+    }
+
     fn add_value(allowed: &mut BTreeSet<String>, request: &Request, value: &Value) {
         match value {
             Value::Scalar { value } => {
                 add_source(allowed, &value.to_string());
-                add_source(allowed, &int(*value));
-                add_source(allowed, &decimal1(*value as f64));
             }
             Value::Ratio { num, den } => {
                 add_source(allowed, &num.to_string());
                 add_source(allowed, &den.to_string());
-                let display = display_ratio(request, *num, *den);
-                add_source(allowed, &decimal1(display));
-                add_source(allowed, &pct1(display));
-                add_source(allowed, &int(i64::try_from(*num).unwrap_or(i64::MAX)));
-                add_source(allowed, &int(i64::try_from(*den).unwrap_or(i64::MAX)));
+                if let Some(display) = expected_value(request, i64::try_from(*num).unwrap(), *den) {
+                    add_number(allowed, display);
+                }
             }
             Value::Rows(rows) => {
+                let mut displayed = Vec::new();
                 for row in rows {
                     add_source(allowed, &row.key.to_string());
-                    add_source(allowed, &int(row.value));
-                    add_source(allowed, &int(i64::try_from(row.base).unwrap_or(i64::MAX)));
-                    add_source(allowed, &row_value(request, *row));
-                    add_source(allowed, &decimal1(ratio_value(request, *row)));
-                    if let Some(dim) = request.op.dimension() {
-                        add_source(allowed, &row_label(request, row.key, Some(dim), &labels()));
+                    add_source(allowed, &row.value.to_string());
+                    add_source(allowed, &row.base.to_string());
+                    let shown = expected_value(request, row.value, row.base);
+                    if let Some(shown) = shown {
+                        add_number(allowed, shown);
                     }
+                    displayed.push(shown);
                     if matches!(request.op, Op::Trend { .. }) {
-                        add_source(allowed, &month_label(row.key));
+                        add_source(allowed, &(row.key / 12).to_string());
                     }
                 }
                 add_source(allowed, &rows.len().to_string());
-                if rows.len() >= 2 {
-                    let a = metric_value(request, rows[0]);
-                    let b = metric_value(request, rows[1]);
-                    let diff = a - b;
-                    add_source(allowed, &decimal1(diff));
-                    add_source(allowed, &pct1(diff / b.abs() * 100.0));
+                if let [Some(a), Some(b), ..] = displayed[..] {
+                    add_number(allowed, a - b);
+                    if b != 0.0 {
+                        add_number(allowed, (a - b) / b.abs() * 100.0);
+                    }
                 }
-                if let (Some(first), Some(last)) = (rows.first(), rows.last()) {
-                    add_source(allowed, &int((last.value - first.value) as f64 as i64));
-                    add_source(allowed, &pct1((last.value - first.value) as f64 * 100.0 / first.value as f64));
+                if let (Some(first), Some(last)) = (rows.first(), rows.last())
+                    && first.value != 0
+                {
+                    add_number(allowed, (last.value - first.value) as f64 * 100.0 / first.value as f64);
                 }
             }
         }
     }
 
+    /// Whole numbers as written in pt-BR ("12.345,6" → "12345.6", "1.234" → "1234"), so a
+    /// grouped or decimal number is checked as one value, not as loose digit runs.
     fn numeric_tokens(text: &str) -> Vec<String> {
+        let chars: Vec<char> = text.chars().collect();
         let mut out = Vec::new();
         let mut current = String::new();
-        for ch in text.chars() {
-            if ch.is_ascii_digit() {
+        for (i, &ch) in chars.iter().enumerate() {
+            let joins = (ch == '.' || ch == ',') && !current.is_empty() && chars.get(i + 1).is_some_and(char::is_ascii_digit);
+            if ch.is_ascii_digit() || joins {
                 current.push(ch);
             } else if !current.is_empty() {
                 out.push(std::mem::take(&mut current));
@@ -1513,7 +1993,17 @@ mod tests {
         if !current.is_empty() {
             out.push(current);
         }
-        out
+        out.into_iter()
+            .map(|token| {
+                if token.contains(',') {
+                    token.replace('.', "").replace(',', ".")
+                } else if token.split('.').skip(1).all(|group| group.len() == 3) {
+                    token.replace('.', "")
+                } else {
+                    token
+                }
+            })
+            .collect()
     }
 
     fn walk_strings(value: &serde_json::Value, allowed: &BTreeSet<String>, case: &str) {

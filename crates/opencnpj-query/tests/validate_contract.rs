@@ -64,7 +64,7 @@ fn capabilities() -> Capabilities {
         ]
         .to_vec(),
         flow_days: day(2025, 1, 1)..=day(2026, 10, 11),
-        populations: vec![PopulationRef::IbgeCensus(2022), PopulationRef::IbgeEstimate(2025)],
+        populations: vec![PopulationRef::IbgeCensus(2022), PopulationRef::IbgeEstimate(2026)],
         catalogue_versions: CatalogueVersions { municipalities: 202610, sectors: 1 },
         sector_count: 2,
         geography: true,
@@ -103,13 +103,13 @@ fn golden_requests_validate() {
 fn population_metric_needs_place_dimension() {
     let capabilities = capabilities();
     let mut request = fixture("padarias_sorriso");
-    set_metric(&mut request, Metric::Per10k(PopulationRef::IbgeEstimate(2025)));
+    set_metric(&mut request, Metric::Per10k(PopulationRef::IbgeEstimate(2026)));
     request.scope.place = PlaceFilter::Any;
     let issues = expect_issue(request, &capabilities, IssueKind::Missing, IssueCode::PopulationNeedsGeography);
     assert!(issues.iter().find(|issue| issue.code == IssueCode::PopulationNeedsGeography).unwrap().options.is_empty());
 
     let mut request = fixture("padarias_sorriso");
-    set_metric(&mut request, Metric::Per10k(PopulationRef::IbgeEstimate(2025)));
+    set_metric(&mut request, Metric::Per10k(PopulationRef::IbgeEstimate(2026)));
     validate(request, &capabilities).unwrap();
 }
 
@@ -117,7 +117,7 @@ fn population_metric_needs_place_dimension() {
 fn population_reference_must_be_available() {
     let capabilities = capabilities();
     let mut request = fixture("padarias_sorriso");
-    set_metric(&mut request, Metric::Per10k(PopulationRef::IbgeEstimate(2026)));
+    set_metric(&mut request, Metric::Per10k(PopulationRef::IbgeEstimate(2025)));
     let issues = expect_issue(request, &capabilities, IssueKind::Impossible, IssueCode::PopulationUnavailable);
     let option = &issues.iter().find(|issue| issue.code == IssueCode::PopulationUnavailable).unwrap().options[0];
     let Metric::Per10k(reference) = option.op.metric().unwrap() else { panic!("expected density metric") };
@@ -140,12 +140,12 @@ fn population_filter_needs_reference() {
 
     let mut request = fixture("padarias_sorriso");
     request.scope.place_population = Some(Range { from: Some(30_000), to: Some(50_000) });
-    request.scope.population_ref = Some(PopulationRef::IbgeEstimate(2026));
+    request.scope.population_ref = Some(PopulationRef::IbgeEstimate(2025));
     expect_issue(request, &capabilities, IssueKind::Impossible, IssueCode::PopulationUnavailable);
 
     let mut request = fixture("padarias_sorriso");
     request.scope.place_population = Some(Range { from: Some(30_000), to: Some(50_000) });
-    request.scope.population_ref = Some(PopulationRef::IbgeEstimate(2025));
+    request.scope.population_ref = Some(PopulationRef::IbgeEstimate(2026));
     validate(request, &capabilities).unwrap();
 }
 

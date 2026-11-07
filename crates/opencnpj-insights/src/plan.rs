@@ -47,7 +47,7 @@ pub fn plan(request: &ValidRequest) -> Result<Plan, PlanError> {
         Op::Lookup { .. } => plan(Backend::Engine, "CNPJ lookups come from the engine"),
         Op::Trend { .. } => {
             let metric = request.op.metric().expect("trend metric");
-            if aggregate_metric(&metric) && aggregate_scope(request) && aligned(request) {
+            if aggregate_metric(&metric) && aggregate_scope(request) && aggregate_filters(request) && aligned(request) {
                 plan(Backend::Aggregates, "flow buckets cover the aligned trend period")
             } else {
                 plan(Backend::Engine, "trend needs the engine")
@@ -119,6 +119,18 @@ fn aggregate_filters(request: &ValidRequest) -> bool {
     }
     if request.unit == Unit::HeadOffices && request.scope.head_office == Tri::No {
         return false;
+    }
+    // Dimensions must exist in the table that will be read: porte and MEI only in the active
+    // stock table (T1); status and head office only in the stock tables, never in the flow
+    // tables, whose detail field is a month bucket.
+    if let Some(dim) = request.op.dimension() {
+        let flow = matches!(request.op.metric(), Some(Metric::Flow(_)));
+        if matches!(dim, Dim::Porte | Dim::Mei) && (flow || !active_only) {
+            return false;
+        }
+        if matches!(dim, Dim::Status | Dim::HeadOffice) && flow {
+            return false;
+        }
     }
     if let Some(Metric::Flow(flow)) = request.op.metric() {
         if request.unit == Unit::HeadOffices || request.scope.head_office != Tri::Any || detail {

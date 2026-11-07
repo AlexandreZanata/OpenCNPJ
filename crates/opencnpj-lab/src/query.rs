@@ -447,7 +447,7 @@ impl EngineExecutor<'_> {
 
     fn filtered_count(&self, request: &Request, set: &RoaringBitmap) -> Result<u64> {
         let Some(range) = request.scope.place_population else { return Ok(set.len()) };
-        let reference = request.scope.population_ref.unwrap_or(PopulationRef::IbgeEstimate(2025));
+        let reference = request.scope.population_ref.unwrap_or_else(|| self.context.municipalities.default_population());
         let range = (range.from.unwrap_or(0), range.to.unwrap_or(u32::MAX));
         Ok(self
             .municipality_groups(set)?
@@ -541,7 +541,7 @@ impl EngineExecutor<'_> {
     }
 
     fn group_dim_population(&self, request: &Request, dim: Dim, set: &RoaringBitmap) -> Result<BTreeMap<u64, i64>> {
-        let reference = request.scope.population_ref.unwrap_or(PopulationRef::IbgeEstimate(2025));
+        let reference = request.scope.population_ref.unwrap_or_else(|| self.context.municipalities.default_population());
         let range = request.scope.place_population.map(|range| (range.from.unwrap_or(0), range.to.unwrap_or(u32::MAX))).unwrap();
         let groups =
             self.municipality_groups(set)?.into_iter().filter(|(id, _)| self.population_ok(*id, range, reference)).collect::<Vec<_>>();
@@ -595,7 +595,7 @@ impl EngineExecutor<'_> {
     fn member_population(&self, request: &Request, key: u64, dim: Dim, _metric: Metric) -> u64 {
         let reference = request.scope.population_ref.unwrap_or_else(|| match request.op.metric() {
             Some(Metric::Per10k(reference) | Metric::InhabitantsPer(reference)) => reference,
-            _ => PopulationRef::IbgeEstimate(2025),
+            _ => self.context.municipalities.default_population(),
         });
         let (municipalities, ufs) = resolve_place(self.context.municipalities, &request.scope.place, &request.scope.within_ufs).unwrap();
         member_population_for(self.context.municipalities, key, dim, municipalities.as_ref(), ufs.as_ref(), reference)
@@ -640,19 +640,21 @@ fn section_of(cnae: u32) -> u8 {
         41..=43 => b'F',
         45..=47 => b'G',
         49..=53 => b'H',
-        55 => b'I',
-        56 => b'J',
-        58..=63 => b'K',
-        64 => b'L',
-        65..=66 => b'M',
-        68 => b'N',
-        69..=75 => b'O',
-        77..=82 => b'P',
-        84 => b'Q',
-        85 => b'R',
-        86..=88 => b'S',
-        90..=93 => b'T',
-        _ => b'U',
+        55..=56 => b'I',
+        58..=63 => b'J',
+        64..=66 => b'K',
+        68 => b'L',
+        69..=75 => b'M',
+        77..=82 => b'N',
+        84 => b'O',
+        85 => b'P',
+        86..=88 => b'Q',
+        90..=93 => b'R',
+        94..=96 => b'S',
+        97 => b'T',
+        99 => b'U',
+        // Divisions that do not exist in CNAE 2.x.
+        _ => b'?',
     }
 }
 
@@ -794,7 +796,20 @@ pub fn canonicalization(
     (municipality_ufs, sector_cnaes)
 }
 
-pub fn validate_capabilities(sectors: &SectorMap, last_day: Day) -> Capabilities {
+pub fn validate_capabilities(catalogue: &MunicipalityCatalogue, sectors: &SectorMap, last_day: Day) -> Capabilities {
+    // Offer only the population references the catalogue actually holds.
+    let mut populations = vec![PopulationRef::IbgeCensus(2022)];
+    let mut years: Vec<u16> = catalogue
+        .rows()
+        .iter()
+        .filter_map(|row| match &row.place {
+            opencnpj_insights::catalog::municipalities::Place::Municipality(geo) => Some(geo.estimate_year),
+            opencnpj_insights::catalog::municipalities::Place::Abroad => None,
+        })
+        .collect();
+    years.sort_unstable();
+    years.dedup();
+    populations.extend(years.into_iter().map(PopulationRef::IbgeEstimate));
     let mut competences = Vec::new();
     let (mut year, mut month) = (2024, 11);
     for _ in 0..24 {
@@ -809,7 +824,7 @@ pub fn validate_capabilities(sectors: &SectorMap, last_day: Day) -> Capabilities
         current: Competence::from_year_month(2026, 10).expect("current competence"),
         competences,
         flow_days: Day::from_ymd(2025, 1, 1).expect("flow start")..=last_day,
-        populations: vec![PopulationRef::IbgeCensus(2022), PopulationRef::IbgeEstimate(2025)],
+        populations,
         catalogue_versions: CatalogueVersions { municipalities: 202610, sectors: 1 },
         sector_count: u16::try_from(sectors.len()).expect("sector count"),
         geography: true,
@@ -821,7 +836,7 @@ pub fn validate_request(request: Request, catalogue: &MunicipalityCatalogue, sec
     let (municipality_ufs, sector_cnaes) = canonicalization(catalogue, sectors, last_day);
     let context = CanonicalContext { first_day: Day(1), last_day, municipality_ufs: &municipality_ufs, sector_cnaes: &sector_cnaes };
     let canonical = request.canonicalize(&context)?.0;
-    let capabilities = validate_capabilities(sectors, last_day);
+    let capabilities = validate_capabilities(catalogue, sectors, last_day);
     validate::validate(canonical, &capabilities)
         .map_err(|issues| anyhow::anyhow!("{}", issues.iter().map(ToString::to_string).collect::<Vec<_>>().join("; ")))
 }

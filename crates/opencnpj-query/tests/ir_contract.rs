@@ -57,6 +57,11 @@ fn goldens() -> Vec<Golden> {
 #[test]
 fn golden_requests() {
     let actual = goldens();
+    if std::env::var_os("UPDATE_GOLDEN").is_some() {
+        let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/ir-v1-golden.jsonl");
+        let lines: Vec<String> = actual.iter().map(|row| serde_json::to_string(row).unwrap()).collect();
+        std::fs::write(path, lines.join("\n") + "\n").unwrap();
+    }
     let expected = EXPECTED.lines().map(|line| serde_json::from_str::<Golden>(line).unwrap()).collect::<Vec<_>>();
     assert!(expected.len() >= 30);
     assert_eq!(actual, expected);
