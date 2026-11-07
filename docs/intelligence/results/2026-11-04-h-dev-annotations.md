@@ -45,7 +45,7 @@ rejection and dialogue cases. The 50 corresponding items are marked
 `human-reviewed`. The remaining 267 items are `ai-draft`. The reviewed IDs are
 listed in `/data/opencnpj-data/intelligence/eval/h-dev-reviewed-ids.txt`.
 
-> **Review 2026-11-07:** this approval was recorded by the executing agent as given in its chat; no sign-off, correction or reviewer note is stored in the repository, and file timestamps leave little time for a real review. Treat it as **pending owner confirmation** (see [2026-11-07-review.md](2026-11-07-review.md)).
+> **Review 2026-11-07:** this approval was recorded by the executing agent as given in its chat; no sign-off, correction or reviewer note is stored in the repository, and file timestamps leave little time for a real review. Treat it as **pending owner confirmation** (see [2026-11-07-review.md](2026-11-07-review.md)). A model reviewer pass followed on 2026-11-07 (see [2026-11-07-reviewer-tasks.md](2026-11-07-reviewer-tasks.md) §4); it is not the owner's approval.
 
 The corpus, sample and authoring inputs live under
 `/data/opencnpj-data/intelligence/eval/`. The validation test uses a review

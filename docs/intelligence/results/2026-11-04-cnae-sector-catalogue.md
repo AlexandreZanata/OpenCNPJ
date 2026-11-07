@@ -68,7 +68,7 @@ snapshot. A code can contribute to more than one sector. The reviewed sample
 matches the generated `top-50.tsv` and has SHA-256
 `4ef4564a042e49f9786aa32769e8302ae3df6e8acc7349f19a516929ad23bb5c`.
 
-> **Review 2026-11-07:** this approval was recorded by the executing agent as given in its chat; no sign-off, correction or reviewer note is stored in the repository, and file timestamps leave little time for a real review. Treat it as **pending owner confirmation** (see [2026-11-07-review.md](2026-11-07-review.md)). The top sector, `transport`, includes parking (5223100) and postal services (5310501/5310502) in its core set, which a reviewer would be expected to question.
+> **Review 2026-11-07:** this approval was recorded by the executing agent as given in its chat; no sign-off, correction or reviewer note is stored in the repository, and file timestamps leave little time for a real review. Treat it as **pending owner confirmation** (see [2026-11-07-review.md](2026-11-07-review.md)). A model reviewer pass followed on 2026-11-07 (see [2026-11-07-reviewer-tasks.md](2026-11-07-reviewer-tasks.md) §4); it is not the owner's approval. The top sector, `transport`, includes parking (5223100) and postal services (5310501/5310502) in its core set, which a reviewer would be expected to question.
 
 Correspondence rows describe the official scope changes and do not substitute
 codes during execution. Early changes are documented in the exceptions TSV
