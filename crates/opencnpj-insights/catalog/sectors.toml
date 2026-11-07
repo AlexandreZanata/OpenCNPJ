@@ -148,7 +148,7 @@ since = "v1"
 [[sector]]
 id = "beauty_care"
 display = { sing = "clínica de estética", plural = "clínicas de estética", gender = "f" }
-aliases = ["esteticista", "esteticistas"]
+aliases = ["esteticista", "esteticistas", "estética"]
 cnae_core = ["9602502", "9609201"]
 cnae_extended = []
 scope = "main"
@@ -157,9 +157,9 @@ since = "v1"
 [[sector]]
 id = "beauty_salon"
 display = { sing = "salão de beleza", plural = "salões de beleza", gender = "m" }
-aliases = ["cabeleireiro", "cabeleireira", "cabeleireiros", "cabeleireiras", "salão de beleza", "salões de beleza", "barbearia", "barbearias", "estética"]
-cnae_core = ["9602501", "9602502"]
-cnae_extended = []
+aliases = ["cabeleireiro", "cabeleireira", "cabeleireiros", "cabeleireiras", "salão de beleza", "salões de beleza", "barbearia", "barbearias"]
+cnae_core = ["9602501"]
+cnae_extended = ["9602502"]
 scope = "main"
 since = "v1"
 
@@ -1647,7 +1647,7 @@ since = "v1"
 [[sector]]
 id = "supermarket"
 display = { sing = "supermercado", plural = "supermercados", gender = "m" }
-aliases = ["supermercado alimentar"]
+aliases = ["supermercado alimentar", "mercado", "mercados"]
 cnae_core = ["4711302"]
 cnae_extended = ["4711301"]
 scope = "main"
@@ -1737,7 +1737,7 @@ since = "v1"
 [[sector]]
 id = "transport"
 display = { sing = "serviço de transporte", plural = "serviços de transporte", gender = "m" }
-aliases = ["transporte", "transportes", "transportadora", "transportadoras"]
+aliases = ["transporte", "transportes"]
 cnae_core = [
     "4911600", "4912401", "4912402", "4912403", "4921301", "4921302", "4922101", "4922102",
     "4922103", "4923001", "4923002", "4924800", "4929901", "4929902", "4929903", "4929904",
@@ -1922,7 +1922,7 @@ since = "v1"
 [[sector]]
 id = "civil_construction"
 display = { sing = "empresa de construção civil", plural = "empresas de construção civil", gender = "f" }
-aliases = ["construção", "construção civil", "construtora", "construtoras"]
+aliases = ["construção", "construção civil"]
 cnae_core = [
     "4110700", "4120400", "4211101", "4211102", "4212000", "4213800", "4221901", "4221902",
     "4221903", "4221904", "4221905", "4222701", "4222702", "4223500", "4291000", "4292801",

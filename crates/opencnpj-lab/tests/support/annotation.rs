@@ -420,7 +420,7 @@ const UFS: &[&str] = &[
     "AC", "AL", "AM", "AP", "BA", "CE", "DF", "ES", "EX", "GO", "MA", "MG", "MS", "MT", "PA", "PB", "PE", "PI", "PR", "RJ", "RN", "RO",
     "RR", "RS", "SC", "SE", "SP", "TO",
 ];
-const SECTORS: &[&str] = &["bakery@v1", "pharmacy@v1", "transport@v1"];
+const SECTORS: &[&str] = &["bakery@v1", "pharmacy@v1", "transport@v1", "truck_freight@v1"];
 
 fn unique_sorted<T: Ord>(members: &[T]) -> bool {
     members.windows(2).all(|pair| pair[0] < pair[1])

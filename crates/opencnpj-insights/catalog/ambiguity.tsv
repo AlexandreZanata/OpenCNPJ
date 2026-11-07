@@ -5,8 +5,6 @@ artigos de armarinho		4641903,4755502
 artigos de cama mesa e banho		4641902,4755503
 box para banheiro com estrutura de aluminio fabricacao de		2512800,2542000
 butano em bruto liquefeito fabricacao de		1921700,1922599
-construtora	civil_construction,construction	
-construtoras	civil_construction,construction	
 cosmeticos produtos de perfumaria e de higiene pessoal		2063100,4772500
 equipamentos de informatica		2621300,4651601
 fabricacao de amplificadores de radiofrequencia		2631100,2790299
@@ -21,11 +19,11 @@ massas alimenticias		1094500,4637105
 materiais de construcao em geral		4679699,4744099
 materiais de construcao nao especificados anteriormente		4679604,4744005
 material eletrico		4673700,4742300
+mercado	grocery,supermarket	
+mercados	grocery,supermarket	
 monitoramento ambiental servicos de		0230600,7120100
 nucleos de po ferromagneticos fabricacao de		2790201,2790299
 producao de programas de televisao ao vivo em estudios de tv por produtores independentes		5911199,6021700
 servicos de monitoramento ambiental		0230600,7120100
 tecnologia	electronics_manufacturing,it_services	
-transportadora	transport,truck_freight	
-transportadoras	transport,truck_freight	
 transporte hidroviario de carga municipal exceto de travessia por rios lagoas canais e outras vias de navegacao interior		5021101,5021102

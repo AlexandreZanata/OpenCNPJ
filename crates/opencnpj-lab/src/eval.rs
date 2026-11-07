@@ -968,6 +968,11 @@ mod sets {
         {
             assert_eq!(gold, catalogue, "{} sector CNAEs differ from the catalogue core", item.id);
         }
+        // "Abriram em 2025" counts registrations of any current status (SR-02); 68 golds once
+        // filtered them to active ones.
+        if matches!(request.op.metric(), Some(Metric::Flow(FlowMetric::Registrations | FlowMetric::NetRegistrations))) {
+            assert!(request.scope.status.is_none_or(|status| status == StatusSet::ALL), "{} registrations count every status", item.id);
+        }
         validate::validate(canonical, caps).unwrap_or_else(|issues| panic!("{} invalid: {issues:?}", item.id));
         if let Some(intent) = &item.gold.intent {
             assert_eq!(intent_of(ir).as_deref(), Some(intent.as_str()), "{} intent", item.id);

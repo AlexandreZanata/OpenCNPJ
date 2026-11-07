@@ -98,7 +98,10 @@ For review, use TOM municipality codes (Sinop `8985`, São Paulo `7107`, Sorriso
 The fixture uses `bakery@v1` for `4721101` and `4721102`, `pharmacy@v1` for
 `4771701`, `4771702` and `4771703` (human pharmacies, including homeopathic),
 and `transport@v1` for divisions `49` through `53`, following the audit's
-transport scope. WP-1.3 will establish the curated catalogue. WP-2.1 will
+transport scope. WP-1.3 will establish the curated catalogue. Since the
+curated catalogue (review 2026-11-07), “transportadora(s)” means road freight
+carriers, `truck_freight@v1` (4930-2/01, 4930-2/02); `transport@v1` keeps the
+generic “transporte” (divisions 49–51). WP-2.1 will
 map these references to canonical typed IR. In review JSON, use ISO dates
 and competence strings, stable operation tags, sorted unique sets and an
 explicit status list. Omit unspecified filter fields. Store one-based pages.
@@ -214,7 +217,7 @@ fallback is named. An explicit status overrides the stock default.
 28. **“Em Sorriso, lista as padarias ativas da página 2 com 10 por página.”**
     Execute. List active bakeries in `9907`, page 2, limit 10, CNPJ order.
 29. **“Lista as transportadoras de MT com telefone e e-mail.”** Execute with
-    note. List active `transport@v1` in MT, contact `both`. Enforce privacy
+    note. List active `truck_freight@v1` in MT, contact `both`. Enforce privacy
     switches when producing rows.
 30. **“Em Sorriso, quanto dá padarias e farmácias, uma contagem pra cada?”**
     Execute with note. Compare the two sectors on stock in `9907`.
