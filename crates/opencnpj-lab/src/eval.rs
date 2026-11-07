@@ -284,7 +284,9 @@ pub fn evaluate(items: &[Item], predictions: &[Prediction]) -> Metrics {
         macro_count += 1;
     }
     metrics.macro_f1 = if macro_count == 0 { 0.0 } else { macro_sum / macro_count as f64 };
-    metrics.risk_coverage = risk_coverage(&selective, metrics.in_domain);
+    // Out-of-policy executions are points on the curve, so they belong in its denominator:
+    // with only the in-domain count, coverage could exceed 1 (AURC 5/3 on the baseline).
+    metrics.risk_coverage = risk_coverage(&selective, metrics.in_domain + out_of_policy);
     metrics.aurc = aurc(&metrics.risk_coverage);
     metrics.ece = ece(&selective);
     metrics.intent_accuracy = if metrics.in_domain == 0 {
@@ -836,9 +838,10 @@ mod tests {
         assert!((metrics.entity_recall - 0.0).abs() < 1e-9);
         assert_eq!(metrics.clarification_recall, 0.0);
         assert_eq!(metrics.ood_rejection, 0.0);
-        // All five predictions share confidence 0.5, so the curve is a single point at
-        // coverage 5/3 with risk 1.0; the area is unnormalized.
-        assert!((metrics.aurc - 5.0 / 3.0).abs() < 1e-9);
+        // All five predictions share confidence 0.5 and all are wrong (two of them execute
+        // clarify/reject items): one point at full coverage with risk 1.
+        assert_eq!(metrics.risk_coverage, vec![(1.0, 1.0)]);
+        assert!((metrics.aurc - 1.0).abs() < 1e-9);
         assert!((metrics.ece - 0.5).abs() < 1e-9);
     }
 
