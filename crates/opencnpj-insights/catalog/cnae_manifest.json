@@ -1,0 +1,67 @@
+{
+  "artifacts": {
+    "ambiguity.tsv": {
+      "bytes": 1672,
+      "sha256": "d9007f0430bc1d678ab96855f8b841a3d011c3dfb9fa711ac93757763b38b072"
+    },
+    "cnae.tsv": {
+      "bytes": 192585,
+      "sha256": "da1dce09b3a6a08ba922152f6760dabbd6c422907ff2ef3c8ce59795902b70f4"
+    },
+    "reachability.tsv": {
+      "bytes": 19061,
+      "sha256": "da5ae32bdbf028f19d7a0a03416ab3d7fc964094eb48d51b5e2af51d44d12e11"
+    },
+    "sector_aliases_auto.tsv": {
+      "bytes": 2434156,
+      "sha256": "d01ac7d99c4b629f20a93e4bc56cecba8995b6b5874d646050728506b6e0e228"
+    },
+    "sectors.toml": {
+      "bytes": 56395,
+      "sha256": "264da75c0f9e16c97139dbe35e5e995059c74c70ecc6b29d1354e68e504d94b5"
+    },
+    "top-50.tsv": {
+      "bytes": 1126,
+      "sha256": "2f556428e20972a3dbd463e6ce08ef5a148312431a64900827ed32593cff6bb4"
+    }
+  },
+  "cnae_version": "2.3",
+  "legacy_exception_sources": {
+    "concla-2.2-notes": "https://cnae.ibge.gov.br/images/concla/downloads/cnae-subclasses-2-2-notas-explicativas.pdf",
+    "concla-2007": "https://cnae.ibge.gov.br/images/concla/resolucoes_e_atas/ataconcla20_22032007.pdf",
+    "concla-2010": "https://www.gov.br/mme/pt-br/arquivos/do-29-06-2010-s1.pdf",
+    "rfb-reference": "rfb_cnaes.tsv"
+  },
+  "legacy_exceptions": {
+    "bytes": 1536,
+    "sha256": "705a7c19acb50738e3606ec360de48679581829843880622373b99b5fa5560a9"
+  },
+  "rfb_inputs": {
+    "rfb_cnaes.tsv": {
+      "bytes": 86436,
+      "sha256": "13da4af3733c3c4b0e434822d337b9b1059b748611878cbbbdf723ea615644e6"
+    },
+    "used_codes.tsv": {
+      "bytes": 860736,
+      "sha256": "da8bea1fbc8df90206e61ec2e2118f9b3392793ea7d8d7d7a754bae5204ea4b6"
+    }
+  },
+  "sources": {
+    "concla-2.2.zip": {
+      "bytes": 255354,
+      "sha256": "135f1ba84f26d46c54820f9418f31965f7add8fc63fdeee868e6d74c66083ccd",
+      "url": "https://ftp.ibge.gov.br/Informacoes_Gerais_e_Referencia/Classificacoes/CNAE/cnae2_2/cnae_2_2_subclasses_ods_20150609.zip"
+    },
+    "concla-2.3.zip": {
+      "bytes": 153979,
+      "sha256": "656685fb58ab46eb3d63d571b4acb1cb13a8a4332fb79bae9afbc538fd681f08",
+      "url": "https://ftp.ibge.gov.br/Informacoes_Gerais_e_Referencia/Classificacoes/CNAE/cnae2_3/cnae_subclasses_2_3_ods.zip"
+    },
+    "ibge-subclasses.json": {
+      "bytes": 3648251,
+      "sha256": "787e14982265b0ffedf5f0180cbec8a2ea64d117fca459b76608ebc99dd668a7",
+      "url": "https://servicodados.ibge.gov.br/api/v2/cnae/subclasses"
+    }
+  },
+  "version": "v1"
+}

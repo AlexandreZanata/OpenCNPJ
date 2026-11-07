@@ -103,6 +103,7 @@ Through HTTP, the 1.2 snapshot served 36.4k CNPJ lookups/s at p95 0.68 ms, CPF l
 | [crates/opencnpj-desktop](crates/opencnpj-desktop/README.md) | Native admin app: build, run, install |
 | [docs/BENCHMARKS.md](docs/BENCHMARKS.md) | Methodology, results, experiments, Pareto front |
 | [docs/DATA_POLICY.md](docs/DATA_POLICY.md) | Provenance, chain of trust, LGPD |
+| [docs/intelligence/](docs/intelligence/README.md) | Plan for a lightweight pt-BR data assistant (no LLM): requirements, research, design, roadmap |
 | [docs/legacy/](docs/legacy/README.md) | Archived implementation and how to restore it |
 | [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) | Development workflow |
 

@@ -1,0 +1,13 @@
+[package]
+name = "opencnpj-nlu"
+description = "Brazilian Portuguese question interpretation for OpenCNPJ Intelligence"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+opencnpj-core.workspace = true
+opencnpj-query.workspace = true
+fst.workspace = true
