@@ -92,10 +92,33 @@ pub struct Metrics {
 
 pub fn load_items(path: &Path) -> Result<Vec<Item>> {
     let text = fs::read_to_string(path).with_context(|| format!("read {}", path.display()))?;
-    text.lines()
-        .filter(|line| !line.trim().is_empty())
-        .map(|line| serde_json::from_str(line).with_context(|| format!("{}", path.display())))
-        .collect()
+    let mut out = Vec::new();
+    for line in text.lines().filter(|line| !line.trim().is_empty()) {
+        let value: Value = serde_json::from_str(line).with_context(|| format!("{}", path.display()))?;
+        if let Some(turns) = value.get("turns") {
+            // A dialogue line expands to one item per turn; later turns see the
+            // previous turn's place as their focus.
+            let id = value.get("id").and_then(Value::as_str).unwrap_or_default();
+            let turns = turns.as_array().cloned().unwrap_or_default();
+            let mut previous_place: Option<Value> = None;
+            for (index, turn) in turns.iter().enumerate() {
+                let text = turn.get("text").and_then(Value::as_str).unwrap_or_default().to_string();
+                let gold: Gold = serde_json::from_value(turn.get("gold").cloned().unwrap_or(Value::Null))
+                    .with_context(|| format!("{}", path.display()))?;
+                let context = previous_place.clone().map(|focus| json!({"focus": focus}));
+                previous_place = turn
+                    .get("gold")
+                    .and_then(|gold| gold.get("ir"))
+                    .and_then(|ir| ir.get("scope"))
+                    .and_then(|scope| scope.get("place"))
+                    .cloned();
+                out.push(Item { id: format!("{id}#{}", index + 1), text, gold, meta: Value::Null, rules: Vec::new(), context });
+            }
+        } else {
+            out.push(serde_json::from_value(value).with_context(|| format!("{}", path.display()))?);
+        }
+    }
+    Ok(out)
 }
 
 pub fn load_predictions(path: &Path) -> Result<Vec<Prediction>> {
@@ -366,11 +389,15 @@ fn risk_coverage(selective: &[(f64, bool)], total: u64) -> Vec<(f64, f64)> {
     sorted.sort_by(|a, b| b.0.partial_cmp(&a.0).unwrap_or(std::cmp::Ordering::Equal));
     let mut errors = 0_usize;
     let mut points = Vec::new();
-    for (index, (_, error)) in sorted.iter().enumerate() {
+    for (index, (confidence, error)) in sorted.iter().enumerate() {
         if *error {
             errors += 1;
         }
-        points.push(((index + 1) as f64 / total as f64, errors as f64 / (index + 1) as f64));
+        // Equal confidences form a single point: only emit at the end of each run.
+        let last_in_run = index + 1 == sorted.len() || sorted[index + 1].0 != *confidence;
+        if last_in_run {
+            points.push(((index + 1) as f64 / total as f64, errors as f64 / (index + 1) as f64));
+        }
     }
     points
 }
@@ -385,7 +412,7 @@ fn aurc(points: &[(f64, f64)]) -> f64 {
         area += risk * (coverage - previous);
         previous = coverage;
     }
-    if previous == 0.0 { 0.0 } else { area / previous }
+    area
 }
 
 fn ece(selective: &[(f64, bool)]) -> f64 {
@@ -726,6 +753,32 @@ mod tests {
     }
 
     #[test]
+    fn equal_confidences_form_a_single_point() {
+        let points = risk_coverage(&[(0.9, false), (0.9, true), (0.5, false)], 3);
+        assert_eq!(points, vec![(2.0 / 3.0, 0.5), (1.0, 1.0 / 3.0)]);
+    }
+
+    #[test]
+    fn dialogue_lines_expand_to_one_item_per_turn() {
+        use std::io::Write as _;
+        let line = json!({
+            "id": "x",
+            "turns": [
+                {"text": "first", "gold": {"decision": "execute", "intent": "count", "ir": {"scope": {"place": {"municipalities": [1]}}}, "act": "new_query"}},
+                {"text": "second", "gold": {"decision": "execute", "intent": "count", "ir": null, "act": "new_query"}},
+            ],
+        });
+        let mut file = tempfile::NamedTempFile::new().unwrap();
+        writeln!(file, "{}", serde_json::to_string(&line).unwrap()).unwrap();
+        let items = load_items(file.path()).unwrap();
+        assert_eq!(items.len(), 2);
+        assert_eq!(items[0].id, "x#1");
+        assert_eq!(items[1].id, "x#2");
+        assert!(items[0].context.is_none());
+        assert_eq!(items[1].context, Some(json!({"focus": {"municipalities": [1]}})));
+    }
+
+    #[test]
     fn metrics_match_hand_computed_example() {
         let items = vec![
             item("1", "execute", "count", Some(ir("A", "S"))),
@@ -783,7 +836,9 @@ mod tests {
         assert!((metrics.entity_recall - 0.0).abs() < 1e-9);
         assert_eq!(metrics.clarification_recall, 0.0);
         assert_eq!(metrics.ood_rejection, 0.0);
-        assert!((metrics.aurc - 1.0).abs() < 1e-9);
+        // All five predictions share confidence 0.5, so the curve is a single point at
+        // coverage 5/3 with risk 1.0; the area is unnormalized.
+        assert!((metrics.aurc - 5.0 / 3.0).abs() < 1e-9);
         assert!((metrics.ece - 0.5).abs() < 1e-9);
     }
 
