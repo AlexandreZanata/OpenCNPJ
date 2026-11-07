@@ -11,8 +11,8 @@ use opencnpj_insights::{
     agg,
     catalog::municipalities::MunicipalityCatalogue,
     execute::{
-        AggregateSet, ExecContext, Row, SectorMap, Value, major_uf, member_population_for, place_population_for, population_of,
-        resolve_place,
+        AggregateSet, ExecContext, PopulationScope, Row, SectorMap, Value, major_uf, member_population_for, place_population_for,
+        population_of, resolve_place,
     },
 };
 use opencnpj_query::{
@@ -589,7 +589,16 @@ impl EngineExecutor<'_> {
     fn place_population(&self, request: &Request, reference: PopulationRef) -> u64 {
         let (municipalities, ufs) = resolve_place(self.context.municipalities, &request.scope.place, &request.scope.within_ufs).unwrap();
         let range = request.scope.place_population.map(|range| (range.from.unwrap_or(0), range.to.unwrap_or(u32::MAX)));
-        place_population_for(self.context.municipalities, municipalities.as_ref(), ufs.as_ref(), range, reference)
+        let exclude_municipalities: BTreeSet<u16> = request.scope.exclude.municipalities.iter().map(|id| id.0).collect();
+        let exclude_ufs: BTreeSet<u8> = request.scope.exclude.ufs.iter().map(|uf| uf.0).collect();
+        let scope = PopulationScope {
+            municipalities: municipalities.as_ref(),
+            ufs: ufs.as_ref(),
+            range,
+            exclude_municipalities: &exclude_municipalities,
+            exclude_ufs: &exclude_ufs,
+        };
+        place_population_for(self.context.municipalities, &scope, reference)
     }
 
     fn member_population(&self, request: &Request, key: u64, dim: Dim, _metric: Metric) -> u64 {
@@ -598,7 +607,17 @@ impl EngineExecutor<'_> {
             _ => self.context.municipalities.default_population(),
         });
         let (municipalities, ufs) = resolve_place(self.context.municipalities, &request.scope.place, &request.scope.within_ufs).unwrap();
-        member_population_for(self.context.municipalities, key, dim, municipalities.as_ref(), ufs.as_ref(), reference)
+        let range = request.scope.place_population.map(|range| (range.from.unwrap_or(0), range.to.unwrap_or(u32::MAX)));
+        let exclude_municipalities: BTreeSet<u16> = request.scope.exclude.municipalities.iter().map(|id| id.0).collect();
+        let exclude_ufs: BTreeSet<u8> = request.scope.exclude.ufs.iter().map(|uf| uf.0).collect();
+        let scope = PopulationScope {
+            municipalities: municipalities.as_ref(),
+            ufs: ufs.as_ref(),
+            range,
+            exclude_municipalities: &exclude_municipalities,
+            exclude_ufs: &exclude_ufs,
+        };
+        member_population_for(self.context.municipalities, key, dim, &scope, reference)
     }
 }
 

@@ -387,42 +387,57 @@ pub fn population_of(row: &Municipality, reference: PopulationRef) -> Option<u32
     }
 }
 
-pub fn place_population_for(
-    catalogue: &MunicipalityCatalogue,
-    municipalities: Option<&BTreeSet<u16>>,
-    ufs: Option<&BTreeSet<u8>>,
-    range: Option<(u32, u32)>,
-    reference: PopulationRef,
-) -> u64 {
-    catalogue
-        .rows()
-        .iter()
-        .filter(|row| {
-            if let Some(values) = ufs
-                && !major_uf(row).is_some_and(|uf| values.contains(&uf))
-            {
+/// Which municipalities a population sum may include: the same place, population range
+/// and exclusions as the counted establishments, so densities compare like with like.
+pub struct PopulationScope<'a> {
+    pub municipalities: Option<&'a BTreeSet<u16>>,
+    pub ufs: Option<&'a BTreeSet<u8>>,
+    pub range: Option<(u32, u32)>,
+    pub exclude_municipalities: &'a BTreeSet<u16>,
+    pub exclude_ufs: &'a BTreeSet<u8>,
+}
+
+impl PopulationScope<'_> {
+    fn admits(&self, row: &Municipality, reference: PopulationRef) -> bool {
+        if let Some(values) = self.ufs
+            && !major_uf(row).is_some_and(|uf| values.contains(&uf))
+        {
+            return false;
+        }
+        if let Some(values) = self.municipalities
+            && !values.contains(&row.id)
+        {
+            return false;
+        }
+        if self.exclude_municipalities.contains(&row.id) {
+            return false;
+        }
+        if major_uf(row).is_some_and(|uf| self.exclude_ufs.contains(&uf)) {
+            return false;
+        }
+        if let Some((low, high)) = self.range {
+            let Some(value) = population_of(row, reference) else { return false };
+            if !(low..=high).contains(&value) {
                 return false;
             }
-            if let Some(values) = municipalities
-                && !values.contains(&row.id)
-            {
-                return false;
-            }
-            if let Some((low, high)) = range {
-                let Some(value) = population_of(row, reference) else { return false };
-                if !(u64::from(low)..=u64::from(high)).contains(&u64::from(value)) {
-                    return false;
-                }
-            }
-            true
-        })
-        .filter_map(|row| population_of(row, reference))
-        .map(u64::from)
-        .sum()
+        }
+        true
+    }
+}
+
+pub fn place_population_for(catalogue: &MunicipalityCatalogue, scope: &PopulationScope<'_>, reference: PopulationRef) -> u64 {
+    catalogue.rows().iter().filter(|row| scope.admits(row, reference)).filter_map(|row| population_of(row, reference)).map(u64::from).sum()
 }
 
 fn place_population(filters: &Filters, context: &ExecContext<'_>, reference: PopulationRef) -> u64 {
-    place_population_for(context.municipalities, filters.municipalities.as_ref(), filters.ufs.as_ref(), filters.population, reference)
+    let scope = PopulationScope {
+        municipalities: filters.municipalities.as_ref(),
+        ufs: filters.ufs.as_ref(),
+        range: filters.population,
+        exclude_municipalities: &filters.exclude_municipalities,
+        exclude_ufs: &filters.exclude_ufs,
+    };
+    place_population_for(context.municipalities, &scope, reference)
 }
 
 fn status_of(code: u8) -> Option<Status> {
@@ -797,16 +812,21 @@ pub fn member_population_for(
     catalogue: &MunicipalityCatalogue,
     key: u64,
     dim: Dim,
-    municipalities: Option<&BTreeSet<u16>>,
-    ufs: Option<&BTreeSet<u8>>,
+    scope: &PopulationScope<'_>,
     reference: PopulationRef,
 ) -> u64 {
     match dim {
-        Dim::Municipality => catalogue.get(key as u16).and_then(|row| population_of(row, reference)).map(u64::from).unwrap_or(0),
+        Dim::Municipality => catalogue
+            .get(key as u16)
+            .filter(|row| scope.admits(row, reference))
+            .and_then(|row| population_of(row, reference))
+            .map(u64::from)
+            .unwrap_or(0),
         Dim::Uf => catalogue
             .rows()
             .iter()
             .filter(|row| major_uf(row) == Some(key as u8))
+            .filter(|row| scope.admits(row, reference))
             .filter_map(|row| population_of(row, reference))
             .map(u64::from)
             .sum(),
@@ -820,15 +840,23 @@ pub fn member_population_for(
                     RegionLevel::Immediate => u64::from(geo.immediate_region) == key,
                 })
             })
+            .filter(|row| scope.admits(row, reference))
             .filter_map(|row| population_of(row, reference))
             .map(u64::from)
             .sum(),
-        _ => place_population_for(catalogue, municipalities, ufs, None, reference),
+        _ => place_population_for(catalogue, scope, reference),
     }
 }
 
 fn member_population(key: u64, dim: Dim, filters: &Filters, context: &ExecContext<'_>, reference: PopulationRef) -> u64 {
-    member_population_for(context.municipalities, key, dim, filters.municipalities.as_ref(), filters.ufs.as_ref(), reference)
+    let scope = PopulationScope {
+        municipalities: filters.municipalities.as_ref(),
+        ufs: filters.ufs.as_ref(),
+        range: filters.population,
+        exclude_municipalities: &filters.exclude_municipalities,
+        exclude_ufs: &filters.exclude_ufs,
+    };
+    member_population_for(context.municipalities, key, dim, &scope, reference)
 }
 
 fn population_reference(request: &ValidRequest, context: &ExecContext<'_>) -> PopulationRef {
@@ -942,7 +970,13 @@ fn trend(request: &ValidRequest, filters: &Filters, grain: Grain, aggregates: &A
 
 #[cfg(test)]
 mod tests {
-    use super::section_of;
+    use super::{PopulationScope, member_population_for, section_of};
+    use crate::catalog::municipalities::MunicipalityCatalogue;
+    use opencnpj_query::ir::{Dim, PopulationRef};
+    use std::{collections::BTreeSet, io::Write};
+
+    /// Exact header of `catalog/municipalities.rs` (`const HEADER` there is private).
+    const MUNICIPALITY_HEADER: &str = "id\ttom\tibge\tuf\tname\tfolded\tvariants\tpop_census_2022\tpop_est\tpop_est_year\tlat\tlon\tneighbours\treg_imediata\treg_intermediaria\tcapital";
 
     /// CNAE 2.x sections as the engine defines them (`opencnpj-store/src/search.rs`,
     /// `cnae_section`), written letter → divisions so the check is independent of `section_of`.
@@ -978,5 +1012,42 @@ mod tests {
         }
         // Restaurants (5611-2/01) are lodging and food (I), not information (J).
         assert_eq!(section_of(5_611_201), b'I');
+    }
+
+    /// Density denominators must see the same place, population range and exclusions as
+    /// the counted establishments.
+    #[test]
+    fn density_denominators_follow_the_same_filters() {
+        let mut file = tempfile::NamedTempFile::new().unwrap();
+        writeln!(file, "{MUNICIPALITY_HEADER}").unwrap();
+        // Two municipalities in RO (UF 20), one in SP (UF 25); same column format as
+        // `catalog/municipalities.tsv`, only id, codes, UF and population changed.
+        writeln!(
+            file,
+            "0\t0001\t1100106\tRO\tAlpha\talpha\t\t9000\t10000\t2026\t-10.787099838256836\t-65.34010314941406\t\t110001\t1101\t0"
+        )
+        .unwrap();
+        writeln!(
+            file,
+            "1\t0002\t1100379\tRO\tBeta\tbeta\t\t180000\t200000\t2026\t-12.133999824523926\t-61.858699798583984\t\t110005\t1102\t0"
+        )
+        .unwrap();
+        writeln!(file, "2\t0003\t3550308\tSP\tGamma\tgamma\t\t55000\t60000\t2026\t-23.5505\t-46.6333\t\t350001\t3501\t0").unwrap();
+        let catalogue = MunicipalityCatalogue::load(file.path()).unwrap();
+        let reference = PopulationRef::IbgeEstimate(2026);
+        let empty: BTreeSet<u16> = BTreeSet::new();
+        let empty_ufs: BTreeSet<u8> = BTreeSet::new();
+        let scope = PopulationScope {
+            municipalities: None,
+            ufs: None,
+            range: Some((50_000, 1_000_000)),
+            exclude_municipalities: &empty,
+            exclude_ufs: &empty_ufs,
+        };
+        assert_eq!(member_population_for(&catalogue, 20, Dim::Uf, &scope, reference), 200_000);
+        let excluded: BTreeSet<u16> = BTreeSet::from([1]);
+        let scope =
+            PopulationScope { municipalities: None, ufs: None, range: None, exclude_municipalities: &excluded, exclude_ufs: &empty_ufs };
+        assert_eq!(member_population_for(&catalogue, 20, Dim::Uf, &scope, reference), 10_000);
     }
 }
