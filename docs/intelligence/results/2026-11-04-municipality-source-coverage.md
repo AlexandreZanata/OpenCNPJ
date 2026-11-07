@@ -50,7 +50,7 @@ earlier population figure on its municipality page as an estimate.
 [IBGE municipality page](https://www.ibge.gov.br/cidades-e-estados/mt/boa-esperanca-do-norte.html)
 [SIDRA census source](https://servicodados.ibge.gov.br/api/v3/agregados/4709/periodos/2022/variaveis/93?localidades=N6%5Ball%5D)
 
-The owner approved using the official IBGE estimate for this municipality.
+The executing agent records that the owner approved using the official IBGE estimate for this municipality (pending owner confirmation, review 2026-11-07).
 Its census field is unavailable in the catalogue. Its estimate is 5,983,
 with reference year 2026 and source SIDRA 6579/9324. The loader requires a
 census value for all other municipalities. The initial preflight failure above

@@ -5,8 +5,13 @@ that answers managers' questions about Brazilian companies **in milliseconds**, 
 real OpenCNPJ data, **without LLMs, generative models or external AI services**, on
 hardware as small as **1 vCPU / 1 GB RAM**.
 
-Status (2026-11-04): **plan only.** No implementation exists yet. The OpenCNPJ engine is
-unchanged. Execution starts with [14-ROADMAP.md](14-ROADMAP.md).
+Status (2026-11-07): phases 0–3 of [14-ROADMAP.md](14-ROADMAP.md) are implemented
+(catalogues, aggregates, query IR, validator, planner/executors, renderer, generator,
+evaluation harness) and were reviewed — see
+[results/2026-11-07-review.md](results/2026-11-07-review.md) for what was fixed, what is
+still open and the status of each work package. WP-1.3 and WP-3.3 are not met yet, and
+phase 4 (the language interpreter itself, `opencnpj-nlu`) has not started. The OpenCNPJ
+engine crates are unchanged.
 
 ## How it works (one paragraph)
 
