@@ -5,13 +5,17 @@ from the municipality/sector catalogues (municipalities 2026-10, sectors v1)
 and the versioned family templates. The files are committed; do not edit them
 without regenerating the SHA-256 values below.
 
+Status: AI-drafted. These sets do not meet WP-3.3, which requires sets written by people
+who never saw the generator or the grammar. They must not be used for the WP-5.1
+decision. See results/2026-11-07-review.md.
+
 | File | Items | SHA-256 |
 |---|---|---|
-| adv.jsonl | 300 | 8af69a9fff6cbf4b2fbfd4ca11f20272f711f94ee36316d2b7d8c924e6c9e60a |
+| adv.jsonl | 235 | bd6e7933860051c6fd50dc67fdbebecf94aedc2dd6a8d4c85f03b607954276be |
 | ood.jsonl | 400 | c3eafa0206e53cd908de5ee71d81a5f7a6de4015f35c11b6036af207f158eb92 |
-| h-informal.jsonl | 200 | 3a8e9439c59d26ce59f1608e9e8d3995bcc3dce5a404bcc5d9b62b2582bf4bca |
-| dialogues.jsonl | 60 | 505ba9a421ab3e4f93c3f091f6ace95ded5c84c596b31d0dddab2a2204e5ad65 |
-| context.json | 1 | d5609a11003d289c2aa8cd676170bdaf3ee31c4f516c72a287081c1b6df7be1a |
+| h-informal.jsonl | 80 | f908c37a78b08f818cf3d0c2d629e9104487cf4c99ec552c220c97e21eec0fce |
+| dialogues.jsonl | 48 | 3b1d89e24d308120decbdac9177a7113417a3484f1083efe18b7f63b4fcbb1b5 |
+| context.json | 1 | f48e58708d9354af710a9a70f3ee06ef30aa05121a02e1c8dd2337ff0b2bff33 |
 
 ## Schemas
 
@@ -24,8 +28,8 @@ without regenerating the SHA-256 values below.
 
 ## Coverage
 
-Traps of 05-INTERPRETER.md §7: abertas=139, crescendo=25, fecharam=25, grandes=5, mais=10, menos=10.
-Semantic rules with at least five items: SR-01=124, SR-02=140, SR-03=16, SR-04=25, SR-05=25, SR-06=26, SR-07=9, SR-08=16, SR-09=9, SR-10=18, SR-11=5, SR-12=6, SR-13=16, SR-14=5.
+Traps of 05-INTERPRETER.md §7: abertas=96, crescendo=25, fecharam=25, grandes=4, mais=2, menos=2.
+Semantic rules with at least five items: SR-01=80, SR-02=96, SR-03=16, SR-04=25, SR-05=25, SR-06=18, SR-07=9, SR-08=16, SR-09=9, SR-10=10, SR-11=5, SR-12=4, SR-13=13, SR-14=5.
 
 ## Sources and attribution
 

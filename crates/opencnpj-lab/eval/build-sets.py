@@ -6,6 +6,7 @@ OHF-Voice/intents pt-BR import is attempted/documented in the dataset card.
 from __future__ import annotations
 import hashlib
 import json
+import tomllib
 from datetime import date
 from pathlib import Path
 
@@ -18,15 +19,18 @@ PLACES = {
     "Bonito": (5096, "MS"), "Bom Jesus": (4847, "RS"),
 }
 UFS = {"MT": 12, "SP": 25, "RJ": 18, "BA": 4, "MS": 11, "RS": 22}
+_CATALOG = tomllib.load(open(DIR.parent.parent / "opencnpj-insights" / "catalog" / "sectors.toml", "rb"))["sector"]
+def _core(sector_id):
+    for index, entry in enumerate(_CATALOG):
+        if entry["id"] == sector_id:
+            return index, [int(code) for code in entry["cnae_core"]]
+    raise SystemExit(f"unknown sector {sector_id}")
 SECTORS = {
-    "padaria": (13, [1091102, 4721101, 4721102, 1091101]),
-    "farmácia": (144, [4771701, 4771702, 4771703]),
-    "supermercado": (182, [4711302, 4711301]),
-    "restaurante": (164, [5611201]),
-    "construtora": (43, [4120400]),
-    "academia": (87, [9313100]),
-    "hotel": (95, [5510801]),
+    "padaria": _core("bakery"), "farmácia": _core("pharmacy"), "supermercado": _core("supermarket"),
+    "restaurante": _core("restaurant"), "construtora": _core("construction"),
+    "academia": _core("gym"), "hotel": _core("hotel"),
 }
+assert [sid for sid, _ in SECTORS.values()] == [13, 144, 182, 164, 43, 87, 95]
 CATALOG = {
     "municipalities": {str(ident): uf for _, (ident, uf) in PLACES.items()},
     "sectors": {str(sid): cnaes for _, (sid, cnaes) in SECTORS.items()},
@@ -90,8 +94,8 @@ def request(op, sc=None, period=None, unit="establishments"):
 
 def count(stock=True, flow=None, per10k=None, inhabitants=None, share=False, change=None):
     if flow: return {"kind": "count", "metric": {"flow": flow}}
-    if per10k: return {"kind": "count", "metric": {"per10k": {"ibge_estimate": 2025}}}
-    if inhabitants: return {"kind": "count", "metric": {"inhabitants_per": {"ibge_estimate": 2025}}}
+    if per10k: return {"kind": "count", "metric": {"per10k": {"ibge_estimate": 2026}}}
+    if inhabitants: return {"kind": "count", "metric": {"inhabitants_per": {"ibge_estimate": 2026}}}
     if share: return {"kind": "count", "metric": "share"}
     if change is not None: return {"kind": "count", "metric": {"active_change": {"pct": change}}}
     return {"kind": "count", "metric": "stock"}
@@ -207,8 +211,8 @@ for text in (
     add(text, gold_reject("Consulta a pessoas físicas e sócios não é permitida; use o CNPJ da empresa."), None, ["SR-14"])
 for place in PL[:5]:
     add(f"quais cidades têm menos padarias em MT", gold_execute(request(rank("municipality", direction="asc"), scope(place=("Mato Grosso", "MT"), sector="padaria"))), "menos", ["SR-06"])
-    add(f"quantas padarias existem em municípios com menos de 50 mil habitantes em MT", gold_execute(request(count(), scope(place=("Mato Grosso", "MT"), sector="padaria", place_population={"from": None, "to": 50000}, population_ref={"ibge_estimate": 2025}))), "menos", ["SR-10"])
-    add(f"quantas padarias existem em municípios com mais de 50 mil habitantes em MT", gold_execute(request(count(), scope(place=("Mato Grosso", "MT"), sector="padaria", place_population={"from": 50000, "to": None}, population_ref={"ibge_estimate": 2025}))), "mais", ["SR-10"])
+    add(f"quantas padarias existem em municípios com menos de 50 mil habitantes em MT", gold_execute(request(count(), scope(place=("Mato Grosso", "MT"), sector="padaria", place_population={"from": None, "to": 50000}, population_ref={"ibge_estimate": 2026}))), "menos", ["SR-10"])
+    add(f"quantas padarias existem em municípios com mais de 50 mil habitantes em MT", gold_execute(request(count(), scope(place=("Mato Grosso", "MT"), sector="padaria", place_population={"from": 50000, "to": None}, population_ref={"ibge_estimate": 2026}))), "mais", ["SR-10"])
     add(f"qual cidade de MT tem mais padarias", gold_execute(request(rank("municipality"), scope(place=("Mato Grosso", "MT"), sector="padaria"))), "mais", ["SR-06"])
 
 # Ensure every rule and trap has five items and the ADV size.
@@ -219,28 +223,13 @@ def counts(values):
     for value in values:
         out[value] = out.get(value, 0) + 1
     return out
-for _ in range(1000):
-    rule_counts = counts([r for x in adv for r in x["rules"]])
-    trap_counts = counts([x["meta"].get("trap") for x in adv if x["meta"].get("trap")])
-    missing_rules = [rule for rule in RULES if rule_counts.get(rule, 0) < 5]
-    missing_traps = [trap for trap in TRAPS if trap_counts.get(trap, 0) < 5]
-    if len(adv) >= 300 and not missing_rules and not missing_traps:
-        break
-    base = adv[(len(adv) * 13 + 7) % max(1, len(adv) - 1)]
-    clone = json.loads(json.dumps(base))
-    clone["id"] = f"adv-{len(adv)+1:04}"
-    clone["text"] = clone["text"] + " (variante)"
-    if missing_rules:
-        clone["rules"] = sorted(set(clone["rules"] + missing_rules))
-    if missing_traps:
-        clone["meta"]["trap"] = missing_traps[0]
-        clone["meta"]["trap_variant"] = True
-    adv.append(clone)
 
 # ------------------------------------------------------------ H-informal
 informal = []
 def inf(text):
-    return text.replace("quantas", "qtas").replace("número", "numero").replace("você", "vc").replace("com", "c/")
+    new_text = text.replace("quantas", "qtas").replace("número", "numero").replace("você", "vc").replace("com", "c/")
+    applied = ["abbrev"] if new_text != text else []
+    return new_text, applied
 for place in PL:
     for sector in ("padaria", "supermercado"):
         texts = [
@@ -252,16 +241,11 @@ for place in PL:
         ]
         for index, text in enumerate(texts):
             ir = request(count(), scope(place=place, sector=sector))
-            informal.append(item(f"inf-{len(informal)+1:04}", inf(text), gold_execute(ir), origin="informal", meta={"register": "informal", "noise": ["abbrev"] if index % 2 == 0 else ["typo"]}))
+            new_text, applied = inf(text)
+            informal.append(item(f"inf-{len(informal)+1:04}", new_text, gold_execute(ir), origin="informal", meta={"register": "informal", "noise": applied if applied else ["none"]}))
             if len(informal) >= 200: break
         if len(informal) >= 200: break
     if len(informal) >= 200: break
-while len(informal) < 200:
-    base = informal[(len(informal) * 7 + 3) % len(informal)]
-    clone = json.loads(json.dumps(base))
-    clone["id"] = f"inf-{len(informal)+1:04}"
-    clone["text"] = clone["text"] + "?"
-    informal.append(clone)
 
 # ----------------------------------------------------------------- OOD
 ood = []
@@ -312,6 +296,54 @@ while len(dialogues) < 60:
     dialogues.append(clone)
 
 # ----------------------------------------------------------------- write
+def _dedupe(rows):
+    seen = set()
+    out = []
+    for row in rows:
+        if row["text"] in seen:
+            continue
+        seen.add(row["text"])
+        out.append(row)
+    return out
+
+adv = _dedupe(adv)
+informal = _dedupe(informal)
+_seen_dialogues = set()
+_kept_dialogues = []
+for dialogue in dialogues:
+    key = tuple(turn["text"] for turn in dialogue["turns"])
+    if key in _seen_dialogues:
+        continue
+    _seen_dialogues.add(key)
+    _kept_dialogues.append(dialogue)
+dialogues = _kept_dialogues
+
+_UF_CODES = {"RS", "MS", "PI", "GO", "PB", "RN", "SC", "RJ", "SP", "MT", "BA", "PE", "CE", "MG", "PR", "AL", "SE", "TO", "PA", "AM", "MA", "ES", "RO", "AC", "AP", "RR", "DF"}
+
+def _words(text):
+    return [word.strip(".,?!:;()\"'") for word in text.split()]
+
+def _is_homonym(text):
+    if "Bom Jesus" not in text and "Bonito" not in text:
+        return False
+    return not any(word in _UF_CODES for word in _words(text))
+
+def _clarify_homonym(text, gold, meta):
+    if not _is_homonym(text):
+        return gold, meta
+    new_gold = {"decision": "clarify", "intent": gold.get("intent"), "act": gold.get("act"), "ir": None}
+    new_meta = dict(meta or {})
+    new_meta["clarify"] = "homonym"
+    return new_gold, new_meta
+
+for row in adv:
+    row["gold"], row["meta"] = _clarify_homonym(row["text"], row["gold"], row["meta"])
+for row in informal:
+    row["gold"], row["meta"] = _clarify_homonym(row["text"], row["gold"], row["meta"])
+for dialogue in dialogues:
+    for turn in dialogue["turns"]:
+        turn["gold"], _ = _clarify_homonym(turn["text"], turn["gold"], {})
+
 def write_jsonl(name, rows):
     text = "\n".join(json.dumps(row, ensure_ascii=False) for row in rows) + "\n"
     (DIR / name).write_text(text)
@@ -333,6 +365,10 @@ Frozen on 2026-11-06. Generated by `crates/opencnpj-lab/eval/build-sets.py`
 from the municipality/sector catalogues (municipalities 2026-10, sectors v1)
 and the versioned family templates. The files are committed; do not edit them
 without regenerating the SHA-256 values below.
+
+Status: AI-drafted. These sets do not meet WP-3.3, which requires sets written by people
+who never saw the generator or the grammar. They must not be used for the WP-5.1
+decision. See results/2026-11-07-review.md.
 
 | File | Items | SHA-256 |
 |---|---|---|
