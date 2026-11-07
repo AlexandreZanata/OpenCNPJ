@@ -1587,7 +1587,7 @@
   "exclusions": {
     "blocks": [
       {
-        "text": "Mato Grosso e São Paulo, exceto Cuiabá (MT), São Paulo e farmácias têm 187 estabelecimentos ativos, segundo a Receita Federal de outubro de 2026.",
+        "text": "Segundo a base da Receita Federal de outubro de 2026, Mato Grosso, exceto Cuiabá (MT) e farmácias tem 187 estabelecimentos ativos.",
         "type": "text"
       },
       {
@@ -1600,7 +1600,7 @@
           "Atividade: todas",
           "Situação cadastral: ativa",
           "Unidade: estabelecimento (CNPJ completo)",
-          "Excluídos: Cuiabá (MT), São Paulo e farmácias"
+          "Excluídos: Cuiabá (MT) e farmácias"
         ],
         "type": "methodology"
       },
@@ -1648,9 +1648,7 @@
           "sectors": [
             2
           ],
-          "ufs": [
-            25
-          ]
+          "ufs": []
         },
         "head_office": "any",
         "mei": "any",
@@ -1658,8 +1656,7 @@
         "opened": null,
         "place": {
           "ufs": [
-            12,
-            25
+            12
           ]
         },
         "place_population": null,
@@ -1696,7 +1693,7 @@
     "timing_us": {
       "render": 0
     },
-    "understood": "estabelecimentos · todas as atividades · Mato Grosso e São Paulo, exceto Cuiabá (MT), São Paulo e farmácias · RFB 2026-10"
+    "understood": "estabelecimentos · todas as atividades · Mato Grosso, exceto Cuiabá (MT) e farmácias · RFB 2026-10"
   },
   "fabricacao_de_paes_sorriso": {
     "blocks": [

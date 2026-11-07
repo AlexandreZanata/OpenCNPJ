@@ -542,6 +542,7 @@ impl Request {
         }
         scope.exclude.sector_cnaes = expand_sectors(&scope.exclude.sectors, context)?;
         canonical_place(scope, context)?;
+        canonical_exclusions(scope, context)?;
         for range in [&mut scope.opened, &mut scope.status_date].into_iter().flatten() {
             *range = clip_days(*range, context)?;
         }
@@ -585,6 +586,48 @@ fn canonical_place(scope: &mut Filters, context: &CanonicalContext<'_>) -> Resul
         PlaceFilter::Region(_) | PlaceFilter::Near { .. } => return Ok(()),
     }
     scope.within_ufs = SmallSet::default();
+    Ok(())
+}
+
+fn canonical_exclusions(scope: &mut Filters, context: &CanonicalContext<'_>) -> Result<(), CanonicalError> {
+    match &mut scope.place {
+        PlaceFilter::Ufs(ufs) => {
+            let kept: Vec<UfId> = ufs.iter().copied().filter(|uf| scope.exclude.ufs.binary_search(uf).is_err()).collect();
+            if kept.is_empty() {
+                return Err(CanonicalError::ConflictingPlace);
+            }
+            *ufs = SmallSet::new(kept);
+            scope.exclude.ufs = SmallSet::default();
+            let mut kept_municipalities = Vec::new();
+            for id in scope.exclude.municipalities.iter() {
+                let uf = context.municipality_ufs.get(id).ok_or(CanonicalError::UnknownMunicipality(*id))?;
+                if ufs.binary_search(uf).is_ok() {
+                    kept_municipalities.push(*id);
+                }
+            }
+            scope.exclude.municipalities = SmallSet::new(kept_municipalities);
+        }
+        PlaceFilter::Municipalities(ids) => {
+            let mut kept = Vec::new();
+            for id in ids.iter() {
+                if scope.exclude.municipalities.binary_search(id).is_ok() {
+                    continue;
+                }
+                let uf = context.municipality_ufs.get(id).ok_or(CanonicalError::UnknownMunicipality(*id))?;
+                if scope.exclude.ufs.binary_search(uf).is_ok() {
+                    continue;
+                }
+                kept.push(*id);
+            }
+            if kept.is_empty() {
+                return Err(CanonicalError::ConflictingPlace);
+            }
+            *ids = SmallSet::new(kept);
+            scope.exclude.municipalities = SmallSet::default();
+            scope.exclude.ufs = SmallSet::default();
+        }
+        _ => {}
+    }
     Ok(())
 }
 

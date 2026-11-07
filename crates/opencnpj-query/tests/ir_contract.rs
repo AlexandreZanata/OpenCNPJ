@@ -132,6 +132,28 @@ fn clipping_and_conflicting_scope() {
 }
 
 #[test]
+fn exclusions_are_canonicalized_against_the_place() {
+    let (municipality_ufs, sector_cnaes) = case_context();
+    let context = CanonicalContext {
+        first_day: Day::from_ymd(1901, 1, 1).unwrap(),
+        last_day: Day::from_ymd(2026, 10, 11).unwrap(),
+        municipality_ufs: &municipality_ufs,
+        sector_cnaes: &sector_cnaes,
+    };
+    let case: Case =
+        serde_json::from_str(INPUTS.lines().find(|line| serde_json::from_str::<Case>(line).unwrap().case == "exclusions").unwrap())
+            .unwrap();
+    let (canonical, _) = case.request.canonicalize(&context).unwrap();
+    assert_eq!(canonical.scope.place, PlaceFilter::Ufs(SmallSet::new([UfId(12)])));
+    assert!(canonical.scope.exclude.ufs.is_empty());
+    assert_eq!(canonical.scope.exclude.municipalities, SmallSet::new([MunicipalityId(5108)]));
+    let mut conflicting = case.request;
+    conflicting.scope.place = PlaceFilter::Ufs(SmallSet::new([UfId(25)]));
+    conflicting.scope.exclude.ufs = SmallSet::new([UfId(25)]);
+    assert_eq!(conflicting.canonicalize(&context), Err(CanonicalError::ConflictingPlace));
+}
+
+#[test]
 fn malformed_binary_and_invalid_cnpj_are_rejected() {
     let request = serde_json::from_str::<Case>(INPUTS.lines().next().unwrap()).unwrap().request;
     let bytes = encode(&request);
