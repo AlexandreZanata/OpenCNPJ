@@ -11,10 +11,7 @@ use opencnpj_ingest::source::sha256_file;
 use opencnpj_insights::{
     agg,
     catalog::municipalities::MunicipalityCatalogue,
-    execute::{
-        AggregateSet, ExecContext, PopulationScope, Row, SectorMap, Value, major_uf, member_population_for, place_population_for,
-        population_of, resolve_place,
-    },
+    execute::{AggregateSet, ExecContext, Row, SectorMap, Value, resolve_place},
 };
 use opencnpj_query::{
     ir::*,
@@ -394,7 +391,23 @@ impl EngineExecutor<'_> {
     }
 
     fn set(&self, request: &Request) -> Result<RoaringBitmap> {
-        let pairs = lower(request, self.context.municipalities)?;
+        // The place is resolved by the oracle (`oracle::place`), not by `resolve_place` and
+        // `lower`, so a place-resolution bug in the executor cannot hide behind shared code.
+        let mut placeless = request.clone();
+        placeless.scope.place = PlaceFilter::Any;
+        placeless.scope.within_ufs = SmallSet::default();
+        let mut pairs = lower(&placeless, self.context.municipalities)?;
+        let place = crate::oracle::place(self.context.municipalities, &request.scope.place, &request.scope.within_ufs)?;
+        if place.is_empty() {
+            return Ok(RoaringBitmap::new());
+        }
+        if let Some(ids) = &place.municipalities {
+            let toms = ids.iter().filter_map(|id| self.context.municipalities.get(*id).map(|row| format!("{:04}", row.tom)));
+            pairs.push(("municipio".into(), toms.collect::<Vec<_>>().join(",")));
+        }
+        if let Some(ufs) = &place.ufs {
+            pairs.push(("uf".into(), ufs.iter().cloned().collect::<Vec<_>>().join(",")));
+        }
         let query = parse(&pairs)?;
         let mut set = search::candidates(self.snapshot, &query, &self.limits)?
             .all
@@ -475,11 +488,11 @@ impl EngineExecutor<'_> {
     }
 
     fn population_ok(&self, id: u16, range: (u32, u32), reference: PopulationRef) -> bool {
-        self.context
-            .municipalities
-            .get(id)
-            .and_then(|row| population_of(row, reference))
-            .is_some_and(|value| (range.0..=range.1).contains(&value))
+        let geo = match &self.context.municipalities.get(id).map(|row| &row.place) {
+            Some(opencnpj_insights::catalog::municipalities::Place::Municipality(geo)) => Some(geo),
+            _ => None,
+        };
+        geo.and_then(|geo| crate::oracle::population_of(geo, reference)).is_some_and(|value| (range.0..=range.1).contains(&value))
     }
 
     fn group_dim(&self, request: &Request, dim: Dim, set: &RoaringBitmap) -> Result<BTreeMap<u64, i64>> {
@@ -495,6 +508,21 @@ impl EngineExecutor<'_> {
                 Ok(out)
             }
             Dim::Uf => self.group_simple(set, Field::Uf, |value| agg::uf_id(value).map(|uf| u64::from(uf.0))),
+            Dim::Cnae(CnaeLevel::Section) => {
+                // Sections are counted with the engine's own section filter (`cnae=<letter>`),
+                // not with a copy of the section table.
+                let mut out = BTreeMap::new();
+                for letter in b'A'..=b'U' {
+                    let query = parse(&[("cnae".into(), char::from(letter).to_string()), ("matriz_filial".into(), "1,2".into())])?;
+                    if let Some(docs) = search::candidates(self.snapshot, &query, &self.limits)?.all {
+                        let count = docs.intersection_len(set);
+                        if count > 0 {
+                            out.insert(u64::from(letter), i64::try_from(count)?);
+                        }
+                    }
+                }
+                Ok(out)
+            }
             Dim::Cnae(level) => self.group_simple(set, Field::Cnae, |value| value.parse::<u32>().ok().map(|cnae| cnae_key(level, cnae))),
             Dim::Sector => {
                 let groups = self.group_simple(set, Field::Cnae, |value| value.parse::<u32>().ok().map(u64::from))?;
@@ -561,8 +589,11 @@ impl EngineExecutor<'_> {
             Dim::Uf => {
                 let mut out = BTreeMap::new();
                 for (id, count) in groups {
-                    if let Some(uf) = self.context.municipalities.get(id).and_then(major_uf) {
-                        *out.entry(u64::from(uf)).or_default() += i64::try_from(count)?;
+                    if let Some(opencnpj_insights::catalog::municipalities::Place::Municipality(geo)) =
+                        self.context.municipalities.get(id).map(|row| &row.place)
+                        && let Some(uf) = agg::uf_id(&geo.uf)
+                    {
+                        *out.entry(u64::from(uf.0)).or_default() += i64::try_from(count)?;
                     }
                 }
                 Ok(out)
@@ -584,7 +615,7 @@ impl EngineExecutor<'_> {
     fn region_of(&self, id: u16, level: RegionLevel) -> Option<u64> {
         let row = self.context.municipalities.get(id)?;
         match (&row.place_level(), level) {
-            (Level::Municipality(_), RegionLevel::Major) => major_uf(row).and_then(opencnpj_insights::execute::major_region).map(u64::from),
+            (Level::Municipality(geo), RegionLevel::Major) => crate::oracle::macro_region(&geo.uf).map(u64::from),
             (Level::Municipality(geo), RegionLevel::Intermediate) => Some(u64::from(geo.intermediate_region)),
             (Level::Municipality(geo), RegionLevel::Immediate) => Some(u64::from(geo.immediate_region)),
             _ => None,
@@ -592,18 +623,7 @@ impl EngineExecutor<'_> {
     }
 
     fn place_population(&self, request: &Request, reference: PopulationRef) -> u64 {
-        let (municipalities, ufs) = resolve_place(self.context.municipalities, &request.scope.place, &request.scope.within_ufs).unwrap();
-        let range = request.scope.place_population.map(|range| (range.from.unwrap_or(0), range.to.unwrap_or(u32::MAX)));
-        let exclude_municipalities: BTreeSet<u16> = request.scope.exclude.municipalities.iter().map(|id| id.0).collect();
-        let exclude_ufs: BTreeSet<u8> = request.scope.exclude.ufs.iter().map(|uf| uf.0).collect();
-        let scope = PopulationScope {
-            municipalities: municipalities.as_ref(),
-            ufs: ufs.as_ref(),
-            range,
-            exclude_municipalities: &exclude_municipalities,
-            exclude_ufs: &exclude_ufs,
-        };
-        place_population_for(self.context.municipalities, &scope, reference)
+        crate::oracle::population(self.context.municipalities, request, None, reference).expect("oracle population")
     }
 
     fn member_population(&self, request: &Request, key: u64, dim: Dim, _metric: Metric) -> u64 {
@@ -611,18 +631,7 @@ impl EngineExecutor<'_> {
             Some(Metric::Per10k(reference) | Metric::InhabitantsPer(reference)) => reference,
             _ => self.context.municipalities.default_population(),
         });
-        let (municipalities, ufs) = resolve_place(self.context.municipalities, &request.scope.place, &request.scope.within_ufs).unwrap();
-        let range = request.scope.place_population.map(|range| (range.from.unwrap_or(0), range.to.unwrap_or(u32::MAX)));
-        let exclude_municipalities: BTreeSet<u16> = request.scope.exclude.municipalities.iter().map(|id| id.0).collect();
-        let exclude_ufs: BTreeSet<u8> = request.scope.exclude.ufs.iter().map(|uf| uf.0).collect();
-        let scope = PopulationScope {
-            municipalities: municipalities.as_ref(),
-            ufs: ufs.as_ref(),
-            range,
-            exclude_municipalities: &exclude_municipalities,
-            exclude_ufs: &exclude_ufs,
-        };
-        member_population_for(self.context.municipalities, key, dim, &scope, reference)
+        crate::oracle::population(self.context.municipalities, request, Some((dim, key)), reference).expect("oracle population")
     }
 }
 
@@ -646,39 +655,11 @@ impl PlaceLevel for opencnpj_insights::catalog::municipalities::Municipality {
 
 fn cnae_key(level: CnaeLevel, cnae: u32) -> u64 {
     match level {
-        CnaeLevel::Section => u64::from(section_of(cnae)),
+        CnaeLevel::Section => unreachable!("sections are counted with the engine's section filter"),
         CnaeLevel::Division => u64::from(cnae / 100_000),
         CnaeLevel::Group => u64::from(cnae / 10_000),
         CnaeLevel::Class => u64::from(cnae / 100),
         CnaeLevel::Subclass => u64::from(cnae),
-    }
-}
-
-fn section_of(cnae: u32) -> u8 {
-    match cnae / 100_000 {
-        1..=3 => b'A',
-        5..=9 => b'B',
-        10..=33 => b'C',
-        35 => b'D',
-        36..=39 => b'E',
-        41..=43 => b'F',
-        45..=47 => b'G',
-        49..=53 => b'H',
-        55..=56 => b'I',
-        58..=63 => b'J',
-        64..=66 => b'K',
-        68 => b'L',
-        69..=75 => b'M',
-        77..=82 => b'N',
-        84 => b'O',
-        85 => b'P',
-        86..=88 => b'Q',
-        90..=93 => b'R',
-        94..=96 => b'S',
-        97 => b'T',
-        99 => b'U',
-        // Divisions that do not exist in CNAE 2.x.
-        _ => b'?',
     }
 }
 
@@ -963,8 +944,23 @@ pub fn diff(args: DiffArgs) -> Result<()> {
                 let historical = request.time.competence != current;
                 let active_change = matches!(request.op.metric(), Some(Metric::ActiveChange { .. }));
                 if historical || active_change {
-                    println!("aggregate-only\t{case}\t{aggregate:?}");
-                    aggregate_only += 1;
+                    // The engine has no past snapshots: check these against the artifacts'
+                    // raw marginal sections instead, when the request shape allows it.
+                    match crate::oracle::marginal_value(request, &aggregates, &sectors)? {
+                        Some(expected) if expected == aggregate => {
+                            println!("marginal-match\t{case}");
+                            compared += 1;
+                        }
+                        Some(expected) => {
+                            println!("MISMATCH\t{case}\taggregate={aggregate:?}\tmarginals={expected:?}");
+                            compared += 1;
+                            mismatches += 1;
+                        }
+                        None => {
+                            println!("aggregate-only\t{case}\t{aggregate:?}");
+                            aggregate_only += 1;
+                        }
+                    }
                     continue;
                 }
                 match engine.execute(&valid) {

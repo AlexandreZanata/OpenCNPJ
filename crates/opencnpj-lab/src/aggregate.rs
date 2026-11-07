@@ -15,7 +15,7 @@ use opencnpj_insights::{
     },
     catalog::municipalities::MunicipalityCatalogue,
 };
-use opencnpj_query::ir::Competence;
+use opencnpj_query::ir::{Competence, UfId};
 use opencnpj_store::{
     Snapshot,
     numeric::{NumField, Range},
@@ -196,6 +196,51 @@ impl Oracle<'_> {
             }
             println!("{section:?}: {} groups, {total} counts, match the engine", actual.len());
         }
+        self.check_uf_cnae(aggregate, table, &query)
+    }
+
+    /// UF × main-CNAE marginals: one engine group-by on CNAE per UF. Keys with a missing UF
+    /// are skipped (the engine cannot filter on "no UF"); keys with a missing CNAE carry the
+    /// UF's remainder.
+    fn check_uf_cnae(&self, aggregate: &Aggregate, table: Table, query: &Query) -> Result<()> {
+        let mut actual = BTreeMap::new();
+        for cell in aggregate.cells(Section::UfCnae(table)) {
+            let Cell { key, count } = cell?;
+            if (key >> 24) as u8 != UF_MISSING {
+                actual.insert(key, count);
+            }
+        }
+        let mut expected = BTreeMap::new();
+        for uf in 0..UF_MISSING {
+            let Some(code) = uf_code(UfId(uf)) else { continue };
+            let mut per_uf = query.clone();
+            per_uf.filters.push((Field::Uf, vec![code.to_string()]));
+            let Some(docs) = search::candidates(self.snapshot, &per_uf, &Limits::DEFAULT)?.all else { continue };
+            if docs.is_empty() {
+                continue;
+            }
+            let base = u64::from(uf) << 24;
+            let mut with_cnae = 0;
+            for (cnae, count) in search::group_counts(self.snapshot, &per_uf, Field::Cnae, &Limits::DEFAULT)? {
+                expected.insert(base | cnae.parse::<u64>()?, count);
+                with_cnae += count;
+            }
+            let absent = docs.len().checked_sub(with_cnae).context("CNAE groups exceed the UF total")?;
+            if absent > 0 {
+                expected.insert(base, absent);
+            }
+        }
+        for key in expected.keys().chain(actual.keys()) {
+            ensure!(
+                expected.get(key) == actual.get(key),
+                "UfCnae({table:?}) key uf {} cnae {}: aggregate {:?}, engine {:?}",
+                key >> 24,
+                key & 0xFF_FFFF,
+                actual.get(key),
+                expected.get(key)
+            );
+        }
+        println!("UfCnae({table:?}): {} groups match the engine", actual.len());
         Ok(())
     }
 

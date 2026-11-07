@@ -155,6 +155,135 @@
     },
     "understood": "estabelecimentos · todas as atividades · a região Nordeste · RFB 2026-10"
   },
+  "breakdown_cnae_section_brazil": {
+    "blocks": [
+      {
+        "text": "A distribuição de estabelecimentos ativos no Brasil tem 3 grupos; os maiores são G (187), H (147) e I (107).",
+        "type": "text"
+      },
+      {
+        "kind": "bar",
+        "series": [
+          {
+            "label": "G",
+            "value": 187.0
+          },
+          {
+            "label": "H",
+            "value": 147.0
+          },
+          {
+            "label": "I",
+            "value": 107.0
+          }
+        ],
+        "type": "chart"
+      },
+      {
+        "columns": [
+          "CNAE",
+          "Valor"
+        ],
+        "rows": [
+          [
+            "G",
+            "187"
+          ],
+          [
+            "H",
+            "147"
+          ],
+          [
+            "I",
+            "107"
+          ]
+        ],
+        "total": null,
+        "type": "table"
+      },
+      {
+        "items": [
+          "Atividade: todas",
+          "Situação cadastral: ativa",
+          "Unidade: estabelecimento (CNPJ completo)"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "dim": {
+          "cnae": "section"
+        },
+        "kind": "breakdown",
+        "metric": "stock"
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": "any",
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": "any",
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "active"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": null
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Ver por município",
+      "Comparar dois grupos"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · todas as atividades · o Brasil · RFB 2026-10"
+  },
   "breakdown_porte": {
     "blocks": [
       {
@@ -1116,6 +1245,120 @@
     },
     "understood": "estabelecimentos · padaria · o Brasil · RFB 2026-10"
   },
+  "count_section_i_mt": {
+    "blocks": [
+      {
+        "text": "Segundo a base da Receita Federal de outubro de 2026, Mato Grosso tem 187 estabelecimentos ativos de CNAE I.",
+        "type": "text"
+      },
+      {
+        "label": "Estabelecimentos ativos",
+        "type": "kpi",
+        "value": "187"
+      },
+      {
+        "items": [
+          "Atividade: CNAE I (CNAE principal)",
+          "Situação cadastral: ativa",
+          "Unidade: estabelecimento (CNPJ completo)"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      },
+      {
+        "items": [
+          {
+            "id": "C-SECT",
+            "text": "Atividade principal: CNAE I."
+          }
+        ],
+        "type": "caveats"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "kind": "count",
+        "metric": "stock"
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": {
+          "cnae": {
+            "codes": [
+              {
+                "section": 73
+              }
+            ],
+            "scope": "main"
+          }
+        },
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": {
+          "ufs": [
+            12
+          ]
+        },
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "active"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": null
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Ver por porte",
+      "Listar os estabelecimentos",
+      "Só matrizes"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · CNAE I · Mato Grosso · RFB 2026-10"
+  },
   "density_census_mt": {
     "blocks": [
       {
@@ -1214,6 +1457,144 @@
         },
         "place_population": null,
         "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "active"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": null
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Ver por porte",
+      "Listar os estabelecimentos",
+      "Só matrizes"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · farmácia · Mato Grosso · RFB 2026-10"
+  },
+  "density_small_towns_mt": {
+    "blocks": [
+      {
+        "text": "Em outubro de 2026, Mato Grosso tem 18,7 estabelecimentos ativos de farmácia por dez mil habitantes (população de 100.000, IBGE estimativa 2026).",
+        "type": "text"
+      },
+      {
+        "label": "Estabelecimentos ativos por dez mil habitantes",
+        "type": "kpi",
+        "value": "18,7"
+      },
+      {
+        "items": [
+          "Atividade: farmácias (CNAE principal)",
+          "Situação cadastral: ativa",
+          "Unidade: estabelecimento (CNPJ completo)",
+          "Municípios com população até 50.000 habitantes",
+          "População: IBGE estimativa 2026"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      },
+      {
+        "items": [
+          {
+            "id": "C-DENS",
+            "text": "Densidade por habitante não indica, sozinha, oportunidade de mercado. População: IBGE estimativa 2026."
+          },
+          {
+            "id": "C-SECT",
+            "text": "Atividade principal: CNAE 4771-7/01, 4771-7/02 e 4771-7/03."
+          }
+        ],
+        "type": "caveats"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "kind": "count",
+        "metric": {
+          "per10k": {
+            "ibge_estimate": 2026
+          }
+        }
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": {
+          "sectors": {
+            "cnaes": [
+              {
+                "subclass": 4771701
+              },
+              {
+                "subclass": 4771702
+              },
+              {
+                "subclass": 4771703
+              }
+            ],
+            "ids": [
+              2
+            ],
+            "scope": "main"
+          }
+        },
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": {
+          "ufs": [
+            12
+          ]
+        },
+        "place_population": {
+          "from": null,
+          "to": 50000
+        },
+        "population_ref": {
+          "ibge_estimate": 2026
+        },
         "porte": [
           "unreported",
           "micro",

@@ -3,6 +3,7 @@
 mod aggregate;
 mod catalog;
 mod eval;
+mod oracle;
 mod query;
 mod synth;
 
