@@ -3,7 +3,7 @@
 [[sector]]
 id = "accounting"
 display = { sing = "escritório de contabilidade", plural = "escritórios de contabilidade", gender = "m" }
-aliases = ["contador", "contadora", "contadores", "contadoras"]
+aliases = ["contador", "contadora", "contadores", "contadoras", "contabilidade", "escritório de contabilidade", "escritórios de contabilidade", "contábil"]
 cnae_core = ["6920601"]
 cnae_extended = []
 scope = "main"
@@ -157,8 +157,8 @@ since = "v1"
 [[sector]]
 id = "beauty_salon"
 display = { sing = "salão de beleza", plural = "salões de beleza", gender = "m" }
-aliases = ["cabeleireiro", "cabeleireira", "cabeleireiros", "cabeleireiras"]
-cnae_core = ["9602501"]
+aliases = ["cabeleireiro", "cabeleireira", "cabeleireiros", "cabeleireiras", "salão de beleza", "salões de beleza", "barbearia", "barbearias", "estética"]
+cnae_core = ["9602501", "9602502"]
 cnae_extended = []
 scope = "main"
 since = "v1"
@@ -230,8 +230,8 @@ since = "v1"
 id = "building_materials"
 display = { sing = "loja de materiais de construção", plural = "lojas de materiais de construção", gender = "f" }
 aliases = ["material de construção", "materiais de construção"]
-cnae_core = ["4744099"]
-cnae_extended = ["4744001", "4744002", "4744003", "4744004", "4744005", "4744006"]
+cnae_core = ["4744005", "4744099"]
+cnae_extended = ["4744001", "4744002", "4744003", "4744004", "4744006"]
 scope = "main"
 since = "v1"
 
@@ -782,7 +782,7 @@ since = "v1"
 [[sector]]
 id = "grocery"
 display = { sing = "mercadinho", plural = "mercadinhos", gender = "m" }
-aliases = ["mercearia", "mercearias", "minimercado", "minimercados"]
+aliases = ["mercearia", "mercearias", "minimercado", "minimercados", "mercado", "mercados", "mercadinho", "mercadinhos"]
 cnae_core = ["4712100"]
 cnae_extended = []
 scope = "main"
@@ -935,7 +935,7 @@ since = "v1"
 [[sector]]
 id = "it_services"
 display = { sing = "serviço de tecnologia da informação", plural = "serviços de tecnologia da informação", gender = "m" }
-aliases = ["tecnologia", "informática", "serviços de TI"]
+aliases = ["tecnologia", "informática", "serviços de TI", "ti", "tecnologia da informação"]
 cnae_core = ["6201501", "6201502", "6202300", "6203100", "6204000", "6209100"]
 cnae_extended = ["6311900"]
 scope = "main"
@@ -990,7 +990,7 @@ since = "v1"
 [[sector]]
 id = "law_firm"
 display = { sing = "escritório de advocacia", plural = "escritórios de advocacia", gender = "m" }
-aliases = ["advogado", "advogada", "advogados", "advogadas"]
+aliases = ["advogado", "advogada", "advogados", "advogadas", "advocacia", "escritório de advocacia", "escritórios de advocacia"]
 cnae_core = ["6911701"]
 cnae_extended = []
 scope = "main"
@@ -1449,7 +1449,7 @@ since = "v1"
 [[sector]]
 id = "real_estate_broker"
 display = { sing = "corretor de imóveis", plural = "corretores de imóveis", gender = "m" }
-aliases = ["corretora de imóveis", "corretoras de imóveis", "corretagem imobiliária"]
+aliases = ["corretora de imóveis", "corretoras de imóveis", "corretagem imobiliária", "imobiliária", "imobiliárias"]
 cnae_core = ["6821801", "6821802"]
 cnae_extended = []
 scope = "main"
@@ -1744,12 +1744,14 @@ cnae_core = [
     "4929999", "4930201", "4930202", "4930203", "4930204", "4940000", "4950700", "5011401",
     "5011402", "5012201", "5012202", "5021101", "5021102", "5022001", "5022002", "5030101",
     "5030102", "5030103", "5091201", "5091202", "5099801", "5099899", "5111100", "5112901",
-    "5112999", "5120000", "5130700", "5211701", "5211702", "5211799", "5212500", "5221400",
-    "5222200", "5223100", "5229001", "5229002", "5229099", "5231101", "5231102", "5231103",
-    "5232000", "5239701", "5239799", "5240101", "5240199", "5250801", "5250802", "5250803",
-    "5250804", "5250805", "5310501", "5310502", "5320201", "5320202",
+    "5112999", "5120000", "5130700",
 ]
-cnae_extended = []
+cnae_extended = [
+    "5211701", "5211702", "5211799", "5212500", "5221400", "5222200", "5223100", "5229001",
+    "5229002", "5229099", "5231101", "5231102", "5231103", "5232000", "5239701", "5239799",
+    "5240101", "5240199", "5250801", "5250802", "5250803", "5250804", "5250805", "5310501",
+    "5310502", "5320201", "5320202",
+]
 scope = "main"
 since = "v1"
 notes = "Shared aliases require a clarification before selecting a sector."
@@ -1766,7 +1768,7 @@ since = "v1"
 [[sector]]
 id = "truck_freight"
 display = { sing = "transportadora rodoviária de cargas", plural = "transportadoras rodoviárias de cargas", gender = "f" }
-aliases = ["transporte rodoviário de carga", "frete rodoviário", "transportadora", "transportadoras"]
+aliases = ["transporte rodoviário de carga", "frete rodoviário", "transportadora", "transportadoras", "transporte de carga", "transporte de cargas"]
 cnae_core = ["4930201", "4930202"]
 cnae_extended = ["4930203", "4930204"]
 scope = "main"
@@ -1905,5 +1907,39 @@ display = { sing = "fábrica de uniformes profissionais", plural = "fábricas de
 aliases = ["confecção de uniformes", "confecção de roupas profissionais"]
 cnae_core = ["1413401"]
 cnae_extended = ["1413402"]
+scope = "main"
+since = "v1"
+
+[[sector]]
+id = "school"
+display = { sing = "escola", plural = "escolas", gender = "f" }
+aliases = ["escola", "escolas", "colégio", "colégios"]
+cnae_core = ["8512100", "8513900", "8520100"]
+cnae_extended = ["8511200"]
+scope = "main"
+since = "v1"
+
+[[sector]]
+id = "civil_construction"
+display = { sing = "empresa de construção civil", plural = "empresas de construção civil", gender = "f" }
+aliases = ["construção", "construção civil", "construtora", "construtoras"]
+cnae_core = [
+    "4110700", "4120400", "4211101", "4211102", "4212000", "4213800", "4221901", "4221902",
+    "4221903", "4221904", "4221905", "4222701", "4222702", "4223500", "4291000", "4292801",
+    "4292802", "4299501", "4299599", "4311801", "4311802", "4312600", "4313400", "4319300",
+    "4321500", "4322301", "4322302", "4322303", "4329101", "4329102", "4329103", "4329104",
+    "4329105", "4329199", "4330401", "4330402", "4330403", "4330404", "4330405", "4330499",
+    "4391600", "4399101", "4399102", "4399103", "4399104", "4399105", "4399199",
+]
+cnae_extended = []
+scope = "main"
+since = "v1"
+
+[[sector]]
+id = "passenger_transport"
+display = { sing = "empresa de transporte de passageiros", plural = "empresas de transporte de passageiros", gender = "f" }
+aliases = ["transporte de passageiros", "transporte coletivo"]
+cnae_core = ["4921301", "4921302", "4922101", "4922102", "4922103", "4929901", "4929902", "4929903", "4929904", "4929999"]
+cnae_extended = ["4923001", "4923002"]
 scope = "main"
 since = "v1"
