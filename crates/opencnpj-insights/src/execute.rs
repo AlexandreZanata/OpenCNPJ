@@ -51,6 +51,9 @@ impl AggregateSet {
                 if aggregate.manifest().competence != competence {
                     bail!("{} declares competence {} in its manifest", path.display(), aggregate.manifest().competence);
                 }
+                if aggregate.manifest().municipality_sha256 != current.manifest().municipality_sha256 {
+                    bail!("{} was built with another municipality catalogue", path.display());
+                }
                 historical.insert(competence, aggregate);
             }
         }
@@ -503,6 +506,11 @@ fn stock_matches(table: Table, key: Key, filters: &Filters, context: &ExecContex
 }
 
 fn for_each_cell(aggregate: &Aggregate, table: Table, filters: &Filters, mut visit: impl FnMut(Key, u64) -> Result<()>) -> Result<()> {
+    // A table missing from the artifact must fail, not read as zero (a current artifact
+    // built with `--tables T1,T2` made every flow answer 0).
+    if !aggregate.manifest().tables.contains(&table) {
+        bail!("aggregate {} has no table {table:?}", aggregate.manifest().competence);
+    }
     let exact = filters
         .cnaes
         .as_ref()

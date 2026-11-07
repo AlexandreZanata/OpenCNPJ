@@ -7,6 +7,7 @@ use std::{
 
 use anyhow::{Context, Result, bail, ensure};
 use opencnpj::{params, params::Caps};
+use opencnpj_ingest::source::sha256_file;
 use opencnpj_insights::{
     agg,
     catalog::municipalities::MunicipalityCatalogue,
@@ -901,6 +902,10 @@ pub fn diff(args: DiffArgs) -> Result<()> {
     let catalogue = MunicipalityCatalogue::load(&args.catalog)?;
     let sectors = load_sectors(&args.sectors)?;
     let aggregates = opencnpj_insights::execute::AggregateSet::open(&args.agg, args.history.as_deref())?;
+    ensure!(
+        sha256_file(&args.catalog)? == aggregates.current().manifest().municipality_sha256,
+        "aggregate uses another municipality catalogue"
+    );
     let context = ExecContext::new(&catalogue, &sectors);
     let snapshot = Snapshot::open(&args.snapshot)?;
     snapshot.set_postings_cache_bytes(512 << 20);
@@ -1253,6 +1258,10 @@ pub fn bench(args: DiffArgs) -> Result<()> {
     let catalogue = MunicipalityCatalogue::load(&args.catalog)?;
     let sectors = load_sectors(&args.sectors)?;
     let aggregates = AggregateSet::open(&args.agg, args.history.as_deref())?;
+    ensure!(
+        sha256_file(&args.catalog)? == aggregates.current().manifest().municipality_sha256,
+        "aggregate uses another municipality catalogue"
+    );
     let context = ExecContext::new(&catalogue, &sectors);
     let snapshot = Snapshot::open(&args.snapshot)?;
     snapshot.set_postings_cache_bytes(512 << 20);
