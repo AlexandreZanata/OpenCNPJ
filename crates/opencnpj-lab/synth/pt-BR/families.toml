@@ -9,7 +9,7 @@ status = "active?"
 place = "municipality"
 sector = true
 authors = ["synth-a", "synth-b"]
-templates = ["{quant} {sector.plural} {exist} {place.prep}", "qual o número de {sector.plural} {status?} {place.prep}", "{place} tem {quant} {sector.plural}", "me diz {quant} {sector.plural} t{place.prep}", "conta pra mim {sector.art_plural} {sector.plural} {place.de}", "existem muit{sector.art_plural} {sector.plural} {place.prep}", "tem {quant} {sector.plural} {status?} {place.prep}", "gostaria de saber {quant} {sector.plural} {exist} {place.prep}"]
+templates = ["{quant} {sector.plural} {exist} {place.prep}", "qual o número de {sector.plural} {status?} {place.prep}", "{place} tem {quant} {sector.plural}", "me diz {quant} {sector.plural} tem {place.prep}", "conta pra mim {sector.art_plural} {sector.plural} {place.de}", "existem muit{sector.art_plural} {sector.plural} {place.prep}", "tem {quant} {sector.plural} {status?} {place.prep}", "gostaria de saber {quant} {sector.plural} {exist} {place.prep}"]
 
 [[family]]
 id = "count.stock.sector_br"
@@ -31,7 +31,7 @@ status = "active?"
 place = "municipality"
 sector = false
 authors = ["synth-a", "synth-b"]
-templates = ["quantas empresas {exist} {place.prep}", "qual o número de estabelecimentos {place.prep}", "me diz quantas empresas t{place.prep}", "quantos estabelecimentos ativos {exist} {place.prep}", "conta os estabelecimentos {place.de}", "existem quantas empresas {place.prep}", "quero o total de estabelecimentos {place.prep}", "quantas empresas {status?} t{place.prep}"]
+templates = ["quantas empresas {exist} {place.prep}", "qual o número de estabelecimentos {place.prep}", "me diz quantas empresas tem {place.prep}", "quantos estabelecimentos ativos {exist} {place.prep}", "conta os estabelecimentos {place.de}", "existem quantas empresas {place.prep}", "quero o total de estabelecimentos {place.prep}", "quantas empresas {status?} tem {place.prep}"]
 
 [[family]]
 id = "count.stock.status"
@@ -42,7 +42,7 @@ status = "closed"
 place = "municipality"
 sector = true
 authors = ["synth-a", "synth-b"]
-templates = ["{quant} {sector.plural} {status?} {exist} {place.prep}", "qual o número de {sector.plural} {status?} {place.prep}", "me diz {quant} {sector.plural} {status?} t{place.prep}", "tem {quant} {sector.plural} {status?} {place.prep}", "conta {sector.art_plural} {sector.plural} {status?} {place.de}", "{quant} {sector.plural} {exist} {status?} {place.prep}", "quero saber {quant} {sector.plural} {status?} {exist} {place.prep}", "existem {sector.plural} {status?} {place.prep}"]
+templates = ["{quant} {sector.plural} {status?} {exist} {place.prep}", "qual o número de {sector.plural} {status?} {place.prep}", "me diz {quant} {sector.plural} {status?} tem {place.prep}", "tem {quant} {sector.plural} {status?} {place.prep}", "conta {sector.art_plural} {sector.plural} {status?} {place.de}", "{quant} {sector.plural} {exist} {status?} {place.prep}", "quero saber {quant} {sector.plural} {status?} {exist} {place.prep}", "existem {sector.plural} {status?} {place.prep}"]
 
 [[family]]
 id = "count.stock.porte"
@@ -53,7 +53,7 @@ status = "active?"
 place = "municipality"
 sector = true
 authors = ["synth-a", "synth-b"]
-templates = ["{quant} {sector.plural} de porte {porte} {exist} {place.prep}", "qual o número de {sector.plural} {porte} {place.prep}", "me diz {quant} {sector.plural} {porte} t{place.prep}", "tem {quant} {sector.plural} {porte} {place.prep}", "conta {sector.art_plural} {sector.plural} {porte} {place.de}", "{quant} {sector.plural} {porte} {status?} {exist} {place.prep}", "quero saber o total de {sector.plural} {porte} {place.prep}", "existem {sector.plural} {porte} {place.prep}"]
+templates = ["{quant} {sector.plural} de porte {porte} {exist} {place.prep}", "qual o número de {sector.plural} {porte} {place.prep}", "me diz {quant} {sector.plural} {porte} tem {place.prep}", "tem {quant} {sector.plural} {porte} {place.prep}", "conta {sector.art_plural} {sector.plural} {porte} {place.de}", "{quant} {sector.plural} {porte} {status?} {exist} {place.prep}", "quero saber o total de {sector.plural} {porte} {place.prep}", "existem {sector.plural} {porte} {place.prep}"]
 
 [[family]]
 id = "count.stock.mei"
@@ -64,7 +64,7 @@ status = "active?"
 place = "municipality"
 sector = true
 authors = ["synth-a", "synth-b"]
-templates = ["{quant} {sector.plural} de MEI {exist} {place.prep}", "qual o número de {sector.plural} MEI {place.prep}", "me diz {quant} {sector.plural} MEI t{place.prep}", "tem {quant} {sector.plural} MEI {place.prep}", "conta {sector.art_plural} {sector.plural} MEI {place.de}", "{quant} {sector.plural} MEI {exist} {place.prep}", "quero o total de {sector.plural} MEI {place.prep}", "existem {sector.plural} MEI {place.prep}"]
+templates = ["{quant} {sector.plural} de MEI {exist} {place.prep}", "qual o número de {sector.plural} MEI {place.prep}", "me diz {quant} {sector.plural} MEI tem {place.prep}", "tem {quant} {sector.plural} MEI {place.prep}", "conta {sector.art_plural} {sector.plural} MEI {place.de}", "{quant} {sector.plural} MEI {exist} {place.prep}", "quero o total de {sector.plural} MEI {place.prep}", "existem {sector.plural} MEI {place.prep}"]
 
 [[family]]
 id = "count.stock.density"
@@ -75,7 +75,7 @@ status = "active?"
 place = "municipality"
 sector = true
 authors = ["synth-a", "synth-b"]
-templates = ["qual a densidade de {sector.plural} por dez mil habitantes {place.prep}", "{quant} {sector.plural} por dez mil habitantes t{place.prep}", "me diz a densidade de {sector.plural} {place.prep}", "tem {quant} {sector.plural} por dez mil habitantes {place.prep}", "qual a concentração de {sector.plural} por habitante {place.prep}", "quero a densidade de {sector.plural} {place.prep}", "{quant} {sector.plural} por dez mil pessoas {exist} {place.prep}", "mostra a densidade de {sector.plural} {place.de}"]
+templates = ["qual a densidade de {sector.plural} por dez mil habitantes {place.prep}", "{quant} {sector.plural} por dez mil habitantes tem {place.prep}", "me diz a densidade de {sector.plural} {place.prep}", "tem {quant} {sector.plural} por dez mil habitantes {place.prep}", "qual a concentração de {sector.plural} por habitante {place.prep}", "quero a densidade de {sector.plural} {place.prep}", "{quant} {sector.plural} por dez mil pessoas {exist} {place.prep}", "mostra a densidade de {sector.plural} {place.de}"]
 
 [[family]]
 id = "count.stock.change"
@@ -596,7 +596,7 @@ status = "closed"
 place = "municipality"
 sector = true
 authors = ["synth-a", "synth-b"]
-templates = ["{quant} {sector.plural} {status?} {exist} {place.prep}", "qual o número de {sector.plural} {status?} {place.prep}", "me diz {quant} {sector.plural} {status?} t{place.prep}", "tem {quant} {sector.plural} {status?} {place.prep}", "conta {sector.art_plural} {sector.plural} {status?} {place.de}", "{quant} {sector.plural} {exist} {status?} {place.prep}", "quero saber {quant} {sector.plural} {status?} {exist} {place.prep}", "existem {sector.plural} {status?} {place.prep}"]
+templates = ["{quant} {sector.plural} {status?} {exist} {place.prep}", "qual o número de {sector.plural} {status?} {place.prep}", "me diz {quant} {sector.plural} {status?} tem {place.prep}", "tem {quant} {sector.plural} {status?} {place.prep}", "conta {sector.art_plural} {sector.plural} {status?} {place.de}", "{quant} {sector.plural} {exist} {status?} {place.prep}", "quero saber {quant} {sector.plural} {status?} {exist} {place.prep}", "existem {sector.plural} {status?} {place.prep}"]
 
 [[family]]
 id = "dialogue.add_filter"
@@ -607,7 +607,7 @@ status = "active?"
 place = "municipality"
 sector = true
 authors = ["synth-a", "synth-b"]
-templates = ["{quant} {sector.plural} {status?} {exist} {place.prep}", "qual o número de {sector.plural} {status?} {place.prep}", "me diz {quant} {sector.plural} {status?} t{place.prep}", "tem {quant} {sector.plural} {status?} {place.prep}", "conta {sector.art_plural} {sector.plural} {status?} {place.de}", "{quant} {sector.plural} {exist} {status?} {place.prep}", "quero saber {quant} {sector.plural} {status?} {exist} {place.prep}", "existem {sector.plural} {status?} {place.prep}"]
+templates = ["{quant} {sector.plural} {status?} {exist} {place.prep}", "qual o número de {sector.plural} {status?} {place.prep}", "me diz {quant} {sector.plural} {status?} tem {place.prep}", "tem {quant} {sector.plural} {status?} {place.prep}", "conta {sector.art_plural} {sector.plural} {status?} {place.de}", "{quant} {sector.plural} {exist} {status?} {place.prep}", "quero saber {quant} {sector.plural} {status?} {exist} {place.prep}", "existem {sector.plural} {status?} {place.prep}"]
 
 [[family]]
 id = "dialogue.remove_filter"
@@ -618,7 +618,7 @@ status = "active?"
 place = "municipality"
 sector = true
 authors = ["synth-a", "synth-b"]
-templates = ["{quant} {sector.plural} {exist} {place.prep}", "qual o número de {sector.plural} {status?} {place.prep}", "{place} tem {quant} {sector.plural}", "me diz {quant} {sector.plural} t{place.prep}", "conta pra mim {sector.art_plural} {sector.plural} {place.de}", "existem muit{sector.art_plural} {sector.plural} {place.prep}", "tem {quant} {sector.plural} {status?} {place.prep}", "gostaria de saber {quant} {sector.plural} {exist} {place.prep}"]
+templates = ["{quant} {sector.plural} {exist} {place.prep}", "qual o número de {sector.plural} {status?} {place.prep}", "{place} tem {quant} {sector.plural}", "me diz {quant} {sector.plural} tem {place.prep}", "conta pra mim {sector.art_plural} {sector.plural} {place.de}", "existem muit{sector.art_plural} {sector.plural} {place.prep}", "tem {quant} {sector.plural} {status?} {place.prep}", "gostaria de saber {quant} {sector.plural} {exist} {place.prep}"]
 
 [[family]]
 id = "dialogue.answer_clarification"
@@ -629,7 +629,7 @@ status = "active?"
 place = "municipality"
 sector = true
 authors = ["synth-a", "synth-b"]
-templates = ["{quant} {sector.plural} {exist} {place.prep}", "qual o número de {sector.plural} {status?} {place.prep}", "{place} tem {quant} {sector.plural}", "me diz {quant} {sector.plural} t{place.prep}", "conta pra mim {sector.art_plural} {sector.plural} {place.de}", "existem muit{sector.art_plural} {sector.plural} {place.prep}", "tem {quant} {sector.plural} {status?} {place.prep}", "gostaria de saber {quant} {sector.plural} {exist} {place.prep}"]
+templates = ["{quant} {sector.plural} {exist} {place.prep}", "qual o número de {sector.plural} {status?} {place.prep}", "{place} tem {quant} {sector.plural}", "me diz {quant} {sector.plural} tem {place.prep}", "conta pra mim {sector.art_plural} {sector.plural} {place.de}", "existem muit{sector.art_plural} {sector.plural} {place.prep}", "tem {quant} {sector.plural} {status?} {place.prep}", "gostaria de saber {quant} {sector.plural} {exist} {place.prep}"]
 
 [[family]]
 id = "dialogue.compare_focus"
@@ -652,7 +652,7 @@ status = "active?"
 place = "municipality"
 sector = true
 authors = ["synth-a", "synth-b"]
-templates = ["{quant} {sector.plural} {exist} {place.prep}", "qual o número de {sector.plural} {status?} {place.prep}", "{place} tem {quant} {sector.plural}", "me diz {quant} {sector.plural} t{place.prep}", "conta pra mim {sector.art_plural} {sector.plural} {place.de}", "existem muit{sector.art_plural} {sector.plural} {place.prep}", "tem {quant} {sector.plural} {status?} {place.prep}", "gostaria de saber {quant} {sector.plural} {exist} {place.prep}"]
+templates = ["{quant} {sector.plural} {exist} {place.prep}", "qual o número de {sector.plural} {status?} {place.prep}", "{place} tem {quant} {sector.plural}", "me diz {quant} {sector.plural} tem {place.prep}", "conta pra mim {sector.art_plural} {sector.plural} {place.de}", "existem muit{sector.art_plural} {sector.plural} {place.prep}", "tem {quant} {sector.plural} {status?} {place.prep}", "gostaria de saber {quant} {sector.plural} {exist} {place.prep}"]
 
 [[family]]
 id = "reject.people"

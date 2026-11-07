@@ -722,8 +722,9 @@ fn sample(family: &FamilySpec, catalogues: &Catalogues, config: Config, split: S
     let uf_pool = pick_pool(&catalogues.ufs, split, |row| row.test_only);
     let coverage = config.coverage();
     let sample_index = |pool: &[usize], table_len: usize, rng: &mut Rng| -> usize {
-        let limit = (pool.len() * coverage / 100).max(1);
-        pool[rng.below(limit.min(pool.len()))].min(table_len - 1)
+        let limit = (pool.len() * coverage / 100).max(1).min(pool.len());
+        let position = rng.below(limit) * pool.len() / limit;
+        pool[position].min(table_len - 1)
     };
     let place = if family.place == "municipality" || family.slots.iter().any(|slot| slot == "place") {
         Some(sample_index(&municipality_pool, catalogues.municipalities.len(), rng))
@@ -1230,7 +1231,7 @@ fn noisify(text: String, rng: &mut Rng, split: Split) -> (String, Vec<String>, S
                     }
                 }
                 "fragment" => fragment(&text),
-                "phonetic" => phonetic(&text),
+                "phonetic" => phonetic(&text, rng),
                 "merged" => merged(&text, rng),
                 _ => text,
             };
@@ -1241,20 +1242,32 @@ fn noisify(text: String, rng: &mut Rng, split: Split) -> (String, Vec<String>, S
 }
 
 fn abbrev(text: &str) -> String {
-    let mut out = text.to_string();
-    for (from, to) in [
-        ("quantas", "qtas"),
-        ("número", "numero"),
-        ("você", "vc"),
-        ("por favor", "pfv"),
-        ("também", "tb"),
-        ("mesmo", "msm"),
-        ("para", "p/"),
-        ("com", "c/"),
-    ] {
-        out = out.replace(from, to);
+    // Whole words only: substring replacement turned "separa" into "sep/".
+    let words: Vec<&str> = text.split(' ').collect();
+    let mut out: Vec<String> = Vec::with_capacity(words.len());
+    let mut index = 0;
+    while index < words.len() {
+        if words[index] == "por" && words.get(index + 1) == Some(&"favor") {
+            out.push("pfv".to_string());
+            index += 2;
+            continue;
+        }
+        out.push(
+            match words[index] {
+                "quantas" => "qtas",
+                "número" => "numero",
+                "você" => "vc",
+                "também" => "tb",
+                "mesmo" => "msm",
+                "para" => "p/",
+                "com" => "c/",
+                other => other,
+            }
+            .to_string(),
+        );
+        index += 1;
     }
-    out
+    out.join(" ")
 }
 
 fn no_accent(text: &str) -> String {
@@ -1276,7 +1289,12 @@ fn typo(text: &str, rng: &mut Rng) -> String {
     if chars.len() < 4 {
         return text.into();
     }
-    let index = rng.below(chars.len() - 1);
+    // Typos must never change digits; only touch pairs of letters.
+    let valid: Vec<usize> = (0..chars.len() - 1).filter(|&i| chars[i].is_alphabetic() && chars[i + 1].is_alphabetic()).collect();
+    if valid.is_empty() {
+        return text.into();
+    }
+    let index = valid[rng.below(valid.len())];
     match rng.below(3) {
         0 => {
             chars.insert(index, chars[index]);
@@ -1291,8 +1309,51 @@ fn typo(text: &str, rng: &mut Rng) -> String {
     chars.into_iter().collect()
 }
 
-fn phonetic(text: &str) -> String {
-    text.replace('s', "ss").replace("ch", "x").replace('z', "s")
+fn phonetic(text: &str, rng: &mut Rng) -> String {
+    // Exactly one change at one rng-chosen position among the candidates present.
+    fn is_vowel(value: char) -> bool {
+        matches!(
+            value.to_lowercase().next().unwrap_or(value),
+            'a' | 'e' | 'i' | 'o' | 'u' | 'á' | 'à' | 'â' | 'ã' | 'é' | 'ê' | 'í' | 'ó' | 'ô' | 'õ' | 'ú' | 'ü'
+        )
+    }
+    enum Edit {
+        SsToS(usize),
+        CedillaToSs(usize),
+        ChToX(usize),
+        SToZ(usize),
+    }
+    let mut candidates = Vec::new();
+    for (index, _) in text.match_indices("ss") {
+        candidates.push(Edit::SsToS(index));
+    }
+    for (index, _) in text.match_indices("ç") {
+        candidates.push(Edit::CedillaToSs(index));
+    }
+    for (index, _) in text.match_indices("ch") {
+        candidates.push(Edit::ChToX(index));
+    }
+    let chars: Vec<(usize, char)> = text.char_indices().collect();
+    for position in 0..chars.len() {
+        let (byte, ch) = chars[position];
+        if ch != 's' {
+            continue;
+        }
+        let prev = position.checked_sub(1).map(|i| chars[i].1);
+        let next = chars.get(position + 1).map(|(_, c)| *c);
+        if prev.is_some_and(is_vowel) && next.is_some_and(is_vowel) {
+            candidates.push(Edit::SToZ(byte));
+        }
+    }
+    if candidates.is_empty() {
+        return text.to_string();
+    }
+    match &candidates[rng.below(candidates.len())] {
+        Edit::SsToS(index) => format!("{}s{}", &text[..*index], &text[index + 2..]),
+        Edit::CedillaToSs(index) => format!("{}ss{}", &text[..*index], &text[index + 'ç'.len_utf8()..]),
+        Edit::ChToX(index) => format!("{}x{}", &text[..*index], &text[index + 2..]),
+        Edit::SToZ(index) => format!("{}z{}", &text[..*index], &text[index + 1..]),
+    }
 }
 
 fn merged(text: &str, rng: &mut Rng) -> String {
@@ -1627,6 +1688,22 @@ mod tests {
         let b = write_dataset(&second, &directory.path().join("second")).unwrap();
         for name in ["train.jsonl", "val.jsonl", "test.jsonl", "dialogues.jsonl", "manifest.json"] {
             assert_eq!(fs::read(a.join(name)).unwrap(), fs::read(b.join(name)).unwrap(), "{name}");
+        }
+    }
+
+    #[test]
+    fn noise_helpers_keep_words_and_digits() {
+        assert_eq!(abbrev("separa para você"), "separa p/ vc");
+        for seed in 0..200u64 {
+            let mut rng = Rng::new(seed);
+            let out = typo("abc 2025 xyz", &mut rng);
+            assert!(out.contains("2025"), "seed {seed}: {out}");
+        }
+        for seed in 0..200u64 {
+            let mut rng = Rng::new(seed);
+            let out = phonetic("passa chácara asa", &mut rng);
+            let delta = out.len().abs_diff("passa chácara asa".len());
+            assert!(delta <= 1, "seed {seed}: {out}");
         }
     }
 
