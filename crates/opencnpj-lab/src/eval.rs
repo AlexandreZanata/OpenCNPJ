@@ -139,6 +139,9 @@ pub fn evaluate(items: &[Item], predictions: &[Prediction]) -> Metrics {
     let mut selective: Vec<(f64, bool)> = Vec::new();
     let mut clarified_gold = 0_u64;
     let mut rejected_gold = 0_u64;
+    // Items whose gold decision is clarify or reject but that were executed anyway: always
+    // wrong answers, and part of the accepted error rate (12-BENCHMARK-PROTOCOL.md §3).
+    let mut out_of_policy = 0_u64;
     for item in items {
         let prediction = by_id.get(item.id.as_str());
         let decision = prediction.map_or("missing", |prediction| prediction.decision.as_str());
@@ -200,6 +203,17 @@ pub fn evaluate(items: &[Item], predictions: &[Prediction]) -> Metrics {
                     }
                 }
             }
+            "clarify" | "reject" if matches!(decision, "execute" | "execute_with_note") => {
+                out_of_policy += 1;
+                if item.gold.decision == "clarify" {
+                    clarified_gold += 1;
+                } else {
+                    rejected_gold += 1;
+                }
+                if let Some(prediction) = prediction {
+                    selective.push((prediction.confidence, true));
+                }
+            }
             "clarify" => {
                 clarified_gold += 1;
                 if decision == "clarify" {
@@ -219,7 +233,8 @@ pub fn evaluate(items: &[Item], predictions: &[Prediction]) -> Metrics {
     metrics.intent_accuracy = metrics.correct as f64 / in_domain;
     metrics.exact_match = metrics.correct as f64 / in_domain;
     metrics.coverage = metrics.executed as f64 / in_domain;
-    metrics.risk = if metrics.executed == 0 { 0.0 } else { (metrics.executed - metrics.correct) as f64 / metrics.executed as f64 };
+    let executed_all = metrics.executed + out_of_policy;
+    metrics.risk = if executed_all == 0 { 0.0 } else { (metrics.executed - metrics.correct + out_of_policy) as f64 / executed_all as f64 };
     metrics.unnecessary_clarification /= in_domain;
     metrics.false_rejection /= in_domain;
     metrics.clarification_recall = if clarified_gold == 0 { 0.0 } else { metrics.clarification_recall / clarified_gold as f64 };
@@ -552,8 +567,12 @@ pub fn write_report(
 }
 
 pub fn ensure_milestone(set: &Path, milestone: bool) -> Result<()> {
-    let name = set.file_name().and_then(|name| name.to_str()).unwrap_or_default().to_ascii_lowercase();
-    if (name.contains("h-blind") || name.contains("hblind")) && !milestone {
+    // Every path component counts: WP-0.3 stores the set as a directory (`eval/h-blind/`).
+    let blind = set.components().any(|part| {
+        let part = part.as_os_str().to_string_lossy().to_ascii_lowercase();
+        part.contains("h-blind") || part.contains("hblind") || part.contains("h_blind")
+    });
+    if blind && !milestone {
         bail!("H-blind runs only with --milestone");
     }
     Ok(())
@@ -688,6 +707,25 @@ mod tests {
     }
 
     #[test]
+    fn executing_clarify_or_reject_items_counts_as_error() {
+        // Always-execute on out-of-domain items used to report risk 0 (executed 0).
+        let items = vec![
+            item("1", "reject", "count", None),
+            item("2", "clarify", "count", None),
+            item("3", "execute", "count", Some(ir("A", "S"))),
+        ];
+        let predictions = vec![
+            prediction("1", "count", Some(ir("A", "S")), 0.9),
+            prediction("2", "count", Some(ir("A", "S")), 0.9),
+            prediction("3", "count", Some(ir("A", "S")), 0.9),
+        ];
+        let metrics = evaluate(&items, &predictions);
+        assert!((metrics.risk - 2.0 / 3.0).abs() < 1e-9, "{}", metrics.risk);
+        assert_eq!(metrics.ood_rejection, 0.0);
+        assert_eq!(metrics.clarification_recall, 0.0);
+    }
+
+    #[test]
     fn metrics_match_hand_computed_example() {
         let items = vec![
             item("1", "execute", "count", Some(ir("A", "S"))),
@@ -755,6 +793,7 @@ mod tests {
         assert!(ensure_milestone(path, false).is_err());
         assert!(ensure_milestone(path, true).is_ok());
         assert!(ensure_milestone(Path::new("h-dev.jsonl"), false).is_ok());
+        assert!(ensure_milestone(Path::new("/data/eval/h-blind/items.jsonl"), false).is_err());
     }
 
     #[test]

@@ -147,7 +147,7 @@ impl Catalogues {
             current: CURRENT,
             competences: competence,
             flow_days: Day::from_ymd(2021, 1, 1).unwrap()..=LAST_DAY,
-            populations: vec![PopulationRef::IbgeCensus(2022), PopulationRef::IbgeEstimate(2025)],
+            populations: vec![PopulationRef::IbgeCensus(2022), PopulationRef::IbgeEstimate(2026)],
             catalogue_versions: CatalogueVersions { municipalities: 202610, sectors: 1 },
             sector_count: u16::try_from(sectors.len()).unwrap(),
             geography: true,
@@ -288,8 +288,6 @@ fn load_sectors(path: &Path) -> Result<Vec<SectorRow>> {
         aliases: Vec<String>,
         #[serde(default)]
         cnae_core: Vec<String>,
-        #[serde(default)]
-        cnae_extended: Vec<String>,
     }
     #[derive(Deserialize)]
     struct Display {
@@ -304,8 +302,11 @@ fn load_sectors(path: &Path) -> Result<Vec<SectorRow>> {
         .into_iter()
         .enumerate()
         .map(|(index, entry)| {
+            // Gold sector sets are the core codes only: the extended set ("incluir fabricação")
+            // is opt-in (09-DATA-ASSETS.md §3), and mixing it in erased the padaria /
+            // fabricação de pães minimal pair.
             let mut cnaes = Vec::new();
-            for code in entry.cnae_core.iter().chain(&entry.cnae_extended) {
+            for code in &entry.cnae_core {
                 if let Ok(code) = code.parse::<u32>() {
                     cnaes.push(code);
                 }
@@ -1006,8 +1007,8 @@ fn frame(family: &FamilySpec, catalogues: &Catalogues, sampled: &Sampled) -> Res
 fn metric(family: &FamilySpec) -> Result<Metric> {
     Ok(match family.metric.as_str() {
         "stock" => Metric::Stock,
-        "per10k" => Metric::Per10k(PopulationRef::IbgeEstimate(2025)),
-        "inhabitants_per" => Metric::InhabitantsPer(PopulationRef::IbgeEstimate(2025)),
+        "per10k" => Metric::Per10k(PopulationRef::IbgeEstimate(2026)),
+        "inhabitants_per" => Metric::InhabitantsPer(PopulationRef::IbgeEstimate(2026)),
         "share" => Metric::Share,
         "active_change" => Metric::ActiveChange { pct: false },
         value if value.starts_with("flow:") => Metric::Flow(match &value[5..] {
