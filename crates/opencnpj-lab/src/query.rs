@@ -47,29 +47,33 @@ pub fn lower(request: &Request, catalogue: &MunicipalityCatalogue) -> Result<Vec
     let (municipalities, ufs) = resolve_place(catalogue, &scope.place, &scope.within_ufs)?;
     if let Some(rows) = &municipalities {
         let toms = rows.iter().filter_map(|id| catalogue.get(*id).map(|row| format!("{:04}", row.tom))).collect::<Vec<_>>();
-        if !toms.is_empty() {
-            pairs.push(("municipio".into(), toms.join(",")));
+        if toms.is_empty() {
+            bail!("place resolves to no municipality");
         }
+        pairs.push(("municipio".into(), toms.join(",")));
     }
     if let Some(values) = &ufs {
         let codes = values.iter().filter_map(|uf| agg::uf_code(UfId(*uf)).map(str::to_string)).collect::<Vec<_>>();
-        if !codes.is_empty() {
-            pairs.push(("uf".into(), codes.join(",")));
+        if codes.is_empty() {
+            bail!("place resolves to no UF");
         }
+        pairs.push(("uf".into(), codes.join(",")));
     }
     match &scope.activity {
         ActivityFilter::Any => {}
         ActivityFilter::Sectors { cnaes, scope: CnaeScope::Main, .. } | ActivityFilter::Cnae { codes: cnaes, scope: CnaeScope::Main } => {
             let values = cnae_values(cnaes);
-            if !values.is_empty() {
-                pairs.push(("cnae".into(), values.join(",")));
+            if values.is_empty() {
+                bail!("activity resolves to no CNAE");
             }
+            pairs.push(("cnae".into(), values.join(",")));
         }
         ActivityFilter::Sectors { cnaes, scope: CnaeScope::Any, .. } | ActivityFilter::Cnae { codes: cnaes, scope: CnaeScope::Any } => {
             let values = cnae_values(cnaes);
-            if !values.is_empty() {
-                pairs.push(("cnae_qualquer".into(), values.join(",")));
+            if values.is_empty() {
+                bail!("activity resolves to no CNAE");
             }
+            pairs.push(("cnae_qualquer".into(), values.join(",")));
         }
     }
     let status = scope.status.unwrap_or_else(|| request.op.default_status());
@@ -1166,6 +1170,33 @@ mod tests {
         assert!(query.filters.contains(&(Field::Contato, vec!["telefone".into()])));
         let capital = query.ranges.iter().find(|range| range.field == NumField::CapitalSocial).unwrap();
         assert_eq!(capital.range.unwrap().lo, 5_000_000_001);
+    }
+
+    #[test]
+    fn lowering_an_unknown_municipality_is_an_error() {
+        let catalogue = MunicipalityCatalogue::from_rows(vec![Municipality {
+            id: 0,
+            tom: 7107,
+            name: "Test".into(),
+            folded: opencnpj_insights::catalog::municipalities::fold_name("Test"),
+            variants: vec![],
+            place: Place::Municipality(Geography {
+                ibge: 1_000_001,
+                uf: "SP".into(),
+                census_2022: Some(1),
+                population_estimate: 1,
+                estimate_year: 2025,
+                latitude: 0.0,
+                longitude: 0.0,
+                neighbours: vec![],
+                immediate_region: 1,
+                intermediate_region: 1,
+                capital: false,
+            }),
+        }])
+        .unwrap();
+        let bad = request(json!({"kind": "count", "metric": "stock"}), json!({"place": {"municipalities": [9999]}}));
+        assert!(lower(&bad, &catalogue).is_err());
     }
 }
 
