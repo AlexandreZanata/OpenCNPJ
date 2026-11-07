@@ -52,20 +52,28 @@ a deterministic `manifest.json` identifying the snapshot, sources and outputs.
 
 ## Build the CNAE and sector catalogue
 
-The offline builder uses Python 3.11 or later and the standard library.
-Use the verified WP-1.1 extraction for the RFB input.
+Use the verified WP-1.1 extraction for the RFB input. No Python is needed (the former
+`build-cnae.py` was ported; its outputs were byte-identical).
 
 ```sh
-python3 crates/opencnpj-lab/scripts/build-cnae.py \
+opencnpj-intel catalog cnae \
   --raw /data/opencnpj-data/intelligence/catalog-raw/2026-11-04/cnae \
   --rfb /data/opencnpj-data/intelligence/catalog-rfb/2026-10-verified \
-  --out /data/opencnpj-data/intelligence/catalog-cnae/2026-10
+  --out /data/opencnpj-data/intelligence/catalog-cnae/<new-directory>
 ```
 
 The output directory contains the hierarchy, sector definitions, automatic
 alias candidates, ambiguity and reachability reports, and a source manifest.
-The generated artefacts remain under `/data`. The curated sector definitions,
-legacy exceptions and catalogue manifest live in `opencnpj-insights/catalog`.
+Copy `cnae.tsv`, `ambiguity.tsv`, `reachability.tsv`, `top-50.tsv` and
+`manifest.json` (as `cnae_manifest.json`) into `opencnpj-insights/catalog`;
+`sector_aliases_auto.tsv` (2.4 MB) stays under `/data`.
+
+## Historical backfill (WP-1.5)
+
+```sh
+opencnpj-intel agg backfill --first 2024-11 --last 2026-10     # one month at a time, Linux only
+opencnpj-intel agg backfill --summarize                       # validate archives, national totals
+```
 
 ## Build and verify aggregates
 

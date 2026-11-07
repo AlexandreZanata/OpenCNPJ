@@ -1,9 +1,6 @@
 //! Query IR lowering and in-process engine execution.
 
-use std::{
-    collections::{BTreeMap, BTreeSet},
-    path::Path,
-};
+use std::{collections::BTreeMap, path::Path};
 
 use anyhow::{Context, Result, bail, ensure};
 use opencnpj::{params, params::Caps};
@@ -743,41 +740,27 @@ impl EngineExecutor<'_> {
 }
 
 /// Load the curated sector TOML into dense sector IDs in file order.
+/// Sector id (position in the catalogue) → **core** CNAE subclasses. The extended set is
+/// opt-in ("incluir fabricação", 09-DATA-ASSETS.md §3); the former line scanner also read
+/// `cnae_extended`, so lab sectors (and both sides of `diff-exec`) were wider than the
+/// catalogue's definition.
 pub fn load_sectors(path: &Path) -> Result<SectorMap> {
+    #[derive(serde::Deserialize)]
+    struct File {
+        sector: Vec<Entry>,
+    }
+    #[derive(serde::Deserialize)]
+    struct Entry {
+        cnae_core: Vec<String>,
+    }
     let text = std::fs::read_to_string(path).with_context(|| format!("read {}", path.display()))?;
+    let file: File = toml::from_str(&text).with_context(|| format!("parse {}", path.display()))?;
     let mut map = SectorMap::new();
-    let mut id = 0_u16;
-    let mut current: Option<BTreeSet<u32>> = None;
-    let mut collecting = false;
-    for raw in text.lines() {
-        let line = raw.trim();
-        if line == "[[sector]]" {
-            if let Some(set) = current.take() {
-                map.insert(id, set);
-                id += 1;
-            }
-            current = Some(BTreeSet::new());
-            collecting = false;
-            continue;
-        }
-        if line.starts_with("cnae_core") || line.starts_with("cnae_extended") {
-            collecting = true;
-        }
-        if collecting {
-            for part in line.split('"').skip(1).step_by(2) {
-                if part.len() == 7 && part.bytes().all(|byte| byte.is_ascii_digit()) {
-                    current.as_mut().context("cnae outside a sector")?.insert(part.parse()?);
-                }
-            }
-            if line.contains(']') {
-                collecting = false;
-            }
-        }
+    for (index, entry) in file.sector.into_iter().enumerate() {
+        let codes =
+            entry.cnae_core.iter().map(|code| code.parse::<u32>().with_context(|| format!("CNAE {code}"))).collect::<Result<_>>()?;
+        map.insert(u16::try_from(index)?, codes);
     }
-    if let Some(set) = current.take() {
-        map.insert(id, set);
-    }
-    ensure!(!map.is_empty(), "empty sector catalogue");
     Ok(map)
 }
 

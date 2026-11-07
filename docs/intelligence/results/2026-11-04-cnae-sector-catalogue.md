@@ -1,5 +1,10 @@
 # 2026-11-04 — WP-1.3 CNAE and sector catalogue [MEASURED]
 
+> **2026-11-07:** the Python scripts used below were ported to Rust and removed
+> (`opencnpj-intel catalog cnae`, `opencnpj-intel agg backfill`); the ports reproduce
+> their outputs byte for byte. See `2026-11-07-reviewer-tasks.md`. Commands below are kept
+> as the record of what ran on 2026-11-04.
+
 Base commit `691330bb2c90f11b061c461a7beab630b718ecde`. Host Intel Core
 i7-13620H, `performance` governor, no CPU pinning. Gate load averages
 `3.29 7.42 8.43`. Compiler `rustc 1.99.0 (b940084d7 2026-09-28)`.

@@ -48,6 +48,7 @@ tempfile = "3"
 smallvec = "1"
 quick-xml = "0.41"
 toml = "0.8"
+unicode-normalization = "0.1"
 rusqlite = { version = "0.40", features = ["bundled"] }
 zip = { version = "9", default-features = false, features = ["deflate"] }
 proptest = "1"

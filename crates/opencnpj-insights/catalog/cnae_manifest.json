@@ -1,8 +1,8 @@
 {
   "artifacts": {
     "ambiguity.tsv": {
-      "bytes": 1672,
-      "sha256": "d9007f0430bc1d678ab96855f8b841a3d011c3dfb9fa711ac93757763b38b072"
+      "bytes": 1763,
+      "sha256": "4ae50eea74cd0b383777f2c898c98e0bb61332e8fc907cb8edceb43b71453fe5"
     },
     "cnae.tsv": {
       "bytes": 192585,
@@ -10,7 +10,7 @@
     },
     "reachability.tsv": {
       "bytes": 19061,
-      "sha256": "da5ae32bdbf028f19d7a0a03416ab3d7fc964094eb48d51b5e2af51d44d12e11"
+      "sha256": "ea1db6bc1cc997b8393cf27e318032ea09396bb183ae4651d6524d55640ba0b5"
     },
     "sector_aliases_auto.tsv": {
       "bytes": 2434156,
@@ -21,8 +21,8 @@
       "sha256": "43ef872321d7fb34c518a9a92767cce279450d01924d8831253a2c7dc51908e2"
     },
     "top-50.tsv": {
-      "bytes": 1126,
-      "sha256": "2f556428e20972a3dbd463e6ce08ef5a148312431a64900827ed32593cff6bb4"
+      "bytes": 1142,
+      "sha256": "47dad0f80012e30c66ec8be776a8787576fa9f8981da85b56a116b9affabe187"
     }
   },
   "cnae_version": "2.3",

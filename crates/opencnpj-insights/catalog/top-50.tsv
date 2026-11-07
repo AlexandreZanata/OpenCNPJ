@@ -1,9 +1,10 @@
 sector	core_main_documents
-transport	5438255
+civil_construction	4376291
 apparel_retail	3739346
+transport	3408070
+beauty_salon	2794779
 truck_freight	2128044
 snack_bar	2061351
-beauty_salon	2044079
 sales_promotion	1880659
 grocery	1737073
 masonry	1411514
@@ -22,6 +23,7 @@ cosmetics_retail	669698
 professional_training	649273
 bar	624948
 street_food	612244
+building_materials	584363
 auto_mechanic	581539
 event_planning	571723
 office_support	554311
@@ -33,7 +35,6 @@ computer_repair	470225
 building_painting	465925
 ride_with_driver	453581
 construction	438858
-building_materials	430276
 home_health	426556
 computer_store	401497
 pharmacy	385419
@@ -42,10 +43,9 @@ furniture_store	354950
 hypermarket	350659
 condominium	340366
 haberdashery	339165
+passenger_transport	337241
 religious_organization	318725
 hardware_store	314204
 management_consulting	313591
 wood_furniture_factory	309451
 medical_consultations	305581
-produce_retail	302248
-car_wash	302002

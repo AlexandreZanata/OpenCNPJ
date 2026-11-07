@@ -37,6 +37,8 @@ pub(crate) enum Command {
         #[arg(long, default_value = "T1,T2,T3,T4,T5")]
         tables: String,
     },
+    /// Build and verify historical T1/T2 aggregates one competence at a time (WP-1.5).
+    Backfill(crate::backfill::BackfillArgs),
 }
 
 #[derive(Args)]
@@ -56,6 +58,7 @@ pub(crate) struct DiffArgs {
 pub(crate) fn run(command: Command) -> Result<()> {
     match command {
         Command::Build { snapshot, catalog, out, tables } => build(&snapshot, &catalog, &out, &tables),
+        Command::Backfill(args) => crate::backfill::run_backfill(args),
     }
 }
 

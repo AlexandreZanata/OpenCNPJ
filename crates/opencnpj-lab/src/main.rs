@@ -1,6 +1,7 @@
 //! Development CLI for OpenCNPJ Intelligence artifacts and experiments.
 
 mod aggregate;
+mod backfill;
 mod catalog;
 mod eval;
 mod oracle;

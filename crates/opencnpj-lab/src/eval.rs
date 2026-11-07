@@ -880,15 +880,37 @@ mod sets {
     const OOD: &str = include_str!("../eval/ood.jsonl");
     const INFORMAL: &str = include_str!("../eval/h-informal.jsonl");
     const DIALOGUES: &str = include_str!("../eval/dialogues.jsonl");
-    const CONTEXT: &str = include_str!("../eval/context.json");
     const CARD: &str = include_str!("../eval/DATASET-CARD.md");
+    /// Frozen files whose SHA-256 the dataset card records, in card order.
+    const FROZEN: [(&str, &str); 4] =
+        [("adv.jsonl", ADV), ("ood.jsonl", OOD), ("h-informal.jsonl", INFORMAL), ("dialogues.jsonl", DIALOGUES)];
 
-    #[derive(Deserialize)]
-    struct ContextFile {
-        municipalities: BTreeMap<u16, String>,
-        sectors: BTreeMap<u16, Vec<u32>>,
+    /// The committed catalogues the sets are labelled against (no generated copy of them).
+    struct Catalogue {
+        municipality_ufs: BTreeMap<MunicipalityId, UfId>,
+        sector_cnaes: BTreeMap<SectorId, SmallSet<CnaeCode>>,
         sector_count: u16,
-        catalogue_versions: CatalogueVersions,
+    }
+
+    fn catalogue() -> Catalogue {
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../opencnpj-insights/catalog");
+        let municipalities =
+            opencnpj_insights::catalog::municipalities::MunicipalityCatalogue::load(&root.join("municipalities.tsv")).expect("catalogue");
+        let municipality_ufs = municipalities
+            .rows()
+            .iter()
+            .filter_map(|row| match &row.place {
+                opencnpj_insights::catalog::municipalities::Place::Municipality(geo) => {
+                    agg::uf_id(&geo.uf).map(|uf| (MunicipalityId(row.id), uf))
+                }
+                opencnpj_insights::catalog::municipalities::Place::Abroad => None,
+            })
+            .collect();
+        let sectors = crate::query::load_sectors(&root.join("sectors.toml")).expect("sectors");
+        let sector_count = u16::try_from(sectors.len()).expect("sector count");
+        let sector_cnaes =
+            sectors.into_iter().map(|(id, codes)| (SectorId(id), SmallSet::new(codes.into_iter().map(CnaeCode::Subclass)))).collect();
+        Catalogue { municipality_ufs, sector_cnaes, sector_count }
     }
 
     #[derive(Deserialize)]
@@ -911,7 +933,7 @@ mod sets {
         digest.iter().map(|byte| format!("{byte:02x}")).collect()
     }
 
-    fn validation_caps(context: &ContextFile) -> Capabilities {
+    fn validation_caps(catalogue: &Catalogue) -> Capabilities {
         let mut competences = Vec::new();
         let (mut year, mut month) = (2024, 11);
         for _ in 0..24 {
@@ -927,8 +949,8 @@ mod sets {
             competences,
             flow_days: Day(1)..=Day(46305),
             populations: vec![PopulationRef::IbgeCensus(2022), PopulationRef::IbgeEstimate(2026)],
-            catalogue_versions: context.catalogue_versions,
-            sector_count: context.sector_count,
+            catalogue_versions: CatalogueVersions { municipalities: 202610, sectors: 1 },
+            sector_count: catalogue.sector_count,
             geography: true,
             list_limit: 100,
         }
@@ -938,6 +960,14 @@ mod sets {
         let ir = item.gold.ir.as_ref().unwrap_or_else(|| panic!("{} lacks the executable IR", item.id));
         let request: Request = serde_json::from_value(ir.clone()).unwrap_or_else(|error| panic!("{} IR: {error}", item.id));
         let canonical = request.canonicalize(context).unwrap_or_else(|error| panic!("{} canonical: {error:?}", item.id)).0;
+        // A gold that spells out a sector's CNAEs must use exactly the catalogue's core set
+        // (the padaria gold once carried an extended code and inverted a minimal pair).
+        if let (ActivityFilter::Sectors { cnaes: gold, .. }, ActivityFilter::Sectors { cnaes: catalogue, .. }) =
+            (&request.scope.activity, &canonical.scope.activity)
+            && !gold.is_empty()
+        {
+            assert_eq!(gold, catalogue, "{} sector CNAEs differ from the catalogue core", item.id);
+        }
         validate::validate(canonical, caps).unwrap_or_else(|issues| panic!("{} invalid: {issues:?}", item.id));
         if let Some(intent) = &item.gold.intent {
             assert_eq!(intent_of(ir).as_deref(), Some(intent.as_str()), "{} intent", item.id);
@@ -946,20 +976,14 @@ mod sets {
 
     #[test]
     fn frozen_sets_validate_and_cover_rules() {
-        let context_file: ContextFile = serde_json::from_str(CONTEXT).expect("context");
-        let municipality_ufs = context_file
-            .municipalities
-            .iter()
-            .filter_map(|(id, uf)| agg::uf_id(uf).map(|uf| (MunicipalityId(*id), uf)))
-            .collect::<BTreeMap<_, _>>();
-        let sector_cnaes = context_file
-            .sectors
-            .iter()
-            .map(|(id, cnaes)| (SectorId(*id), SmallSet::new(cnaes.iter().map(|code| CnaeCode::Subclass(*code)))))
-            .collect::<BTreeMap<_, _>>();
-        let context =
-            CanonicalContext { first_day: Day(1), last_day: Day(46305), municipality_ufs: &municipality_ufs, sector_cnaes: &sector_cnaes };
-        let caps = validation_caps(&context_file);
+        let catalogue = catalogue();
+        let context = CanonicalContext {
+            first_day: Day(1),
+            last_day: Day(46305),
+            municipality_ufs: &catalogue.municipality_ufs,
+            sector_cnaes: &catalogue.sector_cnaes,
+        };
+        let caps = validation_caps(&catalogue);
         let mut ids = BTreeSet::new();
         for (name, text) in [("adv", ADV), ("ood", OOD), ("informal", INFORMAL)] {
             let items: Vec<Item> = parse(text);
@@ -994,15 +1018,29 @@ mod sets {
             }
         }
 
-        for (name, text) in [
-            ("adv.jsonl", ADV),
-            ("ood.jsonl", OOD),
-            ("h-informal.jsonl", INFORMAL),
-            ("dialogues.jsonl", DIALOGUES),
-            ("context.json", CONTEXT),
-        ] {
-            let digest = sha(text);
-            assert!(CARD.contains(&digest), "{name} SHA-256 not in the dataset card");
+        // The sets are edited by hand now (no generator script): their card rows are
+        // refreshed with `UPDATE_CARD=1 cargo test -p opencnpj-lab frozen_sets`.
+        let rows: Vec<(&str, String)> = FROZEN
+            .iter()
+            .map(|(name, text)| {
+                (*name, format!("| {name} | {} | {} |", text.lines().filter(|line| !line.trim().is_empty()).count(), sha(text)))
+            })
+            .collect();
+        if std::env::var_os("UPDATE_CARD").is_some() {
+            let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("eval/DATASET-CARD.md");
+            let card = std::fs::read_to_string(&path).expect("dataset card");
+            let updated: Vec<String> = card
+                .lines()
+                .map(|line| {
+                    rows.iter()
+                        .find(|(name, _)| line.starts_with(&format!("| {name} |")))
+                        .map_or_else(|| line.to_string(), |(_, row)| row.clone())
+                })
+                .collect();
+            std::fs::write(&path, updated.join("\n") + "\n").expect("write dataset card");
+        }
+        for (name, row) in &rows {
+            assert!(CARD.lines().any(|line| line == row), "{name}: dataset card row is out of date (run with UPDATE_CARD=1)");
         }
     }
 

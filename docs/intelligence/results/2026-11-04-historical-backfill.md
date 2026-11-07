@@ -1,5 +1,10 @@
 # 2026-11-04 — WP-1.5 historical backfill
 
+> **2026-11-07:** the Python scripts used below were ported to Rust and removed
+> (`opencnpj-intel catalog cnae`, `opencnpj-intel agg backfill`); the ports reproduce
+> their outputs byte for byte. See `2026-11-07-reviewer-tasks.md`. Commands below are kept
+> as the record of what ran on 2026-11-04.
+
 The initial November 2024 T1/T2 build found the historical UF term `BR`.
 The aggregate format now assigns that value UF ID `28` and retains
 the source row in T2. The corrected build reused the verified snapshot.
