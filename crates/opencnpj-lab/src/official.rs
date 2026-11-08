@@ -1101,18 +1101,37 @@ fn run_ask(args: AskArgs) -> Result<()> {
     let request = match ask::parse(&args.text, &catalogue, &registry) {
         Ok(request) => request,
         Err(error) => {
-            println!("{error}");
+            let status = match error {
+                ask::AskError::Clarify(_) => "clarification_required",
+                ask::AskError::Unsupported(_) => "unsupported",
+                ask::AskError::Unavailable(_) => "unavailable",
+            };
+            if args.json {
+                println!("{}", serde_json::json!({"status": status, "text": error.to_string()}));
+            } else {
+                println!("{error}");
+            }
             return Ok(());
         }
     };
     let Some(dir) = args.dir else {
-        println!("{}", missing_dataset_message(&registry, request.variable_ids()[0]));
+        let message = missing_dataset_message(&registry, request.variable_ids()[0]);
+        if args.json {
+            println!("{}", serde_json::json!({"status": "unavailable", "text": message}));
+        } else {
+            println!("{message}");
+        }
         return Ok(());
     };
     let stores = match StoreSet::open_dir(&dir) {
         Ok(stores) => stores,
         Err(error) => {
-            println!("{}", query::unavailable("ask", format!("Nenhum ativo oficial foi importado: {error}")).text);
+            let answer = query::unavailable("ask", format!("Nenhum ativo oficial foi importado: {error}"));
+            if args.json {
+                println!("{}", serde_json::to_string_pretty(&answer)?);
+            } else {
+                println!("{}", answer.text);
+            }
             return Ok(());
         }
     };

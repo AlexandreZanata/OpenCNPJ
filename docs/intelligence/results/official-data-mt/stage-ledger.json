@@ -101,8 +101,15 @@
     {
       "id": 6,
       "name": "First usable MT release and analytical joins",
-      "status": "pending",
-      "evidence": [],
+      "status": "complete",
+      "evidence": [
+        "docs/intelligence/results/official-data-mt/ACCEPTANCE.md",
+        "docs/intelligence/results/official-data-mt/acceptance/cases.json",
+        "docs/intelligence/results/official-data-mt/acceptance/results.json",
+        "scripts/official-data/run_acceptance.py",
+        "docs/intelligence/results/official-data-mt/logs/stage-6-acceptance.log",
+        "docs/intelligence/results/official-data-mt/logs/stage-6-test.log"
+      ],
       "blockers": []
     },
     {

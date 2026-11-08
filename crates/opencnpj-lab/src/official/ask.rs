@@ -326,6 +326,11 @@ fn detect_periods(text: &str) -> Vec<String> {
         .filter_map(|token| token.parse::<u16>().ok())
         .filter(|year| (1900..=2100).contains(year))
         .collect::<Vec<_>>();
+    if let Some((month, _)) = month(text)
+        && let Some(year) = years.first()
+    {
+        return vec![format!("{year}{month:02}")];
+    }
     if years.len() >= 2 && contains_any(text, &["entre", " de ", " a ", "ate"]) {
         let (from, to) = (years[0].min(years[1]), years[0].max(years[1]));
         return (from..=to).map(|year| year.to_string()).collect();
@@ -334,6 +339,24 @@ fn detect_periods(text: &str) -> Vec<String> {
     unique.sort();
     unique.dedup();
     unique
+}
+
+fn month(text: &str) -> Option<(u8, &'static str)> {
+    let months = [
+        ("janeiro", 1),
+        ("fevereiro", 2),
+        ("marco", 3),
+        ("abril", 4),
+        ("maio", 5),
+        ("junho", 6),
+        ("julho", 7),
+        ("agosto", 8),
+        ("setembro", 9),
+        ("outubro", 10),
+        ("novembro", 11),
+        ("dezembro", 12),
+    ];
+    months.iter().find(|(name, _)| contains_phrase(text, name)).map(|(name, month)| (*month, *name))
 }
 
 fn limit(text: &str) -> usize {
