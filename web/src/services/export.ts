@@ -1,0 +1,43 @@
+import type { Company } from "../domain/models.js";
+
+export type ExportFormat = "csv" | "ndjson";
+
+const HEADER = ["cnpj", "razao_social", "cnae_principal", "cnae_descricao", "municipio", "uf", "capital_social", "data_abertura", "situacao"] as const;
+
+function toRecord(company: Company): Record<(typeof HEADER)[number], string | number> {
+  return {
+    cnpj: company.cnpj,
+    razao_social: company.razaoSocial,
+    cnae_principal: company.cnaeCodigo,
+    cnae_descricao: company.cnaeDescricao,
+    municipio: company.municipio,
+    uf: company.uf,
+    capital_social: company.capitalSocial,
+    data_abertura: company.abertura,
+    situacao: company.situacao,
+  };
+}
+
+function csvCell(value: string | number): string {
+  const text = String(value);
+  return /[",\n;]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+}
+
+export function serialize(rows: readonly Company[], format: ExportFormat): string {
+  const records = rows.map(toRecord);
+  if (format === "ndjson") return records.map((r) => JSON.stringify(r)).join("\n") + "\n";
+  const lines = records.map((r) => HEADER.map((key) => csvCell(r[key])).join(","));
+  return [HEADER.join(","), ...lines].join("\n") + "\n";
+}
+
+/** Triggers a browser download for `content`. */
+export function download(filename: string, content: string, mime: string): void {
+  const url = URL.createObjectURL(new Blob([content], { type: `${mime};charset=utf-8` }));
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
