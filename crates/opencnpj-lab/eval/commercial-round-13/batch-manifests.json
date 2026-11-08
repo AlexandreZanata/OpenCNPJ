@@ -3719,7 +3719,7 @@
     "items": 500,
     "first_id": "commercial-r13-22501",
     "last_id": "commercial-r13-23000",
-    "sha256": "9cf37cdcb6b5538b704f3eab5f7ab3935bf3b41fa6c949b63e0a7e02048a217b",
+    "sha256": "85d50f54db4a913a6f91b373df05827a9d05b112fb3c6180797811385e917c2b",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -3797,7 +3797,7 @@
     "items": 500,
     "first_id": "commercial-r13-23001",
     "last_id": "commercial-r13-23500",
-    "sha256": "5237fad133bf5bc2c0f19f0e86c166187afa57ef4b71a76be4e278f7f891de32",
+    "sha256": "f42f89e306b5ba5096a952b89a4ec439d80454084f9506a3d6e189fb5cdd552a",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -3878,7 +3878,7 @@
     "items": 500,
     "first_id": "commercial-r13-23501",
     "last_id": "commercial-r13-24000",
-    "sha256": "615c4e86b99f0f376b0f9ac4f7a0e55f4f1d6c7d2f3f935d1fbea6a367925b1e",
+    "sha256": "599fcbd4a2b97d10bc9522a9cc3d787576c3cf76b0442224ff28dc918dbdff50",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -3955,7 +3955,7 @@
     "items": 500,
     "first_id": "commercial-r13-24001",
     "last_id": "commercial-r13-24500",
-    "sha256": "605b58239e04d0fcdcea78283fe377cb71c186df3039a51b9e5a6a4afd1dfde2",
+    "sha256": "f9d9f87222e149db897b9c3feecc780e41eaa1d6b094b2882fd3fd42f4e21bb4",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -4038,7 +4038,7 @@
     "items": 500,
     "first_id": "commercial-r13-24501",
     "last_id": "commercial-r13-25000",
-    "sha256": "71a5275c81d37c6a94eaf90ec02b73f1d5314fdbe7cdf5a4fb9ce06dadb02465",
+    "sha256": "f6f46419f0dea5e7e8f4e120193be118056cf608f11ecdc3c0ee73c8ee82b977",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -4118,7 +4118,7 @@
     "items": 500,
     "first_id": "commercial-r13-25001",
     "last_id": "commercial-r13-25500",
-    "sha256": "2faaeff9c2d714aad5f63f2b2dc69876b9d45be99ee2c3d2c7c880ed5eab1002",
+    "sha256": "62ad0463305370c953b4b1ef649353b9420655ff820b65a2ac95306bf239752c",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -4204,7 +4204,7 @@
     "items": 500,
     "first_id": "commercial-r13-25501",
     "last_id": "commercial-r13-26000",
-    "sha256": "2ec331cb1db8efbd8e5ca470b4d350797425e4f277b5e95eacebc9952f225bd0",
+    "sha256": "4f7aebb0225c3c6e123eef9d731479850372ae07a4c4b2aa96a67a56ba33d87c",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -4285,7 +4285,7 @@
     "items": 500,
     "first_id": "commercial-r13-26001",
     "last_id": "commercial-r13-26500",
-    "sha256": "cd97e887a9be993afddc3e3b93fa87c43bbda4d2d881f36fb365344d730f8d6a",
+    "sha256": "161f9079966d4be825a2914c441d7b9a6ee5d8da137ff2b107366a13791c6737",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -4375,7 +4375,7 @@
     "items": 500,
     "first_id": "commercial-r13-26501",
     "last_id": "commercial-r13-27000",
-    "sha256": "f4ffecf19be0ac55477e2c826482daa25f99dfe8e998e1915136c1cb4d809fbd",
+    "sha256": "2a71f75161ca1b84ce4ef34e04426be692c4897b3348be2560eed1247cb7fe73",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -4461,7 +4461,7 @@
     "items": 500,
     "first_id": "commercial-r13-27001",
     "last_id": "commercial-r13-27500",
-    "sha256": "478e2170f49998e6c5ce885c581c23ba6213c6de032d492ea3102e2cd09a68a5",
+    "sha256": "6ff8ca2d69b77002571dc5e754a2b2516a7ff49226df4705a2eab0e28827af39",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -4553,7 +4553,7 @@
     "items": 500,
     "first_id": "commercial-r13-27501",
     "last_id": "commercial-r13-28000",
-    "sha256": "89898242ccdfe8035e3500f33eec34999fa33f7357265a0c0a8ebbb2ddec0933",
+    "sha256": "1ad7f7af3213456fba210d4cebbcc6c1948532b9dfb048d3724370f5b7418ec8",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -4641,7 +4641,7 @@
     "items": 500,
     "first_id": "commercial-r13-28001",
     "last_id": "commercial-r13-28500",
-    "sha256": "a0bc73e8ecd4091db9e1425472dd1e49e495a8712b13582bb70f3a5d15dcb761",
+    "sha256": "2d29fb1f81de425815b2d0d8d977d8bdb3ce15821bda54f38bfa6cc56489e667",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -4732,7 +4732,7 @@
     "items": 500,
     "first_id": "commercial-r13-28501",
     "last_id": "commercial-r13-29000",
-    "sha256": "a323fb8bed2c64492c1770c66dc61950426a045e2ee9425dfc46070fad2d32b1",
+    "sha256": "e35dd8117b6e11975694dff04e961780cb0910de214a30d96dddad11da47917d",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -4816,7 +4816,7 @@
     "items": 500,
     "first_id": "commercial-r13-29001",
     "last_id": "commercial-r13-29500",
-    "sha256": "0a14065756bc432617ef34111aa9eed11066b669cb9f307cdd4ea63c4045e921",
+    "sha256": "c1afec93f8d5ec8d9794b3166abe5d7695937c8f74a5d4ceae940a7096163fc8",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -4901,7 +4901,7 @@
     "items": 500,
     "first_id": "commercial-r13-29501",
     "last_id": "commercial-r13-30000",
-    "sha256": "bff2959cedb181c7b61bc64b23479f05b09f54faae96906adf3d7586d9616bef",
+    "sha256": "9adea00fc0edaa44dfba61609f8e423b2746e59eca7229b126ab90412db2fb69",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -4981,7 +4981,7 @@
     "items": 500,
     "first_id": "commercial-r13-30001",
     "last_id": "commercial-r13-30500",
-    "sha256": "43619f833718d428c5af0e236bd0bc55b970422f1ea244067e01b080bdf3d7d7",
+    "sha256": "38a2cf88b044d7497ef6091b976ba59ecd32709b6adf2b60e702ca7a0fc6d227",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -5067,7 +5067,7 @@
     "items": 500,
     "first_id": "commercial-r13-30501",
     "last_id": "commercial-r13-31000",
-    "sha256": "0e483be31f395cc07aa3c2f6bb25fe394765093809c9d278fe92310b69ec2e20",
+    "sha256": "85fc5da99139affc741f399415c3e218b8c09e66d304d0dfe983777adadf9382",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -5148,7 +5148,7 @@
     "items": 500,
     "first_id": "commercial-r13-31001",
     "last_id": "commercial-r13-31500",
-    "sha256": "1edf4a499e15c15edf2eb5c13126ac2d04eea96018d89a7c1a1e95ec5396fb96",
+    "sha256": "67f8a0e70e36be8e3e346410f0469f5496ae91c9594acad2bd9e3ca2dab62db1",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -5232,7 +5232,7 @@
     "items": 500,
     "first_id": "commercial-r13-31501",
     "last_id": "commercial-r13-32000",
-    "sha256": "4007a39f2595e14c5b62b457c99a9ab1a9152f782964a5f1c7a896f6261f708f",
+    "sha256": "cae74e684d7f7241363e0ec5db04c6045c9a393780498ce363db98502da7338c",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -5314,7 +5314,7 @@
     "items": 500,
     "first_id": "commercial-r13-32001",
     "last_id": "commercial-r13-32500",
-    "sha256": "126d0e5a26887ec8b9ec64204d87d7189f01d35606b50e16d250e660f0fbc243",
+    "sha256": "72643fbd974c3de1a5c51e4e53ad59487b026d274ca6ae73d912e2032ed2cdef",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -5396,7 +5396,7 @@
     "items": 500,
     "first_id": "commercial-r13-32501",
     "last_id": "commercial-r13-33000",
-    "sha256": "8f41466cfb760ca80998557eb0aab6db603ede484d8083fcb0681b5c8b375bdb",
+    "sha256": "bd5bfe0041e2c8a36b3f267ed57976c5592e52efe344e26ea0e65eb33e1aaec2",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -5474,7 +5474,7 @@
     "items": 500,
     "first_id": "commercial-r13-33001",
     "last_id": "commercial-r13-33500",
-    "sha256": "f76c0fb729e87c601d6184b122bffa4426b3b4d657dab9486192112119bec22b",
+    "sha256": "4440d0bcc91836dd7ee32e3faf873f418436bcb6f78a1c546a634f3d982a3b98",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -5558,7 +5558,7 @@
     "items": 500,
     "first_id": "commercial-r13-33501",
     "last_id": "commercial-r13-34000",
-    "sha256": "1ef05de795f087bd7229d2b2410db0be260ce03704f95c252e83530215d699c9",
+    "sha256": "cfde127a0197f403cdf496d9a9e2e929cfc8a3d5944bca000c1c588f501b5a3a",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -5635,7 +5635,7 @@
     "items": 500,
     "first_id": "commercial-r13-34001",
     "last_id": "commercial-r13-34500",
-    "sha256": "ae868855463fdc86f3178c06e881216562d2742015f775d56fbc27eded04db9a",
+    "sha256": "9d6d5e3c00451dda6bb60423d01654f82bdd2d2b037606024e93462d90d72904",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -5719,7 +5719,7 @@
     "items": 500,
     "first_id": "commercial-r13-34501",
     "last_id": "commercial-r13-35000",
-    "sha256": "9e456e457f47a239d535be0fb91fe99cffdfdadfaee1b7eeb3c1b609e34a34a0",
+    "sha256": "729cc0ae667825ab117ff7e6c39a6cb52328881f63fdbe6490a3942e2a36a495",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -5803,7 +5803,7 @@
     "items": 500,
     "first_id": "commercial-r13-35001",
     "last_id": "commercial-r13-35500",
-    "sha256": "0bb0da6d905be385dd52f1321149002e7727c24ab1484c0d6191ebb426a7297c",
+    "sha256": "9e883b3b5d6e4ad3cbdc3d3aed608f819a9ead721f19e81b956f6d112362ca4c",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -5889,7 +5889,7 @@
     "items": 500,
     "first_id": "commercial-r13-35501",
     "last_id": "commercial-r13-36000",
-    "sha256": "17812dcb9404baeafbe51e6470ae73c8bb124728785decb38dc4851fc1061ec1",
+    "sha256": "983df5539433240b16d1c70f18340b54807046b87f4186285676614ff4584961",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -5975,7 +5975,7 @@
     "items": 500,
     "first_id": "commercial-r13-36001",
     "last_id": "commercial-r13-36500",
-    "sha256": "e890c863c1b60340999320fe4e7bc2bac357ccac455c91de8e7a8e33f4705afc",
+    "sha256": "0131e47f0172c253fb0441b7b85588f35205276b361b350180b12c4ea2673cbb",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -6064,7 +6064,7 @@
     "items": 500,
     "first_id": "commercial-r13-36501",
     "last_id": "commercial-r13-37000",
-    "sha256": "85bb70a9205ed33922de4526405f6d0a9fd01af7ee2206e94585766560bc48ed",
+    "sha256": "5eb4b404e2e0eb4f05931f2437e1b406e70a068528755d11055580da96f6963c",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -6150,7 +6150,7 @@
     "items": 500,
     "first_id": "commercial-r13-37001",
     "last_id": "commercial-r13-37500",
-    "sha256": "4aefabeb3770341683aed10bedfb420348e17f2f2583b4d6a53590bf87987861",
+    "sha256": "aacea547932b2fec3c9632360cce2acf9f7d9fb375a6c4e35695a552c6656611",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -6243,7 +6243,7 @@
     "items": 500,
     "first_id": "commercial-r13-37501",
     "last_id": "commercial-r13-38000",
-    "sha256": "adfdfdde1b6318e6d003794ee075dce65fdbefbb2775ce94f48dc8335758bff4",
+    "sha256": "d62570b167abc6e40589b44a0bd26ef16cced5422637a70b065e61902e8165fb",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -6330,7 +6330,7 @@
     "items": 500,
     "first_id": "commercial-r13-38001",
     "last_id": "commercial-r13-38500",
-    "sha256": "833265614c0a418422a262abab1712af68e0839f0c206fde7f0b59a48e1ae3f3",
+    "sha256": "791ed713bae34df747bf8ae44762741158e849dbc3312bd8ee68048d181f0331",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -6420,7 +6420,7 @@
     "items": 500,
     "first_id": "commercial-r13-38501",
     "last_id": "commercial-r13-39000",
-    "sha256": "45b50d4503e7311e1c5d09e4477217a3329ab30bb4b3c29d961808e12bd58435",
+    "sha256": "754453740e3b4dcaa92980dff0d2e83ce136e2aa5cb62724af7d3af3389d63ef",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -6503,7 +6503,7 @@
     "items": 500,
     "first_id": "commercial-r13-39001",
     "last_id": "commercial-r13-39500",
-    "sha256": "2b3e13b3a7ef7a9f3b18127c0c479d26749a7ec274bd5485026d323ad158415a",
+    "sha256": "e5db1681451a196b9811082b1369b5e8e5f5bbad93756443eb994f1264bb0945",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -6588,7 +6588,7 @@
     "items": 500,
     "first_id": "commercial-r13-39501",
     "last_id": "commercial-r13-40000",
-    "sha256": "fb990247afabf9004fb1e6ff5f5297c5d3b1380c24a70f24ab1cf18c9cda5fb1",
+    "sha256": "7aaf13772e029344f5ffeedea073a53a6bd6028d079e1a1dab91a69bf739f1ac",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -6670,7 +6670,7 @@
     "items": 500,
     "first_id": "commercial-r13-40001",
     "last_id": "commercial-r13-40500",
-    "sha256": "3726b3e9b9c53e39366c2949b7367a4d6370fb0da1ac49b4ed44d6c2197a0bfb",
+    "sha256": "569362d070c1c2d18a17ba44413cdebc9018938c653d106b87c0756463968dd6",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -6756,7 +6756,7 @@
     "items": 500,
     "first_id": "commercial-r13-40501",
     "last_id": "commercial-r13-41000",
-    "sha256": "e7301da36941c32014068edafc1d8346f7b887ba59c84dcb00d50146d790b42d",
+    "sha256": "da512d8026c9ae796ffc556a642b1555095acc878935b7d265f1f59782ff51e7",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -6834,7 +6834,7 @@
     "items": 500,
     "first_id": "commercial-r13-41001",
     "last_id": "commercial-r13-41500",
-    "sha256": "cd3f1cf0412563ca3a1d530e8e7cd8b305f4f730173206867d22c5a1dbb36085",
+    "sha256": "ca81eb38210a3a0721255d371f64366583616c5cb1dc0d31fc4560cacaff4953",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -6920,7 +6920,7 @@
     "items": 500,
     "first_id": "commercial-r13-41501",
     "last_id": "commercial-r13-42000",
-    "sha256": "6726483346f2c5046dc04db0c63231585ce9f62ec78dad5f9159935368f1a46f",
+    "sha256": "7d4b43393dc9c3a920f036fa397c3bc27c419a20fde96aca8443918cddeacedf",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -7001,7 +7001,7 @@
     "items": 500,
     "first_id": "commercial-r13-42001",
     "last_id": "commercial-r13-42500",
-    "sha256": "87a57462bc931d0b95a0fad95047d63511dd81d1aa4a37c914cf6cafe0d5db27",
+    "sha256": "fd2f2ef3a72f89a2d60b8979c08c1a22896dfaa0a9cd1856df46e39df41fc920",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -7083,7 +7083,7 @@
     "items": 500,
     "first_id": "commercial-r13-42501",
     "last_id": "commercial-r13-43000",
-    "sha256": "19058afa1f6857cb0c35704797266f7c591d09b1428a1479f19da92b75ef85fb",
+    "sha256": "153e91d2c3343162733ecda1f1961d49bd51935926508c9c48e389dd91f8fcea",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -7162,7 +7162,7 @@
     "items": 500,
     "first_id": "commercial-r13-43001",
     "last_id": "commercial-r13-43500",
-    "sha256": "77156abb498d120991df232a511b902d136e307dcaecdbf82bb888bd13eccd7b",
+    "sha256": "af9ddc1441269b7d224798ef7e776a89561c54152c37a15455112bc31e5a4dc2",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -7243,7 +7243,7 @@
     "items": 500,
     "first_id": "commercial-r13-43501",
     "last_id": "commercial-r13-44000",
-    "sha256": "fbe62cf0fe2a81bd4bb0ec022c2a813c5fc73bb4b879f27780672096e3293e95",
+    "sha256": "e36889892176da6434b635f4edadb053b24174cf512632b34cafbd3a16026908",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -7322,7 +7322,7 @@
     "items": 500,
     "first_id": "commercial-r13-44001",
     "last_id": "commercial-r13-44500",
-    "sha256": "57289df8dffbab0ffbc1328741e9887ae74375d4dac96da9e948656b84181819",
+    "sha256": "7ff52861551a143758afc46bedff276fce9f0d6818b61cc7474d0ca0011e0e12",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -7407,7 +7407,7 @@
     "items": 500,
     "first_id": "commercial-r13-44501",
     "last_id": "commercial-r13-45000",
-    "sha256": "65b94473c7fd18a010a6ea46b50f9f7721ed26fc9a9145a80f3e78e7379e1402",
+    "sha256": "142bf9c59a51cbdc371341ae9254d6dbf65daecee4a9f49a40f2b3ee7289b200",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -7488,7 +7488,7 @@
     "items": 500,
     "first_id": "commercial-r13-45001",
     "last_id": "commercial-r13-45500",
-    "sha256": "5645e5835d65aa67c7b5871ed9e8971eff5066b9d1eb285177c89970e7987966",
+    "sha256": "4f90b7a77330a02cca14db2fd476a6974adaee0f86b09e28c6f3c2d869e905ad",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -7577,7 +7577,7 @@
     "items": 500,
     "first_id": "commercial-r13-45501",
     "last_id": "commercial-r13-46000",
-    "sha256": "7272ddec9bd5626bd84fcf4fa0492a7033fb5a8b0e8281daff7995384078bbbe",
+    "sha256": "6a7cde2e456701ecdfae2c94b0aa2f0cfe2af5c14ff21141e561dc72638c34d0",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -7664,7 +7664,7 @@
     "items": 500,
     "first_id": "commercial-r13-46001",
     "last_id": "commercial-r13-46500",
-    "sha256": "8f4b82528e9fee643a7b69dc00096dc1bac57d293e76065f75e36941c68fa7ab",
+    "sha256": "609be4fdeb6722ace4a5452d24bd7a05b1f2d402cf892265d92add39de4d8d17",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -7756,7 +7756,7 @@
     "items": 500,
     "first_id": "commercial-r13-46501",
     "last_id": "commercial-r13-47000",
-    "sha256": "dab3440e863454293217ad09fbde89d84e6e4b6078b40d7a0caa489455bd36ec",
+    "sha256": "fff2c6df6370a480f885d164c23ece10bc725b6b2f11b754b92694a5d101c6ec",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -7842,7 +7842,7 @@
     "items": 500,
     "first_id": "commercial-r13-47001",
     "last_id": "commercial-r13-47500",
-    "sha256": "9ea7816998b9ab1de10b3874dba2079d8387fbbd91a8e6c9096818fa7e37e327",
+    "sha256": "2a7fc4f26c26b5428077c236e4dd0dfd0f54558e79d9fc7b33b9c685bde01991",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -7930,7 +7930,7 @@
     "items": 500,
     "first_id": "commercial-r13-47501",
     "last_id": "commercial-r13-48000",
-    "sha256": "6bdb1609c30c2bb0273a75c89929cd2d1148140d6e916cc2d74606f2c1347f99",
+    "sha256": "f17d39163b28da42ef54894065343b5afd895fda00bf3388641e0c80a265f88d",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -8013,7 +8013,7 @@
     "items": 500,
     "first_id": "commercial-r13-48001",
     "last_id": "commercial-r13-48500",
-    "sha256": "9703cbd4317bed4b9b1a4298340572d1a8d546ef7a1499be82f8d347158e3911",
+    "sha256": "9852d5d4feed9b647a7a2b9ec68f88dd3c6b3a355a681aedfc16abc9318f6540",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -8102,7 +8102,7 @@
     "items": 500,
     "first_id": "commercial-r13-48501",
     "last_id": "commercial-r13-49000",
-    "sha256": "d26a548ec3fdcaf175663a69aa65e892d18cdeab02f70fde969281d4fd22bda3",
+    "sha256": "d91979bbf59845d8a0263622ba223c9a17a17cf29675e8f2700f791b5dbaa40c",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -8186,7 +8186,7 @@
     "items": 500,
     "first_id": "commercial-r13-49001",
     "last_id": "commercial-r13-49500",
-    "sha256": "3289e9fbd54f7234105f5279b910c025634d5e8b733c6d65c14a3db62541a373",
+    "sha256": "310e872c36b7ca6669cbc5ed6512f3bb3c7260e4887e611d8fe37e23d2f3f51b",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,
@@ -8275,7 +8275,7 @@
     "items": 500,
     "first_id": "commercial-r13-49501",
     "last_id": "commercial-r13-50000",
-    "sha256": "8b7743a8bb609623940361681eff07ff037d72210754e12e339016b1a8a1a756",
+    "sha256": "b21cc712fc20d073d1ae18174af56da4c7ee9f37863943bc5d3515240f88349b",
     "by_family": {
       "market_size_density_competition": 50,
       "prospecting_qualification_territory": 70,

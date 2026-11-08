@@ -3,8 +3,8 @@
 ## Overview
 
 - **Total items**: `50,000` pt-BR commercial questions and dialogue turns (`batch-001` 1,000-item pilot + `batch-002..batch-099` 98 batches of 500 items).
-- **Questions JSONL SHA-256**: `5c3ef5d6948838dcf658ca28f04b0f7c21861c4386419d6f77b6095e31888365`
-- **Questions TSV SHA-256**: `e6d7c2d3db5625728c00a96c577ae9011be1090cf4165239e066cdf9900174d3`
+- **Questions JSONL SHA-256**: `ac4a60129bc55438cbc59f2369be8661133d3dfbfb9e17119a5bc4d6507ee7b9`
+- **Questions TSV SHA-256**: `9dfcb9b50f62287e1286d0f1089a43093e428c8c38b766c932348562fe345dca`
 - **Data anchor**: `2026-10-11` (`Day(46305)`), current competence `2026-10` (`Competence(321)`).
 - **Human validation**: `false` (deferred to product refinement).
 

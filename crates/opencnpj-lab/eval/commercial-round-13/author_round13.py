@@ -125,6 +125,10 @@ class Round13Author(r09.Round09Author):
                 self.prefix_by_uf[m["uf"]].append(m)
         excluded = {fold(n) for n in ["Acre", "Alagoas", "Amazonas", "Amapá", "Bahia", "Ceará", "Distrito Federal", "Espírito Santo", "Goiás", "Maranhão", "Minas Gerais", "Mato Grosso do Sul", "Mato Grosso", "Pará", "Paraíba", "Pernambuco", "Piauí", "Paraná", "Rio de Janeiro", "Rio Grande do Norte", "Rondônia", "Roraima", "Rio Grande do Sul", "Santa Catarina", "Sergipe", "São Paulo", "Tocantins", "Norte", "Nordeste", "Sudeste", "Sul", "Centro-Oeste"]}
         self.ambiguous_geo_names = excluded
+        self.sector_surface_folded = set()
+        for sec in self.sectors:
+            self.sector_surface_folded.add(fold(sec["sing"]))
+            self.sector_surface_folded.add(fold(sec["plural"]))
         self.prefix_pool = [m for m in sorted(self.munis.values(), key=lambda x: x["id"]) if m["folded"] in self.prefix_folded and m["folded"] not in excluded]
         self._geo_prefix = False
         self._colloquial_seen = 0
@@ -727,6 +731,13 @@ class Round13Author(r09.Round09Author):
                     mm = self.next_mt_muni("mt_south_logistics_industrial", seed + len(uniq))
                     if mm["id"] not in {x["id"] for x in uniq}:
                         uniq.append(mm)
+                for idx in range(3):
+                    if uniq[idx]["folded"] in self.sector_surface_folded:
+                        for step in range(1, 40):
+                            mm = self.next_mt_muni("mt_south_logistics_industrial", seed + 100 + step)
+                            if mm["id"] not in {x["id"] for x in uniq} and mm["folded"] not in self.sector_surface_folded:
+                                uniq[idx] = mm
+                                break
                 members = [{"municipality": mm["id"]} for mm in sorted(uniq, key=lambda x: x["id"])]
                 text = self.frames(
                     split,
@@ -758,6 +769,12 @@ class Round13Author(r09.Round09Author):
                         m2 = ul[(seed + 1) % len(ul)]
                         if m2["id"] == m1["id"]:
                             m2 = ul[(seed + 2) % len(ul)]
+                        if m2["folded"] in self.sector_surface_folded:
+                            for step in range(2, min(len(ul), 40)):
+                                cand = ul[step % len(ul)]
+                                if cand["id"] != m1["id"] and cand["folded"] not in self.sector_surface_folded:
+                                    m2 = cand
+                                    break
                 else:
                     target_uf = NON_MT_UFS[seed % len(NON_MT_UFS)]
                     ul = self.uf_munis[target_uf]
@@ -769,6 +786,12 @@ class Round13Author(r09.Round09Author):
                         m2 = ul[(seed + 1) % len(ul)]
                         if m2["id"] == m1["id"]:
                             m2 = ul[(seed + 2) % len(ul)]
+                        if m2["folded"] in self.sector_surface_folded:
+                            for step in range(2, min(len(ul), 40)):
+                                cand = ul[step % len(ul)]
+                                if cand["id"] != m1["id"] and cand["folded"] not in self.sector_surface_folded:
+                                    m2 = cand
+                                    break
                 if m2 is None:
                     text = self.frames(
                         split,
