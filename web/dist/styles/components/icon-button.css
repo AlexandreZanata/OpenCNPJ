@@ -1,0 +1,27 @@
+.icon-button {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink-800);
+}
+
+.icon-button:hover {
+  background: rgba(16, 24, 40, 0.05);
+}
+
+.icon-button__dot {
+  position: absolute;
+  top: 5px;
+  right: 6px;
+  width: 9px;
+  height: 9px;
+  border: 1.5px solid #fbfbfa;
+  border-radius: 50%;
+  background: var(--green-500);
+}

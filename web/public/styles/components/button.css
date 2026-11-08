@@ -1,0 +1,101 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--ink-800);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  box-shadow: 0 1px 1px rgba(16, 24, 40, 0.04);
+  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+
+.btn:hover:not(:disabled) {
+  background: #f8faf9;
+  border-color: #cbd3cf;
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn__icon {
+  flex: none;
+  color: var(--ink-700);
+}
+
+.btn__icon--trailing {
+  margin-left: 2px;
+}
+
+.btn__badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--green-700);
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Primary: brand green with a soft glow. */
+.btn--primary {
+  height: 43px;
+  padding: 0 22px;
+  border: 0;
+  background: linear-gradient(90deg, #08804c 0%, #036139 100%);
+  color: #fff;
+  font-size: 13.5px;
+  gap: 10px;
+  box-shadow: 0 2px 6px rgba(2, 94, 57, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: linear-gradient(90deg, #099055 0%, #04703f 100%);
+}
+
+.btn--primary .btn__icon {
+  color: #fff;
+}
+
+.btn--primary.is-loading .btn__icon {
+  animation: btn-pulse 0.9s ease-in-out infinite alternate;
+}
+
+@keyframes btn-pulse {
+  from { transform: translate(0, 0); opacity: 1; }
+  to { transform: translate(3px, -3px); opacity: 0.5; }
+}
+
+/* Plan selector in the top bar. */
+.btn--plan {
+  height: 35px;
+  padding: 0 14px 0 12px;
+  gap: 12px;
+  border-color: var(--line);
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(4px);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.btn--plan .btn__icon:first-child {
+  color: var(--green-500);
+}
+
+.btn--plan .btn__icon--trailing {
+  margin-left: 12px;
+  color: var(--ink-700);
+}
