@@ -576,6 +576,12 @@ fn operation_limitations(operation: &str, variables: &[&str]) -> Vec<String> {
         limitations
             .push("Produção agropecuária regional não identifica propriedade rural, rebanho ou intenção de compra de um CNPJ.".into());
     }
+    if variables.iter().any(|variable| variable.starts_with("rais_")) {
+        limitations.push("RAIS é um registro anual, não um estoque mensal atual de um CNPJ ou estabelecimento.".into());
+    }
+    if variables.iter().any(|variable| variable.starts_with("frota_") || variable.starts_with("senatran_")) {
+        limitations.push("Frota registrada não é frota circulante e não identifica veículos de um CNPJ.".into());
+    }
     limitations
 }
 

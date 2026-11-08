@@ -678,3 +678,133 @@ classification_id = "48"
 category_id = "39443"
 label = "Soja - LSPA"
 synonyms = ["soja lspa", "producao de soja lspa"]
+
+[[dataset]]
+id = "mte-rais-2024"
+source_id = "mte"
+title = "RAIS 2024 - empregos formais por município e atividade"
+aggregate = "rais-2024-tabela-4"
+api_url = "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/acoes-e-programas/programas-projetos-acoes-obras-e-atividades/estatisticas-trabalho/rais/rais-2024/rais-2024-1/rais-complementar-tabelas-2023x2024.xlsx/@@download/file"
+metadata_url = "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/acoes-e-programas/programas-projetos-acoes-obras-e-atividades/estatisticas-trabalho/rais/rais-2024/rais-2024-1"
+cadence = "annual"
+coverage = "Brazil, states and municipalities; this import keeps the MT slice"
+state = "verified"
+limitations = [
+  "RAIS is an annual administrative record, not a current monthly stock.",
+  "A municipal or sector total is not an individual CNPJ's headcount.",
+  "RAIS codes have six digits; the import bridges them to seven-digit IBGE codes.",
+  "The public microdata are non-identified."
+]
+
+[[variable]]
+id = "rais_emprego_agropecuaria"
+dataset_id = "mte-rais-2024"
+source_variable = "agropecuaria"
+label = "Empregos formais - agropecuária"
+unit = "Vínculos"
+synonyms = ["emprego agropecuario", "empregos na agropecuaria", "rais agropecuaria"]
+
+[[variable]]
+id = "rais_emprego_industria"
+dataset_id = "mte-rais-2024"
+source_variable = "industria"
+label = "Empregos formais - indústria"
+unit = "Vínculos"
+synonyms = ["emprego na industria", "empregos na industria", "rais industria"]
+
+[[variable]]
+id = "rais_emprego_construcao"
+dataset_id = "mte-rais-2024"
+source_variable = "construcao"
+label = "Empregos formais - construção"
+unit = "Vínculos"
+synonyms = ["emprego na construcao", "empregos na construcao", "rais construcao"]
+
+[[variable]]
+id = "rais_emprego_comercio"
+dataset_id = "mte-rais-2024"
+source_variable = "comercio"
+label = "Empregos formais - comércio"
+unit = "Vínculos"
+synonyms = ["emprego no comercio", "empregos no comercio", "rais comercio"]
+
+[[variable]]
+id = "rais_emprego_servicos"
+dataset_id = "mte-rais-2024"
+source_variable = "servicos"
+label = "Empregos formais - serviços"
+unit = "Vínculos"
+synonyms = ["emprego nos servicos", "empregos nos servicos", "rais servicos"]
+
+[[variable]]
+id = "rais_emprego_total"
+dataset_id = "mte-rais-2024"
+source_variable = "total"
+label = "Empregos formais - total"
+unit = "Vínculos"
+synonyms = ["emprego formal", "empregos formais", "estoque de empregos", "rais total"]
+
+[[dataset]]
+id = "senatran-frota-2026-09"
+source_id = "senatran"
+title = "Senatran - frota por município e tipo (setembro/2026)"
+aggregate = "frota-municipio-tipo-202609"
+api_url = "https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2026-2/Frota_por_municipio_e_tipo_Setembro_2026.xlsx/@@download/file"
+metadata_url = "https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2026"
+cadence = "monthly"
+coverage = "Brazilian municipalities; this import keeps the MT slice"
+state = "verified"
+limitations = [
+  "Registered fleet is not circulating fleet.",
+  "A municipal fleet total does not identify vehicles owned by an individual CNPJ.",
+  "The publication month is not a real-time circulation feed.",
+  "Municipality names were bridged to seven-digit IBGE codes through the versioned catalogue."
+]
+
+[[variable]]
+id = "frota_total"
+dataset_id = "senatran-frota-2026-09"
+source_variable = "TOTAL"
+label = "Frota registrada total"
+unit = "Veículos"
+synonyms = ["frota", "frota total", "veiculos registrados"]
+
+[[variable]]
+id = "frota_caminhao"
+dataset_id = "senatran-frota-2026-09"
+source_variable = "CAMINHAO"
+label = "Frota registrada de caminhões"
+unit = "Veículos"
+synonyms = ["caminhoes", "caminhao", "frota de caminhoes"]
+
+[[variable]]
+id = "frota_caminhonete"
+dataset_id = "senatran-frota-2026-09"
+source_variable = "CAMINHONETE"
+label = "Frota registrada de caminhonetes"
+unit = "Veículos"
+synonyms = ["caminhonetes", "caminhonete"]
+
+[[variable]]
+id = "frota_motocicleta"
+dataset_id = "senatran-frota-2026-09"
+source_variable = "MOTOCICLETA"
+label = "Frota registrada de motocicletas"
+unit = "Veículos"
+synonyms = ["motocicletas", "motocicleta", "motos", "moto"]
+
+[[variable]]
+id = "frota_automovel"
+dataset_id = "senatran-frota-2026-09"
+source_variable = "AUTOMOVEL"
+label = "Frota registrada de automóveis"
+unit = "Veículos"
+synonyms = ["automoveis", "automovel", "carros"]
+
+[[variable]]
+id = "frota_onibus"
+dataset_id = "senatran-frota-2026-09"
+source_variable = "ONIBUS"
+label = "Frota registrada de ônibus"
+unit = "Veículos"
+synonyms = ["onibus", "frota de onibus"]

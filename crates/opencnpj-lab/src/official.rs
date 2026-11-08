@@ -11,7 +11,7 @@ use std::{
 use anyhow::{Context, Result, bail, ensure};
 use clap::{Args, Subcommand};
 use opencnpj_insights::{
-    catalog::municipalities::MunicipalityCatalogue,
+    catalog::municipalities::{MunicipalityCatalogue, Place, fold_name},
     official::{
         model::{CellStatus, DatasetManifest, Observation},
         query::{self, Answer, CategoryFilter, Request},
@@ -23,6 +23,7 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
 mod ask;
+mod xlsx;
 
 #[derive(Subcommand)]
 pub(crate) enum SourcesCommand {
@@ -50,6 +51,10 @@ pub(crate) enum SourcesCommand {
 pub(crate) enum OfficialCommand {
     /// Fetch an IBGE aggregate through the official API and publish a .ocind store.
     ImportIbge(IbgeImportArgs),
+    /// Import the RAIS municipal employment table from the official XLSX file.
+    ImportRais(RaisImportArgs),
+    /// Import the Senatran municipal fleet table from the official XLSX file.
+    ImportSenatran(SenatranImportArgs),
     /// Execute an admitted indicator operation.
     Query(QueryArgs),
     /// Interpret a Portuguese question and execute it against published stores.
@@ -67,6 +72,8 @@ pub(crate) fn run_sources(command: SourcesCommand) -> Result<()> {
 pub(crate) fn run_official(command: OfficialCommand) -> Result<()> {
     match command {
         OfficialCommand::ImportIbge(args) => import_ibge(args),
+        OfficialCommand::ImportRais(args) => import_rais(args),
+        OfficialCommand::ImportSenatran(args) => import_senatran(args),
         OfficialCommand::Query(args) => run_query(args),
         OfficialCommand::Ask(args) => run_ask(args),
     }
@@ -224,6 +231,47 @@ pub(crate) struct IbgeImportArgs {
     retries: u8,
     #[arg(long, default_value_t = 60)]
     timeout_seconds: u64,
+}
+
+#[derive(Args)]
+pub(crate) struct RaisImportArgs {
+    /// Local official XLSX file.
+    #[arg(long)]
+    xlsx: PathBuf,
+    /// Destination .ocind path. Must not exist.
+    #[arg(long)]
+    out: PathBuf,
+    /// Raw XLSX evidence path. Defaults to `<out>.raw.xlsx`; must not exist.
+    #[arg(long)]
+    raw_out: Option<PathBuf>,
+    /// Reference year of the table.
+    #[arg(long, default_value_t = 2024)]
+    year: u16,
+    /// Retrieval timestamp recorded in the manifest.
+    #[arg(long)]
+    retrieved_at: Option<String>,
+}
+
+#[derive(Args)]
+pub(crate) struct SenatranImportArgs {
+    /// Local official XLSX file.
+    #[arg(long)]
+    xlsx: PathBuf,
+    /// Destination .ocind path. Must not exist.
+    #[arg(long)]
+    out: PathBuf,
+    /// Raw XLSX evidence path. Defaults to `<out>.raw.xlsx`; must not exist.
+    #[arg(long)]
+    raw_out: Option<PathBuf>,
+    /// Reference month written to the observations, as YYYYMM.
+    #[arg(long, default_value = "202609")]
+    period: String,
+    /// State slice to import.
+    #[arg(long, default_value = "MT")]
+    uf: String,
+    /// Retrieval timestamp recorded in the manifest.
+    #[arg(long)]
+    retrieved_at: Option<String>,
 }
 
 #[derive(Args)]
@@ -443,6 +491,370 @@ fn import_ibge(args: IbgeImportArgs) -> Result<()> {
         published.sha256
     );
     Ok(())
+}
+
+fn import_rais(args: RaisImportArgs) -> Result<()> {
+    ensure!(!args.out.exists(), "destination {} already exists", args.out.display());
+    let raw_path = args.raw_out.clone().unwrap_or_else(|| {
+        let mut path = args.out.clone().into_os_string();
+        path.push(".raw.xlsx");
+        PathBuf::from(path)
+    });
+    ensure!(!raw_path.exists(), "raw evidence {} already exists", raw_path.display());
+    if let Some(parent) = raw_path.parent().filter(|parent| !parent.as_os_str().is_empty()) {
+        fs::create_dir_all(parent)?;
+    }
+    let bytes = fs::read(&args.xlsx).with_context(|| format!("read {}", args.xlsx.display()))?;
+    let raw_sha256 = write_raw(&raw_path, &bytes)?;
+    let workbook = xlsx::Workbook::open(&raw_path)?;
+    if !workbook.sheet_names().any(|name| name == "TABELA 4") {
+        bail!("RAIS workbook has no TABELA 4 sheet");
+    }
+    let rows = workbook.rows("TABELA 4")?;
+    let header = rows.get(12).context("RAIS sheet has no header row")?;
+    ensure!(
+        xlsx::cell(header, 1) == "UF" && xlsx::cell(header, 2) == "Código" && xlsx::cell(header, 3) == "Município",
+        "unexpected RAIS header: {header:?}"
+    );
+    let catalogue = MunicipalityCatalogue::load(Path::new("crates/opencnpj-insights/catalog/municipalities.tsv"))?;
+    let bridge = catalogue
+        .rows()
+        .iter()
+        .filter_map(|row| match &row.place {
+            Place::Municipality(place) if place.uf == "MT" => Some((place.ibge / 10, place.ibge)),
+            _ => None,
+        })
+        .collect::<BTreeMap<_, _>>();
+    let registry = Registry::builtin()?;
+    let dataset = registry.dataset("mte-rais-2024").context("RAIS dataset registry entry")?.clone();
+    let source = registry.source("mte").context("MTE source registry entry")?;
+    let columns = [
+        ("rais_emprego_agropecuaria", 4_usize, 5_usize),
+        ("rais_emprego_industria", 8, 9),
+        ("rais_emprego_construcao", 12, 13),
+        ("rais_emprego_comercio", 16, 17),
+        ("rais_emprego_servicos", 20, 21),
+        ("rais_emprego_total", 24, 25),
+    ];
+    let mut observations = Vec::new();
+    let mut total_cells = 0_u64;
+    let mut rejected_rows = 0_u64;
+    let mut malformed_rows = 0_u64;
+    let mut unmatched = Vec::new();
+    for row in rows.iter().skip(15) {
+        if xlsx::cell(row, 1).trim() != "MT" {
+            continue;
+        }
+        let code = xlsx::cell(row, 2).trim();
+        let name = xlsx::cell(row, 3).trim();
+        let key = xlsx::parse_u32(code).context("RAIS municipality code")?;
+        let Some(ibge) = bridge.get(&key).copied() else {
+            total_cells += 12;
+            rejected_rows += 12;
+            unmatched.push(format!("{code} {name}"));
+            continue;
+        };
+        for (variable_id, column_2023, column_2024) in columns {
+            let variable = registry.variable(variable_id).context("RAIS curated variable")?;
+            for (column, period) in [(column_2023, "2023"), (column_2024, args.year.to_string().as_str())] {
+                total_cells += 1;
+                let raw = xlsx::cell(row, column).trim();
+                if raw.is_empty() || raw == ".." || raw == "..." {
+                    observations.push(Observation {
+                        dataset_id: dataset.id.clone(),
+                        variable_id: variable.id.clone(),
+                        variable_label: variable.label.clone(),
+                        unit: variable.unit.clone(),
+                        classification_id: String::new(),
+                        classification_label: String::new(),
+                        category_id: String::new(),
+                        category_label: String::new(),
+                        geography_level: "N6".into(),
+                        geography_code: format!("{ibge:07}"),
+                        geography_name: name.to_string(),
+                        period: period.to_string(),
+                        value: None,
+                        status: CellStatus::NotAvailable,
+                        source_url: dataset.api_url.clone(),
+                    });
+                    continue;
+                }
+                let (status, value) = rais_cell(raw);
+                if status == CellStatus::Malformed {
+                    malformed_rows += 1;
+                }
+                observations.push(Observation {
+                    dataset_id: dataset.id.clone(),
+                    variable_id: variable.id.clone(),
+                    variable_label: variable.label.clone(),
+                    unit: variable.unit.clone(),
+                    classification_id: String::new(),
+                    classification_label: String::new(),
+                    category_id: String::new(),
+                    category_label: String::new(),
+                    geography_level: "N6".into(),
+                    geography_code: format!("{ibge:07}"),
+                    geography_name: name.to_string(),
+                    period: period.to_string(),
+                    value,
+                    status,
+                    source_url: dataset.api_url.clone(),
+                });
+            }
+        }
+    }
+    let accepted_rows = observations.len() as u64;
+    ensure!(accepted_rows + rejected_rows == total_cells, "RAIS row accounting mismatch");
+    let mut limitations = dataset.limitations.clone();
+    if !unmatched.is_empty() {
+        limitations.push(format!(
+            "{} MT rows had no IBGE municipality bridge and were not stored: {}.",
+            unmatched.len(),
+            unmatched.join(", ")
+        ));
+    }
+    let manifest = DatasetManifest {
+        format_version: 1,
+        source_id: dataset.source_id.clone(),
+        dataset_id: dataset.id.clone(),
+        title: dataset.title.clone(),
+        publisher: source.publisher.clone(),
+        source_url: dataset.api_url.clone(),
+        metadata_url: dataset.metadata_url.clone(),
+        licence: source.licence.clone(),
+        licence_url: source.licence_url.clone(),
+        licence_status: source.licence_status.clone(),
+        attribution: source.attribution.clone(),
+        retrieved_at: args.retrieved_at.unwrap_or_else(now),
+        publication: None,
+        coverage: "Mato Grosso municipalities (RAIS 2024)".into(),
+        unit: "Vínculos".into(),
+        period_from: Some("2023".into()),
+        period_to: Some(args.year.to_string()),
+        raw_sha256,
+        raw_bytes: bytes.len() as u64,
+        row_count: total_cells,
+        accepted_rows,
+        rejected_rows,
+        duplicate_rows: 0,
+        malformed_rows,
+        state: "queryable".into(),
+        limitations,
+    };
+    let published = write_store(&args.out, &manifest, observations)?;
+    println!("raw	{}	bytes={}	sha256={}", raw_path.display(), bytes.len(), published.manifest.raw_sha256);
+    println!(
+        "published	{}	rows={}	rejected={}	malformed={}	bytes={}	sha256={}",
+        published.path.display(),
+        published.manifest.accepted_rows,
+        published.manifest.rejected_rows,
+        published.manifest.malformed_rows,
+        published.bytes,
+        published.sha256
+    );
+    Ok(())
+}
+
+fn rais_cell(raw: &str) -> (CellStatus, Option<f64>) {
+    match raw {
+        "" | ".." | "..." => (CellStatus::NotAvailable, None),
+        "X" | "x" => (CellStatus::Suppressed, None),
+        "-" => (CellStatus::Observed, Some(0.0)),
+        _ => match parse_number(raw) {
+            Some(value) => (CellStatus::Observed, Some(value)),
+            None => (CellStatus::Malformed, None),
+        },
+    }
+}
+
+fn import_senatran(args: SenatranImportArgs) -> Result<()> {
+    ensure!(!args.out.exists(), "destination {} already exists", args.out.display());
+    ensure!(args.period.len() == 6 && args.period.chars().all(|character| character.is_ascii_digit()), "period must be YYYYMM");
+    let raw_path = args.raw_out.clone().unwrap_or_else(|| {
+        let mut path = args.out.clone().into_os_string();
+        path.push(".raw.xlsx");
+        PathBuf::from(path)
+    });
+    ensure!(!raw_path.exists(), "raw evidence {} already exists", raw_path.display());
+    if let Some(parent) = raw_path.parent().filter(|parent| !parent.as_os_str().is_empty()) {
+        fs::create_dir_all(parent)?;
+    }
+    let bytes = fs::read(&args.xlsx).with_context(|| format!("read {}", args.xlsx.display()))?;
+    let raw_sha256 = write_raw(&raw_path, &bytes)?;
+    let workbook = xlsx::Workbook::open(&raw_path)?;
+    let sheet = workbook.sheet_names().next().context("Senatran workbook has no sheet")?.to_string();
+    let rows = workbook.rows(&sheet)?;
+    let header = rows.get(2).context("Senatran sheet has no header row")?;
+    ensure!(xlsx::cell(header, 0) == "UF" && xlsx::cell(header, 1) == "MUNICIPIO", "unexpected Senatran header");
+    let mut columns = Vec::new();
+    for column in 2..header.len() {
+        let label = xlsx::cell(header, column).trim();
+        if label.is_empty() {
+            continue;
+        }
+        let slug = slug(label);
+        let source_variable = label.to_string();
+        let variable = registry_variable_for_senatran(&source_variable);
+        columns.push((column, source_variable, slug, variable));
+    }
+    ensure!(!columns.is_empty(), "Senatran sheet has no vehicle columns");
+    let catalogue = MunicipalityCatalogue::load(Path::new("crates/opencnpj-insights/catalog/municipalities.tsv"))?;
+    let mut by_alias: BTreeMap<String, Vec<u32>> = BTreeMap::new();
+    let mut official_name: BTreeMap<u32, String> = BTreeMap::new();
+    for row in catalogue.rows() {
+        let Place::Municipality(place) = &row.place else { continue };
+        if place.uf != args.uf {
+            continue;
+        }
+        official_name.insert(place.ibge, row.name.clone());
+        by_alias.entry(row.folded.clone()).or_default().push(place.ibge);
+        for variant in &row.variants {
+            by_alias.entry(variant.clone()).or_default().push(place.ibge);
+        }
+    }
+    let registry = Registry::builtin()?;
+    let dataset = registry.dataset("senatran-frota-2026-09").context("Senatran dataset registry entry")?.clone();
+    let source = registry.source("senatran").context("Senatran source registry entry")?;
+    let mut observations = Vec::new();
+    let mut total_cells = 0_u64;
+    let mut rejected_rows = 0_u64;
+    let mut malformed_rows = 0_u64;
+    let mut unmatched = Vec::new();
+    for row in rows.iter().skip(3) {
+        if xlsx::cell(row, 0).trim() != args.uf {
+            continue;
+        }
+        let name = xlsx::cell(row, 1).trim();
+        let folded = senatran_alias(&fold_name(name));
+        let aliases = by_alias.get(&folded).cloned().unwrap_or_default();
+        let code = match aliases.as_slice() {
+            [code] => *code,
+            _ => {
+                total_cells += columns.len() as u64;
+                rejected_rows += columns.len() as u64;
+                unmatched.push(name.to_string());
+                continue;
+            }
+        };
+        let geography_name = official_name.get(&code).cloned().unwrap_or_else(|| name.to_string());
+        for (column, source_variable, slug, variable) in &columns {
+            total_cells += 1;
+            let raw = xlsx::cell(row, *column).trim();
+            let (status, value) = parse_cell(raw);
+            if status == CellStatus::Malformed {
+                malformed_rows += 1;
+            }
+            let variable_id = variable.as_ref().map_or_else(|| format!("senatran_{slug}"), |variable| variable.id.clone());
+            let variable_label = variable.as_ref().map_or_else(|| source_variable.clone(), |variable| variable.label.clone());
+            let unit = variable.as_ref().map_or_else(|| "Veículos".to_string(), |variable| variable.unit.clone());
+            observations.push(Observation {
+                dataset_id: dataset.id.clone(),
+                variable_id,
+                variable_label,
+                unit,
+                classification_id: String::new(),
+                classification_label: String::new(),
+                category_id: String::new(),
+                category_label: String::new(),
+                geography_level: "N6".into(),
+                geography_code: format!("{code:07}"),
+                geography_name: geography_name.clone(),
+                period: args.period.clone(),
+                value,
+                status,
+                source_url: dataset.api_url.clone(),
+            });
+        }
+    }
+    let accepted_rows = observations.len() as u64;
+    ensure!(accepted_rows + rejected_rows == total_cells, "Senatran row accounting mismatch");
+    let mut limitations = dataset.limitations.clone();
+    if !unmatched.is_empty() {
+        limitations.push(format!(
+            "{} {} rows had no unique IBGE municipality bridge and were not stored: {}.",
+            unmatched.len(),
+            args.uf,
+            unmatched.join(", ")
+        ));
+    }
+    let manifest = DatasetManifest {
+        format_version: 1,
+        source_id: dataset.source_id.clone(),
+        dataset_id: dataset.id.clone(),
+        title: dataset.title.clone(),
+        publisher: source.publisher.clone(),
+        source_url: dataset.api_url.clone(),
+        metadata_url: dataset.metadata_url.clone(),
+        licence: source.licence.clone(),
+        licence_url: source.licence_url.clone(),
+        licence_status: source.licence_status.clone(),
+        attribution: source.attribution.clone(),
+        retrieved_at: args.retrieved_at.unwrap_or_else(now),
+        publication: None,
+        coverage: format!("Mato Grosso municipalities ({})", args.period),
+        unit: "Veículos".into(),
+        period_from: Some(args.period.clone()),
+        period_to: Some(args.period.clone()),
+        raw_sha256,
+        raw_bytes: bytes.len() as u64,
+        row_count: total_cells,
+        accepted_rows,
+        rejected_rows,
+        duplicate_rows: 0,
+        malformed_rows,
+        state: "queryable".into(),
+        limitations,
+    };
+    let published = write_store(&args.out, &manifest, observations)?;
+    println!("raw	{}	bytes={}	sha256={}", raw_path.display(), bytes.len(), published.manifest.raw_sha256);
+    println!(
+        "published	{}	rows={}	rejected={}	malformed={}	bytes={}	sha256={}",
+        published.path.display(),
+        published.manifest.accepted_rows,
+        published.manifest.rejected_rows,
+        published.manifest.malformed_rows,
+        published.bytes,
+        published.sha256
+    );
+    Ok(())
+}
+
+fn registry_variable_for_senatran(source_variable: &str) -> Option<open_cnpj_variable::RegisteredVariable> {
+    let registry = Registry::builtin().ok()?;
+    registry
+        .variables()
+        .find(|variable| variable.dataset_id == "senatran-frota-2026-09" && variable.source_variable == source_variable)
+        .map(|variable| open_cnpj_variable::RegisteredVariable {
+            id: variable.id.clone(),
+            label: variable.label.clone(),
+            unit: variable.unit.clone(),
+        })
+}
+
+mod open_cnpj_variable {
+    pub struct RegisteredVariable {
+        pub id: String,
+        pub label: String,
+        pub unit: String,
+    }
+}
+
+fn senatran_alias(name: &str) -> String {
+    match name {
+        "vila bela da santissima trinda" => "vila bela da santissima trindade".into(),
+        other => other.to_string(),
+    }
+}
+
+fn slug(value: &str) -> String {
+    value
+        .chars()
+        .map(|character| if character.is_ascii_alphanumeric() { character.to_ascii_lowercase() } else { '_' })
+        .collect::<String>()
+        .split('_')
+        .filter(|part| !part.is_empty())
+        .collect::<Vec<_>>()
+        .join("_")
 }
 
 fn raw_path_for(base: &Path, _segment: &str, index: usize) -> PathBuf {
