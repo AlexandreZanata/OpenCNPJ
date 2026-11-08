@@ -626,7 +626,7 @@ fn round10_lowercase_para_in_state_list_is_para_uf() {
     let r = req(text);
     assert!(matches!(r.op, Op::Compare { dim: Dim::Uf, .. }));
     let Op::Compare { members, .. } = r.op else { panic!("expected compare") };
-    assert!(members.iter().any(|m| *m == Member::Uf(UfId(13))));
+    assert!(members.contains(&Member::Uf(UfId(13))));
 }
 
 #[test]

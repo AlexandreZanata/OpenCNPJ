@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Finalize Commercial Evaluation Round 09 evidence, metamorphic checks, replays, and report."""
+"""Finalize Commercial Evaluation Round 10 evidence, metamorphic checks, replays, and report."""
 
 from __future__ import annotations
 
@@ -11,9 +11,9 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 ROOT = Path("/home/iiii/PESSOAL-PROJETOS-ALEXANDRE/OpenCNPJ")
-EVAL_DIR = ROOT / "crates/opencnpj-lab/eval/commercial-round-09"
-RES_DIR = ROOT / "docs/intelligence/results/commercial-round-09"
-DATA_RES_DIR = Path("/data/opencnpj-data/intelligence/results/commercial-round-09")
+EVAL_DIR = ROOT / "crates/opencnpj-lab/eval/commercial-round-10"
+RES_DIR = ROOT / "docs/intelligence/results/commercial-round-10"
+DATA_RES_DIR = Path("/data/opencnpj-data/intelligence/results/commercial-round-10")
 BINARY_PATH = Path("/data/opencnpj-target/release/opencnpj-intel")
 SNAPSHOT_PATH = Path("/data/opencnpj-data/snapshots/2026-10-balanced-1.2.ocnpj")
 AGG_PATH = Path("/data/opencnpj-data/intelligence/agg/2026-10.ocagg")
@@ -40,8 +40,9 @@ def main() -> None:
     adjudications_path = RES_DIR / "label-adjudications.jsonl"
 
     set_sha = sha256_file(questions_path)
-    assert set_sha == "a3bc6c78b3066f4f8721b2de30948a04278adc80ca4cbd292acfb978eb763c29", (
-        f"questions.jsonl hash changed: {set_sha}"
+    manifest = load_json(EVAL_DIR / "manifest.json")
+    assert set_sha == manifest["questions_jsonl_sha256"], (
+        f"questions.jsonl hash changed: {set_sha} != {manifest['questions_jsonl_sha256']}"
     )
 
     questions = []
@@ -63,39 +64,10 @@ def main() -> None:
     assert len(results) == 50000
     assert len(preds) == 50000
 
+    mismatches = [(q, r, p) for q, r, p in zip(questions, results, preds) if not r.get("interpretation_correct")]
+    assert not mismatches, "Unexpected interpretation mismatches: " + ", ".join(m[0]["id"] for m in mismatches[:10])
     adjudications = {}
-    adj_lines = []
-    for q, r, p in zip(questions, results, preds):
-        if not r.get("interpretation_correct"):
-            assert "Cruzeiro" in q["text"] and p["decision"] == "execute", (
-                f"Unexpected mismatch {q['id']}: {q['text']} -> {p['decision']}"
-            )
-            orig_gold_bytes = json.dumps(q["gold"], sort_keys=True, ensure_ascii=False).encode("utf-8")
-            orig_gold_sha = hashlib.sha256(orig_gold_bytes).hexdigest()
-            adj_entry = {
-                "id": q["id"],
-                "set_sha256": set_sha,
-                "original_gold_sha256": orig_gold_sha,
-                "original_gold_decision": q["gold"]["decision"],
-                "adjudicated_gold": {
-                    "decision": p["decision"],
-                    "act": "answer",
-                    "intent": p["intent"],
-                    "ir": p["ir"],
-                },
-                "authorship": "synthetic_adjudication",
-                "reason": (
-                    "Cruzeiro/SP (id=3427) is the sole municipality in municipalities.tsv whose exact canonical name is "
-                    "'Cruzeiro' (whereas Cruzeiro do Sul/AC, Cruzeiro do Oeste/PR, and Cruzeiro da Fortaleza/MG are "
-                    "multi-word names); the frozen label marked unqualified 'Cruzeiro' as homonym clarification, "
-                    "while the spotter uniquely resolves exact canonical 'Cruzeiro' to id=3427."
-                ),
-            }
-            adjudications[q["id"]] = adj_entry
-            adj_lines.append(json.dumps(adj_entry, ensure_ascii=False))
-
-    assert len(adjudications) == 25, f"Expected 25 Cruzeiro adjudications, got {len(adjudications)}"
-    adjudications_path.write_text("\n".join(adj_lines) + "\n", encoding="utf-8")
+    adjudications_path.write_text("", encoding="utf-8")
 
     # Verify order and IDs match 1-to-1 and build split breakdown + metamorphic checks
     by_split = defaultdict(lambda: Counter())
@@ -236,7 +208,7 @@ def main() -> None:
                         (op.get("k", 10), rows, q["id"])
                     )
 
-    assert raw_correct == 49975, f"Expected 49975 raw_correct, got {raw_correct}"
+    assert raw_correct == 50000, f"Expected 50000 raw_correct, got {raw_correct}"
     assert adjudicated_correct == 50000, f"Expected 50000 adjudicated_correct, got {adjudicated_correct}"
 
     # Verify metamorphic invariants on actual executed values
@@ -354,7 +326,7 @@ def main() -> None:
                             })
 
     metamorphic_report = {
-        "round": "commercial-round-09",
+        "round": "commercial-round-10",
         "stats": dict(meta_stats),
         "violations_count": len(meta_violations),
         "violations": meta_violations,
@@ -365,7 +337,7 @@ def main() -> None:
     )
 
     split_report = {
-        "round": "commercial-round-09",
+        "round": "commercial-round-10",
         "total_items": 50000,
         "raw_interpretation_correct": raw_correct,
         "adjudicated_interpretation_correct": adjudicated_correct,
@@ -384,7 +356,7 @@ def main() -> None:
 
     # Prior rounds replay summary
     prior_replays = {}
-    for r in ["01", "02", "03", "04", "05", "06", "07", "08"]:
+    for r in ["01", "02", "03", "04", "05", "06", "07", "08", "09"]:
         sum_path = DATA_RES_DIR / f"replay-round-{r}/summary.json"
         s = load_json(sum_path)
         prior_replays[f"replay-round-{r}"] = {
@@ -445,7 +417,7 @@ def main() -> None:
                 str(BINARY_PATH),
                 "eval-questions",
                 "--set",
-                "crates/opencnpj-lab/eval/commercial-round-09/questions.jsonl",
+                "crates/opencnpj-lab/eval/commercial-round-10/questions.jsonl",
                 "--snapshot",
                 str(SNAPSHOT_PATH),
                 "--agg",
@@ -458,7 +430,7 @@ def main() -> None:
             "binary_sha256": bin_sha,
             "exit_code": 0,
             "counts": nat_summary["counts"],
-            "summary_path": "docs/intelligence/results/commercial-round-09/national/summary.json",
+            "summary_path": "docs/intelligence/results/commercial-round-10/national/summary.json",
         }
     }
     for name, set_rel in [
@@ -485,9 +457,9 @@ def main() -> None:
             "binary_sha256": bin_sha,
             "exit_code": 0,
             "counts": frozen_summaries[name]["counts"],
-            "summary_path": f"docs/intelligence/results/commercial-round-09/{name}/summary.json",
+            "summary_path": f"docs/intelligence/results/commercial-round-10/{name}/summary.json",
         }
-    for r in ["01", "02", "03", "04", "05", "06", "07", "08"]:
+    for r in ["01", "02", "03", "04", "05", "06", "07", "08", "09"]:
         key = f"replay-round-{r}"
         eval_runs[key] = {
             "command": [
@@ -515,7 +487,7 @@ def main() -> None:
     pilot_after = load_json(RES_DIR / "pilot-after-fix/summary.json")["counts"]
 
     index_obj = {
-        "round": "commercial-round-09",
+        "round": "commercial-round-10",
         "status": "complete",
         "review_date": "2026-11-08",
         "finalized_at_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
@@ -530,11 +502,11 @@ def main() -> None:
         "pilot_after_fix": pilot_after,
         "national_evaluation": nat_summary["counts"],
         "separate_adjudication_patch": {
-            "items": 25,
+            "items": 0,
             "original_questions_modified": False,
             "raw_frozen_label_agreement": raw_correct,
             "agreement_with_documented_replacement_labels": adjudicated_correct,
-            "reason": "Cruzeiro/SP (id=3427) is the sole municipality whose exact canonical name is 'Cruzeiro'; frozen labels marked unqualified 'Cruzeiro' as homonym clarification, while the spotter uniquely resolves exact canonical 'Cruzeiro' to id=3427.",
+            "reason": "No post-freeze label adjudications were needed; exact-name municipality resolution is encoded before predictions.",
         },
         "frozen_suites": {k: v["counts"] for k, v in frozen_summaries.items()},
         "prior_round_replays": {k: v["counts"] for k, v in prior_replays.items()},
@@ -563,13 +535,21 @@ def main() -> None:
         "crates/opencnpj-lab/src/query.rs",
         "crates/opencnpj-store/src/reader.rs",
         "crates/opencnpj-store/src/search.rs",
-        "crates/opencnpj-lab/eval/commercial-round-09/questions.jsonl",
-        "crates/opencnpj-lab/eval/commercial-round-09/questions.tsv",
-        "crates/opencnpj-lab/eval/commercial-round-09/manifest.json",
-        "crates/opencnpj-lab/eval/commercial-round-09/batches/batch-001.jsonl",
+        "crates/opencnpj-lab/eval/commercial-round-10/questions.jsonl",
+        "crates/opencnpj-lab/eval/commercial-round-10/questions.tsv",
+        "crates/opencnpj-lab/eval/commercial-round-10/manifest.json",
+        "crates/opencnpj-lab/eval/commercial-round-10/batches/batch-001.jsonl",
+        "crates/opencnpj-insights/catalog/sectors.toml",
+        "crates/opencnpj-insights/catalog/municipalities.tsv",
     ]
     source_shas = {rel: sha256_file(ROOT / rel) for rel in tracked_sources}
     (RES_DIR / "final-source-sha256.json").write_text(json.dumps(source_shas, indent=2) + "\n", encoding="utf-8")
+
+    evidence = {}
+    for path in sorted(RES_DIR.rglob("*")):
+        if path.is_file() and path.name != "evidence-sha256.json" and not path.name.endswith(".log"):
+            evidence[str(path.relative_to(RES_DIR))] = sha256_file(path)
+    (RES_DIR / "evidence-sha256.json").write_text(json.dumps(evidence, indent=2) + "\n", encoding="utf-8")
 
     print("Finalized JSON artifacts successfully.")
 
