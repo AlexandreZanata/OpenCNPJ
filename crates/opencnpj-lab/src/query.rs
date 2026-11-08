@@ -234,6 +234,38 @@ pub struct EngineExecutor<'a> {
 }
 
 impl EngineExecutor<'_> {
+    /// Lists use the same complete filter set as counts before sorting or pagination.
+    /// Lowering alone cannot express exclusions or population predicates.
+    pub fn records(&self, request: &ValidRequest) -> Result<search::SearchResult> {
+        ensure!(matches!(request.op, Op::List { .. } | Op::Lookup { .. }), "records needs a list or lookup");
+        let mut set = self.set(request)?;
+        if let Some(range) = request.scope.place_population {
+            let reference = request.scope.population_ref.unwrap_or_else(|| self.context.municipalities.default_population());
+            let mut allowed = RoaringBitmap::new();
+            for row in self.context.municipalities.rows() {
+                if self.population_ok(row.id, (range.from.unwrap_or(0), range.to.unwrap_or(u32::MAX)), reference)
+                    && let Some(postings) = self.snapshot.postings(Field::Municipio, format!("{:04}", row.tom).as_bytes())?
+                {
+                    allowed |= &*postings;
+                }
+            }
+            set &= allowed;
+        }
+        let query = parse(&lower(request, self.context.municipalities)?)?;
+        let total = set.len();
+        let docs = if let Some((field, desc)) = query.sort {
+            let column = self.snapshot.numeric(field).context("missing sort column")?;
+            column
+                .top_k(self.snapshot.bytes(), &set, query.offset.saturating_add(query.limit), desc)
+                .into_iter()
+                .skip(query.offset)
+                .collect()
+        } else {
+            set.iter().skip(query.offset).take(query.limit).collect()
+        };
+        Ok(search::SearchResult { total, docs, ..Default::default() })
+    }
+
     pub fn execute(&self, request: &ValidRequest) -> Result<Value> {
         let request = request.as_request();
         match &request.op {
@@ -406,9 +438,9 @@ impl EngineExecutor<'_> {
             pairs.push(("uf".into(), ufs.iter().cloned().collect::<Vec<_>>().join(",")));
         }
         let query = parse(&pairs)?;
-        let mut set = search::candidates(self.snapshot, &query, &self.limits)?
-            .all
-            .unwrap_or_else(|| RoaringBitmap::from_iter(0..self.snapshot.doc_count()));
+        let candidates = search::candidates(self.snapshot, &query, &self.limits)?;
+        ensure!(!candidates.truncated, "query expansion was truncated");
+        let mut set = candidates.all.unwrap_or_else(|| RoaringBitmap::from_iter(0..self.snapshot.doc_count()));
         if let Some(excluded) = self.exclusions(request)? {
             set -= excluded;
         }
@@ -684,7 +716,11 @@ fn request_with_flow(request: &Request, flow: FlowMetric) -> Request {
         Op::Trend { metric, .. } => *metric = flow,
         _ => {}
     }
-    clone.scope.status = Some(clone.op.default_status());
+    // Only a metric change (the two components of a net flow) needs a new
+    // implied status. An explicit same-flow status is part of the user's filter.
+    if request.op.metric() != Some(Metric::Flow(flow)) {
+        clone.scope.status = Some(clone.op.default_status());
+    }
     clone
 }
 
@@ -811,7 +847,9 @@ pub fn validate_capabilities(catalogue: &MunicipalityCatalogue, sectors: &Sector
     Capabilities {
         current: Competence::from_year_month(2026, 10).expect("current competence"),
         competences,
-        flow_days: Day::from_ymd(2025, 1, 1).expect("flow start")..=last_day,
+        // Current snapshots retain historical registration/status dates.
+        // Aggregate monthly buckets start in 2021; older or unaligned periods use the engine.
+        flow_days: Day(1)..=last_day,
         populations,
         catalogue_versions: CatalogueVersions { municipalities: 202610, sectors: 1 },
         sector_count: u16::try_from(sectors.len()).expect("sector count"),
@@ -1029,6 +1067,74 @@ mod tests {
             "versions": {"municipalities": 202610, "sectors": 1}
         }))
         .unwrap()
+    }
+
+    #[test]
+    fn records_preserve_exclusions_and_population_before_pagination() {
+        let directory = tempfile::tempdir().unwrap();
+        let (path, _) = opencnpj_ingest::testkit::build_fixture(directory.path(), "balanced");
+        let snapshot = Snapshot::open(&path).unwrap();
+        let catalogue = fitting_catalogue(&snapshot);
+        let sectors = SectorMap::new();
+        let context = ExecContext::new(&catalogue, &sectors);
+        let engine = EngineExecutor { snapshot: &snapshot, context: &context, limits: Limits::DEFAULT };
+        let plain =
+            request(json!({"kind":"list","order":"cnpj","limit":100}), json!({"status":["null","active","suspended","unfit","closed"]}));
+        let valid = validate_request(plain.clone(), &catalogue, &sectors, Day(46305)).unwrap();
+        let original = engine.records(&valid).unwrap();
+        assert!(original.total > 0);
+        let municipality_column =
+            opencnpj_core::schema::Table::Estabelecimentos.row_columns().iter().position(|c| c.name == "municipio").unwrap();
+        let unknown = snapshot
+            .docs(&original.docs)
+            .unwrap()
+            .into_iter()
+            .filter(|r| {
+                r.estab
+                    .and_then(|i| r.company.estabelecimentos.get(i))
+                    .and_then(|row| row.get(municipality_column))
+                    .and_then(|code| code.parse::<u16>().ok())
+                    .and_then(|tom| catalogue.by_tom(tom))
+                    .is_none()
+            })
+            .count();
+        let mut excluded = plain.clone();
+        excluded.scope.exclude.municipalities = SmallSet::new(catalogue.rows().iter().map(|r| MunicipalityId(r.id)));
+        let valid = validate_request(excluded, &catalogue, &sectors, Day(46305)).unwrap();
+        let result = engine.records(&valid).unwrap();
+        // Excluding every known municipality must preserve source rows with no valid municipality.
+        assert_eq!(result.total, unknown as u64);
+        assert_eq!(result.docs.len(), unknown);
+        let mut filtered = plain;
+        filtered.scope.place_population = Some(Range { from: Some(2), to: None });
+        filtered.scope.population_ref = Some(PopulationRef::IbgeEstimate(2025));
+        filtered.scope.place = PlaceFilter::Ufs(SmallSet::new([UfId(25)]));
+        let valid = validate_request(filtered, &catalogue, &sectors, Day(46305)).unwrap();
+        let result = engine.records(&valid).unwrap();
+        assert_eq!(result.total, 0);
+        assert!(result.docs.is_empty());
+    }
+
+    #[test]
+    fn registration_flow_preserves_an_explicit_current_status_filter() {
+        let directory = tempfile::tempdir().unwrap();
+        let (path, _) = opencnpj_ingest::testkit::build_fixture(directory.path(), "balanced");
+        let snapshot = Snapshot::open(&path).unwrap();
+        let catalogue = fitting_catalogue(&snapshot);
+        let sectors = SectorMap::new();
+        let context = ExecContext::new(&catalogue, &sectors);
+        let engine = EngineExecutor { snapshot: &snapshot, context: &context, limits: Limits::DEFAULT };
+        let mut flow = request(json!({"kind":"count","metric":{"flow":"registrations"}}), json!({"status":["active"]}));
+        let range = Range { from: Some(Day(1)), to: Some(Day(46305)) };
+        flow.time.period = Some(Period::Days(range));
+        let valid = validate_request(flow.clone(), &catalogue, &sectors, Day(46305)).unwrap();
+        let actual = engine.execute(&valid).unwrap();
+        let stock = request(json!({"kind":"count","metric":"stock"}), json!({"status":["active"],"opened":{"from":1,"to":46305}}));
+        let stock = validate_request(stock, &catalogue, &sectors, Day(46305)).unwrap();
+        assert_eq!(actual, engine.execute(&stock).unwrap());
+        flow.scope.status = Some(StatusSet::ALL);
+        let all = validate_request(flow, &catalogue, &sectors, Day(46305)).unwrap();
+        assert_ne!(actual, engine.execute(&all).unwrap(), "fixture must distinguish active registrations from every status");
     }
 
     #[tokio::test]

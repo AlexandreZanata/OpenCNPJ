@@ -1,0 +1,5 @@
+# Never answer a metric absent from the source data by substituting another metric.
+unavailable = ["faturamento", "faturam", "lucro", "lucrativo", "lucrativos", "funcionarios", "empregados", "empregos", "receita mensal", "ticket medio", "inadimplentes", "dividas", "seguidores", "instagram", "licenca sanitaria", "licenca ambiental", "alvara", "credit score", "score de credito", "preveja", "previsao", "vai abrir", "vao abrir", "vale a pena", "melhor lugar para abrir", "numeros da sorte", "loteria", "loterias", "horoscopo"]
+privacy = ["cpf", "cpfs", "socios", "socio", "donos", "dono", "proprietario", "proprietarios", "documentos pessoais", "pessoas fisicas"]
+ambiguous_activity = ["tecnologia", "mercado", "mercados", "estetica", "beleza"]
+ambiguous_quality = ["melhores", "melhor", "grandes", "grande", "grandona", "grandonas", "grandao", "grandoes", "desse tipo", "desse jeito", "alta recente", "perto de mim", "cidades pequenas", "municipios pequenos"]

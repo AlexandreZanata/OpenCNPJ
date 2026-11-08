@@ -91,3 +91,16 @@ The builder expects a verified snapshot. Select `--tables T1,T2` for a
 historical stock artefact. The comparison checks complete CNAE, UF and
 municipality marginals and queries exact engine counts for sampled cells.
 See the [aggregate format](../../docs/intelligence/AGGREGATES-FORMAT.md).
+
+## Portuguese questions and commercial evaluation
+
+`opencnpj-intel ask --text 'Quantas padarias ativas existem em Sorriso/MT?'`
+interprets a question. Add `--agg`, `--history`, `--snapshot` and optional
+`--state` to execute and continue a local conversation.
+
+`opencnpj-intel eval-questions --set <questions.jsonl> --out <directory>`
+records actual text-only interpretations, canonical label comparisons and,
+when real data paths are provided, separate predicted/gold execution audits.
+`--interpret-only` skips backend execution. The runner never seeds predictions
+or conversation state with labels. See the
+[commercial evaluation runbook](../../docs/intelligence/results/commercial-round-01/RUNBOOK.md).

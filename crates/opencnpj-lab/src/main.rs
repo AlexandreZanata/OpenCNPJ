@@ -6,6 +6,7 @@ mod catalog;
 mod eval;
 mod oracle;
 mod query;
+mod questions;
 mod synth;
 
 use clap::{CommandFactory, Parser, Subcommand, error::ErrorKind};
@@ -31,6 +32,10 @@ enum Command {
     },
     /// Compare aggregate results with engine counts.
     DiffAgg(aggregate::DiffArgs),
+    /// Interpret a Portuguese question and optionally execute it on real data.
+    Ask(questions::AskArgs),
+    /// Interpret every question and audit predictions and backend results.
+    EvalQuestions(questions::EvalArgs),
     /// Execute a query written in the intermediate language.
     Run,
     /// Execute the golden IR set with aggregates and the engine and compare the results.
@@ -55,6 +60,8 @@ enum Command {
 
 fn main() -> anyhow::Result<()> {
     match Cli::parse().command {
+        Some(Command::Ask(args)) => questions::ask(args),
+        Some(Command::EvalQuestions(args)) => questions::evaluate(args),
         Some(Command::Catalog { command }) => catalog::run(command),
         Some(Command::Agg { command }) => aggregate::run(command),
         Some(Command::DiffAgg(args)) => aggregate::diff(args),

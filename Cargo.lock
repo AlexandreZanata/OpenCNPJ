@@ -2651,6 +2651,10 @@ dependencies = [
  "fst",
  "opencnpj-core",
  "opencnpj-query",
+ "serde",
+ "serde_json",
+ "toml",
+ "unicode-normalization",
 ]
 
 [[package]]

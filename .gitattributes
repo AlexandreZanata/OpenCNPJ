@@ -7,3 +7,8 @@ crates/opencnpj-insights/catalog/** text eol=lf
 crates/opencnpj-insights/templates/** text eol=lf
 crates/opencnpj-insights/tests/fixtures/** text eol=lf
 crates/opencnpj-query/tests/fixtures/** text eol=lf
+
+# Frozen evaluation sources and raw logs must retain their recorded byte hashes.
+crates/opencnpj-lab/eval/commercial-round-*/questions.tsv -text !eol -whitespace
+crates/opencnpj-lab/eval/commercial-round-*/*.jsonl -text !eol
+docs/intelligence/results/commercial-round-*/*.log -text -whitespace

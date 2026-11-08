@@ -1,0 +1,3 @@
+    Blocking waiting for file lock on build directory
+    Checking opencnpj-lab v0.1.0 (/home/iiii/PESSOAL-PROJETOS-ALEXANDRE/OpenCNPJ/crates/opencnpj-lab)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.98s

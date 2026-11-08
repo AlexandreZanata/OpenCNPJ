@@ -10,3 +10,7 @@
 .vscode/
 .env
 /.claude/worktrees/
+
+# Generated evaluation outputs can contain national-derived record samples.
+/docs/intelligence/results/commercial-round-*/**/results.jsonl
+/docs/intelligence/results/commercial-round-*/**/predictions.jsonl
