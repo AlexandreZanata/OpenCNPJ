@@ -1,0 +1,142 @@
+{
+  "round": "commercial-round-12",
+  "prior_rounds_audited": {
+    "commercial-round-01": 1000,
+    "commercial-round-02": 1000,
+    "commercial-round-03": 3000,
+    "commercial-round-04": 5000,
+    "commercial-round-05": 10000,
+    "commercial-round-06": 20000,
+    "commercial-round-07": 20000,
+    "commercial-round-08": 50000,
+    "commercial-round-09": 50000,
+    "commercial-round-10": 50000,
+    "commercial-round-11": 50000
+  },
+  "prior_rounds_total_items": 260000,
+  "prior_rounds_distributions": {
+    "categories": {
+      "market_size": 5500,
+      "prospecting": 5500,
+      "tax_size": 5500,
+      "structure_status": 5500,
+      "capital_legal": 5500,
+      "registrations": 5500,
+      "closures": 5500,
+      "trends": 5500,
+      "historical": 5500,
+      "geography": 5500,
+      "density": 5500,
+      "comparison": 5500,
+      "distribution": 5500,
+      "activity": 5500,
+      "exclusion": 5500,
+      "lookup": 5500,
+      "methodology": 5500,
+      "dialogue": 5500,
+      "clarification": 5500,
+      "unsupported": 5500,
+      "market_size_density_competition": 15000,
+      "prospecting_qualification_territory": 21000,
+      "historical_stock_flows_seasonality": 15000,
+      "geography_catchments_comparisons": 15000,
+      "corporate_structure_hq_branches_identity": 12000,
+      "supply_chain_complementary": 15000,
+      "cross_variable_correlation": 15000,
+      "dialogue_corrections_references_planning": 18000,
+      "source_quality_provenance_uncertainty": 9000,
+      "unsupported_missing_contradictions": 9000,
+      "tax_size_legal_capital_numeric": 6000
+    },
+    "decisions": {
+      "execute": 224750,
+      "clarify": 18600,
+      "reject": 16650
+    },
+    "intents": {
+      "count": 126055,
+      "list": 24410,
+      "trend": 8500,
+      "rank": 17805,
+      "compare": 21380,
+      "breakdown": 10750,
+      "lookup": 7350,
+      "None": 35250,
+      "meta": 8500
+    },
+    "acts": {
+      "None": 44545,
+      "new_query": 201855,
+      "replace_slot": 7418,
+      "add_filter": 2382,
+      "remove_filter": 2700,
+      "correction": 500,
+      "compound_edit": 600
+    },
+    "filter_combinations": {
+      "none": 97532,
+      "contact": 4151,
+      "mei": 2278,
+      "simples": 1338,
+      "porte": 1780,
+      "mei+porte": 5,
+      "mei+simples": 1725,
+      "head_office": 8450,
+      "status": 49345,
+      "head_office+mei": 705,
+      "capital": 2865,
+      "natureza": 905,
+      "natureza+simples": 5,
+      "capital+mei": 5,
+      "head_office+status": 690,
+      "porte+status": 20,
+      "mei+status": 652,
+      "within_ufs": 2632,
+      "place_population": 8075,
+      "exclude": 4884,
+      "capital+natureza": 1720,
+      "exclude+status": 2746,
+      "simples+status": 642,
+      "contact+head_office+porte": 3000,
+      "contact+mei+simples": 3000,
+      "capital+contact+head_office": 3000,
+      "contact+opened+porte": 3000,
+      "contact+head_office+natureza": 3000,
+      "contact+mei": 3000,
+      "head_office+porte+simples": 3300,
+      "opened+status": 3000,
+      "head_office+porte": 1000,
+      "capital+mei+simples": 1500,
+      "natureza+porte": 1500,
+      "capital+head_office": 1500,
+      "contact+exclude+head_office": 900,
+      "capital+porte": 600,
+      "head_office+simples": 300
+    },
+    "distinct_municipalities_used": 4394,
+    "mt_municipalities_used": 142,
+    "mt_municipalities_missing": 0
+  },
+  "identified_gaps_and_round_12_remediation": [
+    {
+      "gap_id": "GAP-12-01-SECTOR-COLLOQUIALISMS",
+      "description": "Round 11 added five food/beverage aliases; retífica, lojinha, doceria, pastelaria, choperia and empório were still absent.",
+      "round_12_target": "Add those documented commercial surfaces to existing sectors without inventing customer speech."
+    },
+    {
+      "gap_id": "GAP-12-02-THREE-CITY-COMPARISON",
+      "description": "Round 11 geography comparisons were limited to one or two municipalities.",
+      "round_12_target": "Add a general three-municipality stock comparison subvariant."
+    },
+    {
+      "gap_id": "GAP-12-03-HOMONYM-RESOLVE-LIST",
+      "description": "Round 11 dialogues tested prefix resolution but not homonym clarification followed by an explicit UF resolution and a contact-filtered list.",
+      "round_12_target": "Add the three-turn homonym clarify -> resolve UF -> qualify list pattern."
+    },
+    {
+      "gap_id": "GAP-12-04-AGE-STATUS-AND-CORRELATION",
+      "description": "Round 11 documented eight correlation subvariants but age versus current status was not an explicit cross-variable branch.",
+      "round_12_target": "Add the active-stock change branch (past competence to current) as a descriptive age/status subvariant."
+    }
+  ]
+}
