@@ -1,0 +1,98 @@
+{
+  "categories": {
+    "activity": {
+      "interpretation_correct": 150,
+      "items": 150
+    },
+    "capital_legal": {
+      "interpretation_correct": 150,
+      "items": 150
+    },
+    "clarification": {
+      "interpretation_correct": 150,
+      "items": 150
+    },
+    "closures": {
+      "items": 150
+    },
+    "comparison": {
+      "interpretation_correct": 150,
+      "items": 150
+    },
+    "density": {
+      "interpretation_correct": 150,
+      "items": 150
+    },
+    "dialogue": {
+      "interpretation_correct": 150,
+      "items": 150
+    },
+    "distribution": {
+      "interpretation_correct": 150,
+      "items": 150
+    },
+    "exclusion": {
+      "interpretation_correct": 150,
+      "items": 150
+    },
+    "geography": {
+      "interpretation_correct": 150,
+      "items": 150
+    },
+    "historical": {
+      "interpretation_correct": 150,
+      "items": 150
+    },
+    "lookup": {
+      "interpretation_correct": 150,
+      "items": 150
+    },
+    "market_size": {
+      "interpretation_correct": 144,
+      "items": 150
+    },
+    "methodology": {
+      "interpretation_correct": 150,
+      "items": 150
+    },
+    "prospecting": {
+      "interpretation_correct": 150,
+      "items": 150
+    },
+    "registrations": {
+      "interpretation_correct": 150,
+      "items": 150
+    },
+    "structure_status": {
+      "interpretation_correct": 150,
+      "items": 150
+    },
+    "tax_size": {
+      "interpretation_correct": 150,
+      "items": 150
+    },
+    "trends": {
+      "interpretation_correct": 150,
+      "items": 150
+    },
+    "unsupported": {
+      "interpretation_correct": 150,
+      "items": 150
+    }
+  },
+  "counts": {
+    "act_correct": 2535,
+    "act_items": 2535,
+    "decision_correct": 2844,
+    "interpretation_correct": 2844,
+    "interpretation_wrong": 156,
+    "items": 3000
+  },
+  "data_anchor": "2026-10-11",
+  "evidence_score": "Rule evidence is not a calibrated probability.",
+  "human_validation": "Not performed; human validation is deferred to product refinement.",
+  "method": "Actual text-only deterministic interpretation; gold IR used only for canonical scoring and separate backend reference, never as a prediction or conversation seed.",
+  "set": "crates/opencnpj-lab/eval/commercial-round-03/questions.jsonl",
+  "set_sha256": "331d33f48d655469f2a3b1926fc5140dbc0fdb9c65f88614b82138983aa76d98",
+  "snapshot_sha256": null
+}

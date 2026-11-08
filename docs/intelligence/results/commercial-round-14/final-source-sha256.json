@@ -1,0 +1,16 @@
+{
+  "crates/opencnpj-nlu/lang/pt-BR/cues.toml": "507cc4ca76532ff013391d6bb1b9913d2b1225c69b311a8ed637244158b56c57",
+  "crates/opencnpj-nlu/lang/pt-BR/policy.toml": "cae38d8223956aab1f178140763c8cc3bbe48a5af24a0c4f11846c9dac9df129",
+  "crates/opencnpj-nlu/src/grammar.rs": "90556ca45a25623c54f9f48c6ea3b1e486bdff2d22fcfdd147c9cfadee4d725b",
+  "crates/opencnpj-nlu/src/tests.rs": "268cc8f786dc5561f3a85032e818886249ec4ea69d1560b3f84570c3205dbf88",
+  "crates/opencnpj-lab/src/questions.rs": "5c511d68d9e11392fbe3d9c8a60e992d8c69ced0f600de4a4e5a694c9685b846",
+  "crates/opencnpj-lab/src/query.rs": "5891206498625700f7aad3b3171b932473b2cbebb6186c5ab84121c890edb1d2",
+  "crates/opencnpj-store/src/reader.rs": "3e9e8e5d98781d4bb42fcddfee32b59b5c268c7bc9c2e1d75e6c9bd739df60b2",
+  "crates/opencnpj-store/src/search.rs": "e14f567ad9d9b0f802de891835f3d5af46a9fed7ee00282b088d181c331364e6",
+  "crates/opencnpj-lab/eval/commercial-round-14/questions.jsonl": "08410dfd32f0ff1a2566fc250601600be1d5209dd9e88bdfd499b252a6af069b",
+  "crates/opencnpj-lab/eval/commercial-round-14/questions.tsv": "fb62c3f97c904adfa8908221ae439c407fa88114921b6e4ab64d365cffc41307",
+  "crates/opencnpj-lab/eval/commercial-round-14/manifest.json": "0f52ecfc81bcc3f0b990e4b3d89342bab48a1e86d860199f3bb81311af11e93d",
+  "crates/opencnpj-lab/eval/commercial-round-14/batches/batch-001.jsonl": "2e7fbc6c04c45f34a57258a46ba6a68979dc17d0526b276d96c37bd5f8add479",
+  "crates/opencnpj-insights/catalog/sectors.toml": "9bc3bd78261a70d5131647d881a65d2bf3140ead08968cd474584f787c6b713a",
+  "crates/opencnpj-insights/catalog/municipalities.tsv": "d0bc5bbe308d35ae3b7913e617f0928ca5ac187464c49d517e11b4048d74c2b5"
+}
