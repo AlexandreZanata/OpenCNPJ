@@ -1,0 +1,131 @@
+{
+  "round": "commercial-round-14",
+  "accessed_date": "2026-11-08",
+  "pinned_internal_artifacts": {
+    "snapshot_path": "/data/opencnpj-data/snapshots/2026-10-balanced-1.2.ocnpj",
+    "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b",
+    "current_aggregate_path": "/data/opencnpj-data/intelligence/agg/2026-10.ocagg",
+    "history_aggregates_dir": "/data/opencnpj-data/intelligence/backfill/aggregates",
+    "data_anchor": "2026-10-11",
+    "data_anchor_day": 46305,
+    "current_competence": "2026-10",
+    "current_competence_id": 321,
+    "available_competences_range": [
+      298,
+      321
+    ],
+    "municipalities_catalog_path": "crates/opencnpj-insights/catalog/municipalities.tsv",
+    "municipalities_catalog_sha256": "d0bc5bbe308d35ae3b7913e617f0928ca5ac187464c49d517e11b4048d74c2b5",
+    "municipalities_catalog_version": 202610,
+    "municipalities_count": 5572,
+    "mt_municipalities_count": 142,
+    "sectors_catalog_path": "crates/opencnpj-insights/catalog/sectors.toml",
+    "sectors_catalog_sha256": "9bc3bd78261a70d5131647d881a65d2bf3140ead08968cd474584f787c6b713a",
+    "sectors_catalog_version": 1,
+    "sectors_count": 214
+  },
+  "regional_linguistic_and_cultural_sources": [
+    {
+      "source_id": "REG-MT-01",
+      "title": "Tchá por Deus: uma análise semântico-lexical e cultural da expressão cuiabana",
+      "publisher": "UNEMAT — Revista Estudos Acadêmicos de Letras (Reacl), v. 17, n. 01, 2024",
+      "url": "https://periodicos.unemat.br/index.php/reacl/article/view/12250",
+      "doi": "10.30681/real.v17i01.12250",
+      "accessed_at": "2026-11-08",
+      "verification_status": "HTTP_200_VERIFIED",
+      "license": "CC BY 4.0",
+      "locality": "Cuiabá and Baixada Cuiabana (Mato Grosso)",
+      "role_in_round_14": "Primary academic linguistic reference for Cuiabano interjections and discourse markers ('Tchá por Deus', 'Vôte') and their pragmatic role in spoken and informal written pt-BR.",
+      "reuse_policy": "Short lexical terms and synthetic commercial sentences inspired by documented usage; no verbatim reproduction of article prose."
+    },
+    {
+      "source_id": "REG-MT-02",
+      "title": "MT Criativo — Tchá por Dios / Expressões e Cultura da Baixada Cuiabana",
+      "publisher": "Secretaria de Estado de Cultura, Esporte e Lazer de Mato Grosso (SECEL-MT)",
+      "url": "https://mtcriativo.mt.gov.br/index.php/directory/tcha-por-dios/",
+      "accessed_at": "2026-11-08",
+      "verification_status": "HTTP_200_VERIFIED",
+      "license": "Public government cultural directory (State of Mato Grosso)",
+      "locality": "Cuiabá / Várzea Grande / Mato Grosso",
+      "role_in_round_14": "Public cultural registry documenting regional identity and spelling variants ('Tchá por Deus' / 'Tchá por Dios') in Mato Grosso creative economy contexts.",
+      "reuse_policy": "Metadata and short regional lexical items only."
+    },
+    {
+      "source_id": "REG-MT-03",
+      "title": "Danças, artes, comidas e costumes dão identidade a Mato Grosso (citing Antônio de Arruda 1998 & Antônio Loureiro 2006)",
+      "publisher": "DETRAN-MT / SECOM-MT (Government of Mato Grosso)",
+      "url": "https://www.detran.mt.gov.br/web/mt/w/10050222-dancas-artes-comidas-e-costumes-dao-identidade-a-mato-grosso",
+      "accessed_at": "2026-11-08",
+      "verification_status": "HTTP_200_VERIFIED",
+      "license": "Public government communication citing published Mato Grosso lexicographical works",
+      "locality": "Mato Grosso (Baixada Cuiabana, Pantanal, interior)",
+      "role_in_round_14": "Documents traditional MT vocabulary and cultural practices ('vôte', 'tchá por Deus', 'é mato', 'pau-rodado', 'muxirum', 'quebra-torto') citing Antônio de Arruda ('O Linguajar Cuiabano e Outros Escritos', 1998) and Antônio Loureiro ('Cultura Mato-Grossense', 2006).",
+      "reuse_policy": "Short lexical items and cultural context concepts used to ground synthetic pt-BR business questions."
+    },
+    {
+      "source_id": "REG-BR-01",
+      "title": "Brazilian regional discourse markers and commercial colloquialisms across UFs",
+      "publisher": "Standard Brazilian Portuguese dialectology and public regional usage (MG, RS, PE, BA, CE, PA, AM, GO, MS, PR, SC, SP, RJ)",
+      "url": "https://www.academia.org.br/nossa-lingua/busca-no-vocabulario",
+      "accessed_at": "2026-11-08",
+      "verification_status": "DOCUMENTED_LEXICON",
+      "license": "Public domain lexical items",
+      "locality": "All 26 non-MT Brazilian states and DF",
+      "role_in_round_14": "Provides documented regional interjections ('uai', 'sô', 'trem', 'bah', 'tchê', 'guri', 'oxe', 'oxente', 'visse', 'arretado', 'égua', 'piá', 'manezinho') for cross-UF minimal pairs.",
+      "reuse_policy": "Single-word or two-word public regional interjections embedded in synthetic business queries."
+    }
+  ],
+  "external_socioeconomic_candidates_evaluated": [
+    {
+      "source_id": "EXT-IBGE-CEMPRE",
+      "title": "IBGE — Cadastro Central de Empresas (CEMPRE)",
+      "url": "https://www.ibge.gov.br/estatisticas/economicas/comercio/9016-cadastro-central-de-empresas.html",
+      "sidra_tables": [
+        "1685",
+        "6449"
+      ],
+      "accessed_at": "2026-11-08",
+      "http_note": "Direct HTML URL returned HTTP 403 to automated non-browser client on 2026-11-08; metadata verified via IBGE/SIDRA public specification and docs/intelligence/ROUND-09-EXPANSION.md.",
+      "license": "IBGE Open Data (public official statistics)",
+      "granularity": "Municipality x CNAE Section/Division x Annual Reference Year",
+      "join_keys": [
+        "ibge_7digit_municipality_code",
+        "cnae_section_or_division"
+      ],
+      "integrated_in_runtime": false,
+      "round_14_policy": "Not integrated into .ocnpj/.ocagg runtime artifacts. Questions asking for CEMPRE salaried headcount, total occupied personnel, or annual wage mass per municipality/sector, or attributing aggregate CEMPRE numbers to an individual CNPJ, must fail closed (reject) with a clear unavailable-data explanation."
+    },
+    {
+      "source_id": "EXT-IBGE-PAM",
+      "title": "IBGE — Produção Agrícola Municipal (PAM)",
+      "url": "https://www.ibge.gov.br/estatisticas/economicas/agricultura-e-pecuaria/9117-producao-agricola-municipal-culturas-temporarias-e-permanentes.html",
+      "sidra_tables": [
+        "5457"
+      ],
+      "accessed_at": "2026-11-08",
+      "license": "IBGE Open Data (public official statistics)",
+      "granularity": "Municipality x Temporary/Permanent Crop (soy, corn, cotton, sugarcane, rice) x Annual Reference Year",
+      "join_keys": [
+        "ibge_7digit_municipality_code"
+      ],
+      "integrated_in_runtime": false,
+      "round_14_policy": "Not integrated into .ocnpj/.ocagg runtime artifacts. Questions asking for planted hectares, crop tonnage, harvest value, or statistical correlation between PAM crop output and CNPJ counts must fail closed (reject). Questions comparing cadastral counts or per-10k population density of grain storage, agricultural inputs, or freight transport across agro-industrial municipalities execute on the loaded RFB+IBGE-population artifacts."
+    },
+    {
+      "source_id": "EXT-IBGE-PPM",
+      "title": "IBGE — Pesquisa da Pecuária Municipal (PPM)",
+      "url": "https://www.ibge.gov.br/estatisticas/economicas/agricultura-e-pecuaria/9107-producao-da-pecuaria-municipal.html",
+      "sidra_tables": [
+        "3939"
+      ],
+      "accessed_at": "2026-11-08",
+      "license": "IBGE Open Data (public official statistics)",
+      "granularity": "Municipality x Herd Type (cattle, swine, poultry, milk) x Annual Reference Year",
+      "join_keys": [
+        "ibge_7digit_municipality_code"
+      ],
+      "integrated_in_runtime": false,
+      "round_14_policy": "Not integrated into .ocnpj/.ocagg runtime artifacts. Questions asking for cattle herd headcount (cabeças de gado) or correlating PPM herd figures with slaughterhouse/veterinary CNPJs must fail closed (reject). Cadastral queries for slaughterhouses, cattle raising, milk, veterinary services, and refrigerated transport in Pantanal/Araguaia/Guaporé municipalities execute on the loaded artifacts."
+    }
+  ]
+}
