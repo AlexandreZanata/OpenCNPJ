@@ -1,0 +1,89 @@
+{
+  "version": 1,
+  "updated": "2026-11-08",
+  "branch": "codex/official-data-mt",
+  "base_commit": "27c2b92",
+  "stages": [
+    {
+      "id": 0,
+      "name": "Isolate work and measured baseline",
+      "status": "complete",
+      "evidence": [
+        "docs/intelligence/results/official-data-mt/BASELINE.md",
+        "docs/intelligence/results/official-data-mt/logs/stage-0-test.log",
+        "docs/intelligence/results/official-data-mt/logs/stage-0-clippy.log"
+      ],
+      "blockers": []
+    },
+    {
+      "id": 1,
+      "name": "Source registry, asset lifecycle and typed capability foundation",
+      "status": "pending",
+      "evidence": [],
+      "blockers": []
+    },
+    {
+      "id": 2,
+      "name": "Essential IBGE context for MT",
+      "status": "pending",
+      "evidence": [],
+      "blockers": []
+    },
+    {
+      "id": 3,
+      "name": "Novo Caged and RAIS",
+      "status": "pending",
+      "evidence": [],
+      "blockers": []
+    },
+    {
+      "id": 4,
+      "name": "MT agriculture: PAM, PPM, LSPA",
+      "status": "pending",
+      "evidence": [],
+      "blockers": []
+    },
+    {
+      "id": 5,
+      "name": "MT fleet and ANTT transport specialization",
+      "status": "pending",
+      "evidence": [],
+      "blockers": []
+    },
+    {
+      "id": 6,
+      "name": "First usable MT release and analytical joins",
+      "status": "pending",
+      "evidence": [],
+      "blockers": []
+    },
+    {
+      "id": 7,
+      "name": "Government-sales pack: PNCP, Compras and CGU",
+      "status": "pending",
+      "evidence": [],
+      "blockers": []
+    },
+    {
+      "id": 8,
+      "name": "Additional verticals and local enrichment",
+      "status": "pending",
+      "evidence": [],
+      "blockers": []
+    },
+    {
+      "id": 9,
+      "name": "Licence-sensitive energy and fiscal context",
+      "status": "pending",
+      "evidence": [],
+      "blockers": []
+    },
+    {
+      "id": 10,
+      "name": "Product/API completion and full delivery",
+      "status": "pending",
+      "evidence": [],
+      "blockers": []
+    }
+  ]
+}
