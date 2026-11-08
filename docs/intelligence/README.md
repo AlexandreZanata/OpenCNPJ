@@ -12,9 +12,16 @@ evaluation harness) and were reviewed — see
 still open and the status of each work package, and
 [results/2026-11-07-reviewer-tasks.md](results/2026-11-07-reviewer-tasks.md) for the
 follow-up round (independent differential, no Python, reviewer pass, new evaluation items).
-Owner confirmations and human-written evaluation data are still pending, and phase 4 (the
-language interpreter itself, `opencnpj-nlu`) has not started. The OpenCNPJ engine crates are
-unchanged.
+The deterministic interpreter now has an implementation in `opencnpj-nlu`, with
+`opencnpj-intel ask` and `eval-questions`, a 1,000-question synthetic commercial
+round, real-data execution and separate frozen-suite results. See the
+[commercial report](results/commercial-round-01/REPORT.md) and
+[reproduction runbook](results/commercial-round-01/RUNBOOK.md).
+This starts phase 4; it does not complete its architecture, calibration, compiled-pack,
+transport or resource gates. The owner explicitly deferred human question collection
+and human evaluation to product refinement; they do not block this synthetic
+iteration. Existing owner confirmations remain recorded as pending. The snapshot
+format and production store engine remain unchanged.
 
 ## How it works (one paragraph)
 
@@ -60,7 +67,7 @@ outside the domain are declined.
 | 5. Deterministic interpreter design | 05 (+ 06, 07) | Done (design) |
 | 6. Micro classifier proposal, only if needed | 11 + gates in 03 §6 | Done (conditional design) |
 | 7. Reproducible benchmark protocol | 12 | Done |
-| 8. Measured results of the proofs of concept | results/ | Only aggregate cardinalities so far; PoC results come from phase 4 |
+| 8. Measured results of the proofs of concept | results/ | Aggregate and interpreter development evidence; see [round-08 review](results/commercial-round-08/REPORT.md) |
 | 9. RAM, CPU and storage estimate | 13 | Done (estimates, labelled) |
 | 10. Development plan in independent stages | 14 | Done |
 | 11. Technical justification | 15 | Done (provisional; final after WP-5.1) |
@@ -74,8 +81,14 @@ outside the domain are declined.
   `docs/BENCHMARKS.md`); availability of RFB history (2023-05 … 2026-10) and of the IBGE,
   Tesouro and CNAE sources (web checks listed in 09 §8).
 * **Estimated:** aggregate file sizes, memory and storage budgets (13), with formulas.
-* **Hypotheses:** every statement about interpretation quality and latency. They are
-  settled by phases 3–5.
+* **Measured (2026-11-07):** synthetic commercial interpretation/execution and older
+  frozen-suite scores in the commercial report.
+* **Reviewed (2026-11-08):** [round 08](results/commercial-round-08/REPORT.md)
+  distinguishes frozen-label agreement, confirmed label defects, backend
+  verification and focused semantic regressions. Synthetic scores do not
+  establish product validation.
+* **Hypotheses:** generalization to human product usage and interpretation latency on
+  the target VPS. Architecture gates still require phases 4–5.
 
 ## Guiding principles
 
@@ -84,3 +97,10 @@ outside the domain are declined.
 3. The simplest mechanism that meets the targets wins; learned components must prove
    their value on human-written questions.
 4. Everything is data-driven, versioned, reproducible and reversible.
+
+## Next evaluation round
+
+[Round 09 expansion](ROUND-09-EXPANSION.md) defines 50,000 commercial cases,
+MT-first scenarios, sourced regional language and analytical capability boundaries.
+See the [handoff prompt](ROUND-09-PROMPT.txt) and
+[versioning policy](EVALUATION-VERSIONING.md) for execution and GitHub stages.

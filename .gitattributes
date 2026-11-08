@@ -12,3 +12,5 @@ crates/opencnpj-query/tests/fixtures/** text eol=lf
 crates/opencnpj-lab/eval/commercial-round-*/questions.tsv -text !eol -whitespace
 crates/opencnpj-lab/eval/commercial-round-*/*.jsonl -text !eol
 docs/intelligence/results/commercial-round-*/*.log -text -whitespace
+
+docs/intelligence/results/publish-2026-11-08/*.log -text -whitespace
