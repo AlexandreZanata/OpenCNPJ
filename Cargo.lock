@@ -2598,14 +2598,17 @@ name = "opencnpj-insights"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "hex",
  "memmap2",
  "opencnpj-core",
  "opencnpj-query",
  "opencnpj-store",
  "rayon",
  "roaring",
+ "rusqlite",
  "serde",
  "serde_json",
+ "sha2",
  "tempfile",
  "toml",
  "xxhash-rust",

@@ -4,6 +4,7 @@ mod aggregate;
 mod backfill;
 mod catalog;
 mod eval;
+mod official;
 mod oracle;
 mod query;
 mod questions;
@@ -20,6 +21,11 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Command {
+    /// Inspect and verify official source assets.
+    Sources {
+        #[command(subcommand)]
+        command: official::SourcesCommand,
+    },
     /// Build reference catalogues.
     Catalog {
         #[command(subcommand)]
@@ -60,6 +66,7 @@ enum Command {
 
 fn main() -> anyhow::Result<()> {
     match Cli::parse().command {
+        Some(Command::Sources { command }) => official::run_sources(command),
         Some(Command::Ask(args)) => questions::ask(args),
         Some(Command::EvalQuestions(args)) => questions::evaluate(args),
         Some(Command::Catalog { command }) => catalog::run(command),

@@ -18,8 +18,15 @@
     {
       "id": 1,
       "name": "Source registry, asset lifecycle and typed capability foundation",
-      "status": "pending",
-      "evidence": [],
+      "status": "complete",
+      "evidence": [
+        "crates/opencnpj-insights/official/sources.toml",
+        "crates/opencnpj-insights/src/official/",
+        "crates/opencnpj-lab/src/official.rs",
+        "docs/intelligence/results/official-data-mt/SOURCES.md",
+        "docs/intelligence/results/official-data-mt/logs/stage-1-test.log",
+        "docs/intelligence/results/official-data-mt/logs/stage-1-clippy.log"
+      ],
       "blockers": []
     },
     {

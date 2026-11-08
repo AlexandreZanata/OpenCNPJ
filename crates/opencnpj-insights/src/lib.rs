@@ -14,3 +14,6 @@ pub mod execute;
 
 /// Answer blocks, provenance and templates.
 pub mod render;
+
+/// Official source-backed indicators and immutable `.ocind` assets.
+pub mod official;
