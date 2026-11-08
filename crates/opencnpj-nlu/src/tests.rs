@@ -609,3 +609,12 @@ fn commercial_round_10_prefix_and_scope_edit_regressions() {
     assert_eq!(r.scope.mei, Tri::Any);
     assert_eq!(r.scope.place, PlaceFilter::Municipalities(SmallSet::new([MunicipalityId(2)])));
 }
+
+#[test]
+fn round10_state_name_does_not_trigger_abundance_metaphor() {
+    let text = "Compare padarias ativas entre os estados de Minas Gerais e Mato Grosso.";
+    let r = req(text);
+    assert!(matches!(r.op, Op::Compare { dim: Dim::Uf, .. }));
+    assert_eq!(r.scope.place, PlaceFilter::Any);
+    assert_eq!(parse("Em Sorriso/MT a padaria e mato mesmo?").decision, Decision::Clarify);
+}

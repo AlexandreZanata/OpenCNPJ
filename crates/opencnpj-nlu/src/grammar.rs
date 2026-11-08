@@ -85,7 +85,7 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
                 && words
                     .windows(needle.len())
                     .enumerate()
-                    .any(|(at, w)| w == needle && !preliminary.iter().any(|h| h.start <= at && at + needle.len() <= h.end))
+                    .any(|(at, w)| w == needle && !preliminary.iter().any(|h| h.start < at + needle.len() && at < h.end))
         })
     };
     if uncovered(&policy.ambiguous_quality) {
