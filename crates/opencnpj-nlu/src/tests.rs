@@ -618,3 +618,12 @@ fn round10_state_name_does_not_trigger_abundance_metaphor() {
     assert_eq!(r.scope.place, PlaceFilter::Any);
     assert_eq!(parse("Em Sorriso/MT a padaria e mato mesmo?").decision, Decision::Clarify);
 }
+
+#[test]
+fn round10_lowercase_para_in_state_list_is_para_uf() {
+    let text = "faca a comparacao de padarias ativas entre os estados de para e mato grosso.";
+    let r = req(text);
+    assert!(matches!(r.op, Op::Compare { dim: Dim::Uf, .. }));
+    let Op::Compare { members, .. } = r.op else { panic!("expected compare") };
+    assert!(members.iter().any(|m| *m == Member::Uf(UfId(13))));
+}

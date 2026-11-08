@@ -155,7 +155,7 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
                     && matches!(words[h.start - 1].as_str(), "em" | "no" | "na" | "de" | "do" | "da" | "estado" | "exceto" | "e")
                     && (token != "para"
                         || matches!(words[h.start - 1].as_str(), "no" | "do" | "estado")
-                        || h.start >= 2 && words[h.start - 2] == "estado"
+                        || h.start >= 2 && matches!(words[h.start - 2].as_str(), "estado" | "estados")
                         || text.contains('á')
                         || text.contains('Á'))
         }
