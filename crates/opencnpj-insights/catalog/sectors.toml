@@ -238,7 +238,7 @@ since = "v1"
 [[sector]]
 id = "building_painting"
 display = { sing = "serviço de pintura predial", plural = "serviços de pintura predial", gender = "m" }
-aliases = ["pintor de edifícios", "pintora de edifícios"]
+aliases = ["pintor de edifícios", "pintora de edifícios", "pintor", "pintores"]
 cnae_core = ["4330404"]
 cnae_extended = []
 scope = "main"
@@ -764,7 +764,7 @@ since = "v1"
 [[sector]]
 id = "glass_store"
 display = { sing = "vidraçaria", plural = "vidraçarias", gender = "f" }
-aliases = ["comércio de vidros", "loja de vidros"]
+aliases = ["comércio de vidros", "loja de vidros", "vidraceiro", "vidraceiros"]
 cnae_core = ["4743100"]
 cnae_extended = []
 scope = "main"
@@ -1656,7 +1656,7 @@ since = "v1"
 [[sector]]
 id = "tailoring"
 display = { sing = "ateliê de costura sob medida", plural = "ateliês de costura sob medida", gender = "m" }
-aliases = ["alfaiate", "alfaiates", "costureiro sob medida", "costureira sob medida"]
+aliases = ["alfaiate", "alfaiates", "costureiro sob medida", "costureira sob medida", "costureira", "costureiras"]
 cnae_core = ["1412602"]
 cnae_extended = []
 scope = "main"
