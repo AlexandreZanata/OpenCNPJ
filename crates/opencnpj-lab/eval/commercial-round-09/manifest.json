@@ -1,0 +1,60 @@
+{
+  "round": "commercial-round-09",
+  "items": 50000,
+  "batches": 99,
+  "pilot_batch": "batch-001",
+  "pilot_items": 1000,
+  "questions_jsonl_sha256": "a3bc6c78b3066f4f8721b2de30948a04278adc80ca4cbd292acfb978eb763c29",
+  "questions_tsv_sha256": "29fd87e90d9148d79723a56ac45ad902c682c937d11ed720adf593be7eec6751",
+  "data_anchor": "2026-10-11",
+  "current_competence": "2026-10",
+  "catalogue_versions": {
+    "municipalities": 202610,
+    "sectors": 1
+  },
+  "by_primary_family": {
+    "market_size_density_competition": 5000,
+    "prospecting_qualification_territory": 7000,
+    "historical_stock_flows_seasonality": 5000,
+    "geography_catchments_comparisons": 5000,
+    "corporate_structure_hq_branches_identity": 4000,
+    "supply_chain_complementary": 5000,
+    "cross_variable_correlation": 5000,
+    "dialogue_corrections_references_planning": 6000,
+    "source_quality_provenance_uncertainty": 3000,
+    "unsupported_missing_contradictions": 3000,
+    "tax_size_legal_capital_numeric": 2000
+  },
+  "by_geographic_stratum": {
+    "mt_metropolitan": 5000,
+    "mt_north_agro_industrial": 6000,
+    "mt_south_logistics_industrial": 5000,
+    "mt_east_araguaia_xingu": 4500,
+    "mt_west_parecis_guapore": 4500,
+    "mt_pantanal": 5000,
+    "other_26_ufs": 12000,
+    "national_cross_uf_comparative": 8000
+  },
+  "by_register": {
+    "conversational_professional": 35000,
+    "formal_technical": 10000,
+    "noisy_short": 5000
+  },
+  "by_split": {
+    "synthetic_dev": 35000,
+    "synthetic_eval": 10000,
+    "synthetic_challenge": 5000
+  },
+  "by_decision": {
+    "execute": 41500,
+    "clarify": 4700,
+    "reject": 3800
+  },
+  "overlapping_counts": {
+    "mt_context_items": 35540,
+    "other_uf_regional_items": 4834,
+    "novel_semantic_constructions": 41075,
+    "clarify_or_reject_items": 8500
+  },
+  "human_validated": false
+}

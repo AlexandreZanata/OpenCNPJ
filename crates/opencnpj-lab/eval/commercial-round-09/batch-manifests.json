@@ -1,0 +1,4457 @@
+[
+  {
+    "batch_id": "batch-001",
+    "items": 1000,
+    "first_id": "commercial-r09-00001",
+    "last_id": "commercial-r09-01000",
+    "sha256": "477006e6a44918f48bc5dc8b219cf74562c034f12785640cb026ef4af5f5e9fa",
+    "by_family": {
+      "market_size_density_competition": 100,
+      "prospecting_qualification_territory": 140,
+      "historical_stock_flows_seasonality": 100,
+      "geography_catchments_comparisons": 100,
+      "corporate_structure_hq_branches_identity": 80,
+      "supply_chain_complementary": 100,
+      "cross_variable_correlation": 100,
+      "dialogue_corrections_references_planning": 120,
+      "source_quality_provenance_uncertainty": 60,
+      "unsupported_missing_contradictions": 60,
+      "tax_size_legal_capital_numeric": 40
+    },
+    "by_geographic_stratum": {
+      "mt_metropolitan": 100,
+      "mt_north_agro_industrial": 120,
+      "mt_south_logistics_industrial": 100,
+      "mt_east_araguaia_xingu": 90,
+      "mt_west_parecis_guapore": 90,
+      "mt_pantanal": 100,
+      "other_26_ufs": 240,
+      "national_cross_uf_comparative": 160
+    },
+    "by_register": {
+      "conversational_professional": 700,
+      "formal_technical": 200,
+      "noisy_short": 100
+    },
+    "by_split": {
+      "synthetic_dev": 700,
+      "synthetic_eval": 200,
+      "synthetic_challenge": 100
+    },
+    "by_decision": {
+      "execute": 830,
+      "clarify": 94,
+      "reject": 76
+    }
+  },
+  {
+    "batch_id": "batch-002",
+    "items": 500,
+    "first_id": "commercial-r09-01001",
+    "last_id": "commercial-r09-01500",
+    "sha256": "f1599a5f99fd1882498a07b1f1769d73121dfa181406ee370fe14aabaff80e09",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-003",
+    "items": 500,
+    "first_id": "commercial-r09-01501",
+    "last_id": "commercial-r09-02000",
+    "sha256": "542df4fec7781c06a5ebd58b464c6d82309525081c433025e8b04993b54f0c3f",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-004",
+    "items": 500,
+    "first_id": "commercial-r09-02001",
+    "last_id": "commercial-r09-02500",
+    "sha256": "6f8ad37c2f1ad83f4b52f78805da5083aec28474cb45d74f7a1dea8a2a544fd5",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-005",
+    "items": 500,
+    "first_id": "commercial-r09-02501",
+    "last_id": "commercial-r09-03000",
+    "sha256": "0c5baade71a805411cad20f0d76bc5d470cb51cf7c19359fcdf85ba96fbf4049",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-006",
+    "items": 500,
+    "first_id": "commercial-r09-03001",
+    "last_id": "commercial-r09-03500",
+    "sha256": "a8e86bc2f01a824ebf9c6deb385f3164cd9168ddd6730f2575fa659488c10cf2",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-007",
+    "items": 500,
+    "first_id": "commercial-r09-03501",
+    "last_id": "commercial-r09-04000",
+    "sha256": "22382cbe7224b94b409ef159863eceaa1ce7e3bc2c7f53f2630c235c07ee33e1",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-008",
+    "items": 500,
+    "first_id": "commercial-r09-04001",
+    "last_id": "commercial-r09-04500",
+    "sha256": "0355eb46e22c6a36357d5de013db8fa6aaf0147f0e7646e0d9725ef52b0f31f1",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-009",
+    "items": 500,
+    "first_id": "commercial-r09-04501",
+    "last_id": "commercial-r09-05000",
+    "sha256": "151619b4819deb7d18d893ae2dfda90cdcc7e62b2d6fe982d59bfdffef23c9c3",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-010",
+    "items": 500,
+    "first_id": "commercial-r09-05001",
+    "last_id": "commercial-r09-05500",
+    "sha256": "291fdae50b8e4cfcae938260b0f1efe1434aaa2c0bdcefa463792839e7c167d3",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-011",
+    "items": 500,
+    "first_id": "commercial-r09-05501",
+    "last_id": "commercial-r09-06000",
+    "sha256": "0f1346d2d6bc4a0b6a306a7a1ca060f43c4eac0e9dc914f4e81f16a9082dd3b6",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-012",
+    "items": 500,
+    "first_id": "commercial-r09-06001",
+    "last_id": "commercial-r09-06500",
+    "sha256": "8704d2c0e5fe8f3faa4ccd919353e51f265ab2ec03af7f836b6f119b2f91d78a",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-013",
+    "items": 500,
+    "first_id": "commercial-r09-06501",
+    "last_id": "commercial-r09-07000",
+    "sha256": "59e51d12d771da5fb4d5aa88772d887b708e29d620cccc70531aee617ed1a558",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-014",
+    "items": 500,
+    "first_id": "commercial-r09-07001",
+    "last_id": "commercial-r09-07500",
+    "sha256": "c860577e1438b46b146b155d99a536be41af6f1b1986c9f5efc64bc99b37c96c",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-015",
+    "items": 500,
+    "first_id": "commercial-r09-07501",
+    "last_id": "commercial-r09-08000",
+    "sha256": "2216f540087294de09fc05bc128115608a406c82c3af0552deb691e4f6a335e2",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-016",
+    "items": 500,
+    "first_id": "commercial-r09-08001",
+    "last_id": "commercial-r09-08500",
+    "sha256": "b1df3559d55c526d75c345f0cd68fa7b55cc7d617831cc251a5380502aa584dc",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-017",
+    "items": 500,
+    "first_id": "commercial-r09-08501",
+    "last_id": "commercial-r09-09000",
+    "sha256": "d365e8636dc9778aaf858500e8004b64c3baf5b871402caa1774d3dca82e2bba",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-018",
+    "items": 500,
+    "first_id": "commercial-r09-09001",
+    "last_id": "commercial-r09-09500",
+    "sha256": "e9d9333637c5bf9262251fdcfabb2320f72beece9dc70978f50b24a58b181f56",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-019",
+    "items": 500,
+    "first_id": "commercial-r09-09501",
+    "last_id": "commercial-r09-10000",
+    "sha256": "ca1ae5c150c44684d26d8acc6ca5a3d68e807b01fba0c25d82dcff91fd5cd83c",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-020",
+    "items": 500,
+    "first_id": "commercial-r09-10001",
+    "last_id": "commercial-r09-10500",
+    "sha256": "d67f2eb9fa6ec301f726a903f2a58beaceb605c879b12bf6655181d26366f0f8",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-021",
+    "items": 500,
+    "first_id": "commercial-r09-10501",
+    "last_id": "commercial-r09-11000",
+    "sha256": "e6f5a6cce055630d9fcb4ece24d0da399b19b706d4ba7d1457bde7de85fbaa93",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-022",
+    "items": 500,
+    "first_id": "commercial-r09-11001",
+    "last_id": "commercial-r09-11500",
+    "sha256": "c3ebcd757738f246c870f9a94fcf0bb2c4d7de7850288a495728e3645b18842f",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-023",
+    "items": 500,
+    "first_id": "commercial-r09-11501",
+    "last_id": "commercial-r09-12000",
+    "sha256": "2ff58aff38d75d17f6ca2a6ecc4b4c667d868c4355c95d9047517c359efa3f66",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-024",
+    "items": 500,
+    "first_id": "commercial-r09-12001",
+    "last_id": "commercial-r09-12500",
+    "sha256": "596637c4f9ebf1292325914be9cd3c48fbbd99fa3a8078041807b10ebed9e509",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-025",
+    "items": 500,
+    "first_id": "commercial-r09-12501",
+    "last_id": "commercial-r09-13000",
+    "sha256": "5285afc975d3fee64a4b4f349b6bb8708689bcdefaf595bbcedd7b2f31fe1765",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-026",
+    "items": 500,
+    "first_id": "commercial-r09-13001",
+    "last_id": "commercial-r09-13500",
+    "sha256": "b895b551a0f8a42b5eae7f1a46a7cc453e6f3e34df204223b68ec4cd1ff7d54c",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-027",
+    "items": 500,
+    "first_id": "commercial-r09-13501",
+    "last_id": "commercial-r09-14000",
+    "sha256": "bc224a2b1a1625ff50807890c5fbe1df268d6a846fdda7f4025c962565659075",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-028",
+    "items": 500,
+    "first_id": "commercial-r09-14001",
+    "last_id": "commercial-r09-14500",
+    "sha256": "d162155da1c4593ab4a2104919c547ebc9607a52c9487b80b7d49caaef8561c1",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-029",
+    "items": 500,
+    "first_id": "commercial-r09-14501",
+    "last_id": "commercial-r09-15000",
+    "sha256": "fcaf9bc260f6363ee653d87f590acb4f646a3f34ea2c72682f2714436a9459f2",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-030",
+    "items": 500,
+    "first_id": "commercial-r09-15001",
+    "last_id": "commercial-r09-15500",
+    "sha256": "85f2da09bfc9560e72d87fb3c277711ea8296f6764a04cd791211edd0a68808b",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-031",
+    "items": 500,
+    "first_id": "commercial-r09-15501",
+    "last_id": "commercial-r09-16000",
+    "sha256": "0c78038a8f3723ac95a943080444971eee1ad4d552b2691432a206718a5841e0",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-032",
+    "items": 500,
+    "first_id": "commercial-r09-16001",
+    "last_id": "commercial-r09-16500",
+    "sha256": "0d1f7f269cbd8ded77ab831d55a04c4b9c5cbb655639f8e48d15330d42968a66",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-033",
+    "items": 500,
+    "first_id": "commercial-r09-16501",
+    "last_id": "commercial-r09-17000",
+    "sha256": "3339624d641f9cd0f632fc37a13585c0e793518c6deca85539bcd3b5fa6298fd",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-034",
+    "items": 500,
+    "first_id": "commercial-r09-17001",
+    "last_id": "commercial-r09-17500",
+    "sha256": "0fc3b72ba3edb58a6fc4805d4c324353eb26f5e86a038938e298c1a520ddae1f",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-035",
+    "items": 500,
+    "first_id": "commercial-r09-17501",
+    "last_id": "commercial-r09-18000",
+    "sha256": "e488fc29344a5a132d788f9cde8369f0d6e04517efa7d7dc452c31989871aa47",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-036",
+    "items": 500,
+    "first_id": "commercial-r09-18001",
+    "last_id": "commercial-r09-18500",
+    "sha256": "02a9a7a551ab9f0f2177de7648b98572a16bdd0f4f9c1cea262101e57e1a6e9b",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-037",
+    "items": 500,
+    "first_id": "commercial-r09-18501",
+    "last_id": "commercial-r09-19000",
+    "sha256": "bda9742813e1fe63390e7805b9d9ee65f45d6a7567adf420b3f5af675180b097",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-038",
+    "items": 500,
+    "first_id": "commercial-r09-19001",
+    "last_id": "commercial-r09-19500",
+    "sha256": "7c0e2c5fa8bb751f72860e67f57ede164fd5162227a099cb49f90d3666338c5b",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-039",
+    "items": 500,
+    "first_id": "commercial-r09-19501",
+    "last_id": "commercial-r09-20000",
+    "sha256": "043da73b15c3a3d29573f3140446f37fae8538b597f1798bdee84adb21ddea20",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-040",
+    "items": 500,
+    "first_id": "commercial-r09-20001",
+    "last_id": "commercial-r09-20500",
+    "sha256": "8fbc1932b833fccdc41798b4fb5e57a51917c4bc6e54062864cb91b02415bf11",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-041",
+    "items": 500,
+    "first_id": "commercial-r09-20501",
+    "last_id": "commercial-r09-21000",
+    "sha256": "a187103f8c4ad00339f638147ad9cfc63ff39b7874242aaf135a65a874b5155a",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-042",
+    "items": 500,
+    "first_id": "commercial-r09-21001",
+    "last_id": "commercial-r09-21500",
+    "sha256": "76ad68a756b76561d68f912192075e4489e1ed389813b2c71d3b8c6d49c72973",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-043",
+    "items": 500,
+    "first_id": "commercial-r09-21501",
+    "last_id": "commercial-r09-22000",
+    "sha256": "2ceed3647556d444d49deca42d6da889fa753580933206cedb44d05c7d18a563",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-044",
+    "items": 500,
+    "first_id": "commercial-r09-22001",
+    "last_id": "commercial-r09-22500",
+    "sha256": "0d738584fc1018e6ad79fb7c431e6236d9ecc3382649d94206eb86416c67d467",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-045",
+    "items": 500,
+    "first_id": "commercial-r09-22501",
+    "last_id": "commercial-r09-23000",
+    "sha256": "0bd5bd9c75ee995ce142b7b849407c8954277c111e3c7056fc047a3c9e97d23b",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-046",
+    "items": 500,
+    "first_id": "commercial-r09-23001",
+    "last_id": "commercial-r09-23500",
+    "sha256": "4cbc2ba5c1e264b6a0d7bff004853dab9b9c7c70945f168a7b682b811cd745df",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-047",
+    "items": 500,
+    "first_id": "commercial-r09-23501",
+    "last_id": "commercial-r09-24000",
+    "sha256": "4a352a7ef56965b8ffcba3f9b0e0d7840e086ccdd3e4a48b7c68b10cda3fa007",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-048",
+    "items": 500,
+    "first_id": "commercial-r09-24001",
+    "last_id": "commercial-r09-24500",
+    "sha256": "c37e9ac0fd2104e60097833a3ca788e8fc44d95f98139469e1385a09670b1851",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-049",
+    "items": 500,
+    "first_id": "commercial-r09-24501",
+    "last_id": "commercial-r09-25000",
+    "sha256": "d817d73d8830283a8b40f9ba8d2d1f2943bdb3de6108a00656a3a95493a5cb33",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-050",
+    "items": 500,
+    "first_id": "commercial-r09-25001",
+    "last_id": "commercial-r09-25500",
+    "sha256": "9a254f038f535a362fe5d7e1bec60f21a94e593d06bbcfec5de04b6bb05f5490",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45
+    },
+    "by_register": {
+      "formal_technical": 100,
+      "noisy_short": 50,
+      "conversational_professional": 350
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-051",
+    "items": 500,
+    "first_id": "commercial-r09-25501",
+    "last_id": "commercial-r09-26000",
+    "sha256": "cbc66d64f15a8fbcb61fce0e1244b70fd1b0c59088f76e52a7c502303ba742cf",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45
+    },
+    "by_register": {
+      "formal_technical": 100,
+      "noisy_short": 50,
+      "conversational_professional": 350
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-052",
+    "items": 500,
+    "first_id": "commercial-r09-26001",
+    "last_id": "commercial-r09-26500",
+    "sha256": "a423b7255ec176c45d0b819b091bdfda63902bae0603a12c0be47f4b51526de4",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45
+    },
+    "by_register": {
+      "formal_technical": 100,
+      "noisy_short": 50,
+      "conversational_professional": 350
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-053",
+    "items": 500,
+    "first_id": "commercial-r09-26501",
+    "last_id": "commercial-r09-27000",
+    "sha256": "201840c76bbdd2455c20623650b68bc5619915667133332897d7e3654b215dae",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50
+    },
+    "by_register": {
+      "formal_technical": 100,
+      "noisy_short": 50,
+      "conversational_professional": 350
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-054",
+    "items": 500,
+    "first_id": "commercial-r09-27001",
+    "last_id": "commercial-r09-27500",
+    "sha256": "e41289fd8515a2b228a525658cf72a726c24a3c464650674a1f2204bdc144fae",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50
+    },
+    "by_register": {
+      "formal_technical": 100,
+      "noisy_short": 50,
+      "conversational_professional": 350
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-055",
+    "items": 500,
+    "first_id": "commercial-r09-27501",
+    "last_id": "commercial-r09-28000",
+    "sha256": "9ccef47d28ce97a0019f2381189bb9397595561f3c8efe0cbdc2f44cc788ef57",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50
+    },
+    "by_register": {
+      "formal_technical": 100,
+      "noisy_short": 50,
+      "conversational_professional": 350
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-056",
+    "items": 500,
+    "first_id": "commercial-r09-28001",
+    "last_id": "commercial-r09-28500",
+    "sha256": "460f09358db25e38ef475880fe9348f2a75507a79a695da798194310d8ea445b",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50
+    },
+    "by_register": {
+      "formal_technical": 100,
+      "noisy_short": 50,
+      "conversational_professional": 350
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-057",
+    "items": 500,
+    "first_id": "commercial-r09-28501",
+    "last_id": "commercial-r09-29000",
+    "sha256": "73fb652538b443399ce3515c0c9be1ebf4bfe16c456036776241086234837f8c",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50
+    },
+    "by_register": {
+      "formal_technical": 100,
+      "noisy_short": 50,
+      "conversational_professional": 350
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-058",
+    "items": 500,
+    "first_id": "commercial-r09-29001",
+    "last_id": "commercial-r09-29500",
+    "sha256": "c6eb29248c63295601980970e7f6329106d28984dee8a34f0f1a449293244b69",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50
+    },
+    "by_register": {
+      "formal_technical": 100,
+      "noisy_short": 50,
+      "conversational_professional": 350
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-059",
+    "items": 500,
+    "first_id": "commercial-r09-29501",
+    "last_id": "commercial-r09-30000",
+    "sha256": "ea83f620839abf1dd27f88450f034c7d70938f1ac70caa6b61b5de1d67292f36",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50
+    },
+    "by_register": {
+      "formal_technical": 100,
+      "noisy_short": 50,
+      "conversational_professional": 350
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-060",
+    "items": 500,
+    "first_id": "commercial-r09-30001",
+    "last_id": "commercial-r09-30500",
+    "sha256": "7bc693973f9b97ac8f682e87f73c11675a37c632490d37d5332781095c87ecac",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50
+    },
+    "by_register": {
+      "formal_technical": 100,
+      "noisy_short": 50,
+      "conversational_professional": 350
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-061",
+    "items": 500,
+    "first_id": "commercial-r09-30501",
+    "last_id": "commercial-r09-31000",
+    "sha256": "6a547aa4411b302cd5ac80bbe24d2dd76295071cfa7efabdc73c203855e76361",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50
+    },
+    "by_register": {
+      "formal_technical": 100,
+      "noisy_short": 50,
+      "conversational_professional": 350
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-062",
+    "items": 500,
+    "first_id": "commercial-r09-31001",
+    "last_id": "commercial-r09-31500",
+    "sha256": "fb1ec9accec0232876549cbadee70b7554f47d9b1e18166f6aad41fa365e4835",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50
+    },
+    "by_register": {
+      "formal_technical": 100,
+      "noisy_short": 50,
+      "conversational_professional": 350
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-063",
+    "items": 500,
+    "first_id": "commercial-r09-31501",
+    "last_id": "commercial-r09-32000",
+    "sha256": "9f9ba6792e9618df8d46aed606ceca64d7e50f4c3709856fa0d96bb37e43745a",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50
+    },
+    "by_register": {
+      "formal_technical": 100,
+      "noisy_short": 50,
+      "conversational_professional": 350
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-064",
+    "items": 500,
+    "first_id": "commercial-r09-32001",
+    "last_id": "commercial-r09-32500",
+    "sha256": "de05e0ccb5d16c6b401a4e114f7ebcd30353117253b6f552f749c4c9d1eb2ee6",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50
+    },
+    "by_register": {
+      "formal_technical": 100,
+      "noisy_short": 50,
+      "conversational_professional": 350
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-065",
+    "items": 500,
+    "first_id": "commercial-r09-32501",
+    "last_id": "commercial-r09-33000",
+    "sha256": "869350d847f2796fa50ee0cca42fd050ec634dd104381df031055317546935cb",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50
+    },
+    "by_register": {
+      "noisy_short": 50,
+      "conversational_professional": 350,
+      "formal_technical": 100
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-066",
+    "items": 500,
+    "first_id": "commercial-r09-33001",
+    "last_id": "commercial-r09-33500",
+    "sha256": "0d99ad42edb8e01ae90def453948642e050e6be667911ad1045f0a5510c8945b",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50
+    },
+    "by_register": {
+      "noisy_short": 50,
+      "conversational_professional": 350,
+      "formal_technical": 100
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-067",
+    "items": 500,
+    "first_id": "commercial-r09-33501",
+    "last_id": "commercial-r09-34000",
+    "sha256": "3de0695fbea4e9507e53bff675f8d27e5df0d52573ce37a5b28bf51d4795ee16",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50
+    },
+    "by_register": {
+      "noisy_short": 50,
+      "conversational_professional": 350,
+      "formal_technical": 100
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-068",
+    "items": 500,
+    "first_id": "commercial-r09-34001",
+    "last_id": "commercial-r09-34500",
+    "sha256": "7539d83a378c124729e86a88813e82c5e89bd9f140d5e288e9f90c0c7583a309",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50
+    },
+    "by_register": {
+      "noisy_short": 50,
+      "conversational_professional": 350,
+      "formal_technical": 100
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-069",
+    "items": 500,
+    "first_id": "commercial-r09-34501",
+    "last_id": "commercial-r09-35000",
+    "sha256": "55c6d8bd9dfbd38c7e10618048d0d971fe878244a1f76cc2f9110292b90b8236",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50
+    },
+    "by_register": {
+      "noisy_short": 50,
+      "conversational_professional": 350,
+      "formal_technical": 100
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-070",
+    "items": 500,
+    "first_id": "commercial-r09-35001",
+    "last_id": "commercial-r09-35500",
+    "sha256": "b62b9b2f228f03f78fb10daf2e8f3a59ae38d8e7add0e0429c99d2ea3b1c44a8",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50
+    },
+    "by_register": {
+      "noisy_short": 50,
+      "conversational_professional": 350,
+      "formal_technical": 100
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-071",
+    "items": 500,
+    "first_id": "commercial-r09-35501",
+    "last_id": "commercial-r09-36000",
+    "sha256": "da8c538e7e4baeb7301dce9095d001bd40d92826979c9da32fb1816a6e246cf2",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50
+    },
+    "by_register": {
+      "noisy_short": 50,
+      "conversational_professional": 350,
+      "formal_technical": 100
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-072",
+    "items": 500,
+    "first_id": "commercial-r09-36001",
+    "last_id": "commercial-r09-36500",
+    "sha256": "d7ac45feb11248b621d3901251675817ba4cadd13a9cf6c842be520a8f24e31c",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-073",
+    "items": 500,
+    "first_id": "commercial-r09-36501",
+    "last_id": "commercial-r09-37000",
+    "sha256": "dcc0371677605d288978cf57b88c38160994a22e13f2d579f4a4fa981ce7ca9d",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-074",
+    "items": 500,
+    "first_id": "commercial-r09-37001",
+    "last_id": "commercial-r09-37500",
+    "sha256": "839685cde6d85f01319b81e280d7f7f5e6470fda05b10017d9c71f2b1a665161",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-075",
+    "items": 500,
+    "first_id": "commercial-r09-37501",
+    "last_id": "commercial-r09-38000",
+    "sha256": "1367aa29c3bdb56a3fc659fb2f4ec8be635acf9e2f7ad09ba5eb47f747f6b60f",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-076",
+    "items": 500,
+    "first_id": "commercial-r09-38001",
+    "last_id": "commercial-r09-38500",
+    "sha256": "1b7e295007ddbe143812b9706480de1d2d61b37416c621c60d79ae02d206b4c0",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-077",
+    "items": 500,
+    "first_id": "commercial-r09-38501",
+    "last_id": "commercial-r09-39000",
+    "sha256": "2f740f9aa314703a1399059aa983b36c9ee7df7b4bc85cf1653a0df135ad2f46",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-078",
+    "items": 500,
+    "first_id": "commercial-r09-39001",
+    "last_id": "commercial-r09-39500",
+    "sha256": "ea19c54c535a7fda58595f8e8351883bb96b972f2fc29fdb89ad0aec0ae9b346",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-079",
+    "items": 500,
+    "first_id": "commercial-r09-39501",
+    "last_id": "commercial-r09-40000",
+    "sha256": "f5fd6a2e7750ca69515bf6b90e5efecf2a704f0d96bfaefd2a799591435b537d",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-080",
+    "items": 500,
+    "first_id": "commercial-r09-40001",
+    "last_id": "commercial-r09-40500",
+    "sha256": "d2229995d26027d81d1ec7eebae993247c85ddd76b7aaa79cc08ff909f69391f",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-081",
+    "items": 500,
+    "first_id": "commercial-r09-40501",
+    "last_id": "commercial-r09-41000",
+    "sha256": "bc539fc00f6d72371334c5f4d2a47e817457a38bba7a9912744730e003d677a7",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-082",
+    "items": 500,
+    "first_id": "commercial-r09-41001",
+    "last_id": "commercial-r09-41500",
+    "sha256": "e8d4e3ec399bfa1087eeffd6f4de0c08792acebd50c5d346a01e117350b8bc16",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-083",
+    "items": 500,
+    "first_id": "commercial-r09-41501",
+    "last_id": "commercial-r09-42000",
+    "sha256": "e12013065645f071e5ee26a1fd118ba46abc7ffdea0361c4b63b627c4a659ab9",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-084",
+    "items": 500,
+    "first_id": "commercial-r09-42001",
+    "last_id": "commercial-r09-42500",
+    "sha256": "8a86d1e3f52935c130344f1fec0b0d69bd272a33ac50ab01d31b22cc1f94ec6b",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-085",
+    "items": 500,
+    "first_id": "commercial-r09-42501",
+    "last_id": "commercial-r09-43000",
+    "sha256": "13f2ef778f67f310e3b3f28dcaec755952d967469a3f3c3403987f7958dad814",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-086",
+    "items": 500,
+    "first_id": "commercial-r09-43001",
+    "last_id": "commercial-r09-43500",
+    "sha256": "6252d1d32557e40982a90e2c5f9e9fe511ca86e015a151b64a26fed10d90f2c9",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-087",
+    "items": 500,
+    "first_id": "commercial-r09-43501",
+    "last_id": "commercial-r09-44000",
+    "sha256": "5f9d408cc365fefc29e2c9dc85b22e720fa1ed7304d4b349d8d351c64a4790db",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-088",
+    "items": 500,
+    "first_id": "commercial-r09-44001",
+    "last_id": "commercial-r09-44500",
+    "sha256": "4ae6ee0434e150b73b20eecc60858617284285717aa666229e27c49f65c7413a",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-089",
+    "items": 500,
+    "first_id": "commercial-r09-44501",
+    "last_id": "commercial-r09-45000",
+    "sha256": "420645ec475ffd53b1ae1fe2c1b6daae8b98fe094f8a8099bd043d8d1ee956c7",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-090",
+    "items": 500,
+    "first_id": "commercial-r09-45001",
+    "last_id": "commercial-r09-45500",
+    "sha256": "2739ddd01795f4415a8d58a07dfc243dd2649d3c2ef8d5f40031c641461973f1",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-091",
+    "items": 500,
+    "first_id": "commercial-r09-45501",
+    "last_id": "commercial-r09-46000",
+    "sha256": "3bc01a0fe9f4187be457ec199c28d5e93a845f91db206a7a20310ad7570ee590",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-092",
+    "items": 500,
+    "first_id": "commercial-r09-46001",
+    "last_id": "commercial-r09-46500",
+    "sha256": "dbf09a2df94c83ba7cf6cfd0f79aed9061a7e50215769e1dc0f6405f6f923a98",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-093",
+    "items": 500,
+    "first_id": "commercial-r09-46501",
+    "last_id": "commercial-r09-47000",
+    "sha256": "56b176afb432b8ad5f7959f3038e354e4c0c36fa07e775f0c31ef9f4a9f0d29a",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-094",
+    "items": 500,
+    "first_id": "commercial-r09-47001",
+    "last_id": "commercial-r09-47500",
+    "sha256": "1893524815ce314b3b60ed548ec7501c477d185896a4ee00bca19409dccd80a5",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-095",
+    "items": 500,
+    "first_id": "commercial-r09-47501",
+    "last_id": "commercial-r09-48000",
+    "sha256": "91323c5fdb15a1e120d8d8e10e52bc9d5dd02fa8bbd34267c7595fdacc8f4d71",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-096",
+    "items": 500,
+    "first_id": "commercial-r09-48001",
+    "last_id": "commercial-r09-48500",
+    "sha256": "01eaa137c6b5f732090dab89d3511c5ec7d7fffc81c8deb7946160d4c6b4aa28",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_metropolitan": 50,
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-097",
+    "items": 500,
+    "first_id": "commercial-r09-48501",
+    "last_id": "commercial-r09-49000",
+    "sha256": "43f33a6212597c573ccd444ba25c27ef8b8784e432c622a7352d972233ef5ac5",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-098",
+    "items": 500,
+    "first_id": "commercial-r09-49001",
+    "last_id": "commercial-r09-49500",
+    "sha256": "0c0ee6c365f539eddc76b32be90ad63374ca4e5c0f3b27f255e1c2c27a842173",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  },
+  {
+    "batch_id": "batch-099",
+    "items": 500,
+    "first_id": "commercial-r09-49501",
+    "last_id": "commercial-r09-50000",
+    "sha256": "5949c78bd8728597a4bea23cc0a3579f20f21191bf06f3d0b19374c1a57fe629",
+    "by_family": {
+      "market_size_density_competition": 50,
+      "prospecting_qualification_territory": 70,
+      "historical_stock_flows_seasonality": 50,
+      "geography_catchments_comparisons": 50,
+      "corporate_structure_hq_branches_identity": 40,
+      "supply_chain_complementary": 50,
+      "cross_variable_correlation": 50,
+      "dialogue_corrections_references_planning": 60,
+      "source_quality_provenance_uncertainty": 30,
+      "unsupported_missing_contradictions": 30,
+      "tax_size_legal_capital_numeric": 20
+    },
+    "by_geographic_stratum": {
+      "mt_north_agro_industrial": 60,
+      "mt_south_logistics_industrial": 50,
+      "mt_east_araguaia_xingu": 45,
+      "mt_west_parecis_guapore": 45,
+      "mt_pantanal": 50,
+      "other_26_ufs": 120,
+      "national_cross_uf_comparative": 80,
+      "mt_metropolitan": 50
+    },
+    "by_register": {
+      "conversational_professional": 350,
+      "formal_technical": 100,
+      "noisy_short": 50
+    },
+    "by_split": {
+      "synthetic_dev": 350,
+      "synthetic_eval": 100,
+      "synthetic_challenge": 50
+    },
+    "by_decision": {
+      "execute": 415,
+      "clarify": 47,
+      "reject": 38
+    }
+  }
+]

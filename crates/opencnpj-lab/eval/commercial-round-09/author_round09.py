@@ -442,24 +442,35 @@ class Round09Author:
     def build_unit(self, unit_idx: int, batch_id: str, start_item_num: int, start_sess_num: int) -> list[dict]:
         """Build 1 unit of 500 items with exact quotas across all orthogonal dimensions."""
         # Geography schedule for the 500 items in this unit:
-        # 300 MT: 50 metro, 60 north, 50 south, 45 east, 45 west, 50 pantanal
-        # 120 other_26_ufs
-        # 80 national_cross_uf_comparative
-        geo_slots = (
-            ["mt_metropolitan"] * 50
-            + ["mt_north_agro_industrial"] * 60
-            + ["mt_south_logistics_industrial"] * 50
-            + ["mt_east_araguaia_xingu"] * 45
-            + ["mt_west_parecis_guapore"] * 45
-            + ["mt_pantanal"] * 50
-            + ["other_26_ufs"] * 120
-            + ["national_cross_uf_comparative"] * 80
+        # Total unit quotas: 300 MT (50 metro, 60 north, 50 south, 45 east, 45 west, 50 pantanal),
+        # 120 other_26_ufs, 80 national_cross_uf_comparative.
+        # Reserve 60 slots (36 MT: 6 per MT stratum + 24 national_cross_uf_comparative) for the 60 dialogue turns
+        # so that all 120 other_26_ufs slots map 1-to-1 to single-turn items calling next_other_uf_muni() once.
+        dlg_geo_slots = (
+            ["mt_metropolitan"] * 6
+            + ["mt_north_agro_industrial"] * 6
+            + ["mt_south_logistics_industrial"] * 6
+            + ["mt_east_araguaia_xingu"] * 6
+            + ["mt_west_parecis_guapore"] * 6
+            + ["mt_pantanal"] * 6
+            + ["national_cross_uf_comparative"] * 24
         )
-        assert len(geo_slots) == 500
-        # Permute geo_slots with a coprime stride so every family gets a rich mix of MT, other UFs, and national
-        permuted_geo = [geo_slots[(i * 17 + unit_idx * 3) % 500] for i in range(500)]
-        # Verify permutation is bijective (gcd(17, 500) == 1)
-        assert len(permuted_geo) == 500
+        assert len(dlg_geo_slots) == 60
+        permuted_dlg_geo = [dlg_geo_slots[(i * 7 + unit_idx * 3) % 60] for i in range(60)]
+
+        single_geo_slots = (
+            ["mt_metropolitan"] * 44
+            + ["mt_north_agro_industrial"] * 54
+            + ["mt_south_logistics_industrial"] * 44
+            + ["mt_east_araguaia_xingu"] * 39
+            + ["mt_west_parecis_guapore"] * 39
+            + ["mt_pantanal"] * 44
+            + ["other_26_ufs"] * 120
+            + ["national_cross_uf_comparative"] * 56
+        )
+        assert len(single_geo_slots) == 440
+        # gcd(9, 440) == 1 -> bijective permutation
+        permuted_single_geo = [single_geo_slots[(i * 9 + unit_idx * 5) % 440] for i in range(440)]
 
         # Register schedule for 500 items: 350 conversational_professional, 100 formal_technical, 50 noisy_short
         reg_slots = (
@@ -490,7 +501,9 @@ class Round09Author:
         assert sum(x[4] for x in family_plan) == 50
 
         items = []
-        slot_cursor = 0
+        reg_cursor = 0
+        single_geo_cursor = 0
+        dlg_geo_cursor = 0
         item_num = start_item_num
         sess_num = start_sess_num
 
@@ -504,9 +517,10 @@ class Round09Author:
                 # Generate 20 3-turn dialogues (14 dev, 4 eval, 2 challenge)
                 for d_idx in range(20):
                     split = split_seq[d_idx * 3]
-                    geos = [permuted_geo[slot_cursor + t] for t in range(3)]
-                    regs = [permuted_reg[slot_cursor + t] for t in range(3)]
-                    slot_cursor += 3
+                    geos = [permuted_dlg_geo[dlg_geo_cursor + t] for t in range(3)]
+                    dlg_geo_cursor += 3
+                    regs = [permuted_reg[reg_cursor + t] for t in range(3)]
+                    reg_cursor += 3
                     session_id = f"r09-sess-{sess_num:04d}"
                     sess_num += 1
                     turns = self._gen_dialogue(unit_idx, d_idx, split, geos, regs, session_id, batch_id, item_num)
@@ -515,9 +529,10 @@ class Round09Author:
             else:
                 for local_idx in range(total_cnt):
                     split = split_seq[local_idx]
-                    geo_stratum = permuted_geo[slot_cursor]
-                    register = permuted_reg[slot_cursor]
-                    slot_cursor += 1
+                    geo_stratum = permuted_single_geo[single_geo_cursor]
+                    single_geo_cursor += 1
+                    register = permuted_reg[reg_cursor]
+                    reg_cursor += 1
                     item = self._gen_single_item(
                         fam_name, unit_idx, local_idx, split, geo_stratum, register, batch_id, item_num
                     )
@@ -978,17 +993,22 @@ class Round09Author:
                     "Active stock within centroid distance radius in kilometers.", split, batch_id
                 )
             elif sub == 2:
-                # 2-city or 3-city comparison
+                # 2-city comparison
                 if geo_stratum.startswith("mt_"):
                     m1 = muni_obj or self.next_mt_muni(geo_stratum, seed)
                     m2 = self.next_mt_muni(geo_stratum, seed + 1)
                     if m2["id"] == m1["id"]:
                         m2 = self.next_mt_muni("mt_metropolitan", seed + 2)
-                else:
-                    _, m1 = self.next_other_uf_muni()
-                    _, m2 = self.next_other_uf_muni()
+                elif geo_stratum == "other_26_ufs":
+                    m1 = muni_obj or self.uf_munis[uf][0]
+                    uf_list = self.uf_munis[uf]
+                    m2 = uf_list[(seed + 1) % len(uf_list)]
                     if m2["id"] == m1["id"]:
-                        m2 = self.mt_strata["mt_north_agro_industrial"][0]
+                        m2 = uf_list[(seed + 2) % len(uf_list)] if len(uf_list) > 1 else self.mt_strata["mt_north_agro_industrial"][0]
+                else:
+                    m1 = self.mt_strata["mt_north_agro_industrial"][seed % len(self.mt_strata["mt_north_agro_industrial"])]
+                    other_uf = NON_MT_UFS[seed % len(NON_MT_UFS)]
+                    m2 = self.uf_munis[other_uf][seed % len(self.uf_munis[other_uf])]
                 members = [{"municipality": mid} for mid in sorted({m1["id"], m2["id"]})]
                 use_density = (local_idx % 2 == 1)
                 metric = {"per10k": {"ibge_estimate": 2026}} if use_density else "stock"
@@ -1010,9 +1030,12 @@ class Round09Author:
                     ex_m = muni_obj or self.mt_strata["mt_metropolitan"][0]
                     target_uf = "MT"
                     mt_ctx = True
+                elif geo_stratum == "other_26_ufs":
+                    ex_m = muni_obj or self.uf_munis[uf][0]
+                    target_uf = uf
                 else:
-                    ex_m = muni_obj or self.uf_munis["SP"][0]
-                    target_uf = ex_m["uf"]
+                    target_uf = NON_MT_UFS[seed % len(NON_MT_UFS)]
+                    ex_m = self.uf_munis[target_uf][0]
                 text = f"{opener}Quantos estabelecimentos ativos de {sname} existem em {target_uf}, exceto os da cidade de {ex_m['name']}/{target_uf}?"
                 extra = {"exclude": {"municipalities": [ex_m["id"]], "ufs": [], "sectors": [], "sector_cnaes": []}}
                 ir = base_ir({"kind": "count", "metric": "stock"}, place_uf(target_uf), activity_sector(s), extra_scope=extra)
@@ -1025,17 +1048,18 @@ class Round09Author:
                     "UF stock count excluding the specified municipality.", split, batch_id
                 )
             else:
-                # UF-to-UF comparison (MT vs GO/MS/PR/PA/RS/SP)
-                other_uf = NON_MT_UFS[local_idx % len(NON_MT_UFS)]
+                # UF-to-UF comparison (MT vs other UF)
+                other_uf = uf if geo_stratum == "other_26_ufs" else NON_MT_UFS[local_idx % len(NON_MT_UFS)]
                 uf1 = "MT" if (geo_stratum.startswith("mt_") or uf == "MT") else other_uf
                 uf2 = "GO" if uf1 == "MT" and other_uf == "MT" else (other_uf if uf1 == "MT" else "MT")
                 members = [{"uf": uid} for uid in sorted({UF_ID[uf1], UF_ID[uf2]})]
                 text = f"{opener}Compare a quantidade de estabelecimentos ativos de {sname} entre o estado de {UF_NAME[uf1]} e o estado de {UF_NAME[uf2]}."
                 ir = base_ir({"kind": "compare", "dim": "uf", "members": members, "metric": "stock"}, "any", activity_sector(s))
                 gold = {"decision": "execute", "intent": "compare", "ir": ir, "act": "new_query"}
+                item_uf = uf if geo_stratum == "other_26_ufs" else ("MT" if uf == "MT" else "MULTI")
                 return self._make_item(
                     item_num, text, register, gold, ["SR-02", "SR-06", "SR-07"],
-                    fam, "Compare two states on active establishments in sector", geo_stratum, "MULTI" if uf != "MT" else "MT", reg_ids, True, ouf_reg,
+                    fam, "Compare two states on active establishments in sector", geo_stratum, item_uf, reg_ids, True, ouf_reg,
                     "geo_compare_ufs", "COMPARE/UF/STOCK",
                     "cross_state_corridor_comparison", "supported_aggregates", [],
                     "State-to-state comparison on active establishment stock.", split, batch_id
@@ -1099,9 +1123,10 @@ class Round09Author:
                 text = f"{opener}Consulte {label_kind} {cid} na base cadastral para conferência societária."
                 ir = base_ir({"kind": "lookup", "id": cid}, "any", "any", status=ALL_STATUS)
                 gold = {"decision": "execute", "intent": "lookup", "ir": ir, "act": "new_query"}
+                item_uf = uf if geo_stratum == "other_26_ufs" else c_entry["uf"]
                 return self._make_item(
                     item_num, text, register, gold, ["SR-02", "SR-13"],
-                    fam, "Verify exact CNPJ or 8-digit company root in snapshot", geo_stratum, c_entry["uf"], reg_ids, mt_ctx, ouf_reg,
+                    fam, "Verify exact CNPJ or 8-digit company root in snapshot", geo_stratum, item_uf, reg_ids, mt_ctx, ouf_reg,
                     f"corp_lookup_{use_root}", "LOOKUP/VALID_CNPJ",
                     "verified_mt_or_national_cnpj_lookup", "supported_engine", [],
                     "Exact lookup of verified CNPJ or 8-digit root.", split, batch_id
@@ -1347,9 +1372,10 @@ class Round09Author:
                     "ir": None,
                     "expected_behavior": f"Clarify which UF is intended for homonymous municipality {hname}.",
                 }
+                item_uf = uf if geo_stratum == "other_26_ufs" else "UNRESOLVED"
                 return self._make_item(
                     item_num, text, register, gold, ["SR-08"],
-                    fam, "Require UF disambiguation for homonymous Brazilian/MT municipality", geo_stratum, "UNRESOLVED", reg_ids,
+                    fam, "Require UF disambiguation for homonymous Brazilian/MT municipality", geo_stratum, item_uf, reg_ids,
                     hname in {"Água Boa", "Canarana", "Várzea Grande", "Pedra Preta", "Rio Branco", "Santa Terezinha", "Nova Olímpia", "General Carneiro", "Novo Santo Antônio"},
                     ouf_reg, "prov_clarify_homonym", "CLARIFY/HOMONYM_MUNI",
                     "mt_and_national_homonym_municipality_guard", "clarify_homonym", [],
@@ -1409,9 +1435,10 @@ class Round09Author:
                     "ir": None,
                     "expected_behavior": "Clarify which specific municipalities or UF should be included for the informal subregion.",
                 }
+                item_uf = uf if geo_stratum == "other_26_ufs" else "MT"
                 return self._make_item(
                     item_num, text, register, gold, ["SR-06", "SR-09"],
-                    fam, "Clarify informal regional designation not mapped to a single catalogue entity", geo_stratum, "MT", r_ids, True, False,
+                    fam, "Clarify informal regional designation not mapped to a single catalogue entity", geo_stratum, item_uf, r_ids, True, ouf_reg,
                     "prov_clarify_subregion", "CLARIFY/INFORMAL_SUBREGION",
                     "mt_informal_subregion_clarification", "clarify_homonym", [],
                     "Informal subregions ('Nortão', 'Baixada Cuiabana', 'Vale do Araguaia') require specifying the municipalities.", split, batch_id
@@ -1641,7 +1668,7 @@ class Round09Author:
                 t2_txt = "Agora considere somente matrizes de microempresa."
                 t2_act = "add_filter"
             else:
-                t2_txt = f"Agora considere somente matrizes de microempresa na cidade de {m1['name']}/{m1['uf']}."
+                t2_txt = f"Agora considere somente matrizes de microempresa de {s1['sing']} na cidade de {m1['name']}/{m1['uf']}."
                 t2_act = "replace_slot"
             ir2 = base_ir(
                 {"kind": "count", "metric": "stock"},
@@ -1688,7 +1715,7 @@ class Round09Author:
             if unit_idx == 0 and d_idx < 4:
                 t2_txt = "Agora retire o filtro de matriz e conte matrizes e filiais."
             else:
-                t2_txt = f"Agora retire o filtro de matriz e conte matrizes e filiais na cidade de {m1['name']}/{m1['uf']}."
+                t2_txt = f"Agora retire o filtro de matriz e conte matrizes e filiais de {s1['sing']} na cidade de {m1['name']}/{m1['uf']}."
             ir2 = base_ir({"kind": "count", "metric": "stock"}, place_muni(m1), activity_sector(s1))
             turns.append(self._make_item(
                 start_item_num + 1, t2_txt, regs[1],
@@ -1790,7 +1817,7 @@ class Round09Author:
                 t3_txt = "Agora filtre somente optantes pelo MEI."
                 t3_act = "add_filter"
             else:
-                t3_txt = f"Agora filtre somente optantes pelo MEI na cidade de {h_name}/MT."
+                t3_txt = f"Agora filtre somente optantes pelo MEI de {s1['sing']} na cidade de {h_name}/MT."
                 t3_act = "replace_slot"
             ir3 = base_ir({"kind": "count", "metric": "stock"}, place_muni(h_muni), activity_sector(s1), extra_scope={"mei": "yes"})
             turns.append(self._make_item(
