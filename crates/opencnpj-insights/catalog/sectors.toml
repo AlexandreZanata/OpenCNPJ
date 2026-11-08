@@ -93,7 +93,7 @@ since = "v1"
 [[sector]]
 id = "auto_mechanic"
 display = { sing = "oficina mecânica", plural = "oficinas mecânicas", gender = "f" }
-aliases = ["mecânico de automóveis", "mecânica de automóveis", "oficina", "oficinas", "mecânica", "mecânicas"]
+aliases = ["mecânico de automóveis", "mecânica de automóveis", "oficina", "oficinas", "mecânica", "mecânicas", "retífica", "retíficas"]
 cnae_core = ["4520001"]
 cnae_extended = []
 scope = "main"
@@ -130,7 +130,7 @@ notes = "Includes the current and historical retail bakery codes. Industrial bak
 [[sector]]
 id = "bar"
 display = { sing = "bar", plural = "bares", gender = "m" }
-aliases = ["boteco", "botecos", "botequim", "botequins"]
+aliases = ["boteco", "botecos", "botequim", "botequins", "choperia", "choperias"]
 cnae_core = ["5611204", "5611205"]
 cnae_extended = []
 scope = "main"
@@ -265,7 +265,7 @@ since = "v1"
 [[sector]]
 id = "candy_store"
 display = { sing = "loja de doces", plural = "lojas de doces", gender = "f" }
-aliases = ["bomboniere", "bombonieres"]
+aliases = ["bomboniere", "bombonieres", "doceria", "docerias"]
 cnae_core = ["4721104"]
 cnae_extended = []
 scope = "main"
@@ -782,7 +782,7 @@ since = "v1"
 [[sector]]
 id = "grocery"
 display = { sing = "mercadinho", plural = "mercadinhos", gender = "m" }
-aliases = ["mercearia", "mercearias", "minimercado", "minimercados", "mercado", "mercados", "mercadinho", "mercadinhos"]
+aliases = ["mercearia", "mercearias", "minimercado", "minimercados", "mercado", "mercados", "mercadinho", "mercadinhos", "empório", "empórios"]
 cnae_core = ["4712100"]
 cnae_extended = []
 scope = "main"
@@ -1557,7 +1557,7 @@ since = "v1"
 [[sector]]
 id = "snack_bar"
 display = { sing = "lanchonete", plural = "lanchonetes", gender = "f" }
-aliases = ["casa de chá", "casa de sucos", "hamburgueria", "hamburguerias", "cafeteria", "cafeterias", "sorveteria", "sorveterias"]
+aliases = ["casa de chá", "casa de sucos", "hamburgueria", "hamburguerias", "cafeteria", "cafeterias", "sorveteria", "sorveterias", "pastelaria", "pastelarias"]
 cnae_core = ["5611203"]
 cnae_extended = []
 scope = "main"
@@ -1823,7 +1823,7 @@ since = "v1"
 [[sector]]
 id = "variety_store"
 display = { sing = "loja de variedades", plural = "lojas de variedades", gender = "f" }
-aliases = ["bazar", "bazares"]
+aliases = ["bazar", "bazares", "lojinha", "lojinhas"]
 cnae_core = ["4713002"]
 cnae_extended = []
 scope = "main"

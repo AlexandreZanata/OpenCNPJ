@@ -1382,7 +1382,9 @@ fn filters(n: &str, m: &str, raw: &str, r: &mut Request, act: &mut String, popul
         // Scale words are not parsed as independent quantities.
         if let Some(&value) = nums.first() {
             let cents = value;
-            let (from, to) = if has(m, &["entre"]) {
+            let interval =
+                (at0..t.len()).any(|j| t[j] == "entre" && ((j + 1..t.len()).take(2).any(|k| time::money_quantity(&t, k).is_some())));
+            let (from, to) = if interval {
                 (Some(cents), Some(*nums.get(1).ok_or_else(|| clarify("Informe os dois limites de capital social."))?))
             } else if has(n, &["ate", "no maximo"]) {
                 (None, Some(cents))

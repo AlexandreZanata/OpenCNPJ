@@ -661,3 +661,12 @@ fn round11_followup_preserves_inherited_place_exclusion() {
     let r = out.request.unwrap();
     assert_eq!(r.scope.exclude.municipalities, SmallSet::new([MunicipalityId(1)]));
 }
+
+#[test]
+fn round12_discourse_entre_does_not_require_capital_interval() {
+    let r = req(
+        "No cruzamento entre porte e capital, quantas padarias ativas em Sorriso/MT sao pequeno porte com capital social acima de 100000 reais?",
+    );
+    assert_eq!(r.scope.capital, Some(Range { from: Some(10_000_001), to: None }));
+    assert_eq!(r.scope.porte, PorteSet::only(Porte::Small));
+}
