@@ -136,7 +136,7 @@
         "docs/intelligence/results/official-data-mt/STAGE-7-9.md"
       ],
       "blockers": [
-        "CNES and INEP record ingestion is implemented; ANP, Comex Stat, BCB and MT portal adapters remain pending."
+        "CNES, INEP, ANP, Comex Stat, BCB and MT portal ingestion adapters are implemented; analytical queries/joins over these record stores are not yet curated."
       ]
     },
     {
@@ -150,7 +150,7 @@
         "docs/intelligence/results/official-data-mt/STAGE-7-9.md"
       ],
       "blockers": [
-        "PGFN FGTS/Previdenciário record ingestion is implemented; ANEEL ODbL adapted-database assessment remains pending."
+        "PGFN FGTS/Previdenciário and ANEEL record ingestion are implemented; ODbL adapted-database and fiscal-join assessments remain pending."
       ]
     },
     {
@@ -200,6 +200,24 @@
         "Adapters buffer parsed records before publication; full national runs peaked at ~10.7 GB RSS. A streaming sink is future work.",
         "CNES DF administrative-region codes need a verified crosswalk.",
         "Invalid PGFN CNPJs need source/crosswalk normalization before joins."
+      ]
+    },
+    {
+      "id": 13,
+      "name": "Streaming sink and remaining source adapters",
+      "status": "complete",
+      "evidence": [
+        "crates/opencnpj-insights/src/official/records.rs",
+        "crates/opencnpj-lab/src/official/adapters.rs",
+        "docs/intelligence/results/official-data-mt/ADAPTERS.md",
+        "docs/intelligence/results/official-data-mt/ingest/records-cnpj-audit-national.json",
+        "docs/intelligence/results/official-data-mt/logs/stage-13-stream-inep-national.log",
+        "docs/intelligence/results/official-data-mt/logs/stage-13-stream-pgfn-prev-national.log"
+      ],
+      "blockers": [
+        "ANEEL raw CSV entry is still buffered per file (~1.5 GB RSS).",
+        "CNES DF administrative-region codes need a verified crosswalk.",
+        "Invalid PGFN/ANEEL CNPJs need source/crosswalk normalization before joins."
       ]
     }
   ]

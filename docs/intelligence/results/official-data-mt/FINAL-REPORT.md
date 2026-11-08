@@ -51,17 +51,24 @@ No national dataset or large binary was committed.
 
 ## Full-resource adapters
 
-Four record-level adapters now ingest complete published resources into immutable
+Nine record-level adapters ingest complete published resources into immutable
 `.ocrec` stores: ANTT RNTRC (JSON), CNES (CSV/ZIP), INEP Censo Escolar 2024
-(CSV/ZIP) and PGFN FGTS/Previdenciário (CSV/ZIP). Each row is accounted for as
-accepted, out of scope, rejected or duplicate; `--scope MT` and `--scope all`
-are supported. Full national runs produced 98,119 ANTT, 641,928 CNES, 215,545
-INEP and 3,837,044 PGFN records. The stores are outside Git.
+(CSV/ZIP), PGFN FGTS/Previdenciário (CSV/ZIP), BCB SGS (JSON), ANEEL distributed
+generation (CSV/ZIP), ANP fuel prices (CSV), Comex Stat municipal exports (CSV)
+and MT state convenios (CSV). Each row is accounted for as accepted, out of
+scope, rejected or duplicate; `--scope MT` and `--scope all` are supported.
+Full national runs produced 98,119 ANTT, 641,928 CNES, 215,545 INEP and
+3,837,044 PGFN records. The stores are outside Git.
 
-Record-level CNPJ audit: CNES/INEP/PGFN sampled CNPJs are present in the CNPJ
-snapshot except 2 INEP CNPJs; PGFN contains invalid check-digit CNPJs. CNES has
-340 DF administrative-region codes without an IBGE municipality match. These are
-flagged for later normalization, not silently repaired. See `ADAPTERS.md`.
+The record writer is now a true streaming sink: full national INEP dropped from
+~10.5 GB to 238 MB RSS and PGFN Previdenciário from ~10.7 GB to 198 MB. The raw
+CSV entry for ANEEL is still buffered per file (~1.5 GB).
+
+Record-level CNPJ audit: CNES/INEP/PGFN/ANP/MT sampled CNPJs are present in the
+CNPJ snapshot except 2 INEP and 1 ANEEL CNPJs; PGFN and ANEEL contain invalid
+check-digit CNPJs. CNES has 340 DF administrative-region codes without an IBGE
+municipality match. These are flagged for later normalization, not silently
+repaired. See `ADAPTERS.md`.
 
 ## Additional source and CNPJ crosswalk audit
 
@@ -88,7 +95,7 @@ Evidence: `SOURCE-AUDIT.md`, `INCONSISTENCIES.md`,
 |---|---|
 | `cargo fmt --all --check` | exit 0 |
 | `cargo clippy --workspace --all-targets -- -D warnings` | exit 0 |
-| `cargo test --workspace` | 328 passed, 0 failed (29 suites, including doc tests) |
+| `cargo test --workspace` | 329 passed, 0 failed (29 suites, including doc tests) |
 | MT acceptance corpus | 261/261 passed |
 | HTTP API smoke | `/api/v1/official/sources` and `/api/v1/official/query` returned source-backed answer |
 

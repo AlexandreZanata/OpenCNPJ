@@ -129,6 +129,21 @@ opencnpj-intel official ingest --adapter pgfn --dataset pgfn-previdenciario-2026
   --input /data/opencnpj-data/intelligence/official/ingest/raw/pgfn_previdenciario_2026Q3.zip \
   --out /data/opencnpj-data/intelligence/official/ingest/national/pgfn-previdenciario-2026Q3.ocrec \
   --scope all --period 2026Q3
+opencnpj-intel official ingest --adapter bcb --dataset bcb-sgs-1 \
+  --input /data/opencnpj-data/intelligence/official/ingest/raw/bcb_sgs_1.json \
+  --out /data/opencnpj-data/intelligence/official/ingest/national/bcb-sgs-1.ocrec --scope all
+opencnpj-intel official ingest --adapter aneel --dataset aneel-gd \
+  --input /data/opencnpj-data/intelligence/official/ingest/raw/aneel_gd.zip \
+  --out /data/opencnpj-data/intelligence/official/ingest/mt/aneel-gd.ocrec --scope MT
+opencnpj-intel official ingest --adapter anp --dataset anp-precos-revenda \
+  --input /data/opencnpj-data/intelligence/official/ingest/raw/anp_precos_revenda_latest.csv \
+  --out /data/opencnpj-data/intelligence/official/ingest/mt/anp-precos-revenda.ocrec --scope MT
+opencnpj-intel official ingest --adapter comex --dataset comex-exp-2025-mun \
+  --input /data/opencnpj-data/intelligence/official/ingest/raw/comex_exp_2025_mun.csv \
+  --out /data/opencnpj-data/intelligence/official/ingest/mt/comex-exp-2025-mun.ocrec --scope MT
+opencnpj-intel official ingest --adapter mt --dataset mt-convenios-2024 \
+  --input /data/opencnpj-data/intelligence/official/ingest/raw/mt_convenios_2024.csv \
+  --out /data/opencnpj-data/intelligence/official/ingest/mt/mt-convenios-2024.ocrec --scope MT
 opencnpj-intel official verify-records --dir /data/opencnpj-data/intelligence/official/ingest/national
 opencnpj-intel official audit-records \
   --dir /data/opencnpj-data/intelligence/official/ingest/national \

@@ -34,6 +34,9 @@ Generated from `audit/cnpj-crosswalk-audit.json` and `audit/source-audit.json`.
 | INEP has 2 sampled CNPJs absent from the 2026-10 snapshot | medium | Check source year/root; keep unmatched explicit |
 | PGFN FGTS has 1 invalid check-digit CNPJ | high | Quarantine before any CNPJ join; preserve the raw field |
 | PGFN Previdenciário has 20 invalid check-digit CNPJs in the sample | high | Quarantine before any CNPJ join; preserve the raw field |
+| ANEEL has 1 invalid check-digit CNPJ and 1 sampled CNPJ absent from the snapshot | medium | Quarantine the invalid value; check the absent source year/root |
+| ANP sample: 126 unique MT CNPJs, all present; no invalid CNPJ | info | No action |
+| MT convenios sample: 68 unique CNPJs, all present | info | No action |
 | INEP uses `99999999999999` as a CNPJ sentinel | info | Normalized to missing; recorded in adapter limitations |
 | PGFN national excludes natural persons | info | Kept out of the business-prospecting slice |
 

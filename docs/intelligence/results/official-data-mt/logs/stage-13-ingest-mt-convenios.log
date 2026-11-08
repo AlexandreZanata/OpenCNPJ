@@ -1,0 +1,2 @@
+raw	/data/opencnpj-data/intelligence/official/ingest/raw/mt_convenios_2024.csv	bytes=43128	sha256=ed77dad0c37525940647632430f36632b88ab326c05bbcd406729ec31dd56d06
+published	/data/opencnpj-data/intelligence/official/ingest/mt/mt-convenios-2024.ocrec	rows=79	total=79	out_of_scope=0	rejected=0	duplicates=0	bytes=114688	sha256=f075bb13b29ea8e062064d4616976da495c29705c0de9fcde3e8a21ef908370b

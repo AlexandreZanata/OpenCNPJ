@@ -1,0 +1,3 @@
+/data/opencnpj-data/intelligence/official/ingest/stream-national/inep-censo-escolar-2024.ocrec	inep-censo-escolar-2024	records=215545	total=215545	out_of_scope=0	rejected=0	duplicates=0	sha256=a61c2a587e4c07d0e6890859fa1bd62a32521b2b636a4053eb165cc7b05596e7
+/data/opencnpj-data/intelligence/official/ingest/stream-national/pgfn-fgts-2026Q3.ocrec	pgfn-fgts-2026Q3	records=549458	total=552079	out_of_scope=2621	rejected=0	duplicates=0	sha256=6ad508dc7b7f75850079b2dccec5ce1b8bdf998068b05f8c9e71eb3a79a9a7ed
+/data/opencnpj-data/intelligence/official/ingest/stream-national/pgfn-previdenciario-2026Q3.ocrec	pgfn-previdenciario-2026Q3	records=3287586	total=3397082	out_of_scope=109496	rejected=0	duplicates=0	sha256=07ee3d066eceb44f45434890bc096459d82c377ca2f2466ed385bc35dcacf8ca

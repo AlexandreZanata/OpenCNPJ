@@ -36,6 +36,11 @@
 | INEP | `inep-censo-escolar-2024` | CSV/ZIP | 215,545 |
 | PGFN | `pgfn-fgts-2026Q3` | CSV/ZIP | 549,458 accepted |
 | PGFN | `pgfn-previdenciario-2026Q3` | CSV/ZIP | 3,287,586 accepted |
+| BCB | `bcb-sgs-1`, `bcb-sgs-433` | JSON | 2,471 + 561 |
+| ANEEL | `aneel-gd` | CSV/ZIP | 15,651 MT legal persons |
+| ANP | `anp-precos-revenda` | CSV | 843 MT legal persons |
+| Comex Stat | `comex-exp-2025-mun` | CSV | 13,271 MT records |
+| MT portal | `mt-convenios-2024` | CSV | 79 MT convenios |
 
 ## Not implemented / blocked
 

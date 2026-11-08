@@ -13,6 +13,11 @@ accepted, out of scope, rejected or duplicate.
 | `cnes` | CNES establishments | CSV inside ZIP | CNES/unit IDs, `CO_IBGE`, CNPJ fields | MT |
 | `inep` | INEP Censo Escolar 2024 | CSV inside ZIP | school ID, `CO_MUNICIPIO`, CNPJ fields | MT |
 | `pgfn` | PGFN active debt (FGTS/Previdenciário) | CSV inside ZIP | CNPJ, inscription, UF | MT, legal persons |
+| `bcb` | BCB SGS series | JSON array | date, series value | all (national) |
+| `aneel` | ANEEL distributed generation | CSV inside ZIP | `CodEmpreendimento`, `CodMunicipioIbge`, CNPJ | MT, legal persons |
+| `anp` | ANP fuel resale prices | CSV | CNPJ, municipality, product, date | MT, legal persons |
+| `comex` | Comex Stat municipal exports | CSV | `CO_MUN`, SH4, year/month | MT |
+| `mt` | MT state convenios | CSV | convenio number, CNPJ | MT |
 
 Common `.ocrec` identity columns: `record_id`, `geography_level`,
 `geography_code`, `geography_name`, `cnpj`, `cnpj_root`, `period` and
@@ -43,6 +48,19 @@ opencnpj-intel official audit-records \
   --out /data/opencnpj-data/intelligence/official/ingest/audit/records-cnpj-audit-national.json
 ```
 
+## Streaming sink
+
+`RecordWriter` inserts each parsed record directly into the temporary SQLite
+store inside one transaction. The adapters no longer materialize a record vector,
+so full national runs stay bounded by the source buffer plus the current row.
+Measured full national runs:
+
+| Dataset | Records | Max RSS before | Max RSS with sink |
+|---|---:|---:|---:|
+| INEP 2024 | 215,545 | ~10.5 GB | 238 MB |
+| PGFN Previdenciário | 3,287,586 | ~10.7 GB | 198 MB |
+| PGFN FGTS | 549,458 | ~1.9 GB | 65 MB |
+
 ## MT runs
 
 | Dataset | Records | Source rows | Out of scope | Rejected | Store bytes | Store SHA-256 |
@@ -52,6 +70,10 @@ opencnpj-intel official audit-records \
 | `inep-censo-escolar-2024` | 3,191 | 215,545 | 212,354 | 0 | 39,591,936 | `9bbc05425c87d85afd5a386ffe78a5388976c154522fa9606c86526bc5b814e0` |
 | `pgfn-fgts-2026Q3` | 7,598 | 552,079 | 544,481 | 0 | 6,250,496 | `dca95fe3a47233f784add9996135fb9d2b2c20c587f0b62bcce5cfe8ba0f7962` |
 | `pgfn-previdenciario-2026Q3` | 81,870 | 3,397,082 | 3,315,212 | 0 | 60,026,880 | `54fc88b5836a788e969a8eb3f5dc6cff170b9b89554f972f4cb3b57b9fa23e57` |
+| `aneel-gd` | 15,651 | 4,735,908 | 4,720,257 | 0 | 22,953,984 | `2f5f63995f9265838d6facabf0fe183f8c9852bf4f8f8c9bc5198f8814b470a9` |
+| `anp-precos-revenda` | 843 | 47,555 | 46,712 | 0 | 618,496 | `a7b392fe8aae94f15b0e9d71d3f7f77dfdb5ff126067230425ca183dfa938502` |
+| `comex-exp-2025-mun` | 13,271 | 1,207,088 | 1,193,817 | 0 | 4,296,704 | `25fa3903acb29e7327325e3f4951f0304caf73ccb90fedb2ae0985e533d43620` |
+| `mt-convenios-2024` | 79 | 79 | 0 | 0 | 114,688 | `f075bb13b29ea8e062064d4616976da495c29705c0de9fcde3e8a21ef908370b` |
 
 ## Full national runs
 
@@ -62,6 +84,8 @@ opencnpj-intel official audit-records \
 | `inep-censo-escolar-2024` | 215,545 | 215,545 | 0 | 0 | 2,673,111,040 | `40ae4bb680f96c1d5451e9791bc40612973e183913ad7f3f6711793a27c870df` |
 | `pgfn-fgts-2026Q3` | 549,458 | 552,079 | 2,621 | 0 | 451,731,456 | `de8bd16f72256c33f6c07c8e16c09370a15e6cb8d9d6b8af5cf7decbd7730eed` |
 | `pgfn-previdenciario-2026Q3` | 3,287,586 | 3,397,082 | 109,496 | 0 | 2,416,336,896 | `fa18994994d98920f9d2b9f0499660b56cba8ac3222a472292149321257213c3` |
+| `bcb-sgs-1` | 2,471 | 2,471 | 0 | 0 | 442,368 | `a1a01ad73087fbd6d698d3195814b38cc1a653b2db26ec19b2c194b56c3364e2` |
+| `bcb-sgs-433` | 561 | 561 | 0 | 0 | 126,976 | `240bb6584a3c9327e6a92a4642eaab046b909cc16c2067c6604d45de2bfc2aa8` |
 
 Raw evidence is outside Git under
 `/data/opencnpj-data/intelligence/official/ingest/raw/`. The full national stores
@@ -76,6 +100,11 @@ are 6.1 GB and remain outside Git.
 - PGFN FGTS: 309,267 unique CNPJs; 1 invalid check-digit CNPJ found.
 - PGFN Previdenciário: 824,940 unique CNPJs; 20 invalid check-digit CNPJs found.
 - ANTT: no CNPJ identity in this aggregate resource.
+- ANEEL: 1 invalid check-digit CNPJ and 1 CNPJ absent from the snapshot in the MT sample.
+- ANP: all 126 unique MT CNPJs sampled were present; no invalid CNPJ found.
+- MT convenios: all 68 unique CNPJs sampled were present.
+- Comex Stat: no CNPJ identity; municipal export totals only.
+- BCB: national series, no CNPJ.
 - CNES national: 340 rows rejected because they use DF administrative-region
   codes (`530040`, `530050`, …) that are not in the IBGE municipality catalogue.
   The sample is recorded in the manifest limitations.
@@ -86,9 +115,8 @@ repaired. They require source-side or crosswalk normalization before any join.
 
 ## Limitations
 
-- The adapters buffer parsed records before publishing. Full national runs used
-  up to 10.7 GB RSS (PGFN/INEP). A future streaming sink can lower this, but the
-  current runs completed and verified.
+- The record writer is streaming. Large raw CSV entries are still buffered per
+  file (ANEEL: ~1.5 GB) before row iteration, but records are not accumulated.
 - `--scope MT` still reads every source row; out-of-scope rows are counted.
 - PGFN natural-person records are excluded from this business slice.
 - ANTT records are aggregate, not identified company fleets.
