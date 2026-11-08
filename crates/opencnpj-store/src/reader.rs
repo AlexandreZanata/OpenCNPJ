@@ -532,8 +532,11 @@ impl Snapshot {
         let section = &self.map[self.postings.0..self.postings.1];
         let (bm, len) = postings::decode_postings(section, off as usize, self.doc_count)?;
         let bm = Arc::new(bm);
-        if len >= CACHE_MIN_ENCODED {
-            self.cache.lock().expect("lock").insert(off, bm.clone(), len);
+        {
+            let mut c = self.cache.lock().expect("lock");
+            if len >= CACHE_MIN_ENCODED || c.budget > DEFAULT_POSTINGS_CACHE {
+                c.insert(off, bm.clone(), len);
+            }
         }
         Ok(bm)
     }

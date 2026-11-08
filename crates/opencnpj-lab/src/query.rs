@@ -239,17 +239,22 @@ impl EngineExecutor<'_> {
     pub fn records(&self, request: &ValidRequest) -> Result<search::SearchResult> {
         ensure!(matches!(request.op, Op::List { .. } | Op::Lookup { .. }), "records needs a list or lookup");
         let mut set = self.set(request)?;
-        if let Some(range) = request.scope.place_population {
+        if let Some(range) = request.scope.place_population
+            && !set.is_empty()
+        {
+            let place = crate::oracle::place(self.context.municipalities, &request.scope.place, &request.scope.within_ufs)?;
             let reference = request.scope.population_ref.unwrap_or_else(|| self.context.municipalities.default_population());
             let mut allowed = RoaringBitmap::new();
             for row in self.context.municipalities.rows() {
-                if self.population_ok(row.id, (range.from.unwrap_or(0), range.to.unwrap_or(u32::MAX)), reference)
+                if let Level::Municipality(geo) = row.place_level()
+                    && place.admits(row.id, &geo.uf)
+                    && self.population_ok(row.id, (range.from.unwrap_or(0), range.to.unwrap_or(u32::MAX)), reference)
                     && let Some(postings) = self.snapshot.postings(Field::Municipio, format!("{:04}", row.tom).as_bytes())?
                 {
-                    allowed |= &*postings;
+                    allowed |= &set & &*postings;
                 }
             }
-            set &= allowed;
+            set = allowed;
         }
         let query = parse(&lower(request, self.context.municipalities)?)?;
         let total = set.len();
@@ -310,7 +315,39 @@ impl EngineExecutor<'_> {
 
     fn compare(&self, request: &Request, dim: Dim, members: &Members) -> Result<Value> {
         let metric = request.op.metric().context("operation metric")?;
-        let (values, bases) = self.metric_rows(request, metric, dim)?;
+        let mut scoped = request.clone();
+        if !matches!(metric, Metric::Share) {
+            match dim {
+                Dim::Municipality if matches!(scoped.scope.place, PlaceFilter::Any) => {
+                    let ids: Vec<_> =
+                        members.iter().filter_map(|m| if let Member::Municipality(id) = m { Some(*id) } else { None }).collect();
+                    if !ids.is_empty() {
+                        scoped.scope.place = PlaceFilter::Municipalities(SmallSet::new(ids));
+                    }
+                }
+                Dim::Uf if matches!(scoped.scope.place, PlaceFilter::Any) => {
+                    let ids: Vec<_> = members.iter().filter_map(|m| if let Member::Uf(id) = m { Some(*id) } else { None }).collect();
+                    if !ids.is_empty() {
+                        scoped.scope.place = PlaceFilter::Ufs(SmallSet::new(ids));
+                    }
+                }
+                Dim::Sector if matches!(scoped.scope.activity, ActivityFilter::Any) => {
+                    let ids: Vec<_> = members.iter().filter_map(|m| if let Member::Sector(id) = m { Some(*id) } else { None }).collect();
+                    let mut cnaes = Vec::new();
+                    for id in &ids {
+                        if let Some(codes) = self.context.sectors.get(&id.0) {
+                            cnaes.extend(codes.iter().map(|&c| CnaeCode::Subclass(c)));
+                        }
+                    }
+                    if !ids.is_empty() && !cnaes.is_empty() {
+                        scoped.scope.activity =
+                            ActivityFilter::Sectors { ids: SmallSet::new(ids), cnaes: SmallSet::new(cnaes), scope: CnaeScope::Main };
+                    }
+                }
+                _ => {}
+            }
+        }
+        let (values, bases) = self.metric_rows(&scoped, metric, dim)?;
         let mut rows = Vec::with_capacity(members.len());
         for member in members.iter() {
             let key = member_key(member);
@@ -497,16 +534,58 @@ impl EngineExecutor<'_> {
         let reference = request.scope.population_ref.unwrap_or_else(|| self.context.municipalities.default_population());
         let range = (range.from.unwrap_or(0), range.to.unwrap_or(u32::MAX));
         Ok(self
-            .municipality_groups(set)?
+            .municipality_groups(request, set)?
             .into_iter()
             .filter(|(id, _)| self.population_ok(*id, range, reference))
             .map(|(_, count)| count)
             .sum())
     }
 
-    fn municipality_groups(&self, set: &RoaringBitmap) -> Result<BTreeMap<u16, u64>> {
+    fn group_counts(&self, set: &RoaringBitmap, field: Field) -> Result<Vec<(String, u64)>> {
+        if set.len() <= 500_000
+            && let Some(col) = self.snapshot.doc_values(field)
+        {
+            let counts = self.snapshot.doc_value_counts(col, set.iter())?;
+            return Ok(col.values.iter().zip(&counts[1..]).filter(|(_, n)| **n > 0).map(|(v, n)| (v.clone(), *n)).collect());
+        }
+        Ok(search::group_counts_postings(self.snapshot, Some(set), field)?)
+    }
+
+    fn municipality_groups(&self, request: &Request, set: &RoaringBitmap) -> Result<BTreeMap<u16, u64>> {
+        if set.is_empty() {
+            return Ok(BTreeMap::new());
+        }
+        let place = crate::oracle::place(self.context.municipalities, &request.scope.place, &request.scope.within_ufs)?;
         let mut groups = BTreeMap::new();
-        for (tom, count) in search::group_counts_postings(self.snapshot, Some(set), Field::Municipio)? {
+        if set.len() <= 500_000 && self.snapshot.doc_values(Field::Municipio).is_some() {
+            for (tom, count) in self.group_counts(set, Field::Municipio)? {
+                if let Ok(tom) = tom.parse::<u16>()
+                    && let Some(row) = self.context.municipalities.by_tom(tom)
+                    && let Level::Municipality(geo) = row.place_level()
+                    && place.admits(row.id, &geo.uf)
+                    && !request.scope.exclude.municipalities.contains(&MunicipalityId(row.id))
+                {
+                    groups.insert(row.id, count);
+                }
+            }
+            return Ok(groups);
+        }
+        if place.municipalities.is_some() || place.ufs.is_some() {
+            for row in self.context.municipalities.rows() {
+                if let Level::Municipality(geo) = row.place_level()
+                    && place.admits(row.id, &geo.uf)
+                    && !request.scope.exclude.municipalities.contains(&MunicipalityId(row.id))
+                    && let Some(postings) = self.snapshot.postings(Field::Municipio, format!("{:04}", row.tom).as_bytes())?
+                {
+                    let count = set.intersection_len(&postings);
+                    if count > 0 {
+                        groups.insert(row.id, count);
+                    }
+                }
+            }
+            return Ok(groups);
+        }
+        for (tom, count) in self.group_counts(set, Field::Municipio)? {
             if let Ok(tom) = tom.parse::<u16>()
                 && let Some(row) = self.context.municipalities.by_tom(tom)
             {
@@ -525,13 +604,16 @@ impl EngineExecutor<'_> {
     }
 
     fn group_dim(&self, request: &Request, dim: Dim, set: &RoaringBitmap) -> Result<BTreeMap<u64, i64>> {
+        if set.is_empty() {
+            return Ok(BTreeMap::new());
+        }
         if request.scope.place_population.is_some() {
             return self.group_dim_population(request, dim, set);
         }
         match dim {
             Dim::Municipality => {
                 let mut out = BTreeMap::new();
-                for (id, count) in self.municipality_groups(set)? {
+                for (id, count) in self.municipality_groups(request, set)? {
                     out.insert(u64::from(id), i64::try_from(count)?);
                 }
                 Ok(out)
@@ -539,21 +621,46 @@ impl EngineExecutor<'_> {
             Dim::Uf => self.group_simple(set, Field::Uf, |value| agg::uf_id(value).map(|uf| u64::from(uf.0))),
             Dim::Cnae(CnaeLevel::Section) => {
                 // Sections are counted with the engine's own section filter (`cnae=<letter>`),
-                // not with a copy of the section table.
+                // summing division counts that match each section's 2-digit prefix range.
+                let div_counts =
+                    self.group_simple(set, Field::Cnae, |value| value.parse::<u32>().ok().map(|cnae| cnae_key(CnaeLevel::Division, cnae)))?;
                 let mut out = BTreeMap::new();
                 for letter in b'A'..=b'U' {
-                    let query = parse(&[("cnae".into(), char::from(letter).to_string()), ("matriz_filial".into(), "1,2".into())])?;
-                    if let Some(docs) = search::candidates(self.snapshot, &query, &self.limits)?.all {
-                        let count = docs.intersection_len(set);
-                        if count > 0 {
-                            out.insert(u64::from(letter), i64::try_from(count)?);
+                    let pat = search::filter_pattern(Field::Cnae, &char::from(letter).to_string())?;
+                    let mut count = 0i64;
+                    for (_, t) in &pat.prefixes {
+                        if let Ok(div) = t.parse::<u64>()
+                            && let Some(n) = div_counts.get(&div)
+                        {
+                            count += *n;
                         }
+                    }
+                    if count > 0 {
+                        out.insert(u64::from(letter), count);
                     }
                 }
                 Ok(out)
             }
             Dim::Cnae(level) => self.group_simple(set, Field::Cnae, |value| value.parse::<u32>().ok().map(|cnae| cnae_key(level, cnae))),
             Dim::Sector => {
+                if let ActivityFilter::Sectors { cnaes, scope: CnaeScope::Main, .. } = &request.scope.activity
+                    && !cnaes.is_empty()
+                {
+                    let mut out = BTreeMap::new();
+                    for code in cnaes.iter() {
+                        if let CnaeCode::Subclass(cnae) = code
+                            && let Some(postings) = self.snapshot.postings(Field::Cnae, format!("{cnae:07}").as_bytes())?
+                        {
+                            let count = i64::try_from(set.intersection_len(&postings))?;
+                            if count > 0 {
+                                for sector in self.context.sectors_of(*cnae) {
+                                    *out.entry(u64::from(*sector)).or_default() += count;
+                                }
+                            }
+                        }
+                    }
+                    return Ok(out);
+                }
                 let groups = self.group_simple(set, Field::Cnae, |value| value.parse::<u32>().ok().map(u64::from))?;
                 let mut out = BTreeMap::new();
                 for (cnae, count) in groups {
@@ -589,7 +696,7 @@ impl EngineExecutor<'_> {
                 _ => None,
             }),
             Dim::Region(level) => {
-                let groups = self.municipality_groups(set)?;
+                let groups = self.municipality_groups(request, set)?;
                 let mut out = BTreeMap::new();
                 for (id, count) in groups {
                     if let Some(region) = self.region_of(id, level) {
@@ -605,8 +712,11 @@ impl EngineExecutor<'_> {
     fn group_dim_population(&self, request: &Request, dim: Dim, set: &RoaringBitmap) -> Result<BTreeMap<u64, i64>> {
         let reference = request.scope.population_ref.unwrap_or_else(|| self.context.municipalities.default_population());
         let range = request.scope.place_population.map(|range| (range.from.unwrap_or(0), range.to.unwrap_or(u32::MAX))).unwrap();
-        let groups =
-            self.municipality_groups(set)?.into_iter().filter(|(id, _)| self.population_ok(*id, range, reference)).collect::<Vec<_>>();
+        let groups = self
+            .municipality_groups(request, set)?
+            .into_iter()
+            .filter(|(id, _)| self.population_ok(*id, range, reference))
+            .collect::<Vec<_>>();
         match dim {
             Dim::Municipality => {
                 let mut out = BTreeMap::new();
@@ -632,8 +742,11 @@ impl EngineExecutor<'_> {
     }
 
     fn group_simple(&self, set: &RoaringBitmap, field: Field, map: impl Fn(&str) -> Option<u64>) -> Result<BTreeMap<u64, i64>> {
+        if set.is_empty() {
+            return Ok(BTreeMap::new());
+        }
         let mut out = BTreeMap::new();
-        for (value, count) in search::group_counts_postings(self.snapshot, Some(set), field)? {
+        for (value, count) in self.group_counts(set, field)? {
             if let Some(key) = map(&value) {
                 *out.entry(key).or_default() += i64::try_from(count)?;
             }

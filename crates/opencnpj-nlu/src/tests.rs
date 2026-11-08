@@ -534,12 +534,13 @@ fn commercial_round_09_grammar_regressions() {
         .unwrap();
     assert_eq!(r.scope.place, PlaceFilter::Near { center: MunicipalityId(1), rule: NearRule::Neighbours(1) });
 
-    // Sub-municipal "no logradouro principal" is rejected even when Logradouro/PB is in the lexicon.
+    // Sub-municipal "no logradouro principal" is not executed as Logradouro/PB even when Logradouro/PB is in the lexicon.
     let res = engine.interpret(
         "Quantos estabelecimentos ativos de padaria existem no logradouro principal de Sorriso/MT?",
         &mut Conversation::default(),
     );
-    assert_eq!(res.decision, Decision::Reject);
+    assert_eq!(res.decision, Decision::Clarify);
+    assert!(res.request.is_none());
 
     // External statistical metrics (IBGE PAM/PPM/CEMPRE, Pearson correlation) are rejected.
     for text in [

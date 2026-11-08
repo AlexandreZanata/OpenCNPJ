@@ -246,6 +246,7 @@ fn filters_intersection(snap: &Snapshot, filters: &[(Field, Vec<String>)]) -> Re
         let next = match &acc {
             None => parts.iter().map(|p| &**p).union(),
             Some(a) if a.is_empty() => return Ok(acc),
+            Some(_) if parts.len() == 2 && size == u64::from(snap.doc_count()) => continue,
             // Restricting each part pays off only when the running set is much smaller.
             Some(a) if a.len().saturating_mul(8) < size => parts.iter().map(|p| a & &**p).union(),
             Some(a) => a & parts.iter().map(|p| &**p).union(),
