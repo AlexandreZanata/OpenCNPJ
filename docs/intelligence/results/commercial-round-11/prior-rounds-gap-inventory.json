@@ -1,0 +1,138 @@
+{
+  "round": "commercial-round-11",
+  "prior_rounds_audited": {
+    "commercial-round-01": 1000,
+    "commercial-round-02": 1000,
+    "commercial-round-03": 3000,
+    "commercial-round-04": 5000,
+    "commercial-round-05": 10000,
+    "commercial-round-06": 20000,
+    "commercial-round-07": 20000,
+    "commercial-round-08": 50000,
+    "commercial-round-09": 50000,
+    "commercial-round-10": 50000
+  },
+  "prior_rounds_total_items": 210000,
+  "prior_rounds_distributions": {
+    "categories": {
+      "market_size": 5500,
+      "prospecting": 5500,
+      "tax_size": 5500,
+      "structure_status": 5500,
+      "capital_legal": 5500,
+      "registrations": 5500,
+      "closures": 5500,
+      "trends": 5500,
+      "historical": 5500,
+      "geography": 5500,
+      "density": 5500,
+      "comparison": 5500,
+      "distribution": 5500,
+      "activity": 5500,
+      "exclusion": 5500,
+      "lookup": 5500,
+      "methodology": 5500,
+      "dialogue": 5500,
+      "clarification": 5500,
+      "unsupported": 5500,
+      "market_size_density_competition": 10000,
+      "prospecting_qualification_territory": 14000,
+      "historical_stock_flows_seasonality": 10000,
+      "geography_catchments_comparisons": 10000,
+      "corporate_structure_hq_branches_identity": 8000,
+      "supply_chain_complementary": 10000,
+      "cross_variable_correlation": 10000,
+      "dialogue_corrections_references_planning": 12000,
+      "source_quality_provenance_uncertainty": 6000,
+      "unsupported_missing_contradictions": 6000,
+      "tax_size_legal_capital_numeric": 4000
+    },
+    "decisions": {
+      "execute": 181950,
+      "clarify": 14400,
+      "reject": 13650
+    },
+    "intents": {
+      "count": 102815,
+      "list": 17910,
+      "trend": 7500,
+      "rank": 15105,
+      "compare": 16220,
+      "breakdown": 8350,
+      "lookup": 6550,
+      "None": 28050,
+      "meta": 7500
+    },
+    "acts": {
+      "None": 36345,
+      "new_query": 163755,
+      "replace_slot": 5518,
+      "add_filter": 1482,
+      "remove_filter": 2400,
+      "correction": 500
+    },
+    "filter_combinations": {
+      "none": 78632,
+      "contact": 4151,
+      "mei": 2278,
+      "simples": 1338,
+      "porte": 1780,
+      "mei+porte": 5,
+      "mei+simples": 1725,
+      "head_office": 7050,
+      "status": 42145,
+      "head_office+mei": 405,
+      "capital": 2865,
+      "natureza": 905,
+      "natureza+simples": 5,
+      "capital+mei": 5,
+      "head_office+status": 690,
+      "porte+status": 20,
+      "mei+status": 652,
+      "within_ufs": 2632,
+      "place_population": 5775,
+      "exclude": 3384,
+      "capital+natureza": 1720,
+      "exclude+status": 2746,
+      "simples+status": 642,
+      "contact+head_office+porte": 2000,
+      "contact+mei+simples": 2000,
+      "capital+contact+head_office": 2000,
+      "contact+opened+porte": 2000,
+      "contact+head_office+natureza": 2000,
+      "contact+mei": 2000,
+      "head_office+porte+simples": 2000,
+      "opened+status": 2000,
+      "head_office+porte": 1000,
+      "capital+mei+simples": 1000,
+      "natureza+porte": 1000,
+      "capital+head_office": 1000,
+      "contact+exclude+head_office": 400
+    },
+    "distinct_municipalities_used": 4341,
+    "mt_municipalities_used": 142,
+    "mt_municipalities_missing": 0
+  },
+  "identified_gaps_and_round_11_remediation": [
+    {
+      "gap_id": "GAP-11-01-SECTOR-COLLOQUIALISMS",
+      "description": "Round 10 added nine colloquial sector surfaces; common food and beverage terms such as churrascaria, hamburgueria, cafeteria, sorveteria and adega were still absent.",
+      "round_11_target": "Add those documented commercial aliases to existing sectors and exercise them without claiming collected customer speech."
+    },
+    {
+      "gap_id": "GAP-11-02-ACT-TAXONOMY",
+      "description": "Round 10 scored 39,800/41,000 on act names because compound keep/drop edits were labelled remove_filter while preserving filters semantically.",
+      "round_11_target": "Introduce a general compound_edit act for simultaneous keep/drop turns and label the affected dialogues accordingly."
+    },
+    {
+      "gap_id": "GAP-11-03-CONVERSATIONAL-REFERENTS",
+      "description": "The frozen adv, h-informal and dialogues suites remained at 214/304, 121/202 and 84/122; implicit carry-over beyond two follow-ups is still weak.",
+      "round_11_target": "Add two new three-turn dialogue patterns (compound keep/drop/switch and prefix-exclusion with sector pivot) without overfitting frozen items."
+    },
+    {
+      "gap_id": "GAP-11-04-CORRELATION-FAMILIES",
+      "description": "Round 10 documented seven descriptive correlation families but its cross-variable family used five subvariants.",
+      "round_11_target": "Split cross-variable authoring into eight subvariants covering population density, net flow, size/MEI share, external reject, capital vs size, branch penetration, CNAE co-occurrence and statistical reject."
+    }
+  ]
+}
