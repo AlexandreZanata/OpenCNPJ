@@ -1,0 +1,137 @@
+{
+  "generated_at": "unix:1794160314",
+  "inconsistencies": [
+    {
+      "action": "Check the source year and CNPJ root/establishment; keep unmatched rows explicit.",
+      "dataset_id": "inep-censo-escolar-2024",
+      "kind": "record_cnpj_absent_from_snapshot",
+      "sample": [
+        "00134372290001",
+        "07952179000126"
+      ],
+      "severity": "medium"
+    },
+    {
+      "action": "Quarantine or repair the source field; do not join it as a valid CNPJ.",
+      "dataset_id": "pgfn-fgts-2026Q3",
+      "kind": "record_cnpj_invalid_check_digits",
+      "sample": [
+        "00013637851920"
+      ],
+      "severity": "high"
+    },
+    {
+      "action": "Quarantine or repair the source field; do not join it as a valid CNPJ.",
+      "dataset_id": "pgfn-previdenciario-2026Q3",
+      "kind": "record_cnpj_invalid_check_digits",
+      "sample": [
+        "07676892000108",
+        "07676892000108",
+        "05593893000187",
+        "50561075000100",
+        "89858591000100",
+        "46341673000100",
+        "88473210000100",
+        "88473210000100",
+        "88473210000100",
+        "88473210000100",
+        "88473210000100",
+        "88473210000100",
+        "88473210000100",
+        "88473210000100",
+        "21565684000014",
+        "42043067000000",
+        "16666372000172",
+        "07323900000190",
+        "30134977000000",
+        "02581389000162"
+      ],
+      "severity": "high"
+    }
+  ],
+  "sample_per_store": 5000,
+  "snapshot": "/data/opencnpj-data/snapshots/2026-10-balanced.ocnpj",
+  "stores": [
+    {
+      "absent_cnpj_sample": [],
+      "cnpj_checked_against_snapshot": 0,
+      "dataset_id": "antt-rntrc-veiculos",
+      "invalid_cnpj_sample": [],
+      "records": 98119,
+      "source_sha256": "9bd0f0acb5412482670c9e1c8ef370171013cb3c36840b085f4669b8bf7de159",
+      "store_sha256": "012bc71670b3db2216e3856920b87ffc631620735962b0418cd91585fd93f69f",
+      "unique_cnpjs": 0,
+      "unmatched_geographies": 0
+    },
+    {
+      "absent_cnpj_sample": [],
+      "cnpj_checked_against_snapshot": 5000,
+      "dataset_id": "cnes-estabelecimentos",
+      "invalid_cnpj_sample": [],
+      "records": 641928,
+      "source_sha256": "32fc3f981d0c3e93049ff2aeaf83d3ac2a6781d1972af894eb35e32f7a40f07a",
+      "store_sha256": "fd50018f7b2e57dab8e02623a41b110d58ac2cc1a8a7e57d610e16efc6780bb0",
+      "unique_cnpjs": 345326,
+      "unmatched_geographies": 0
+    },
+    {
+      "absent_cnpj_sample": [
+        "00134372290001",
+        "07952179000126"
+      ],
+      "cnpj_checked_against_snapshot": 5000,
+      "dataset_id": "inep-censo-escolar-2024",
+      "invalid_cnpj_sample": [],
+      "records": 215545,
+      "source_sha256": "ae29d81d45ddecef59e11eda39788cbfd30dfa1cc71be9d29f23051fc2d640db",
+      "store_sha256": "40ae4bb680f96c1d5451e9791bc40612973e183913ad7f3f6711793a27c870df",
+      "unique_cnpjs": 35385,
+      "unmatched_geographies": 0
+    },
+    {
+      "absent_cnpj_sample": [],
+      "cnpj_checked_against_snapshot": 5000,
+      "dataset_id": "pgfn-fgts-2026Q3",
+      "invalid_cnpj_sample": [
+        "00013637851920"
+      ],
+      "records": 549458,
+      "source_sha256": "a011daf66131376f5d68271181e3179a25189633a1a4d79f31850740811b7356",
+      "store_sha256": "de8bd16f72256c33f6c07c8e16c09370a15e6cb8d9d6b8af5cf7decbd7730eed",
+      "unique_cnpjs": 309267,
+      "unmatched_geographies": 0
+    },
+    {
+      "absent_cnpj_sample": [],
+      "cnpj_checked_against_snapshot": 5000,
+      "dataset_id": "pgfn-previdenciario-2026Q3",
+      "invalid_cnpj_sample": [
+        "07676892000108",
+        "07676892000108",
+        "05593893000187",
+        "50561075000100",
+        "89858591000100",
+        "46341673000100",
+        "88473210000100",
+        "88473210000100",
+        "88473210000100",
+        "88473210000100",
+        "88473210000100",
+        "88473210000100",
+        "88473210000100",
+        "88473210000100",
+        "21565684000014",
+        "42043067000000",
+        "16666372000172",
+        "07323900000190",
+        "30134977000000",
+        "02581389000162"
+      ],
+      "records": 3287586,
+      "source_sha256": "149d857cfa4aa748017838ed24f29dcf1dc878309c6b2221a6d4cb6e0cb54c26",
+      "store_sha256": "fa18994994d98920f9d2b9f0499660b56cba8ac3222a472292149321257213c3",
+      "unique_cnpjs": 824940,
+      "unmatched_geographies": 0
+    }
+  ]
+}

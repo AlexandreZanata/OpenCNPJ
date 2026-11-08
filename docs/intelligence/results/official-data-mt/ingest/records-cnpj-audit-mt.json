@@ -1,0 +1,63 @@
+{
+  "generated_at": "unix:1794158026",
+  "inconsistencies": [],
+  "sample_per_store": 5000,
+  "snapshot": "/data/opencnpj-data/snapshots/2026-10-balanced.ocnpj",
+  "stores": [
+    {
+      "absent_cnpj_sample": [],
+      "cnpj_checked_against_snapshot": 0,
+      "dataset_id": "antt-rntrc-veiculos",
+      "invalid_cnpj_sample": [],
+      "records": 4533,
+      "source_sha256": "9bd0f0acb5412482670c9e1c8ef370171013cb3c36840b085f4669b8bf7de159",
+      "store_sha256": "1364a79e4fc0ab7958ca788f96c341e1a65dc18209fab38f20d7522bc64520c4",
+      "unique_cnpjs": 0,
+      "unmatched_geographies": 0
+    },
+    {
+      "absent_cnpj_sample": [],
+      "cnpj_checked_against_snapshot": 5000,
+      "dataset_id": "cnes-estabelecimentos",
+      "invalid_cnpj_sample": [],
+      "records": 14101,
+      "source_sha256": "32fc3f981d0c3e93049ff2aeaf83d3ac2a6781d1972af894eb35e32f7a40f07a",
+      "store_sha256": "eb673a1917c1a6d076978c28a622e9a03c331ad5a412ea3bd1f5cbe358735386",
+      "unique_cnpjs": 8140,
+      "unmatched_geographies": 0
+    },
+    {
+      "absent_cnpj_sample": [],
+      "cnpj_checked_against_snapshot": 468,
+      "dataset_id": "inep-censo-escolar-2024",
+      "invalid_cnpj_sample": [],
+      "records": 3191,
+      "source_sha256": "ae29d81d45ddecef59e11eda39788cbfd30dfa1cc71be9d29f23051fc2d640db",
+      "store_sha256": "9bbc05425c87d85afd5a386ffe78a5388976c154522fa9606c86526bc5b814e0",
+      "unique_cnpjs": 465,
+      "unmatched_geographies": 0
+    },
+    {
+      "absent_cnpj_sample": [],
+      "cnpj_checked_against_snapshot": 5000,
+      "dataset_id": "pgfn-fgts-2026Q3",
+      "invalid_cnpj_sample": [],
+      "records": 7598,
+      "source_sha256": "a011daf66131376f5d68271181e3179a25189633a1a4d79f31850740811b7356",
+      "store_sha256": "dca95fe3a47233f784add9996135fb9d2b2c20c587f0b62bcce5cfe8ba0f7962",
+      "unique_cnpjs": 4161,
+      "unmatched_geographies": 0
+    },
+    {
+      "absent_cnpj_sample": [],
+      "cnpj_checked_against_snapshot": 5000,
+      "dataset_id": "pgfn-previdenciario-2026Q3",
+      "invalid_cnpj_sample": [],
+      "records": 81870,
+      "source_sha256": "149d857cfa4aa748017838ed24f29dcf1dc878309c6b2221a6d4cb6e0cb54c26",
+      "store_sha256": "54fc88b5836a788e969a8eb3f5dc6cff170b9b89554f972f4cb3b57b9fa23e57",
+      "unique_cnpjs": 20497,
+      "unmatched_geographies": 0
+    }
+  ]
+}

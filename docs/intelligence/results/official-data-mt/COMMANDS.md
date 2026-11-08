@@ -106,6 +106,38 @@ opencnpj-intel official audit-cnpj \
 Result: 24 probes, 0 network errors, 0 unmatched CNPJ municipality IDs. See
 `SOURCE-AUDIT.md` and `INCONSISTENCIES.md`.
 
+## Full-resource adapters
+
+```bash
+opencnpj-intel official ingest --adapter antt --dataset antt-rntrc-veiculos \
+  --input /data/opencnpj-data/intelligence/official/ingest/raw/antt_rntrc_veiculos.json \
+  --out /data/opencnpj-data/intelligence/official/ingest/national/antt-rntrc-veiculos.ocrec \
+  --scope all --period 2026-11
+opencnpj-intel official ingest --adapter cnes --dataset cnes-estabelecimentos \
+  --input /data/opencnpj-data/intelligence/official/ingest/raw/cnes_estabelecimentos_csv.zip \
+  --out /data/opencnpj-data/intelligence/official/ingest/national/cnes-estabelecimentos.ocrec \
+  --scope all --period 2026-11
+opencnpj-intel official ingest --adapter inep --dataset inep-censo-escolar-2024 \
+  --input /data/opencnpj-data/intelligence/official/ingest/raw/inep_censo_escolar_2024.zip \
+  --out /data/opencnpj-data/intelligence/official/ingest/national/inep-censo-escolar-2024.ocrec \
+  --scope all --period 2024
+opencnpj-intel official ingest --adapter pgfn --dataset pgfn-fgts-2026Q3 \
+  --input /data/opencnpj-data/intelligence/official/ingest/raw/pgfn_fgts_2026Q3.zip \
+  --out /data/opencnpj-data/intelligence/official/ingest/national/pgfn-fgts-2026Q3.ocrec \
+  --scope all --period 2026Q3
+opencnpj-intel official ingest --adapter pgfn --dataset pgfn-previdenciario-2026Q3 \
+  --input /data/opencnpj-data/intelligence/official/ingest/raw/pgfn_previdenciario_2026Q3.zip \
+  --out /data/opencnpj-data/intelligence/official/ingest/national/pgfn-previdenciario-2026Q3.ocrec \
+  --scope all --period 2026Q3
+opencnpj-intel official verify-records --dir /data/opencnpj-data/intelligence/official/ingest/national
+opencnpj-intel official audit-records \
+  --dir /data/opencnpj-data/intelligence/official/ingest/national \
+  --snapshot /data/opencnpj-data/snapshots/2026-10-balanced.ocnpj \
+  --out /data/opencnpj-data/intelligence/official/ingest/audit/records-cnpj-audit-national.json
+```
+
+See `ADAPTERS.md` for row counts, hashes and findings.
+
 ## Acceptance corpus
 
 ```bash

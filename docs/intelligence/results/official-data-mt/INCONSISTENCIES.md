@@ -26,6 +26,17 @@ Generated from `audit/cnpj-crosswalk-audit.json` and `audit/source-audit.json`.
 | CGU/Compras/CNES/Comex/MT links not statically discoverable | high | Inspect each resource/API before admission |
 | ANTT JSON larger than probe limit | low | Stream with a bounded adapter and inspect schema |
 
+## Record-level sources (full national ingestion)
+
+| Finding | Severity | Proposed resolution |
+|---|---|---|
+| CNES has 340 rows with DF administrative-region codes (`530040`, `530050`, …) absent from the IBGE municipality catalogue | high | Add a verified DF-region crosswalk or keep the rows rejected; never assign them to Brasília by name |
+| INEP has 2 sampled CNPJs absent from the 2026-10 snapshot | medium | Check source year/root; keep unmatched explicit |
+| PGFN FGTS has 1 invalid check-digit CNPJ | high | Quarantine before any CNPJ join; preserve the raw field |
+| PGFN Previdenciário has 20 invalid check-digit CNPJs in the sample | high | Quarantine before any CNPJ join; preserve the raw field |
+| INEP uses `99999999999999` as a CNPJ sentinel | info | Normalized to missing; recorded in adapter limitations |
+| PGFN national excludes natural persons | info | Kept out of the business-prospecting slice |
+
 ## Resolved during this pass
 
 - RAIS six-digit to seven-digit IBGE municipality bridge: all MT rows matched.

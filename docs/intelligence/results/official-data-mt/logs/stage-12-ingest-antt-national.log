@@ -1,0 +1,3 @@
+raw	/data/opencnpj-data/intelligence/official/ingest/raw/antt_rntrc_veiculos.json	bytes=24287850	sha256=9bd0f0acb5412482670c9e1c8ef370171013cb3c36840b085f4669b8bf7de159
+published	/data/opencnpj-data/intelligence/official/ingest/national/antt-rntrc-veiculos.ocrec	rows=98119	total=98119	out_of_scope=0	rejected=0	duplicates=0	bytes=41459712	sha256=012bc71670b3db2216e3856920b87ffc631620735962b0418cd91585fd93f69f
+elapsed 7.21 s maxrss 285060 KB

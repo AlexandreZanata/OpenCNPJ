@@ -27,6 +27,16 @@
 | Future 2024 GDP | `empty` |
 | Census cell not released for Boa Esperança do Norte | `empty` |
 
+## Record-level adapters (`.ocrec`)
+
+| Source | Dataset | Adapter | Full national records |
+|---|---|---|---:|
+| ANTT | `antt-rntrc-veiculos` | JSON streaming/buffer | 98,119 |
+| CNES | `cnes-estabelecimentos` | CSV/ZIP | 641,928 accepted (340 rejected) |
+| INEP | `inep-censo-escolar-2024` | CSV/ZIP | 215,545 |
+| PGFN | `pgfn-fgts-2026Q3` | CSV/ZIP | 549,458 accepted |
+| PGFN | `pgfn-previdenciario-2026Q3` | CSV/ZIP | 3,287,586 accepted |
+
 ## Not implemented / blocked
 
 - Novo Caged monthly aggregate.

@@ -85,17 +85,18 @@
       "name": "MT fleet and ANTT transport specialization",
       "status": "partial",
       "evidence": [
-        "crates/opencnpj-lab/src/official.rs",
-        "crates/opencnpj-lab/src/official/xlsx.rs",
         "crates/opencnpj-insights/official/sources.toml",
-        "docs/intelligence/results/official-data-mt/STAGE-5.md",
+        "crates/opencnpj-lab/src/official.rs",
+        "crates/opencnpj-lab/src/official/adapters.rs",
+        "crates/opencnpj-lab/src/official/xlsx.rs",
+        "docs/intelligence/results/official-data-mt/ADAPTERS.md",
         "docs/intelligence/results/official-data-mt/REAL-DATA.md",
+        "docs/intelligence/results/official-data-mt/STAGE-5.md",
         "docs/intelligence/results/official-data-mt/logs/stage-5-senatran-import.log",
         "docs/intelligence/results/official-data-mt/logs/stage-5-senatran-queries.log"
       ],
       "blockers": [
-        "ANTT RNTRC aggregate/identified schemas not admitted; no CNPJ fleet ownership link.",
-        "Vehicles per related establishment requires an explicit CNPJ cross-source operation, not implemented."
+        "ANTT identified resources and CNPJ/fleet ownership are still not admitted; ANTT aggregate RNTRC records are now ingestible."
       ]
     },
     {
@@ -127,25 +128,29 @@
     {
       "id": 8,
       "name": "Additional verticals and local enrichment",
-      "status": "blocked",
+      "status": "partial",
       "evidence": [
-        "docs/intelligence/results/official-data-mt/STAGE-7-9.md",
-        "crates/opencnpj-insights/official/sources.toml"
+        "crates/opencnpj-insights/official/sources.toml",
+        "crates/opencnpj-lab/src/official/adapters.rs",
+        "docs/intelligence/results/official-data-mt/ADAPTERS.md",
+        "docs/intelligence/results/official-data-mt/STAGE-7-9.md"
       ],
       "blockers": [
-        "CNES, INEP, ANP, Comex Stat, BCB and MT portal datasets were revalidated but not admitted. No dataset-specific adapter/store/query was implemented."
+        "CNES and INEP record ingestion is implemented; ANP, Comex Stat, BCB and MT portal adapters remain pending."
       ]
     },
     {
       "id": 9,
       "name": "Licence-sensitive energy and fiscal context",
-      "status": "blocked",
+      "status": "partial",
       "evidence": [
-        "docs/intelligence/results/official-data-mt/STAGE-7-9.md",
-        "crates/opencnpj-insights/official/sources.toml"
+        "crates/opencnpj-insights/official/sources.toml",
+        "crates/opencnpj-lab/src/official/adapters.rs",
+        "docs/intelligence/results/official-data-mt/ADAPTERS.md",
+        "docs/intelligence/results/official-data-mt/STAGE-7-9.md"
       ],
       "blockers": [
-        "ANEEL ODbL adapted-database obligations pending; PGFN fiscal/personal-data semantics pending. No commercial enablement claimed."
+        "PGFN FGTS/Previdenciário record ingestion is implemented; ANEEL ODbL adapted-database assessment remains pending."
       ]
     },
     {
@@ -178,6 +183,23 @@
       ],
       "blockers": [
         "Large national resources were bounded samples; full microdata admission still requires a dedicated streaming adapter."
+      ]
+    },
+    {
+      "id": 12,
+      "name": "Full-resource record adapters",
+      "status": "complete",
+      "evidence": [
+        "crates/opencnpj-lab/src/official/adapters.rs",
+        "crates/opencnpj-insights/src/official/records.rs",
+        "docs/intelligence/results/official-data-mt/ADAPTERS.md",
+        "docs/intelligence/results/official-data-mt/ingest/records-cnpj-audit-national.json",
+        "docs/intelligence/results/official-data-mt/logs/stage-12-verify-records-national.log"
+      ],
+      "blockers": [
+        "Adapters buffer parsed records before publication; full national runs peaked at ~10.7 GB RSS. A streaming sink is future work.",
+        "CNES DF administrative-region codes need a verified crosswalk.",
+        "Invalid PGFN CNPJs need source/crosswalk normalization before joins."
       ]
     }
   ]
