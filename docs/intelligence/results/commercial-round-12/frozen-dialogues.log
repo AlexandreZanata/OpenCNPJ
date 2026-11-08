@@ -1,0 +1,15 @@
+processed 50/122 correct 37
+processed 100/122 correct 64
+{
+  "act_correct": 89,
+  "act_items": 122,
+  "correct_executed_answer": 68,
+  "decision_correct": 106,
+  "execution_fresh": 74,
+  "execution_reused_identical_ir": 52,
+  "gold_backend_ok": 104,
+  "interpretation_correct": 84,
+  "interpretation_wrong": 38,
+  "items": 122,
+  "verification_engine_match": 104
+}

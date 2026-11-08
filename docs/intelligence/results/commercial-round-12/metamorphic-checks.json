@@ -1,0 +1,19 @@
+{
+  "round": "commercial-round-12",
+  "stats": {
+    "equivalence_groups_checked": 1061,
+    "equivalence_items_checked": 2829,
+    "equivalence_groups_passed": 1061,
+    "monotonic_subset_pairs_checked": 1215,
+    "monotonic_subset_pairs_passed": 1215,
+    "partition_sum_breakdowns_checked": 1400,
+    "partition_sum_breakdowns_passed": 1400,
+    "negation_exclusion_items_checked": 1200,
+    "negation_exclusion_items_passed": 1200,
+    "ranking_prefix_pairs_checked": 1505,
+    "ranking_prefix_pairs_passed": 1505
+  },
+  "violations_count": 0,
+  "violations": [],
+  "status": "PASS"
+}
