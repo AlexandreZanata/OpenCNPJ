@@ -918,3 +918,103 @@ limitations = [
   "A debt record is not insolvency, a credit score or a current tax-clearance certificate.",
   "Natural-person records are excluded from this business-prospecting slice."
 ]
+
+[[dataset]]
+id = "bcb-sgs-1"
+category = "macroeconomy"
+source_id = "bcb"
+title = "BCB SGS 1 - dólar comercial (venda)"
+aggregate = "bcb-sgs-1"
+api_url = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.1/dados?formato=json&dataInicial=01/01/2017"
+metadata_url = "https://www.bcb.gov.br/estabilidadefinanceira/sgs"
+cadence = "daily"
+coverage = "Brazil"
+state = "verified"
+limitations = [
+  "Series revisions and unit are specific to SGS series 1.",
+  "It is not a company banking balance or credit limit."
+]
+
+[[dataset]]
+id = "bcb-sgs-433"
+category = "macroeconomy"
+source_id = "bcb"
+title = "BCB SGS 433 - IPCA mensal"
+aggregate = "bcb-sgs-433"
+api_url = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados?formato=json"
+metadata_url = "https://www.bcb.gov.br/estabilidadefinanceira/sgs"
+cadence = "monthly"
+coverage = "Brazil"
+state = "verified"
+limitations = [
+  "Series revisions and unit are specific to SGS series 433.",
+  "It is not municipal household income."
+]
+
+[[dataset]]
+id = "aneel-gd"
+category = "energy"
+source_id = "aneel"
+title = "ANEEL - empreendimentos de geração distribuída"
+aggregate = "empreendimento-geracao-distribuida"
+api_url = "https://dadosabertos.aneel.gov.br/dataset/5e0fafd2-21b9-4d5b-b622-40438d40aba2/resource/b1bd71e7-d0ad-4214-9053-cbd58e9564a7/download/empreendimento-geracao-distribuida.zip"
+metadata_url = "https://dadosabertos.aneel.gov.br/dataset/relacao-de-empreendimentos-de-geracao-distribuida"
+cadence = "continuous publication"
+coverage = "Brazil; this adapter keeps the MT legal-person slice"
+state = "verified"
+limitations = [
+  "ODbL adapted-database obligations require assessment before commercial enablement.",
+  "A generator register does not identify every installer or prove consumption.",
+  "Natural-person CPF records are excluded from the business slice."
+]
+
+[[dataset]]
+id = "anp-precos-revenda"
+category = "fuel"
+source_id = "anp"
+title = "ANP - preços de revenda de combustíveis"
+aggregate = "ultimas-4-semanas-gasolina-etanol"
+api_url = "https://www.gov.br/anp/pt-br/centrais-de-conteudo/dados-abertos/arquivos/shpc/qus/ultimas-4-semanas-gasolina-etanol.csv"
+metadata_url = "https://www.gov.br/anp/pt-br/centrais-de-conteudo/dados-abertos/serie-historica-de-precos-de-combustiveis"
+cadence = "weekly sample"
+coverage = "Brazil; this adapter keeps the MT slice"
+state = "verified"
+limitations = [
+  "The survey is a sample, not every station or municipality.",
+  "Collection dates and prices are as published; they are not a live feed.",
+  "Natural-person CPF records are excluded."
+]
+
+[[dataset]]
+id = "comex-exp-2025-mun"
+category = "trade"
+source_id = "comexstat"
+title = "Comex Stat - exportações municipais 2025"
+aggregate = "EXP_2025_MUN"
+api_url = "https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun/EXP_2025_MUN.csv"
+metadata_url = "https://comexstat.mdic.gov.br/pt/home"
+cadence = "monthly"
+coverage = "Brazil by municipality; this adapter keeps the MT slice"
+state = "verified"
+limitations = [
+  "Municipal detail uses the declarant's fiscal domicile and SH4, not a CNPJ exporter list.",
+  "Values are FOB and net kilograms; they are not company revenue.",
+  "The HTTPS chain failed verification on the check date; the official HTTP endpoint or a local artifact is used."
+]
+
+[[dataset]]
+id = "mt-convenios-2024"
+category = "local_government"
+source_id = "mt"
+title = "MT - convênios e acordos 2024"
+aggregate = "transparencia_csv"
+api_url = "https://dadosabertos.mt.gov.br/dataset/db568036-af7f-4d4a-977c-536f58a50136/resource/aafe6bb4-7e3b-4d7a-9c27-30b4eeccdcdc/download/transparencia_csv.csv"
+metadata_url = "https://dadosabertos.mt.gov.br/dataset/consulta-de-convenios-e-acordos"
+cadence = "dataset-specific"
+coverage = "Mato Grosso state convenios"
+state = "verified"
+limitations = [
+  "A convenio is not a contract, payment or private B2B demand.",
+  "Natural-person CPF records are excluded; only 14-digit CNPJs are stored.",
+  "Values and dates are kept exactly as published."
+]

@@ -20,7 +20,7 @@ use opencnpj_insights::{
     catalog::municipalities::{MunicipalityCatalogue, Place},
     official::{
         query::uf_code,
-        records::{RECORD_FORMAT_VERSION, Record, RecordManifest, sha256_file, write_records},
+        records::{RECORD_FORMAT_VERSION, Record, RecordManifest, RecordWriter, sha256_file},
         registry::Registry,
     },
 };
@@ -59,10 +59,12 @@ pub(crate) struct IngestArgs {
     limit: Option<usize>,
     #[arg(long, default_value_t = 60)]
     timeout_seconds: u64,
+    /// Accept an incomplete TLS chain for an official open-data host (INEB/COMEX).
+    #[arg(long)]
+    allow_invalid_cert: bool,
 }
 
 struct AdapterOutput {
-    records: Vec<Record>,
     total_rows: u64,
     out_of_scope_rows: u64,
     rejected_rows: u64,
@@ -102,16 +104,60 @@ pub(crate) fn run(args: IngestArgs) -> Result<()> {
             if let Some(parent) = raw_path.parent().filter(|parent| !parent.as_os_str().is_empty()) {
                 fs::create_dir_all(parent)?;
             }
-            let downloaded = download(&url, &raw_path, args.timeout_seconds)?;
+            let downloaded = download(&url, &raw_path, args.timeout_seconds, args.allow_invalid_cert)?;
             (raw_path.clone(), downloaded.0, downloaded.1, url)
         }
     };
     let catalogue = MunicipalityCatalogue::load(Path::new("crates/opencnpj-insights/catalog/municipalities.tsv"))?;
+    let draft_period = args.period.clone().unwrap_or_else(|| match args.adapter.as_str() {
+        "antt" => "current".into(),
+        "cnes" => "current".into(),
+        "inep" => "2024".into(),
+        "pgfn" => "2026Q3".into(),
+        "bcb" => "current".into(),
+        "aneel" => "current".into(),
+        "anp" => "current".into(),
+        "comex" => "2025".into(),
+        "mt" => "2024".into(),
+        _ => String::new(),
+    });
+    let draft = RecordManifest {
+        format_version: RECORD_FORMAT_VERSION,
+        source_id: dataset.source_id.clone(),
+        dataset_id: dataset.id.clone(),
+        title: dataset.title.clone(),
+        publisher: source.publisher.clone(),
+        source_url: source_url.clone(),
+        metadata_url: dataset.metadata_url.clone(),
+        licence: source.licence.clone(),
+        licence_url: source.licence_url.clone(),
+        licence_status: source.licence_status.clone(),
+        attribution: source.attribution.clone(),
+        retrieved_at: crate::official::now(),
+        period: draft_period,
+        coverage: format!("{}; scope {}", dataset.coverage, args.scope),
+        raw_sha256: raw_sha256.clone(),
+        raw_bytes,
+        row_count: 0,
+        accepted_rows: 0,
+        out_of_scope_rows: 0,
+        rejected_rows: 0,
+        duplicate_rows: 0,
+        state: "queryable".into(),
+        schema: Value::Null,
+        limitations: dataset.limitations.clone(),
+    };
+    let mut writer = RecordWriter::create(&args.out, &dataset.id, &draft)?;
     let mut output = match args.adapter.as_str() {
-        "antt" => parse_antt(&input, &args.scope, args.period.as_deref(), args.limit)?,
-        "cnes" => parse_cnes(&input, &args.scope, &catalogue, args.period.as_deref(), args.limit)?,
-        "inep" => parse_inep(&input, &args.scope, &catalogue, args.period.as_deref(), args.limit)?,
-        "pgfn" => parse_pgfn(&input, &args.scope, args.period.as_deref(), args.limit)?,
+        "antt" => parse_antt(&input, &args.scope, args.period.as_deref(), args.limit, &mut writer)?,
+        "cnes" => parse_cnes(&input, &args.scope, &catalogue, args.period.as_deref(), args.limit, &mut writer)?,
+        "inep" => parse_inep(&input, &args.scope, &catalogue, args.period.as_deref(), args.limit, &mut writer)?,
+        "pgfn" => parse_pgfn(&input, &args.scope, args.period.as_deref(), args.limit, &mut writer)?,
+        "bcb" => parse_bcb(&input, args.period.as_deref(), args.limit, &mut writer)?,
+        "aneel" => parse_aneel(&input, &args.scope, &catalogue, args.period.as_deref(), args.limit, &mut writer)?,
+        "anp" => parse_anp(&input, &args.scope, &catalogue, args.period.as_deref(), args.limit, &mut writer)?,
+        "comex" => parse_comex(&input, &args.scope, &catalogue, args.period.as_deref(), args.limit, &mut writer)?,
+        "mt" => parse_mt(&input, args.period.as_deref(), args.limit, &mut writer)?,
         other => bail!("unknown adapter {other}"),
     };
     if args.limit.is_some() {
@@ -149,7 +195,7 @@ pub(crate) fn run(args: IngestArgs) -> Result<()> {
         schema: output.schema,
         limitations,
     };
-    let published = write_records(&args.out, &manifest, output.records)?;
+    let published = writer.finish(&manifest)?;
     println!("raw\t{}\tbytes={}\tsha256={}", input.display(), raw_bytes, published.manifest.raw_sha256);
     println!(
         "published\t{}\trows={}\ttotal={}\tout_of_scope={}\trejected={}\tduplicates={}\tbytes={}\tsha256={}",
@@ -165,10 +211,13 @@ pub(crate) fn run(args: IngestArgs) -> Result<()> {
     Ok(())
 }
 
-fn download(url: &str, path: &Path, timeout_seconds: u64) -> Result<(String, u64)> {
+fn download(url: &str, path: &Path, timeout_seconds: u64, allow_invalid_cert: bool) -> Result<(String, u64)> {
     let runtime = tokio::runtime::Runtime::new().context("create async runtime")?;
     runtime.block_on(async {
-        let client = reqwest::Client::builder().timeout(std::time::Duration::from_secs(timeout_seconds)).build()?;
+        let client = reqwest::Client::builder()
+            .timeout(std::time::Duration::from_secs(timeout_seconds))
+            .danger_accept_invalid_certs(allow_invalid_cert)
+            .build()?;
         let mut response = client.get(url).send().await?.error_for_status()?;
         let mut file = File::options().write(true).create_new(true).open(path)?;
         let mut hasher = Sha256::new();
@@ -183,11 +232,10 @@ fn download(url: &str, path: &Path, timeout_seconds: u64) -> Result<(String, u64
     })
 }
 
-fn parse_antt(input: &Path, scope: &str, period: Option<&str>, limit: Option<usize>) -> Result<AdapterOutput> {
+fn parse_antt(input: &Path, scope: &str, period: Option<&str>, limit: Option<usize>, writer: &mut RecordWriter) -> Result<AdapterOutput> {
     let bytes = fs::read(input).with_context(|| format!("read {}", input.display()))?;
     let document: Value = serde_json::from_slice(&bytes).with_context(|| "parse ANTT JSON")?;
     let vehicles = document.get("veiculos").and_then(Value::as_array).context("ANTT JSON has no veiculos array")?;
-    let mut records = Vec::new();
     let mut out_of_scope = 0_u64;
     let mut total = 0_u64;
     let mut schema = Value::Null;
@@ -206,7 +254,7 @@ fn parse_antt(input: &Path, scope: &str, period: Option<&str>, limit: Option<usi
         }
         let key = serde_json::to_vec(vehicle)?;
         let record_id = format!("antt:{:016x}", xxh3_64(&key));
-        records.push(Record {
+        writer.push(Record {
             record_id,
             geography_level: "UF".into(),
             geography_code: uf_code(uf).unwrap_or("").into(),
@@ -215,10 +263,9 @@ fn parse_antt(input: &Path, scope: &str, period: Option<&str>, limit: Option<usi
             cnpj_root: String::new(),
             period: period.unwrap_or("current").into(),
             data: vehicle.clone(),
-        });
+        })?;
     }
     Ok(AdapterOutput {
-        records,
         total_rows: total,
         out_of_scope_rows: out_of_scope,
         rejected_rows: 0,
@@ -235,11 +282,11 @@ fn parse_cnes(
     catalogue: &MunicipalityCatalogue,
     period: Option<&str>,
     limit: Option<usize>,
+    writer: &mut RecordWriter,
 ) -> Result<AdapterOutput> {
     let (entry, bytes) = zip_entry(input, |name| name == "cnes_estabelecimentos.csv")?;
-    let (header, expected) = csv_header(&bytes)?;
+    let (header, expected) = csv_header(&bytes, b';')?;
     let bridge = ibge_bridge(catalogue, scope);
-    let mut records = Vec::new();
     let mut total = 0_u64;
     let mut out_of_scope = 0_u64;
     let mut rejected = 0_u64;
@@ -282,7 +329,7 @@ fn parse_cnes(
             row.get("CO_CNES").map(String::as_str).unwrap_or(""),
             row.get("CO_UNIDADE").map(String::as_str).unwrap_or("")
         );
-        records.push(Record {
+        writer.push(Record {
             record_id,
             geography_level: "N6".into(),
             geography_code: format!("{code7:07}"),
@@ -291,11 +338,10 @@ fn parse_cnes(
             cnpj_root: root,
             period: period.unwrap_or("current").into(),
             data: json_row(row),
-        });
+        })?;
         Ok(())
     })?;
     Ok(AdapterOutput {
-        records,
         total_rows: total,
         out_of_scope_rows: out_of_scope,
         rejected_rows: rejected,
@@ -315,10 +361,10 @@ fn parse_inep(
     catalogue: &MunicipalityCatalogue,
     period: Option<&str>,
     limit: Option<usize>,
+    writer: &mut RecordWriter,
 ) -> Result<AdapterOutput> {
     let (entry, bytes) = zip_entry(input, |name| name.ends_with("microdados_ed_basica_2024.csv"))?;
-    let (header, expected) = csv_header(&bytes)?;
-    let mut records = Vec::new();
+    let (header, expected) = csv_header(&bytes, b';')?;
     let mut total = 0_u64;
     let mut out_of_scope = 0_u64;
     let mut rejected = 0_u64;
@@ -360,7 +406,7 @@ fn parse_inep(
             row.get("NU_ANO_CENSO").map(String::as_str).unwrap_or(""),
             row.get("CO_ENTIDADE").map(String::as_str).unwrap_or("")
         );
-        records.push(Record {
+        writer.push(Record {
             record_id,
             geography_level: "N6".into(),
             geography_code: format!("{code:07}"),
@@ -369,11 +415,10 @@ fn parse_inep(
             cnpj_root: root,
             period: period.unwrap_or_else(|| row.get("NU_ANO_CENSO").map(String::as_str).unwrap_or("")).into(),
             data: json_row(row),
-        });
+        })?;
         Ok(())
     })?;
     Ok(AdapterOutput {
-        records,
         total_rows: total,
         out_of_scope_rows: out_of_scope,
         rejected_rows: rejected,
@@ -387,14 +432,13 @@ fn parse_inep(
     })
 }
 
-fn parse_pgfn(input: &Path, scope: &str, period: Option<&str>, limit: Option<usize>) -> Result<AdapterOutput> {
+fn parse_pgfn(input: &Path, scope: &str, period: Option<&str>, limit: Option<usize>, writer: &mut RecordWriter) -> Result<AdapterOutput> {
     let mut zip = zip::ZipArchive::new(File::open(input).with_context(|| format!("open {}", input.display()))?)?;
     let names = (0..zip.len())
         .filter_map(|index| zip.by_index(index).ok().and_then(|file| file.name().ok().map(|name| name.into_owned())))
         .filter(|name| name.ends_with(".csv"))
         .collect::<Vec<_>>();
     ensure!(!names.is_empty(), "PGFN ZIP has no CSV entries");
-    let mut records = Vec::new();
     let mut total = 0_u64;
     let mut out_of_scope = 0_u64;
     let mut rejected = 0_u64;
@@ -405,7 +449,7 @@ fn parse_pgfn(input: &Path, scope: &str, period: Option<&str>, limit: Option<usi
         let mut bytes = Vec::new();
         zip.by_name(&name)?.read_to_end(&mut bytes)?;
         if header.is_empty() {
-            (header, expected) = csv_header(&bytes)?;
+            (header, expected) = csv_header(&bytes, b';')?;
         }
         let mut stop = false;
         for_each_csv_record(&bytes, b';', |line, fields| {
@@ -444,7 +488,7 @@ fn parse_pgfn(input: &Path, scope: &str, period: Option<&str>, limit: Option<usi
                 row.get("NUMERO_INSCRICAO").map(String::as_str).unwrap_or(""),
                 cnpj
             );
-            records.push(Record {
+            writer.push(Record {
                 record_id,
                 geography_level: "UF".into(),
                 geography_code: uf_code(uf).unwrap_or("").into(),
@@ -453,7 +497,7 @@ fn parse_pgfn(input: &Path, scope: &str, period: Option<&str>, limit: Option<usi
                 cnpj_root: root,
                 period: period.unwrap_or("2026Q3").into(),
                 data: json_row(row),
-            });
+            })?;
             Ok(())
         })?;
         if stop {
@@ -461,7 +505,6 @@ fn parse_pgfn(input: &Path, scope: &str, period: Option<&str>, limit: Option<usi
         }
     }
     Ok(AdapterOutput {
-        records,
         total_rows: total,
         out_of_scope_rows: out_of_scope,
         rejected_rows: rejected,
@@ -476,6 +519,384 @@ fn parse_pgfn(input: &Path, scope: &str, period: Option<&str>, limit: Option<usi
     })
 }
 
+fn parse_bcb(input: &Path, period: Option<&str>, limit: Option<usize>, writer: &mut RecordWriter) -> Result<AdapterOutput> {
+    let bytes = fs::read(input).with_context(|| format!("read {}", input.display()))?;
+    let rows: Vec<Value> = serde_json::from_slice(&bytes).with_context(|| "parse BCB SGS JSON")?;
+    let mut total = 0_u64;
+    let mut rejected = 0_u64;
+    let mut rejected_samples = Vec::new();
+    let mut schema = Value::Null;
+    for row in rows {
+        if limit.is_some_and(|limit| total as usize >= limit) {
+            break;
+        }
+        total += 1;
+        if schema.is_null() {
+            schema = json!({"kind": "object", "keys": row.as_object().map(|object| object.keys().cloned().collect::<Vec<_>>()).unwrap_or_default()});
+        }
+        let Some(date) = row.get("data").and_then(Value::as_str) else {
+            rejected += 1;
+            if rejected_samples.len() < 20 {
+                rejected_samples.push("missing data".into());
+            }
+            continue;
+        };
+        let Some(period_value) = iso_date(date) else {
+            rejected += 1;
+            if rejected_samples.len() < 20 {
+                rejected_samples.push(date.to_string());
+            }
+            continue;
+        };
+        let record_id = format!("bcb:{period_value}");
+        writer.push(Record {
+            record_id,
+            geography_level: "BR".into(),
+            geography_code: "BR".into(),
+            geography_name: "Brasil".into(),
+            cnpj: String::new(),
+            cnpj_root: String::new(),
+            period: period.map_or(period_value, str::to_string),
+            data: row,
+        })?;
+    }
+    Ok(AdapterOutput {
+        total_rows: total,
+        out_of_scope_rows: 0,
+        rejected_rows: rejected,
+        rejected_samples,
+        schema,
+        period: period.unwrap_or("current").into(),
+        limitations: vec!["BCB SGS series are national and are not filtered by municipality scope.".into()],
+    })
+}
+
+fn parse_aneel(
+    input: &Path,
+    scope: &str,
+    catalogue: &MunicipalityCatalogue,
+    period: Option<&str>,
+    limit: Option<usize>,
+    writer: &mut RecordWriter,
+) -> Result<AdapterOutput> {
+    let (entry, bytes) = zip_entry(input, |name| name.ends_with("empreendimento-geracao-distribuida.csv"))?;
+    let (header, expected) = csv_header(&bytes, b';')?;
+    let mut total = 0_u64;
+    let mut out_of_scope = 0_u64;
+    let mut rejected = 0_u64;
+    let mut rejected_samples = Vec::new();
+    let mut stop = false;
+    for_each_csv_record(&bytes, b';', |line, fields| {
+        if stop || line == 1 {
+            return Ok(());
+        }
+        if limit.is_some_and(|limit| total as usize >= limit) {
+            stop = true;
+            return Ok(());
+        }
+        total += 1;
+        if fields.len() != expected {
+            rejected += 1;
+            return Ok(());
+        }
+        let row = row_map(&header, &fields);
+        let uf = row.get("SigUF").map(String::as_str).unwrap_or("");
+        if !scope_matches(uf, scope) {
+            out_of_scope += 1;
+            return Ok(());
+        }
+        let cnpj = normalize_cnpj(row.get("NumCPFCNPJ").map(String::as_str).unwrap_or(""));
+        if cnpj.len() != 14 {
+            out_of_scope += 1;
+            return Ok(());
+        }
+        let Some(code) =
+            row.get("CodMunicipioIbge").and_then(|value| value.parse::<u32>().ok()).filter(|code| catalogue.by_ibge(*code).is_some())
+        else {
+            rejected += 1;
+            if rejected_samples.len() < 20 {
+                rejected_samples.push(row.get("CodMunicipioIbge").cloned().unwrap_or_default());
+            }
+            return Ok(());
+        };
+        let (cnpj, root) = split_cnpj(&cnpj);
+        let record_id = format!("aneel:{}", row.get("CodEmpreendimento").map(String::as_str).unwrap_or(""));
+        writer.push(Record {
+            record_id,
+            geography_level: "N6".into(),
+            geography_code: format!("{code:07}"),
+            geography_name: catalogue.by_ibge(code).map(|row| row.name.clone()).unwrap_or_default(),
+            cnpj,
+            cnpj_root: root,
+            period: period.map(str::to_string).or_else(|| row.get("AnmPeriodoReferencia").cloned()).unwrap_or_else(|| "current".into()),
+            data: json_row(row),
+        })?;
+        Ok(())
+    })?;
+    Ok(AdapterOutput {
+        total_rows: total,
+        out_of_scope_rows: out_of_scope,
+        rejected_rows: rejected,
+        rejected_samples,
+        schema: json!({"entry": entry, "columns": header}),
+        period: period.unwrap_or("current").into(),
+        limitations: vec![
+            "ODbL adapted-database obligations require assessment before commercial enablement.".into(),
+            "A generator register does not identify every installer or prove consumption.".into(),
+            "Natural-person CPF records are excluded.".into(),
+        ],
+    })
+}
+
+fn parse_anp(
+    input: &Path,
+    scope: &str,
+    catalogue: &MunicipalityCatalogue,
+    period: Option<&str>,
+    limit: Option<usize>,
+    writer: &mut RecordWriter,
+) -> Result<AdapterOutput> {
+    let bytes = fs::read(input).with_context(|| format!("read {}", input.display()))?;
+    let (header, expected) = csv_header(&bytes, b';')?;
+    let municipalities = municipality_map(catalogue, scope);
+    let mut total = 0_u64;
+    let mut out_of_scope = 0_u64;
+    let mut rejected = 0_u64;
+    let mut rejected_samples = Vec::new();
+    let mut stop = false;
+    for_each_csv_record(&bytes, b';', |line, fields| {
+        if stop || line == 1 {
+            return Ok(());
+        }
+        if limit.is_some_and(|limit| total as usize >= limit) {
+            stop = true;
+            return Ok(());
+        }
+        total += 1;
+        if fields.len() != expected {
+            rejected += 1;
+            return Ok(());
+        }
+        let row = row_map(&header, &fields);
+        let uf = row.get("Estado - Sigla").map(String::as_str).unwrap_or("");
+        if !scope_matches(uf, scope) {
+            out_of_scope += 1;
+            return Ok(());
+        }
+        let cnpj = normalize_cnpj(row.get("CNPJ da Revenda").map(String::as_str).unwrap_or(""));
+        if cnpj.len() != 14 {
+            out_of_scope += 1;
+            return Ok(());
+        }
+        let name = row.get("Municipio").map(|value| fold(value)).unwrap_or_default();
+        let Some(Some(code)) = municipalities.get(&name) else {
+            rejected += 1;
+            if rejected_samples.len() < 20 {
+                rejected_samples.push(row.get("Municipio").cloned().unwrap_or_default());
+            }
+            return Ok(());
+        };
+        let (cnpj, root) = split_cnpj(&cnpj);
+        let date = row.get("Data da Coleta").and_then(|value| iso_date(value)).unwrap_or_else(|| period.unwrap_or("current").into());
+        let key = format!(
+            "{}|{}|{}|{}|{}",
+            cnpj,
+            row.get("Produto").map(String::as_str).unwrap_or(""),
+            date,
+            row.get("Revenda").map(String::as_str).unwrap_or(""),
+            row.get("Valor de Venda").map(String::as_str).unwrap_or("")
+        );
+        writer.push(Record {
+            record_id: format!("anp:{:016x}", xxh3_64(key.as_bytes())),
+            geography_level: "N6".into(),
+            geography_code: format!("{:07}", code),
+            geography_name: catalogue.by_ibge(*code).map(|row| row.name.clone()).unwrap_or_default(),
+            cnpj,
+            cnpj_root: root,
+            period: date,
+            data: json_row(row),
+        })?;
+        Ok(())
+    })?;
+    Ok(AdapterOutput {
+        total_rows: total,
+        out_of_scope_rows: out_of_scope,
+        rejected_rows: rejected,
+        rejected_samples,
+        schema: json!({"columns": header}),
+        period: period.unwrap_or("current").into(),
+        limitations: vec![
+            "The survey is a sample, not every station or municipality.".into(),
+            "Collection dates and prices are not a live feed.".into(),
+            "Natural-person CPF records are excluded.".into(),
+        ],
+    })
+}
+
+fn parse_comex(
+    input: &Path,
+    scope: &str,
+    catalogue: &MunicipalityCatalogue,
+    period: Option<&str>,
+    limit: Option<usize>,
+    writer: &mut RecordWriter,
+) -> Result<AdapterOutput> {
+    let bytes = fs::read(input).with_context(|| format!("read {}", input.display()))?;
+    let (header, expected) = csv_header(&bytes, b';')?;
+    let mut total = 0_u64;
+    let mut out_of_scope = 0_u64;
+    let mut rejected = 0_u64;
+    let mut rejected_samples = Vec::new();
+    let mut stop = false;
+    for_each_csv_record(&bytes, b';', |line, fields| {
+        if stop || line == 1 {
+            return Ok(());
+        }
+        if limit.is_some_and(|limit| total as usize >= limit) {
+            stop = true;
+            return Ok(());
+        }
+        total += 1;
+        if fields.len() != expected {
+            rejected += 1;
+            return Ok(());
+        }
+        let row = row_map(&header, &fields);
+        let uf = row.get("SG_UF_MUN").map(String::as_str).unwrap_or("");
+        if !scope_matches(uf, scope) {
+            out_of_scope += 1;
+            return Ok(());
+        }
+        let Some(code) = row.get("CO_MUN").and_then(|value| value.parse::<u32>().ok()).filter(|code| catalogue.by_ibge(*code).is_some())
+        else {
+            rejected += 1;
+            if rejected_samples.len() < 20 {
+                rejected_samples.push(row.get("CO_MUN").cloned().unwrap_or_default());
+            }
+            return Ok(());
+        };
+        let year = row.get("CO_ANO").cloned().unwrap_or_default();
+        let month = row.get("CO_MES").cloned().unwrap_or_default();
+        let record_period = period.map(str::to_string).unwrap_or_else(|| format!("{year}{month:0>2}"));
+        let key = format!(
+            "{}|{}|{}|{}|{}|{}|{}",
+            year,
+            month,
+            row.get("SH4").map(String::as_str).unwrap_or(""),
+            row.get("CO_PAIS").map(String::as_str).unwrap_or(""),
+            row.get("CO_MUN").map(String::as_str).unwrap_or(""),
+            row.get("KG_LIQUIDO").map(String::as_str).unwrap_or(""),
+            row.get("VL_FOB").map(String::as_str).unwrap_or("")
+        );
+        writer.push(Record {
+            record_id: format!("comex:{:016x}", xxh3_64(key.as_bytes())),
+            geography_level: "N6".into(),
+            geography_code: format!("{code:07}"),
+            geography_name: catalogue.by_ibge(code).map(|row| row.name.clone()).unwrap_or_default(),
+            cnpj: String::new(),
+            cnpj_root: String::new(),
+            period: record_period,
+            data: json_row(row),
+        })?;
+        Ok(())
+    })?;
+    Ok(AdapterOutput {
+        total_rows: total,
+        out_of_scope_rows: out_of_scope,
+        rejected_rows: rejected,
+        rejected_samples,
+        schema: json!({"columns": header}),
+        period: period.unwrap_or("2025").into(),
+        limitations: vec![
+            "Municipal detail uses the declarant's fiscal domicile and SH4.".into(),
+            "Values are FOB and net kilograms; they are not company revenue.".into(),
+        ],
+    })
+}
+
+fn parse_mt(input: &Path, period: Option<&str>, limit: Option<usize>, writer: &mut RecordWriter) -> Result<AdapterOutput> {
+    let bytes = fs::read(input).with_context(|| format!("read {}", input.display()))?;
+    let (header, expected) = csv_header(&bytes, b',')?;
+    let mut total = 0_u64;
+    let mut out_of_scope = 0_u64;
+    let mut rejected = 0_u64;
+    let rejected_samples = Vec::new();
+    let mut stop = false;
+    for_each_csv_record(&bytes, b',', |line, fields| {
+        if stop || line == 1 {
+            return Ok(());
+        }
+        if limit.is_some_and(|limit| total as usize >= limit) {
+            stop = true;
+            return Ok(());
+        }
+        total += 1;
+        if fields.len() != expected {
+            rejected += 1;
+            return Ok(());
+        }
+        let row = row_map(&header, &fields);
+        let cnpj = normalize_cnpj(row.get("cpf/cnpj convenente").map(String::as_str).unwrap_or(""));
+        if cnpj.len() != 14 {
+            out_of_scope += 1;
+            return Ok(());
+        }
+        let (cnpj, root) = split_cnpj(&cnpj);
+        let record_id = format!("mt-convenios:{}:{}", row.get("número").map(String::as_str).unwrap_or(""), cnpj);
+        writer.push(Record {
+            record_id,
+            geography_level: "UF".into(),
+            geography_code: "51".into(),
+            geography_name: "Mato Grosso".into(),
+            cnpj,
+            cnpj_root: root,
+            period: period.unwrap_or("2024").into(),
+            data: json_row(row),
+        })?;
+        Ok(())
+    })?;
+    Ok(AdapterOutput {
+        total_rows: total,
+        out_of_scope_rows: out_of_scope,
+        rejected_rows: rejected,
+        rejected_samples,
+        schema: json!({"columns": header}),
+        period: period.unwrap_or("2024").into(),
+        limitations: vec![
+            "A convenio is not a contract, payment or private B2B demand.".into(),
+            "Natural-person CPF records are excluded; only 14-digit CNPJs are stored.".into(),
+        ],
+    })
+}
+
+fn municipality_map(catalogue: &MunicipalityCatalogue, scope: &str) -> BTreeMap<String, Option<u32>> {
+    let mut map = BTreeMap::new();
+    for row in catalogue.rows() {
+        let Place::Municipality(place) = &row.place else { continue };
+        if !scope.eq_ignore_ascii_case("all") && !place.uf.eq_ignore_ascii_case(scope) {
+            continue;
+        }
+        map.entry(fold(&row.name)).and_modify(|value| *value = None).or_insert(Some(place.ibge));
+    }
+    map
+}
+
+fn iso_date(value: &str) -> Option<String> {
+    let value = value.trim();
+    let (day, rest) = value.split_once('/')?;
+    let (month, year) = rest.split_once('/')?;
+    if day.len() != 2 || month.len() != 2 || year.len() != 4 {
+        return None;
+    }
+    if !day.chars().all(|character| character.is_ascii_digit())
+        || !month.chars().all(|character| character.is_ascii_digit())
+        || !year.chars().all(|character| character.is_ascii_digit())
+    {
+        return None;
+    }
+    Some(format!("{year}-{month}-{day}"))
+}
+
 fn zip_entry(input: &Path, wanted: impl Fn(&str) -> bool) -> Result<(String, Vec<u8>)> {
     let mut zip = zip::ZipArchive::new(File::open(input).with_context(|| format!("open {}", input.display()))?)?;
     let names = (0..zip.len())
@@ -487,15 +908,18 @@ fn zip_entry(input: &Path, wanted: impl Fn(&str) -> bool) -> Result<(String, Vec
     Ok((name, bytes))
 }
 
-fn csv_header(bytes: &[u8]) -> Result<(Vec<String>, usize)> {
+fn csv_header(bytes: &[u8], delimiter: u8) -> Result<(Vec<String>, usize)> {
     let mut header = None;
-    for_each_csv_record(bytes, b';', |line, fields| {
+    for_each_csv_record(bytes, delimiter, |line, fields| {
         if line == 1 {
             header = Some(fields);
         }
         Ok(())
     })?;
-    let header = header.context("empty CSV header")?;
+    let mut header = header.context("empty CSV header")?;
+    if let Some(first) = header.first_mut() {
+        *first = first.trim_start_matches('\u{feff}').to_string();
+    }
     ensure!(!header.is_empty(), "empty CSV header");
     let width = header.len();
     Ok((header, width))
@@ -659,12 +1083,22 @@ mod tests {
     #[test]
     fn csv_header_and_row_map_preserve_columns() {
         let data = b"CO_UF;CO_IBGE;NU_CNPJ\r\n51;510792;12345678000199\r\n";
-        let (header, width) = csv_header(data).unwrap();
+        let (header, width) = csv_header(data, b';').unwrap();
         assert_eq!(width, 3);
         assert_eq!(header, ["CO_UF", "CO_IBGE", "NU_CNPJ"]);
         let fields = vec!["51".into(), "510792".into(), "12345678000199".into()];
         let row = row_map(&header, &fields);
         assert_eq!(row.get("CO_UF").unwrap(), "51");
+    }
+
+    #[test]
+    fn iso_dates_and_bom_headers() {
+        assert_eq!(iso_date("07/10/2026"), Some("2026-10-07".into()));
+        assert_eq!(iso_date("7/10/2026"), None);
+        assert_eq!(iso_date("2026-10-07"), None);
+        let (header, width) = csv_header(b"\xef\xbb\xbfCO_UF;CO_MUN\nMT;5107925\n", b';').unwrap();
+        assert_eq!(width, 2);
+        assert_eq!(header[0], "CO_UF");
     }
 
     #[test]

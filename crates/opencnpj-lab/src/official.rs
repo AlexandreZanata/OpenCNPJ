@@ -227,36 +227,33 @@ fn audit_records(args: AuditRecordsArgs) -> Result<()> {
         let store = RecordStore::open(&path)?;
         store.verify()?;
         let manifest = store.manifest();
-        let records = store.records()?;
         let mut cnpjs = BTreeSet::new();
         let mut invalid_cnpj = Vec::new();
         let mut absent_cnpj = Vec::new();
         let mut checked = 0_usize;
         let mut unmatched_geography = Vec::new();
-        for record in &records {
-            if record.geography_level == "N6"
-                && record.geography_code.len() == 7
-                && record.geography_code.parse::<u32>().ok().is_none_or(|code| catalogue.by_ibge(code).is_none())
-            {
-                unmatched_geography.push(json!({"code": record.geography_code, "name": record.geography_name}));
+        store.for_each_identity(|level, code, name, cnpj| {
+            if level == "N6" && code.len() == 7 && code.parse::<u32>().ok().is_none_or(|code| catalogue.by_ibge(code).is_none()) {
+                unmatched_geography.push(json!({"code": code, "name": name}));
             }
-            if record.cnpj.len() != 14 {
-                continue;
+            if cnpj.len() != 14 {
+                return Ok(());
             }
-            if !valid_cnpj(&record.cnpj) {
+            if !valid_cnpj(cnpj) {
                 if invalid_cnpj.len() < 20 {
-                    invalid_cnpj.push(record.cnpj.clone());
+                    invalid_cnpj.push(cnpj.to_string());
                 }
-                continue;
+                return Ok(());
             }
-            cnpjs.insert(record.cnpj.clone());
+            cnpjs.insert(cnpj.to_string());
             if checked < args.sample {
                 checked += 1;
-                if snapshot.cnpj_prefix_docs(&record.cnpj)?.is_empty() && absent_cnpj.len() < 50 {
-                    absent_cnpj.push(record.cnpj.clone());
+                if snapshot.cnpj_prefix_docs(cnpj)?.is_empty() && absent_cnpj.len() < 50 {
+                    absent_cnpj.push(cnpj.to_string());
                 }
             }
-        }
+            Ok(())
+        })?;
         if !invalid_cnpj.is_empty() {
             inconsistencies.push(json!({
                 "kind": "record_cnpj_invalid_check_digits",

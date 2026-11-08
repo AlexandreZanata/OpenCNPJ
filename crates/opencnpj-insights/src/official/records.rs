@@ -198,6 +198,35 @@ impl RecordStore {
         rows.collect::<rusqlite::Result<Vec<_>>>().with_context(|| format!("read records from {}", self.path.display()))
     }
 
+    /// Stream only identity columns for crosswalks and audits.
+    pub fn for_each_identity(&self, mut callback: impl FnMut(&str, &str, &str, &str) -> Result<()>) -> Result<()> {
+        let mut statement = self
+            .connection
+            .prepare("SELECT geography_level, geography_code, geography_name, cnpj FROM records ORDER BY dataset_id, record_id")?;
+        let mut rows = statement.query([])?;
+        while let Some(row) = rows.next()? {
+            let level: String = row.get(0)?;
+            let code: String = row.get(1)?;
+            let name: String = row.get(2)?;
+            let cnpj: String = row.get(3)?;
+            callback(&level, &code, &name, &cnpj)?;
+        }
+        Ok(())
+    }
+
+    /// Stream records without materializing the whole store.
+    pub fn for_each_record(&self, mut callback: impl FnMut(Record) -> Result<()>) -> Result<()> {
+        let mut statement = self.connection.prepare(
+            "SELECT record_id, geography_level, geography_code, geography_name, cnpj, cnpj_root, period, data_json
+             FROM records ORDER BY dataset_id, record_id",
+        )?;
+        let mut rows = statement.query([])?;
+        while let Some(row) = rows.next()? {
+            callback(record_from_row(row)?)?;
+        }
+        Ok(())
+    }
+
     pub fn records_for_geography(&self, level: &str, code: &str) -> Result<Vec<Record>> {
         let mut statement = self.connection.prepare(
             "SELECT record_id, geography_level, geography_code, geography_name, cnpj, cnpj_root, period, data_json
@@ -289,68 +318,102 @@ fn record_from_row(row: &rusqlite::Row<'_>) -> rusqlite::Result<Record> {
     })
 }
 
-/// Publish an immutable record store. `manifest.accepted_rows` and
-/// `manifest.duplicate_rows` are computed from the inserted records.
+/// Streaming writer for an immutable record store. Records are inserted as they
+/// are parsed, so a full national source does not need to be held in memory.
+pub struct RecordWriter {
+    path: PathBuf,
+    file: tempfile::NamedTempFile,
+    connection: Option<Connection>,
+    dataset_id: String,
+    inserted: u64,
+    duplicates: u64,
+}
+
+impl RecordWriter {
+    pub fn create(path: impl AsRef<Path>, dataset_id: &str, manifest: &RecordManifest) -> Result<Self> {
+        manifest.validate_metadata()?;
+        ensure!(manifest.dataset_id == dataset_id, "writer dataset mismatch");
+        let path = path.as_ref().to_path_buf();
+        ensure!(!path.exists(), "refusing to overwrite existing record store {}", path.display());
+        let parent = path.parent().filter(|parent| !parent.as_os_str().is_empty()).unwrap_or_else(|| Path::new("."));
+        fs::create_dir_all(parent).with_context(|| format!("create {}", parent.display()))?;
+        let file = tempfile::NamedTempFile::new_in(parent)?;
+        let connection = Connection::open(file.path())?;
+        connection.pragma_update(None, "journal_mode", "OFF")?;
+        connection.pragma_update(None, "synchronous", "FULL")?;
+        connection.execute_batch(SCHEMA)?;
+        connection.execute_batch("BEGIN IMMEDIATE")?;
+        Ok(Self { path, file, connection: Some(connection), dataset_id: dataset_id.to_string(), inserted: 0, duplicates: 0 })
+    }
+
+    pub fn push(&mut self, record: Record) -> Result<bool> {
+        record.validate()?;
+        let connection = self.connection.as_ref().context("record writer already finished")?;
+        let mut statement = connection.prepare_cached(
+            "INSERT OR IGNORE INTO records
+             (dataset_id, record_id, geography_level, geography_code, geography_name, cnpj, cnpj_root, period, data_json)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)",
+        )?;
+        let changed = statement.execute(params![
+            self.dataset_id,
+            record.record_id,
+            record.geography_level,
+            record.geography_code,
+            record.geography_name,
+            record.cnpj,
+            record.cnpj_root,
+            record.period,
+            serde_json::to_string(&record.data)?,
+        ])?;
+        if changed == 1 {
+            self.inserted += 1;
+            Ok(true)
+        } else {
+            self.duplicates += 1;
+            Ok(false)
+        }
+    }
+
+    pub fn inserted(&self) -> u64 {
+        self.inserted
+    }
+
+    pub fn duplicates(&self) -> u64 {
+        self.duplicates
+    }
+
+    pub fn finish(mut self, manifest: &RecordManifest) -> Result<PublishedRecords> {
+        let connection = self.connection.take().context("record writer already finished")?;
+        let mut final_manifest = manifest.clone();
+        final_manifest.accepted_rows = self.inserted;
+        final_manifest.duplicate_rows = self.duplicates;
+        final_manifest.validate()?;
+        insert_manifest(&connection, &final_manifest)?;
+        connection.execute_batch("COMMIT")?;
+        let check: String = connection.query_row("PRAGMA integrity_check", [], |row| row.get(0))?;
+        ensure!(check == "ok", "new record store failed integrity check: {check}");
+        connection.close().map_err(|(_, error)| error)?;
+        self.file.as_file().sync_all()?;
+        let bytes = self.file.as_file().metadata()?.len();
+        let sha256 = sha256_file(self.file.path())?;
+        self.file.persist_noclobber(&self.path).with_context(|| format!("publish {}", self.path.display()))?;
+        Ok(PublishedRecords { path: self.path, sha256, bytes, manifest: final_manifest })
+    }
+}
+
+/// Publish an immutable record store from an in-memory iterator. Prefer
+/// `RecordWriter` for large sources.
 pub fn write_records(
     path: impl AsRef<Path>,
     manifest: &RecordManifest,
     records: impl IntoIterator<Item = Record>,
 ) -> Result<PublishedRecords> {
-    manifest.validate_metadata()?;
     let path = path.as_ref().to_path_buf();
-    ensure!(!path.exists(), "refusing to overwrite existing record store {}", path.display());
-    let parent = path.parent().filter(|parent| !parent.as_os_str().is_empty()).unwrap_or_else(|| Path::new("."));
-    fs::create_dir_all(parent).with_context(|| format!("create {}", parent.display()))?;
-    let file = tempfile::NamedTempFile::new_in(parent)?;
-    let mut final_manifest = manifest.clone();
-    {
-        let mut connection = Connection::open(file.path())?;
-        connection.pragma_update(None, "journal_mode", "OFF")?;
-        connection.pragma_update(None, "synchronous", "FULL")?;
-        connection.execute_batch(SCHEMA)?;
-        let transaction = connection.transaction()?;
-        let mut inserted = 0_u64;
-        let mut duplicates = 0_u64;
-        {
-            let mut statement = transaction.prepare(
-                "INSERT OR IGNORE INTO records
-                 (dataset_id, record_id, geography_level, geography_code, geography_name, cnpj, cnpj_root, period, data_json)
-                 VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)",
-            )?;
-            for record in records {
-                record.validate()?;
-                let changed = statement.execute(params![
-                    final_manifest.dataset_id,
-                    record.record_id,
-                    record.geography_level,
-                    record.geography_code,
-                    record.geography_name,
-                    record.cnpj,
-                    record.cnpj_root,
-                    record.period,
-                    serde_json::to_string(&record.data)?,
-                ])?;
-                if changed == 1 {
-                    inserted += 1;
-                } else {
-                    duplicates += 1;
-                }
-            }
-        }
-        final_manifest.accepted_rows = inserted;
-        final_manifest.duplicate_rows = duplicates;
-        final_manifest.validate()?;
-        insert_manifest(&transaction, &final_manifest)?;
-        transaction.commit()?;
-        let check: String = connection.query_row("PRAGMA integrity_check", [], |row| row.get(0))?;
-        ensure!(check == "ok", "new record store failed integrity check: {check}");
-        connection.close().map_err(|(_, error)| error)?;
+    let mut writer = RecordWriter::create(&path, &manifest.dataset_id, manifest)?;
+    for record in records {
+        writer.push(record)?;
     }
-    file.as_file().sync_all()?;
-    let bytes = file.as_file().metadata()?.len();
-    let sha256 = sha256_file(file.path())?;
-    file.persist_noclobber(&path).with_context(|| format!("publish {}", path.display()))?;
-    Ok(PublishedRecords { path, sha256, bytes, manifest: final_manifest })
+    writer.finish(manifest)
 }
 
 fn insert_manifest(connection: &Connection, manifest: &RecordManifest) -> Result<()> {
