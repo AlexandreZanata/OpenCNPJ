@@ -11,6 +11,7 @@ use std::{
 use anyhow::{Context, Result, bail, ensure};
 use clap::{Args, Subcommand};
 use opencnpj_insights::{
+    agg::{Aggregate, MUNICIPALITY_MISSING, Section, Table},
     catalog::municipalities::{MunicipalityCatalogue, Place, fold_name},
     official::{
         model::{CellStatus, DatasetManifest, Observation},
@@ -20,7 +21,10 @@ use opencnpj_insights::{
     },
 };
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 use sha2::{Digest, Sha256};
+
+const AUDIT_PROBES_TOML: &str = include_str!("../../opencnpj-insights/official/audit-probes.toml");
 
 mod ask;
 mod xlsx;
@@ -55,6 +59,10 @@ pub(crate) enum OfficialCommand {
     ImportRais(RaisImportArgs),
     /// Import the Senatran municipal fleet table from the official XLSX file.
     ImportSenatran(SenatranImportArgs),
+    /// Audit CNPJ municipality marginals against the IBGE catalogue and official stores.
+    AuditCnpj(AuditCnpjArgs),
+    /// Revalidate every registered source and catalog downloaded samples exactly as received.
+    AuditSources(AuditSourcesArgs),
     /// Execute an admitted indicator operation.
     Query(QueryArgs),
     /// Interpret a Portuguese question and execute it against published stores.
@@ -74,6 +82,8 @@ pub(crate) fn run_official(command: OfficialCommand) -> Result<()> {
         OfficialCommand::ImportIbge(args) => import_ibge(args),
         OfficialCommand::ImportRais(args) => import_rais(args),
         OfficialCommand::ImportSenatran(args) => import_senatran(args),
+        OfficialCommand::AuditCnpj(args) => audit_cnpj(args),
+        OfficialCommand::AuditSources(args) => audit_sources(args),
         OfficialCommand::Query(args) => run_query(args),
         OfficialCommand::Ask(args) => run_ask(args),
     }
@@ -272,6 +282,37 @@ pub(crate) struct SenatranImportArgs {
     /// Retrieval timestamp recorded in the manifest.
     #[arg(long)]
     retrieved_at: Option<String>,
+}
+
+#[derive(Args)]
+pub(crate) struct AuditCnpjArgs {
+    /// Aggregate artifact built from the verified CNPJ snapshot.
+    #[arg(long)]
+    agg: PathBuf,
+    /// Municipality catalogue used by the aggregate.
+    #[arg(long)]
+    catalog: PathBuf,
+    /// Optional directory of official `.ocind` stores.
+    #[arg(long)]
+    stores: Option<PathBuf>,
+    /// JSON audit output.
+    #[arg(long)]
+    out: PathBuf,
+}
+
+#[derive(Args)]
+pub(crate) struct AuditSourcesArgs {
+    /// Directory for raw audit downloads and the JSON report.
+    #[arg(long)]
+    out_dir: PathBuf,
+    /// JSON audit report path.
+    #[arg(long)]
+    json_out: PathBuf,
+    /// Only probe one source ID.
+    #[arg(long)]
+    only: Option<String>,
+    #[arg(long, default_value_t = 60)]
+    timeout_seconds: u64,
 }
 
 #[derive(Args)]
@@ -857,6 +898,614 @@ fn slug(value: &str) -> String {
         .join("_")
 }
 
+#[derive(Debug, Deserialize)]
+struct ProbeFile {
+    version: u32,
+    #[serde(default)]
+    probe: Vec<Probe>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+struct Probe {
+    source_id: String,
+    category: String,
+    label: String,
+    url: String,
+    kind: String,
+    max_bytes: usize,
+    #[serde(default)]
+    note: String,
+}
+
+fn audit_sources(args: AuditSourcesArgs) -> Result<()> {
+    ensure!(args.timeout_seconds > 0, "timeout must be positive");
+    let file: ProbeFile = toml::from_str(AUDIT_PROBES_TOML).context("parse audit probes")?;
+    ensure!(file.version == 1, "unsupported audit probe version {}", file.version);
+    let registry = Registry::builtin()?;
+    for probe in &file.probe {
+        ensure!(registry.source(&probe.source_id).is_some(), "probe references unknown source {}", probe.source_id);
+        ensure!(probe.url.starts_with("https://"), "audit probe must use HTTPS: {}", probe.url);
+        ensure!(probe.max_bytes > 0, "audit probe needs a positive max_bytes");
+    }
+    let probes = file.probe.into_iter().filter(|probe| args.only.as_ref().is_none_or(|only| &probe.source_id == only)).collect::<Vec<_>>();
+    ensure!(!probes.is_empty(), "no audit probes selected");
+    let runtime = tokio::runtime::Runtime::new().context("create async runtime")?;
+    let client = reqwest::Client::builder().timeout(Duration::from_secs(args.timeout_seconds)).build()?;
+    let mut results = Vec::new();
+    for probe in probes {
+        results.push(runtime.block_on(run_probe(&client, &probe, &args.out_dir)));
+    }
+    let mut by_category: BTreeMap<String, usize> = BTreeMap::new();
+    let mut by_format: BTreeMap<String, usize> = BTreeMap::new();
+    let mut by_source: BTreeMap<String, usize> = BTreeMap::new();
+    let mut errors = 0_usize;
+    for result in &results {
+        *by_category.entry(result["category"].as_str().unwrap_or("unknown").into()).or_default() += 1;
+        *by_format.entry(result["format"].as_str().unwrap_or("unknown").into()).or_default() += 1;
+        *by_source.entry(result["source_id"].as_str().unwrap_or("unknown").into()).or_default() += 1;
+        if result.get("error").is_some()
+            || result.get("http_status").and_then(serde_json::Value::as_u64).is_some_and(|status| !(200..300).contains(&status))
+        {
+            errors += 1;
+        }
+    }
+    let report = json!({
+        "generated_at": now(),
+        "source_count": registry.sources().count(),
+        "dataset_count": registry.datasets().count(),
+        "probe_count": results.len(),
+        "error_count": errors,
+        "by_category": by_category,
+        "by_format": by_format,
+        "by_source": by_source,
+        "sources": registry.sources().map(|source| json!({
+            "source_id": source.id,
+            "category": source.category,
+            "title": source.title,
+            "publisher": source.publisher,
+            "state": source.state,
+            "licence": source.licence,
+            "licence_status": source.licence_status,
+            "licence_url": source.licence_url,
+        })).collect::<Vec<_>>(),
+        "datasets": registry.datasets().map(|dataset| json!({
+            "dataset_id": dataset.id,
+            "source_id": dataset.source_id,
+            "category": dataset.category,
+            "title": dataset.title,
+            "state": dataset.state,
+            "cadence": dataset.cadence,
+            "coverage": dataset.coverage,
+        })).collect::<Vec<_>>(),
+        "probes": results,
+    });
+    if let Some(parent) = args.json_out.parent().filter(|parent| !parent.as_os_str().is_empty()) {
+        fs::create_dir_all(parent)?;
+    }
+    fs::write(&args.json_out, serde_json::to_vec_pretty(&report)?)?;
+    println!(
+        "audit written to {}: {} probes, {} errors; categories {:?}; formats {:?}",
+        args.json_out.display(),
+        report["probe_count"].as_u64().unwrap_or(0),
+        errors,
+        report["by_category"],
+        report["by_format"]
+    );
+    Ok(())
+}
+
+async fn run_probe(client: &reqwest::Client, probe: &Probe, out_dir: &Path) -> serde_json::Value {
+    let response = client.get(&probe.url).send().await;
+    let mut response = match response {
+        Ok(response) => response,
+        Err(error) => {
+            return json!({
+                "source_id": probe.source_id,
+                "category": probe.category,
+                "label": probe.label,
+                "url": probe.url,
+                "kind": probe.kind,
+                "note": probe.note,
+                "error": error.to_string(),
+                "format": "unavailable",
+                "bytes": 0,
+                "truncated": false,
+            });
+        }
+    };
+    let status = response.status();
+    let content_type =
+        response.headers().get(reqwest::header::CONTENT_TYPE).and_then(|value| value.to_str().ok()).unwrap_or("").to_string();
+    let content_length = response.content_length();
+    let max_bytes = probe.max_bytes;
+    let mut bytes = Vec::new();
+    let mut truncated = false;
+    loop {
+        match response.chunk().await {
+            Ok(Some(chunk)) => {
+                if bytes.len() + chunk.len() > max_bytes {
+                    bytes.extend_from_slice(&chunk[..max_bytes - bytes.len()]);
+                    truncated = true;
+                    break;
+                }
+                bytes.extend_from_slice(&chunk);
+            }
+            Ok(None) => break,
+            Err(error) => {
+                return json!({
+                    "source_id": probe.source_id,
+                    "category": probe.category,
+                    "label": probe.label,
+                    "url": probe.url,
+                    "kind": probe.kind,
+                    "note": probe.note,
+                    "http_status": status.as_u16(),
+                    "content_type": content_type,
+                    "error": error.to_string(),
+                    "format": "unavailable",
+                    "bytes": bytes.len(),
+                    "truncated": truncated,
+                });
+            }
+        }
+    }
+    if content_length.is_none() && bytes.len() == max_bytes {
+        truncated = true;
+    }
+    let (format, extension, schema) = classify_payload(&bytes, &content_type, truncated, &probe.url);
+    let source_dir = out_dir.join("raw").join(&probe.source_id);
+    if let Err(error) = fs::create_dir_all(&source_dir) {
+        return json!({"source_id": probe.source_id, "error": error.to_string(), "format": format});
+    }
+    let path = source_dir.join(format!("{}.{extension}", sanitize_label(&probe.label)));
+    let saved = if status.is_success() && !bytes.is_empty() {
+        fs::write(&path, &bytes).map(|_| path.display().to_string()).map_err(|error| error.to_string())
+    } else {
+        Err("empty or failed response".to_string())
+    };
+    let bytes_sha256 = {
+        let mut hasher = Sha256::new();
+        hasher.update(&bytes);
+        hex::encode(hasher.finalize())
+    };
+    let saved = match saved {
+        Ok(path) => json!(path),
+        Err(error) => json!({"error": error}),
+    };
+    json!({
+        "source_id": probe.source_id,
+        "category": probe.category,
+        "label": probe.label,
+        "url": probe.url,
+        "kind": probe.kind,
+        "note": probe.note,
+        "http_status": status.as_u16(),
+        "content_type": content_type,
+        "content_length": content_length,
+        "bytes": bytes.len(),
+        "truncated": truncated,
+        "sha256": bytes_sha256,
+        "format": format,
+        "schema": schema,
+        "file": saved,
+    })
+}
+
+fn extract_resource_links(text: &str, base_url: &str) -> Vec<serde_json::Value> {
+    let base = reqwest::Url::parse(base_url).ok();
+    let mut links = BTreeSet::new();
+    for attribute in ["href=\"", "src=\""] {
+        let mut rest = text;
+        while let Some(start) = rest.find(attribute) {
+            rest = &rest[start + attribute.len()..];
+            let Some(end) = rest.find('"') else { break };
+            let raw = rest[..end].trim();
+            rest = &rest[end + 1..];
+            if raw.is_empty() || raw.starts_with('#') || raw.starts_with("javascript:") || raw.starts_with("mailto:") {
+                continue;
+            }
+            let url = if raw.starts_with("http://") || raw.starts_with("https://") {
+                raw.to_string()
+            } else if let Some(base) = &base {
+                match base.join(raw) {
+                    Ok(url) => url.to_string(),
+                    Err(_) => continue,
+                }
+            } else {
+                continue;
+            };
+            let lower = url.to_ascii_lowercase();
+            let extension = ["csv", "zip", "xlsx", "xls", "json", "pdf", "7z", "txt", "ods"]
+                .into_iter()
+                .find(|extension| lower.contains(&format!(".{extension}")))
+                .unwrap_or("");
+            if extension.is_empty() {
+                continue;
+            }
+            links.insert((url, extension.to_string()));
+            if links.len() >= 50 {
+                break;
+            }
+        }
+    }
+    links.into_iter().map(|(url, extension)| json!({"url": url, "extension": extension})).collect()
+}
+
+fn sanitize_label(value: &str) -> String {
+    value
+        .chars()
+        .map(|character| if character.is_ascii_alphanumeric() || character == '-' || character == '_' { character } else { '-' })
+        .collect::<String>()
+        .trim_matches('-')
+        .to_string()
+}
+
+fn classify_payload(bytes: &[u8], content_type: &str, truncated: bool, base_url: &str) -> (String, String, serde_json::Value) {
+    let lower_type = content_type.to_ascii_lowercase();
+    if bytes.starts_with(b"PK\x03\x04") {
+        let mut archive = match zip::ZipArchive::new(std::io::Cursor::new(bytes)) {
+            Ok(archive) => archive,
+            Err(error) => return ("zip_partial_or_invalid".into(), "zip".into(), json!({"error": error.to_string()})),
+        };
+        let names = (0..archive.len())
+            .filter_map(|index| archive.by_index(index).ok().and_then(|file| file.name().ok().map(|name| name.into_owned())))
+            .collect::<Vec<_>>();
+        let xlsx = names.iter().any(|name| name == "xl/workbook.xml");
+        return (
+            if xlsx { "xlsx" } else { "zip" }.into(),
+            if xlsx { "xlsx" } else { "zip" }.into(),
+            json!({"zip_entries": names.len(), "has_workbook": xlsx, "first_entries": names.iter().take(12).collect::<Vec<_>>()}),
+        );
+    }
+    if bytes.starts_with(b"%PDF") {
+        return ("pdf".into(), "pdf".into(), json!({"note": "PDF body not parsed"}));
+    }
+    if bytes.starts_with(b"7z\xBC\xAF\x27\x1C") {
+        return ("7z".into(), "7z".into(), json!({"note": "7z body not parsed"}));
+    }
+    let text = std::str::from_utf8(bytes).ok();
+    let head_lossy = String::from_utf8_lossy(&bytes[..bytes.len().min(4096)]).to_string();
+    let trimmed_head = head_lossy.trim_start();
+    let trimmed = text.map(str::trim_start).unwrap_or(trimmed_head);
+    let lower_head = trimmed_head.get(..512).unwrap_or(trimmed_head).to_ascii_lowercase();
+    if lower_type.contains("text/html")
+        || lower_type.contains("application/xhtml")
+        || lower_head.starts_with("<!doctype")
+        || lower_head.starts_with("<html")
+        || lower_head.contains("<html")
+    {
+        let title = trimmed.find("<title>").and_then(|start| {
+            let rest = &trimmed[start + 7..];
+            rest.find("</title>").map(|end| rest[..end].trim().to_string())
+        });
+        let links = text.map(|text| extract_resource_links(text, base_url)).unwrap_or_default();
+        return ("html".into(), "html".into(), json!({"title": title, "content_type": content_type, "candidate_resources": links}));
+    }
+    if trimmed_head.starts_with('{') || trimmed_head.starts_with('[') {
+        return match serde_json::from_slice::<serde_json::Value>(bytes) {
+            Ok(value) => {
+                let schema = if let Some(array) = value.as_array() {
+                    json!({"json_type": "array", "items": array.len(), "first_keys": array.first().and_then(|item| item.as_object()).map(|object| object.keys().take(20).cloned().collect::<Vec<_>>())})
+                } else if let Some(object) = value.as_object() {
+                    json!({"json_type": "object", "keys": object.keys().take(30).collect::<Vec<_>>()})
+                } else {
+                    json!({"json_type": "scalar"})
+                };
+                ("json".into(), "json".into(), schema)
+            }
+            Err(error) => ("json_partial_or_invalid".into(), "json".into(), json!({"error": error.to_string(), "truncated": truncated})),
+        };
+    }
+    if trimmed_head.starts_with('<') {
+        return ("xml_or_markup".into(), "xml".into(), json!({"content_type": content_type}));
+    }
+    if let Some(text) = text {
+        let first_line = text.lines().next().unwrap_or("");
+        let semicolons = first_line.matches(';').count();
+        let commas = first_line.matches(',').count();
+        let tabs = first_line.matches('\t').count();
+        let (format, extension) = if semicolons >= 1 {
+            ("csv_semicolon", "csv")
+        } else if tabs >= 1 {
+            ("tsv", "tsv")
+        } else if commas >= 1 {
+            ("csv_comma", "csv")
+        } else {
+            ("text", "txt")
+        };
+        return (
+            format.into(),
+            extension.into(),
+            json!({"first_line": first_line.chars().take(300).collect::<String>(), "columns_guess": semicolons.max(commas).max(tabs) + 1, "content_type": content_type, "truncated": truncated}),
+        );
+    }
+    ("binary".into(), "bin".into(), json!({"content_type": content_type, "truncated": truncated, "lower_type": lower_type}))
+}
+
+fn normalized_geo_name(name: &str) -> String {
+    let mut value = name.trim();
+    if let Some((left, right)) = value.rsplit_once(" - ")
+        && (right == "MT" || (right.len() == 2 && right.chars().all(|character| character.is_ascii_uppercase())))
+    {
+        value = left.trim();
+    }
+    fold_name(value)
+}
+
+fn audit_cnpj(args: AuditCnpjArgs) -> Result<()> {
+    let aggregate = Aggregate::open(&args.agg)?;
+    let catalogue = MunicipalityCatalogue::load(&args.catalog)?;
+    let registry = Registry::builtin()?;
+    let mut counts: BTreeMap<u16, u64> = BTreeMap::new();
+    let mut missing_municipality = 0_u64;
+    let mut unmatched_ids = Vec::new();
+    let mut totals = BTreeMap::new();
+    for table in [Table::T1, Table::T2] {
+        let mut total = 0_u64;
+        for cell in aggregate.cells(Section::Municipality(table)) {
+            let cell = cell?;
+            total += cell.count;
+            if cell.key == u64::from(MUNICIPALITY_MISSING) {
+                missing_municipality += cell.count;
+                continue;
+            }
+            let Ok(id) = u16::try_from(cell.key) else {
+                unmatched_ids.push(json!({"table": format!("{table:?}"), "id": cell.key, "reason": "id exceeds u16"}));
+                continue;
+            };
+            if catalogue.get(id).is_none() {
+                unmatched_ids.push(json!({"table": format!("{table:?}"), "id": id, "reason": "id absent from catalogue"}));
+                continue;
+            }
+            *counts.entry(id).or_default() += cell.count;
+        }
+        totals.insert(format!("{table:?}"), total);
+    }
+
+    let mut duplicate_names = Vec::new();
+    let mut names: BTreeMap<(String, String), Vec<u16>> = BTreeMap::new();
+    for row in catalogue.rows() {
+        let Place::Municipality(place) = &row.place else { continue };
+        names.entry((place.uf.clone(), row.folded.clone())).or_default().push(row.id);
+    }
+    for ((uf, name), ids) in names {
+        if ids.len() > 1 {
+            duplicate_names.push(json!({"uf": uf, "name": name, "ids": ids}));
+        }
+    }
+    let zero_cnpj = catalogue
+        .rows()
+        .iter()
+        .filter(|row| matches!(&row.place, Place::Municipality(_)) && counts.get(&row.id).copied().unwrap_or(0) == 0)
+        .map(|row| json!({"id": row.id, "tom": format!("{:04}", row.tom), "name": row.name}))
+        .collect::<Vec<_>>();
+    let census_missing = catalogue
+        .rows()
+        .iter()
+        .filter_map(|row| match &row.place {
+            Place::Municipality(place) if place.census_2022.is_none() => Some(json!({"id": row.id, "ibge": place.ibge, "name": row.name})),
+            _ => None,
+        })
+        .collect::<Vec<_>>();
+
+    let mt_catalogue = catalogue
+        .rows()
+        .iter()
+        .filter_map(|row| match &row.place {
+            Place::Municipality(place) if place.uf == "MT" => Some((place.ibge, row.name.clone())),
+            _ => None,
+        })
+        .collect::<BTreeMap<_, _>>();
+    let mut inconsistencies = Vec::new();
+    let mut push = |kind: &str, severity: &str, entity: String, detail: String, action: String| {
+        inconsistencies.push(json!({
+            "kind": kind,
+            "severity": severity,
+            "entity": entity,
+            "detail": detail,
+            "suggested_action": action
+        }));
+    };
+    if missing_municipality > 0 {
+        push(
+            "aggregate_missing_municipality",
+            "high",
+            "aggregate".into(),
+            format!("{missing_municipality} cells use the missing municipality sentinel"),
+            "Decide whether these records are out of scope or need a bridge; never assign them to a real municipality by name.".into(),
+        );
+    }
+    for unmatched in &unmatched_ids {
+        push(
+            "cnpj_municipality_not_in_catalogue",
+            "high",
+            unmatched["id"].to_string(),
+            unmatched.to_string(),
+            "Rebuild the aggregate with the matching municipality catalogue version or bridge the identifier explicitly.".into(),
+        );
+    }
+    for duplicate in &duplicate_names {
+        push(
+            "catalogue_duplicate_name_same_uf",
+            "high",
+            duplicate["uf"].to_string(),
+            duplicate.to_string(),
+            "Disambiguate by IBGE code; never resolve a name-only match silently.".into(),
+        );
+    }
+    for row in &census_missing {
+        push(
+            "catalogue_census_missing",
+            "info",
+            row["name"].as_str().unwrap_or_default().into(),
+            row.to_string(),
+            "Keep the Census cell absent; do not backfill it from the population estimate.".into(),
+        );
+    }
+    if !zero_cnpj.is_empty() {
+        push(
+            "catalogue_municipality_without_cnpj",
+            "low",
+            format!("{} municipalities", zero_cnpj.len()),
+            "Municipalities exist in the IBGE catalogue but have zero active CNPJ establishments in T1.".into(),
+            "Keep the zero or missing distinction; no synthetic establishment should be created.".into(),
+        );
+    }
+
+    let mut source_reports = Vec::new();
+    let mut normalization_tasks = Vec::new();
+    if let Some(directory) = &args.stores {
+        let stores = StoreSet::open_dir(directory)?;
+        for store in stores.stores() {
+            let manifest = store.manifest();
+            let geographies = store.geographies()?;
+            let mut unmatched = Vec::new();
+            let mut name_mismatches = Vec::new();
+            let mut without_cnpj = Vec::new();
+            let mut non_municipal = Vec::new();
+            for (level, code, name) in &geographies {
+                if level != "N6" {
+                    non_municipal.push(json!({"level": level, "code": code, "name": name}));
+                    continue;
+                }
+                let Ok(ibge) = code.parse::<u32>() else {
+                    unmatched.push(json!({"code": code, "name": name, "reason": "non-numeric IBGE code"}));
+                    continue;
+                };
+                let Some(row) = catalogue.by_ibge(ibge) else {
+                    unmatched.push(json!({"code": code, "name": name, "reason": "IBGE code absent from catalogue"}));
+                    continue;
+                };
+                let folded = normalized_geo_name(name);
+                if folded != row.folded && !row.variants.iter().any(|variant| variant == &folded) {
+                    name_mismatches.push(json!({"code": code, "source_name": name, "catalogue_name": row.name}));
+                }
+                if counts.get(&row.id).copied().unwrap_or(0) == 0 {
+                    without_cnpj.push(json!({"code": code, "name": name}));
+                }
+            }
+            for unmatched_geo in &unmatched {
+                push(
+                    "official_geography_not_in_catalogue",
+                    "high",
+                    format!("{} {}", manifest.dataset_id, unmatched_geo["code"]),
+                    unmatched_geo.to_string(),
+                    "Add a verified crosswalk or exclude the row; do not guess the municipality.".into(),
+                );
+            }
+            for mismatch in &name_mismatches {
+                push(
+                    "official_geography_name_mismatch",
+                    "medium",
+                    format!("{} {}", manifest.dataset_id, mismatch["code"]),
+                    mismatch.to_string(),
+                    "Keep the IBGE code as identity and record the source spelling as an alias.".into(),
+                );
+            }
+            if !without_cnpj.is_empty() {
+                push(
+                    "official_municipality_without_cnpj",
+                    "low",
+                    manifest.dataset_id.clone(),
+                    format!("{} official geographies have zero active CNPJ establishments in T1", without_cnpj.len()),
+                    "Keep the zero as zero; it is not a missing official cell.".into(),
+                );
+            }
+            let present = geographies
+                .iter()
+                .filter(|(level, _, _)| level == "N6")
+                .filter_map(|(_, code, _)| code.parse::<u32>().ok())
+                .collect::<BTreeSet<_>>();
+            let missing_catalogue = mt_catalogue
+                .iter()
+                .filter(|(code, _)| !present.contains(code))
+                .map(|(code, name)| json!({"ibge": code, "name": name}))
+                .collect::<Vec<_>>();
+            let variables = store.variables()?;
+            let unknown_variables = variables.iter().filter(|variable| registry.variable(variable).is_none()).cloned().collect::<Vec<_>>();
+            if !missing_catalogue.is_empty() && manifest.dataset_id != "ibge-6588" {
+                normalization_tasks.push(json!({
+                    "kind": "official_source_coverage_gap",
+                    "dataset_id": manifest.dataset_id,
+                    "missing_count": missing_catalogue.len(),
+                    "sample": missing_catalogue.iter().take(10).collect::<Vec<_>>(),
+                    "action": "Keep absent cells absent; if the municipality is in scope, record the source coverage gap and refresh when the publisher includes it."
+                }));
+            }
+            if !non_municipal.is_empty() {
+                normalization_tasks.push(json!({
+                    "kind": "official_non_municipal_scope",
+                    "dataset_id": manifest.dataset_id,
+                    "geographies": non_municipal,
+                    "action": "Do not join this geography to a municipality; keep the published scope explicit."
+                }));
+            }
+            if !unknown_variables.is_empty() {
+                normalization_tasks.push(json!({
+                    "kind": "uncurated_official_variables",
+                    "dataset_id": manifest.dataset_id,
+                    "variables": unknown_variables,
+                    "action": "Add curated IDs, labels and pt-BR synonyms, or mark these columns as generated-only."
+                }));
+            }
+            source_reports.push(json!({
+                "dataset_id": manifest.dataset_id,
+                "category": registry.dataset(&manifest.dataset_id).map(|dataset| dataset.category.clone()).unwrap_or_else(|| "unregistered".into()),
+                "rows": manifest.accepted_rows,
+                "variables": variables,
+                "unknown_variables": unknown_variables,
+                "geographies": geographies.len(),
+                "non_municipal_geographies": non_municipal,
+                "unmatched_geographies": unmatched,
+                "name_mismatches": name_mismatches,
+                "without_cnpj": without_cnpj,
+                "missing_catalogue_municipalities": missing_catalogue,
+            }));
+        }
+    }
+
+    let report = json!({
+        "generated_at": now(),
+        "aggregate": {
+            "path": args.agg.display().to_string(),
+            "competence": aggregate.manifest().competence.to_string(),
+            "municipality_catalogue_sha256": aggregate.manifest().municipality_sha256,
+            "totals": totals,
+            "missing_municipality_cells": missing_municipality,
+            "unmatched_ids": unmatched_ids,
+        },
+        "catalogue": {
+            "path": args.catalog.display().to_string(),
+            "rows": catalogue.rows().len(),
+            "duplicate_names_same_uf": duplicate_names,
+            "census_missing": census_missing,
+            "municipalities_without_cnpj": zero_cnpj,
+        },
+        "sources": source_reports,
+        "inconsistencies": inconsistencies,
+        "normalization_tasks": normalization_tasks,
+    });
+    if let Some(parent) = args.out.parent().filter(|parent| !parent.as_os_str().is_empty()) {
+        fs::create_dir_all(parent)?;
+    }
+    fs::write(&args.out, serde_json::to_vec_pretty(&report)?)?;
+    println!(
+        "audit written to {}: {} inconsistencies, {} unmatched CNPJ municipality ids, {} official geography mismatches",
+        args.out.display(),
+        report["inconsistencies"].as_array().map(Vec::len).unwrap_or(0),
+        report["aggregate"]["unmatched_ids"].as_array().map(Vec::len).unwrap_or(0),
+        report["sources"]
+            .as_array()
+            .map(|rows| rows
+                .iter()
+                .map(|row| row["unmatched_geographies"].as_array().map(Vec::len).unwrap_or(0)
+                    + row["name_mismatches"].as_array().map(Vec::len).unwrap_or(0))
+                .sum::<usize>())
+            .unwrap_or(0)
+    );
+    Ok(())
+}
+
 fn raw_path_for(base: &Path, _segment: &str, index: usize) -> PathBuf {
     if index == 0 {
         base.to_path_buf()
@@ -1194,6 +1843,31 @@ mod tests {
         assert_eq!(sinop.status, CellStatus::NotAvailable);
         assert_eq!(sinop.value, None);
         assert_eq!(parsed.units.into_iter().collect::<Vec<_>>(), ["Pessoas"]);
+    }
+
+    #[test]
+    fn audit_normalizes_uf_suffixes_and_extracts_resource_links() {
+        assert_eq!(normalized_geo_name("Acorizal - MT"), "acorizal");
+        assert_eq!(normalized_geo_name("Vila Bela da Santíssima Trindade"), "vila bela da santissima trindade");
+        let links = extract_resource_links(
+            r#"<a href="/files/fleet.csv">fleet</a><a href="https://example.test/meta.json">meta</a>"#,
+            "https://example.test/dataset/page",
+        );
+        assert_eq!(links.len(), 2);
+        assert!(links.iter().any(|link| link["url"] == "https://example.test/files/fleet.csv"));
+        assert!(links.iter().any(|link| link["extension"] == "json"));
+    }
+
+    #[test]
+    fn audit_classifies_raw_payloads() {
+        let (format, _, schema) = classify_payload(b"{\"a\":1}", "application/json", false, "https://example.test");
+        assert_eq!(format, "json");
+        assert_eq!(schema["keys"][0], "a");
+        let (format, _, _) = classify_payload(b"A;B;\n1;2\n", "text/csv", false, "https://example.test");
+        assert_eq!(format, "csv_semicolon");
+        let (format, _, schema) = classify_payload(b"<!doctype html><title>x</title>", "text/html", false, "https://example.test");
+        assert_eq!(format, "html");
+        assert_eq!(schema["title"], "x");
     }
 
     #[test]

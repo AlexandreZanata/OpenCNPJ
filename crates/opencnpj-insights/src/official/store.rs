@@ -124,6 +124,24 @@ impl Store {
         rows.collect::<rusqlite::Result<Vec<_>>>().with_context(|| format!("read {} observations", self.path.display()))
     }
 
+    /// Distinct geography cells stored for this dataset.
+    pub fn geographies(&self) -> Result<Vec<(String, String, String)>> {
+        let mut statement = self.connection.prepare(
+            "SELECT geography_level, geography_code, geography_name FROM observations
+             GROUP BY geography_level, geography_code, geography_name
+             ORDER BY geography_level, geography_code",
+        )?;
+        let rows = statement.query_map([], |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)))?;
+        rows.collect::<rusqlite::Result<Vec<_>>>().with_context(|| format!("read geographies of {}", self.path.display()))
+    }
+
+    /// Distinct variable IDs stored for this dataset.
+    pub fn variables(&self) -> Result<Vec<String>> {
+        let mut statement = self.connection.prepare("SELECT DISTINCT variable_id FROM observations ORDER BY variable_id")?;
+        let rows = statement.query_map([], |row| row.get::<_, String>(0))?;
+        rows.collect::<rusqlite::Result<Vec<_>>>().with_context(|| format!("read variables of {}", self.path.display()))
+    }
+
     pub fn row_count(&self) -> Result<u64> {
         let count: i64 = self.connection.query_row("SELECT COUNT(*) FROM observations", [], |row| row.get(0))?;
         u64::try_from(count).context("negative observation count")

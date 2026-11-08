@@ -9,9 +9,15 @@ use super::model::SOURCE_STATES;
 
 const REGISTRY_TOML: &str = include_str!("../../official/sources.toml");
 
+fn default_category() -> String {
+    "uncategorized".into()
+}
+
 #[derive(Debug, Clone, Deserialize)]
 pub struct Source {
     pub id: String,
+    #[serde(default = "default_category")]
+    pub category: String,
     pub title: String,
     pub publisher: String,
     pub discovery_url: String,
@@ -30,6 +36,8 @@ pub struct Source {
 #[derive(Debug, Clone, Deserialize)]
 pub struct Dataset {
     pub id: String,
+    #[serde(default = "default_category")]
+    pub category: String,
     pub source_id: String,
     pub title: String,
     pub aggregate: String,
@@ -100,6 +108,7 @@ impl Registry {
             validate_url(&source.licence_url)?;
             ensure!(SOURCE_STATES.contains(&source.state.as_str()), "unknown source state '{}'", source.state);
             ensure!(!source.licence_status.is_empty(), "source {} has no licence status", source.id);
+            ensure!(!source.category.is_empty(), "source {} has no category", source.id);
             ensure!(sources.insert(source.id.clone(), source).is_none(), "duplicate official source ID");
         }
         let mut datasets = BTreeMap::new();
@@ -108,6 +117,7 @@ impl Registry {
             validate_url(&dataset.api_url)?;
             validate_url(&dataset.metadata_url)?;
             ensure!(SOURCE_STATES.contains(&dataset.state.as_str()), "unknown dataset state '{}'", dataset.state);
+            ensure!(!dataset.category.is_empty(), "dataset {} has no category", dataset.id);
             ensure!(datasets.insert(dataset.id.clone(), dataset).is_none(), "duplicate official dataset ID");
         }
         let mut variables = BTreeMap::new();

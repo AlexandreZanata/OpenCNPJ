@@ -8,6 +8,7 @@ version = 1
 
 [[source]]
 id = "ibge"
+category = "statistics"
 title = "Instituto Brasileiro de Geografia e Estatística"
 publisher = "IBGE"
 discovery_url = "https://servicodados.ibge.gov.br/api/v3/agregados"
@@ -23,6 +24,7 @@ notes = "The metadata API returned HTTP 200; the terms page returned HTTP 403 to
 
 [[source]]
 id = "mte"
+category = "labour"
 title = "Ministério do Trabalho e Emprego - estatísticas"
 publisher = "MTE"
 discovery_url = "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/estatisticas-trabalho"
@@ -38,6 +40,7 @@ notes = "No verified small bulk aggregate endpoint was admitted in this slice. P
 
 [[source]]
 id = "senatran"
+category = "transport"
 title = "Senatran - frota de veículos"
 publisher = "Ministério dos Transportes / Senatran"
 discovery_url = "https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2026"
@@ -53,6 +56,7 @@ notes = "The page returned HTTP 200 and links monthly XLSX files. Registered fle
 
 [[source]]
 id = "antt"
+category = "transport"
 title = "ANTT - RNTRC"
 publisher = "Agência Nacional de Transportes Terrestres"
 discovery_url = "https://dados.antt.gov.br/pt_BR/dataset/rntrc-veiculos"
@@ -68,6 +72,7 @@ notes = "Aggregate history and identified resources have different schemas. No C
 
 [[source]]
 id = "pncp"
+category = "procurement"
 title = "Portal Nacional de Contratações Públicas"
 publisher = "PNCP"
 discovery_url = "https://www.gov.br/pncp/pt-br/acesso-a-informacao/dados-abertos"
@@ -83,6 +88,7 @@ notes = "The institutional page returned HTTP 401 to an automated request. No un
 
 [[source]]
 id = "compras"
+category = "procurement"
 title = "Compras.gov.br - dados abertos"
 publisher = "Ministério da Gestão e da Inovação em Serviços Públicos"
 discovery_url = "https://dadosabertos.compras.gov.br/swagger-ui/index.html"
@@ -98,6 +104,7 @@ notes = "Swagger UI returned HTTP 200. Estimated, awarded, contracted and paid a
 
 [[source]]
 id = "cgu"
+category = "compliance"
 title = "CGU - CEIS e CNEP"
 publisher = "Controladoria-Geral da União"
 discovery_url = "https://portaldatransparencia.gov.br/download-de-dados/ceis"
@@ -113,6 +120,7 @@ notes = "A missing sanction record is not a certificate of good standing. Match 
 
 [[source]]
 id = "cnes"
+category = "health"
 title = "CNES - Cadastro Nacional de Estabelecimentos de Saúde"
 publisher = "Ministério da Saúde"
 discovery_url = "https://dadosabertos.saude.gov.br/dataset/cnes-cadastro-nacional-de-estabelecimentos-de-saude"
@@ -128,6 +136,7 @@ notes = "CNES IDs are not CNPJs. Personal-professional fields are out of scope."
 
 [[source]]
 id = "inep"
+category = "education"
 title = "INEP - Censo Escolar"
 publisher = "INEP"
 discovery_url = "https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/microdados/censo-escolar"
@@ -143,6 +152,7 @@ notes = "School IDs are not CNPJs. Student-level information is out of scope."
 
 [[source]]
 id = "anp"
+category = "fuel"
 title = "ANP - levantamento de preços de combustíveis"
 publisher = "Agência Nacional do Petróleo, Gás Natural e Biocombustíveis"
 discovery_url = "https://www.gov.br/anp/pt-br/assuntos/precos-e-defesa-da-concorrencia/precos/precos-revenda-e-de-distribuicao-combustiveis/informacoes-levantamento-de-precos-de-combustiveis"
@@ -158,6 +168,7 @@ notes = "The survey is a sample, not every station or municipality and not a liv
 
 [[source]]
 id = "comexstat"
+category = "trade"
 title = "Comex Stat"
 publisher = "MDIC"
 discovery_url = "https://comexstat.mdic.gov.br/pt/home"
@@ -173,6 +184,7 @@ notes = "Municipal detail uses the declarant's fiscal domicile and SH4. Do not c
 
 [[source]]
 id = "bcb"
+category = "macroeconomy"
 title = "Banco Central do Brasil - dados abertos"
 publisher = "BCB"
 discovery_url = "https://www.bcb.gov.br/acessoinformacao/dadosabertos"
@@ -188,6 +200,7 @@ notes = "Each series has its own frequency, unit and revision policy. No company
 
 [[source]]
 id = "aneel"
+category = "energy"
 title = "ANEEL - geração distribuída"
 publisher = "ANEEL"
 discovery_url = "https://dadosabertos.aneel.gov.br/dataset/relacao-de-empreendimentos-de-geracao-distribuida"
@@ -203,6 +216,7 @@ notes = "ODbL adapted-database obligations must be assessed before commercial en
 
 [[source]]
 id = "pgfn"
+category = "fiscal"
 title = "PGFN - dívida ativa da União"
 publisher = "Procuradoria-Geral da Fazenda Nacional"
 discovery_url = "https://www.gov.br/pgfn/pt-br/assuntos/divida-ativa-da-uniao/transparencia-fiscal-1/dados-abertos"
@@ -218,6 +232,7 @@ notes = "Federal/FGTS scope. A record is not insolvency, a universal credit scor
 
 [[source]]
 id = "mt"
+category = "local_government"
 title = "Dados Abertos MT"
 publisher = "Governo do Estado de Mato Grosso"
 discovery_url = "https://dadosabertos.mt.gov.br/"
@@ -233,6 +248,7 @@ notes = "A portal group or dashboard is not an admitted bulk dataset. Only indiv
 
 [[dataset]]
 id = "ibge-6579"
+category = "population"
 source_id = "ibge"
 title = "IBGE - População residente estimada"
 aggregate = "6579"
@@ -249,6 +265,7 @@ limitations = [
 
 [[dataset]]
 id = "ibge-9922"
+category = "census"
 source_id = "ibge"
 title = "IBGE - Censo 2022: domicílios e moradores"
 aggregate = "9922"
@@ -265,6 +282,7 @@ limitations = [
 
 [[dataset]]
 id = "ibge-5938"
+category = "economy"
 source_id = "ibge"
 title = "IBGE - PIB dos municípios"
 aggregate = "5938"
@@ -281,6 +299,7 @@ limitations = [
 
 [[dataset]]
 id = "ibge-9509"
+category = "economy"
 source_id = "ibge"
 title = "IBGE - CEMPRE"
 aggregate = "9509"
@@ -297,6 +316,7 @@ limitations = [
 
 [[dataset]]
 id = "ibge-1612"
+category = "agriculture"
 source_id = "ibge"
 title = "IBGE - PAM lavouras temporárias"
 aggregate = "1612"
@@ -313,6 +333,7 @@ limitations = [
 
 [[dataset]]
 id = "ibge-1613"
+category = "agriculture"
 source_id = "ibge"
 title = "IBGE - PAM lavouras permanentes"
 aggregate = "1613"
@@ -329,6 +350,7 @@ limitations = [
 
 [[dataset]]
 id = "ibge-3939"
+category = "agriculture"
 source_id = "ibge"
 title = "IBGE - PPM efetivo dos rebanhos"
 aggregate = "3939"
@@ -345,6 +367,7 @@ limitations = [
 
 [[dataset]]
 id = "ibge-6588"
+category = "agriculture"
 source_id = "ibge"
 title = "IBGE - LSPA série histórica"
 aggregate = "6588"
@@ -681,6 +704,7 @@ synonyms = ["soja lspa", "producao de soja lspa"]
 
 [[dataset]]
 id = "mte-rais-2024"
+category = "labour"
 source_id = "mte"
 title = "RAIS 2024 - empregos formais por município e atividade"
 aggregate = "rais-2024-tabela-4"
@@ -746,6 +770,7 @@ synonyms = ["emprego formal", "empregos formais", "estoque de empregos", "rais t
 
 [[dataset]]
 id = "senatran-frota-2026-09"
+category = "transport"
 source_id = "senatran"
 title = "Senatran - frota por município e tipo (setembro/2026)"
 aggregate = "frota-municipio-tipo-202609"
