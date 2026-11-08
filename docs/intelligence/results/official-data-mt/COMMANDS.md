@@ -90,6 +90,22 @@ opencnpj-intel official ask --dir /data/opencnpj-data/intelligence/official \
   --text "Quantos funcionários tem o CNPJ de Sorriso?"
 ```
 
+## Additional source and CNPJ crosswalk audit
+
+```bash
+opencnpj-intel official audit-sources \
+  --out-dir /data/opencnpj-data/intelligence/official/audit \
+  --json-out /data/opencnpj-data/intelligence/official/audit/source-audit.json
+opencnpj-intel official audit-cnpj \
+  --agg /data/opencnpj-data/intelligence/agg/2026-10.ocagg \
+  --catalog crates/opencnpj-insights/catalog/municipalities.tsv \
+  --stores /data/opencnpj-data/intelligence/official \
+  --out /data/opencnpj-data/intelligence/official/audit/cnpj-crosswalk-audit.json
+```
+
+Result: 24 probes, 0 network errors, 0 unmatched CNPJ municipality IDs. See
+`SOURCE-AUDIT.md` and `INCONSISTENCIES.md`.
+
 ## Acceptance corpus
 
 ```bash

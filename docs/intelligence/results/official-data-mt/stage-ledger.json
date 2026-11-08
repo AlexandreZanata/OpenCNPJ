@@ -163,6 +163,22 @@
       "blockers": [
         "Commercially enabled capabilities remain limited to the licence review decisions recorded in the source registry."
       ]
+    },
+    {
+      "id": 11,
+      "name": "Additional source audit and CNPJ crosswalk",
+      "status": "complete",
+      "evidence": [
+        "docs/intelligence/results/official-data-mt/SOURCE-AUDIT.md",
+        "docs/intelligence/results/official-data-mt/INCONSISTENCIES.md",
+        "docs/intelligence/results/official-data-mt/audit/source-audit.json",
+        "docs/intelligence/results/official-data-mt/audit/cnpj-crosswalk-audit.json",
+        "crates/opencnpj-insights/official/audit-probes.toml",
+        "crates/opencnpj-lab/src/official.rs"
+      ],
+      "blockers": [
+        "Large national resources were bounded samples; full microdata admission still requires a dedicated streaming adapter."
+      ]
     }
   ]
 }

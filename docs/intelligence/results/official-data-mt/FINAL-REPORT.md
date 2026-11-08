@@ -49,13 +49,32 @@ Raw responses and `.ocind` stores are outside Git under
 hashes and selected official cell values are in `SOURCES.md` and `REAL-DATA.md`.
 No national dataset or large binary was committed.
 
+## Additional source and CNPJ crosswalk audit
+
+A second pass revalidated all 15 registered sources with 24 bounded probes and
+categorized the received bytes (JSON, XLSX, CSV, HTML, truncated sample) without
+normalizing them in place. The CNPJ T1/T2 municipality marginals were compared
+with the versioned IBGE catalogue and every admitted `.ocind` geography.
+
+- 0 CNPJ municipality IDs outside the catalogue.
+- 0 missing-municipality sentinel cells.
+- 0 duplicate folded names in the same UF.
+- 0 official N6 geography codes without a catalogue match.
+- Remaining items are source coverage/naming/availability tasks, not CNPJ
+  identity mismatches: Boa Esperança do Norte census/CEMPRE/PIB gaps, LSPA
+  state-only scope, 16 generated Senatran vehicle IDs, PGFN malformed links and
+  variable ANP availability.
+
+Evidence: `SOURCE-AUDIT.md`, `INCONSISTENCIES.md`,
+`audit/source-audit.json`, `audit/cnpj-crosswalk-audit.json`.
+
 ## Validation
 
 | Gate | Result |
 |---|---|
 | `cargo fmt --all --check` | exit 0 |
 | `cargo clippy --workspace --all-targets -- -D warnings` | exit 0 |
-| `cargo test --workspace` | 321 passed, 0 failed (29 suites, including doc tests) |
+| `cargo test --workspace` | 323 passed, 0 failed (29 suites, including doc tests) |
 | MT acceptance corpus | 261/261 passed |
 | HTTP API smoke | `/api/v1/official/sources` and `/api/v1/official/query` returned source-backed answer |
 
