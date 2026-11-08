@@ -512,6 +512,46 @@ unit = "Mil Reais"
 synonyms = ["valor da producao"]
 
 [[variable]]
+id = "cafe_area_plantada"
+dataset_id = "ibge-1613"
+source_variable = "2313"
+label = "Área destinada à colheita de café"
+unit = "Hectares"
+synonyms = ["area plantada de cafe"]
+
+[[variable]]
+id = "cafe_area_colhida"
+dataset_id = "ibge-1613"
+source_variable = "216"
+label = "Área colhida de café"
+unit = "Hectares"
+synonyms = ["area colhida de cafe"]
+
+[[variable]]
+id = "cafe_producao"
+dataset_id = "ibge-1613"
+source_variable = "214"
+label = "Quantidade produzida de café"
+unit = "Toneladas"
+synonyms = ["producao de cafe", "quantidade produzida de cafe"]
+
+[[variable]]
+id = "cafe_rendimento"
+dataset_id = "ibge-1613"
+source_variable = "112"
+label = "Rendimento médio do café"
+unit = "Quilogramas por hectare"
+synonyms = ["rendimento do cafe", "produtividade do cafe"]
+
+[[variable]]
+id = "cafe_valor_producao"
+dataset_id = "ibge-1613"
+source_variable = "215"
+label = "Valor da produção de café"
+unit = "Mil Reais"
+synonyms = ["valor da producao de cafe"]
+
+[[variable]]
 id = "ppm_efetivo"
 dataset_id = "ibge-3939"
 source_variable = "105"
@@ -630,3 +670,11 @@ classification_id = "79"
 category_id = "2677"
 label = "Ovino"
 synonyms = ["ovino", "ovinos", "gado ovino"]
+
+[[category]]
+id = "lspa_soja"
+dataset_id = "ibge-6588"
+classification_id = "48"
+category_id = "39443"
+label = "Soja - LSPA"
+synonyms = ["soja lspa", "producao de soja lspa"]

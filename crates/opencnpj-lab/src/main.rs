@@ -26,6 +26,11 @@ enum Command {
         #[command(subcommand)]
         command: official::SourcesCommand,
     },
+    /// Import, query and ask about official source-backed indicators.
+    Official {
+        #[command(subcommand)]
+        command: official::OfficialCommand,
+    },
     /// Build reference catalogues.
     Catalog {
         #[command(subcommand)]
@@ -67,6 +72,7 @@ enum Command {
 fn main() -> anyhow::Result<()> {
     match Cli::parse().command {
         Some(Command::Sources { command }) => official::run_sources(command),
+        Some(Command::Official { command }) => official::run_official(command),
         Some(Command::Ask(args)) => questions::ask(args),
         Some(Command::EvalQuestions(args)) => questions::evaluate(args),
         Some(Command::Catalog { command }) => catalog::run(command),

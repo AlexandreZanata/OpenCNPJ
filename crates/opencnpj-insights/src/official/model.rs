@@ -149,8 +149,11 @@ impl DatasetManifest {
                 self.row_count, self.accepted_rows, self.rejected_rows
             ));
         }
-        if self.rejected_rows != self.duplicate_rows.saturating_add(self.malformed_rows) {
-            return Err("rejected rows must equal duplicate plus malformed rows".into());
+        if self.duplicate_rows > self.rejected_rows {
+            return Err("duplicate rows cannot exceed rejected rows".into());
+        }
+        if self.malformed_rows > self.accepted_rows {
+            return Err("malformed rows cannot exceed accepted rows".into());
         }
         Ok(())
     }

@@ -343,11 +343,16 @@ fn trend(
     let selected = filter(&observations, std::slice::from_ref(&geography), periods);
     let meta = meta_for(registry, variable);
     let rows = selected.iter().map(AnswerRow::from_observation).collect::<Vec<_>>();
-    let notes = if selected.is_empty() {
+    let mut notes = if selected.is_empty() {
         vec!["Não há série observada para essa geografia; ausência de célula não significa zero.".into()]
     } else {
         Vec::new()
     };
+    let returned = selected.iter().map(|observation| observation.period.as_str()).collect::<BTreeSet<_>>();
+    let absent = periods.iter().filter(|period| !returned.contains(period.as_str())).cloned().collect::<Vec<_>>();
+    if !absent.is_empty() {
+        notes.push(format!("Períodos solicitados sem célula publicada: {}. Não foram imputados.", absent.join(", ")));
+    }
     build_answer(
         registry,
         stores,
@@ -378,15 +383,7 @@ fn ratio(
     let denominator_rows = stores.unique_observations(denominator, category.map(CategoryFilter::pair))?;
     let numerator_meta = meta_for(registry, numerator);
     let denominator_meta = meta_for(registry, denominator);
-    let selected_period = period.map(str::to_string).or_else(|| {
-        let numerator_latest = latest_period(&numerator_rows);
-        let denominator_latest = latest_period(&denominator_rows);
-        match (numerator_latest, denominator_latest) {
-            (Some(left), Some(right)) if left == right => Some(left),
-            (Some(left), Some(right)) => Some(left.min(right)),
-            _ => None,
-        }
-    });
+    let selected_period = period.map(str::to_string).or_else(|| latest_common_period(&numerator_rows, &denominator_rows));
     let mut numerator_map = BTreeMap::new();
     for observation in filter(&numerator_rows, geographies, &[])
         .into_iter()
@@ -483,6 +480,20 @@ fn filter(observations: &[Observation], geographies: &[String], periods: &[Strin
 
 fn latest_period(observations: &[Observation]) -> Option<String> {
     observations.iter().filter(|observation| observation.status.is_observed()).map(|observation| observation.period.clone()).max()
+}
+
+fn latest_common_period(numerator: &[Observation], denominator: &[Observation]) -> Option<String> {
+    let numerator_periods = numerator
+        .iter()
+        .filter(|observation| observation.status.is_observed())
+        .map(|observation| observation.period.as_str())
+        .collect::<BTreeSet<_>>();
+    let denominator_periods = denominator
+        .iter()
+        .filter(|observation| observation.status.is_observed())
+        .map(|observation| observation.period.as_str())
+        .collect::<BTreeSet<_>>();
+    numerator_periods.intersection(&denominator_periods).max().map(|period| (*period).to_string())
 }
 
 #[allow(clippy::too_many_arguments)]
