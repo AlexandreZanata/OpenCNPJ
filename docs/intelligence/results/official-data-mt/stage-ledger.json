@@ -115,30 +115,54 @@
     {
       "id": 7,
       "name": "Government-sales pack: PNCP, Compras and CGU",
-      "status": "pending",
-      "evidence": [],
-      "blockers": []
+      "status": "blocked",
+      "evidence": [
+        "docs/intelligence/results/official-data-mt/STAGE-7-9.md",
+        "crates/opencnpj-insights/official/sources.toml"
+      ],
+      "blockers": [
+        "PNCP/Compras/CGU contracts were not admitted: contract-level schema, pagination, deduplication, amount semantics and sanction scope require a dedicated store. PNCP HTML returned HTTP 401; Compras guessed endpoint returned HTTP 404."
+      ]
     },
     {
       "id": 8,
       "name": "Additional verticals and local enrichment",
-      "status": "pending",
-      "evidence": [],
-      "blockers": []
+      "status": "blocked",
+      "evidence": [
+        "docs/intelligence/results/official-data-mt/STAGE-7-9.md",
+        "crates/opencnpj-insights/official/sources.toml"
+      ],
+      "blockers": [
+        "CNES, INEP, ANP, Comex Stat, BCB and MT portal datasets were revalidated but not admitted. No dataset-specific adapter/store/query was implemented."
+      ]
     },
     {
       "id": 9,
       "name": "Licence-sensitive energy and fiscal context",
-      "status": "pending",
-      "evidence": [],
-      "blockers": []
+      "status": "blocked",
+      "evidence": [
+        "docs/intelligence/results/official-data-mt/STAGE-7-9.md",
+        "crates/opencnpj-insights/official/sources.toml"
+      ],
+      "blockers": [
+        "ANEEL ODbL adapted-database obligations pending; PGFN fiscal/personal-data semantics pending. No commercial enablement claimed."
+      ]
     },
     {
       "id": 10,
       "name": "Product/API completion and full delivery",
-      "status": "pending",
-      "evidence": [],
-      "blockers": []
+      "status": "complete",
+      "evidence": [
+        "crates/opencnpj/src/api.rs",
+        "crates/opencnpj/tests/accounts_contract.rs",
+        "docs/API.md",
+        "docs/intelligence/results/official-data-mt/FINAL-REPORT.md",
+        "docs/intelligence/results/official-data-mt/logs/stage-10-http-api.log",
+        "docs/intelligence/results/official-data-mt/logs/stage-10-test.log"
+      ],
+      "blockers": [
+        "Commercially enabled capabilities remain limited to the licence review decisions recorded in the source registry."
+      ]
     }
   ]
 }

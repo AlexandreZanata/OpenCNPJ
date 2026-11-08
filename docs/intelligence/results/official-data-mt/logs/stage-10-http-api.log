@@ -1,0 +1,7 @@
+opened /data/opencnpj-data/snapshots/2026-10-balanced.ocnpj (73809381 documents) in 1108.0 ms
+listening on http://127.0.0.1:18080 (auth off)
+shutting down: draining in-flight requests
+usage flushed; bye
+', 'ibge-3939', 'ibge-5938', 'ibge-6579', 'ibge-6588', 'ibge-9509', 'ibge-9922', 'mte-rais-2024', 'senatran-frota-2026-09']
+$ query
+status ok unit Pessoas value 120985.0 source ibge-6579
