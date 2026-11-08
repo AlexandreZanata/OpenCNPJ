@@ -1,0 +1,136 @@
+{
+  "round": "commercial-round-10",
+  "prior_rounds_audited": {
+    "commercial-round-01": 1000,
+    "commercial-round-02": 1000,
+    "commercial-round-03": 3000,
+    "commercial-round-04": 5000,
+    "commercial-round-05": 10000,
+    "commercial-round-06": 20000,
+    "commercial-round-07": 20000,
+    "commercial-round-08": 50000,
+    "commercial-round-09": 50000
+  },
+  "prior_rounds_total_items": 160000,
+  "prior_rounds_distributions": {
+    "categories": {
+      "market_size": 5500,
+      "prospecting": 5500,
+      "tax_size": 5500,
+      "structure_status": 5500,
+      "capital_legal": 5500,
+      "registrations": 5500,
+      "closures": 5500,
+      "trends": 5500,
+      "historical": 5500,
+      "geography": 5500,
+      "density": 5500,
+      "comparison": 5500,
+      "distribution": 5500,
+      "activity": 5500,
+      "exclusion": 5500,
+      "lookup": 5500,
+      "methodology": 5500,
+      "dialogue": 5500,
+      "clarification": 5500,
+      "unsupported": 5500,
+      "market_size_density_competition": 5000,
+      "prospecting_qualification_territory": 7000,
+      "historical_stock_flows_seasonality": 5000,
+      "geography_catchments_comparisons": 5000,
+      "corporate_structure_hq_branches_identity": 4000,
+      "supply_chain_complementary": 5000,
+      "cross_variable_correlation": 5000,
+      "dialogue_corrections_references_planning": 6000,
+      "source_quality_provenance_uncertainty": 3000,
+      "unsupported_missing_contradictions": 3000,
+      "tax_size_legal_capital_numeric": 2000
+    },
+    "decisions": {
+      "execute": 139950,
+      "clarify": 10200,
+      "reject": 9850
+    },
+    "intents": {
+      "count": 81275,
+      "list": 11510,
+      "trend": 6500,
+      "rank": 12105,
+      "compare": 10760,
+      "breakdown": 5550,
+      "lookup": 5750,
+      "None": 20050,
+      "meta": 6500
+    },
+    "acts": {
+      "None": 27345,
+      "new_query": 126355,
+      "replace_slot": 3518,
+      "add_filter": 682,
+      "remove_filter": 1600,
+      "correction": 500
+    },
+    "filter_combinations": {
+      "none": 59432,
+      "contact": 4151,
+      "mei": 2278,
+      "simples": 1338,
+      "porte": 1780,
+      "mei+porte": 5,
+      "mei+simples": 1725,
+      "head_office": 5450,
+      "status": 34645,
+      "head_office+mei": 5,
+      "capital": 2865,
+      "natureza": 905,
+      "natureza+simples": 5,
+      "capital+mei": 5,
+      "head_office+status": 690,
+      "porte+status": 20,
+      "mei+status": 652,
+      "within_ufs": 2632,
+      "place_population": 3775,
+      "exclude": 1984,
+      "capital+natureza": 1720,
+      "exclude+status": 2746,
+      "simples+status": 642,
+      "contact+head_office+porte": 1000,
+      "contact+mei+simples": 1000,
+      "capital+contact+head_office": 1000,
+      "contact+opened+porte": 1000,
+      "contact+head_office+natureza": 1000,
+      "contact+mei": 1000,
+      "head_office+porte+simples": 1000,
+      "opened+status": 1000,
+      "head_office+porte": 1000,
+      "capital+mei+simples": 500,
+      "natureza+porte": 500,
+      "capital+head_office": 500
+    },
+    "distinct_municipalities_used": 4116,
+    "mt_municipalities_used": 142,
+    "mt_municipalities_missing": 0
+  },
+  "identified_gaps_and_round_10_remediation": [
+    {
+      "gap_id": "GAP-10-01-SECTOR-COLLOQUIALISMS",
+      "description": "Round 09 still rejected or clarified common sector colloquialisms absent from the catalogue aliases (oficina, posto, frigorifico, funilaria, pizzaria, pet, grafica, eletricista, sacolao).",
+      "round_10_target": "Add documented commercial aliases to existing catalogue sectors plus a meat_processing sector, and exercise them in authored scenarios without inventing customer speech."
+    },
+    {
+      "gap_id": "GAP-10-02-MULTI-TURN-SCOPE-EDITS",
+      "description": "Round 09 dialogues used at most one filter change per follow-up; complex keep/drop/switch combinations were out of coverage.",
+      "round_10_target": "Use 3-turn dialogues with compound additions, explicit keep/drop pairs (mantenha matriz, tire MEI), city/sector pivots, and focus-based comparisons."
+    },
+    {
+      "gap_id": "GAP-10-03-MUNICIPAL-PREFIX-DISAMBIGUATION",
+      "description": "Round 09 conflated exact single-word municipality matches with longer prefix-sharing names (Cruzeiro vs Cruzeiro do Sul) and recorded 25 defective clarify labels.",
+      "round_10_target": "Author execute items for exact-name prefix collisions and clarify items for genuine exact homonyms; add regression tests proving longest-match exact resolution."
+    },
+    {
+      "gap_id": "GAP-10-04-NUMERIC-AND-EXCLUSION-BOUNDARIES",
+      "description": "Round 09 covered capital bands but left exact numeric boundaries, coordinated exclusions and alternative comparison frames sparse.",
+      "round_10_target": "Add exact capital/date boundaries, multi-place exclusions, and alternative comparison frames while preserving verified filters."
+    }
+  ]
+}

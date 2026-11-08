@@ -1,0 +1,72 @@
+{
+  "batch_id": "batch-001",
+  "items": 1000,
+  "first_id": "commercial-r10-00001",
+  "last_id": "commercial-r10-01000",
+  "sha256": "5f69d496f961e02ba5f970c11eca1a062d112817bdf49d20e8ed7c9b8b67ee8a",
+  "by_family": {
+    "market_size_density_competition": 100,
+    "prospecting_qualification_territory": 140,
+    "historical_stock_flows_seasonality": 100,
+    "geography_catchments_comparisons": 100,
+    "corporate_structure_hq_branches_identity": 80,
+    "supply_chain_complementary": 100,
+    "cross_variable_correlation": 100,
+    "dialogue_corrections_references_planning": 120,
+    "source_quality_provenance_uncertainty": 60,
+    "unsupported_missing_contradictions": 60,
+    "tax_size_legal_capital_numeric": 40
+  },
+  "by_geographic_stratum": {
+    "mt_metropolitan": 100,
+    "mt_north_agro_industrial": 120,
+    "mt_south_logistics_industrial": 100,
+    "mt_east_araguaia_xingu": 90,
+    "mt_west_parecis_guapore": 90,
+    "mt_pantanal": 100,
+    "other_26_ufs": 240,
+    "national_cross_uf_comparative": 160
+  },
+  "by_register": {
+    "conversational_professional": 700,
+    "formal_technical": 200,
+    "noisy_short": 100
+  },
+  "by_split": {
+    "synthetic_dev": 700,
+    "synthetic_eval": 200,
+    "synthetic_challenge": 100
+  },
+  "by_decision": {
+    "execute": 840,
+    "clarify": 84,
+    "reject": 76
+  },
+  "by_novelty_reason": {
+    "None": 665,
+    "colloquial_sector:posto": 4,
+    "colloquial_sector:pet": 1,
+    "colloquial_sector:abatedouro": 2,
+    "colloquial_sector:eletricista": 3,
+    "colloquial_sector:academia": 5,
+    "opened_to_closure_cohort_boundary": 20,
+    "state_internal_exclusion": 20,
+    "colloquial_sector:funilaria": 2,
+    "supply:gráfica+serviço de fretamento de ônibus": 1,
+    "cnae_section_division_breakdown": 20,
+    "supply:oficina+loja de artesanato": 1,
+    "supply:funilaria+corretor de imóveis": 2,
+    "population_band_density_rank": 20,
+    "sector_by_tax_regime_share": 20,
+    "multi_turn_compound_scope_edit": 120,
+    "mt_and_national_homonym_municipality_guard": 10,
+    "regional_or_agro_ambiguous_activity_clarify": 10,
+    "temporal_validation_guard": 10,
+    "mt_informal_subregion_clarification": 10,
+    "municipal_prefix_exact_match": 41,
+    "colloquial_sector:pizzaria": 5,
+    "colloquial_sector:gráfica": 6,
+    "supply:loja de doces+gráfica": 1,
+    "supply:eletricista+empresa de transporte de passageiros": 1
+  }
+}
