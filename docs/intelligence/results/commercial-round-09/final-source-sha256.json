@@ -1,0 +1,14 @@
+{
+  "crates/opencnpj-nlu/lang/pt-BR/cues.toml": "5ad30877131ddcf26e7efa776fec1321ec149bd0020e718f6c4ed7f3ee2d89e1",
+  "crates/opencnpj-nlu/lang/pt-BR/policy.toml": "1e51f00b3cabf0e635a1814142c8ae25262ca15ea48a22d8a6a71e5f7b3425d5",
+  "crates/opencnpj-nlu/src/grammar.rs": "a2b97488d229fb24382c17a091c2d7d2c60068367718c136ac2b5b83471448e6",
+  "crates/opencnpj-nlu/src/tests.rs": "0c5a02f2d2d3ad79947d205171ffc9af9c6f2a665ba000b07f21f8ff852914ef",
+  "crates/opencnpj-lab/src/questions.rs": "5c511d68d9e11392fbe3d9c8a60e992d8c69ced0f600de4a4e5a694c9685b846",
+  "crates/opencnpj-lab/src/query.rs": "5891206498625700f7aad3b3171b932473b2cbebb6186c5ab84121c890edb1d2",
+  "crates/opencnpj-store/src/reader.rs": "3e9e8e5d98781d4bb42fcddfee32b59b5c268c7bc9c2e1d75e6c9bd739df60b2",
+  "crates/opencnpj-store/src/search.rs": "e14f567ad9d9b0f802de891835f3d5af46a9fed7ee00282b088d181c331364e6",
+  "crates/opencnpj-lab/eval/commercial-round-09/questions.jsonl": "a3bc6c78b3066f4f8721b2de30948a04278adc80ca4cbd292acfb978eb763c29",
+  "crates/opencnpj-lab/eval/commercial-round-09/questions.tsv": "29fd87e90d9148d79723a56ac45ad902c682c937d11ed720adf593be7eec6751",
+  "crates/opencnpj-lab/eval/commercial-round-09/manifest.json": "85c2f68cfc13a516a8bb76a1abaa0987125b8730081692365abf7e4b0ab78dc9",
+  "crates/opencnpj-lab/eval/commercial-round-09/batches/batch-001.jsonl": "477006e6a44918f48bc5dc8b219cf74562c034f12785640cb026ef4af5f5e9fa"
+}
