@@ -1,0 +1,434 @@
+{
+  "national": {
+    "command": [
+      "/data/opencnpj-target/release/opencnpj-intel",
+      "eval-questions",
+      "--set",
+      "crates/opencnpj-lab/eval/commercial-round-11/questions.jsonl",
+      "--snapshot",
+      "/data/opencnpj-data/snapshots/2026-10-balanced-1.2.ocnpj",
+      "--agg",
+      "/data/opencnpj-data/intelligence/agg/2026-10.ocagg",
+      "--history",
+      "/data/opencnpj-data/intelligence/backfill/aggregates",
+      "--out",
+      "/data/opencnpj-data/intelligence/results/commercial-round-11/national"
+    ],
+    "binary_sha256": "aed7f400c64ee31c6ac5dbecbb6b3802be0565dd600e963c4d06aea950249765",
+    "exit_code": 0,
+    "counts": {
+      "act_correct": 40400,
+      "act_items": 41800,
+      "correct_executed_answer": 42800,
+      "decision_correct": 50000,
+      "execution_fresh": 40962,
+      "execution_reused_identical_ir": 1838,
+      "gold_backend_ok": 42800,
+      "gold_empty_records": 3526,
+      "gold_zero_scalar": 8550,
+      "interpretation_correct": 50000,
+      "items": 50000,
+      "verification_engine_match": 27800,
+      "verification_marginal_match": 196,
+      "verification_no_independent_reference": 1804,
+      "verification_not_numeric": 1000,
+      "verification_single_backend": 12000
+    },
+    "summary_path": "docs/intelligence/results/commercial-round-11/national/summary.json"
+  },
+  "frozen-adv": {
+    "command": [
+      "/data/opencnpj-target/release/opencnpj-intel",
+      "eval-questions",
+      "--set",
+      "crates/opencnpj-lab/eval/adv.jsonl",
+      "--snapshot",
+      "/data/opencnpj-data/snapshots/2026-10-balanced-1.2.ocnpj",
+      "--agg",
+      "/data/opencnpj-data/intelligence/agg/2026-10.ocagg",
+      "--history",
+      "/data/opencnpj-data/intelligence/backfill/aggregates",
+      "--out",
+      "/data/opencnpj-data/intelligence/results/commercial-round-11/frozen-adv"
+    ],
+    "binary_sha256": "aed7f400c64ee31c6ac5dbecbb6b3802be0565dd600e963c4d06aea950249765",
+    "exit_code": 0,
+    "counts": {
+      "act_correct": 303,
+      "act_items": 304,
+      "correct_executed_answer": 155,
+      "decision_correct": 285,
+      "execution_fresh": 182,
+      "execution_reused_identical_ir": 133,
+      "gold_backend_mismatch": 1,
+      "gold_backend_ok": 242,
+      "gold_zero_scalar": 4,
+      "interpretation_correct": 214,
+      "interpretation_wrong": 90,
+      "items": 304,
+      "out_of_policy_execution": 1,
+      "verification_engine_match": 191,
+      "verification_marginal_match": 2,
+      "verification_mismatch": 1,
+      "verification_no_independent_reference": 28,
+      "verification_not_numeric": 2,
+      "verification_single_backend": 19
+    },
+    "summary_path": "docs/intelligence/results/commercial-round-11/frozen-adv/summary.json"
+  },
+  "frozen-informal": {
+    "command": [
+      "/data/opencnpj-target/release/opencnpj-intel",
+      "eval-questions",
+      "--set",
+      "crates/opencnpj-lab/eval/h-informal.jsonl",
+      "--snapshot",
+      "/data/opencnpj-data/snapshots/2026-10-balanced-1.2.ocnpj",
+      "--agg",
+      "/data/opencnpj-data/intelligence/agg/2026-10.ocagg",
+      "--history",
+      "/data/opencnpj-data/intelligence/backfill/aggregates",
+      "--out",
+      "/data/opencnpj-data/intelligence/results/commercial-round-11/frozen-informal"
+    ],
+    "binary_sha256": "aed7f400c64ee31c6ac5dbecbb6b3802be0565dd600e963c4d06aea950249765",
+    "exit_code": 0,
+    "counts": {
+      "act_correct": 201,
+      "act_items": 202,
+      "correct_executed_answer": 85,
+      "decision_correct": 172,
+      "execution_fresh": 137,
+      "execution_reused_identical_ir": 79,
+      "gold_backend_mismatch": 1,
+      "gold_backend_ok": 164,
+      "interpretation_correct": 121,
+      "interpretation_wrong": 81,
+      "items": 202,
+      "verification_engine_match": 143,
+      "verification_marginal_match": 2,
+      "verification_mismatch": 1,
+      "verification_no_independent_reference": 3,
+      "verification_not_numeric": 1,
+      "verification_single_backend": 15
+    },
+    "summary_path": "docs/intelligence/results/commercial-round-11/frozen-informal/summary.json"
+  },
+  "frozen-dialogues": {
+    "command": [
+      "/data/opencnpj-target/release/opencnpj-intel",
+      "eval-questions",
+      "--set",
+      "crates/opencnpj-lab/eval/dialogues.jsonl",
+      "--snapshot",
+      "/data/opencnpj-data/snapshots/2026-10-balanced-1.2.ocnpj",
+      "--agg",
+      "/data/opencnpj-data/intelligence/agg/2026-10.ocagg",
+      "--history",
+      "/data/opencnpj-data/intelligence/backfill/aggregates",
+      "--out",
+      "/data/opencnpj-data/intelligence/results/commercial-round-11/frozen-dialogues"
+    ],
+    "binary_sha256": "aed7f400c64ee31c6ac5dbecbb6b3802be0565dd600e963c4d06aea950249765",
+    "exit_code": 0,
+    "counts": {
+      "act_correct": 89,
+      "act_items": 122,
+      "correct_executed_answer": 68,
+      "decision_correct": 106,
+      "execution_fresh": 74,
+      "execution_reused_identical_ir": 52,
+      "gold_backend_ok": 104,
+      "interpretation_correct": 84,
+      "interpretation_wrong": 38,
+      "items": 122,
+      "verification_engine_match": 104
+    },
+    "summary_path": "docs/intelligence/results/commercial-round-11/frozen-dialogues/summary.json"
+  },
+  "frozen-ood": {
+    "command": [
+      "/data/opencnpj-target/release/opencnpj-intel",
+      "eval-questions",
+      "--set",
+      "crates/opencnpj-lab/eval/ood.jsonl",
+      "--snapshot",
+      "/data/opencnpj-data/snapshots/2026-10-balanced-1.2.ocnpj",
+      "--agg",
+      "/data/opencnpj-data/intelligence/agg/2026-10.ocagg",
+      "--history",
+      "/data/opencnpj-data/intelligence/backfill/aggregates",
+      "--out",
+      "/data/opencnpj-data/intelligence/results/commercial-round-11/frozen-ood"
+    ],
+    "binary_sha256": "aed7f400c64ee31c6ac5dbecbb6b3802be0565dd600e963c4d06aea950249765",
+    "exit_code": 0,
+    "counts": {
+      "act_correct": 400,
+      "act_items": 400,
+      "decision_correct": 400,
+      "interpretation_correct": 400,
+      "items": 400
+    },
+    "summary_path": "docs/intelligence/results/commercial-round-11/frozen-ood/summary.json"
+  },
+  "replay-round-01": {
+    "command": [
+      "/data/opencnpj-target/release/opencnpj-intel",
+      "eval-questions",
+      "--set",
+      "crates/opencnpj-lab/eval/commercial-round-01/questions.jsonl",
+      "--agg",
+      "/data/opencnpj-data/intelligence/agg/2026-10.ocagg",
+      "--history",
+      "/data/opencnpj-data/intelligence/backfill/aggregates",
+      "--interpret-only",
+      "--out",
+      "/data/opencnpj-data/intelligence/results/commercial-round-11/replay-round-01"
+    ],
+    "binary_sha256": "aed7f400c64ee31c6ac5dbecbb6b3802be0565dd600e963c4d06aea950249765",
+    "exit_code": 0,
+    "counts": {
+      "act_correct": 50,
+      "act_items": 50,
+      "decision_correct": 1000,
+      "interpretation_correct": 1000,
+      "items": 1000
+    },
+    "summary_path": "/data/opencnpj-data/intelligence/results/commercial-round-11/replay-round-01/summary.json"
+  },
+  "replay-round-02": {
+    "command": [
+      "/data/opencnpj-target/release/opencnpj-intel",
+      "eval-questions",
+      "--set",
+      "crates/opencnpj-lab/eval/commercial-round-02/questions.jsonl",
+      "--agg",
+      "/data/opencnpj-data/intelligence/agg/2026-10.ocagg",
+      "--history",
+      "/data/opencnpj-data/intelligence/backfill/aggregates",
+      "--interpret-only",
+      "--out",
+      "/data/opencnpj-data/intelligence/results/commercial-round-11/replay-round-02"
+    ],
+    "binary_sha256": "aed7f400c64ee31c6ac5dbecbb6b3802be0565dd600e963c4d06aea950249765",
+    "exit_code": 0,
+    "counts": {
+      "act_correct": 845,
+      "act_items": 845,
+      "decision_correct": 950,
+      "interpretation_correct": 950,
+      "interpretation_wrong": 50,
+      "items": 1000
+    },
+    "summary_path": "/data/opencnpj-data/intelligence/results/commercial-round-11/replay-round-02/summary.json"
+  },
+  "replay-round-03": {
+    "command": [
+      "/data/opencnpj-target/release/opencnpj-intel",
+      "eval-questions",
+      "--set",
+      "crates/opencnpj-lab/eval/commercial-round-03/questions.jsonl",
+      "--agg",
+      "/data/opencnpj-data/intelligence/agg/2026-10.ocagg",
+      "--history",
+      "/data/opencnpj-data/intelligence/backfill/aggregates",
+      "--interpret-only",
+      "--out",
+      "/data/opencnpj-data/intelligence/results/commercial-round-11/replay-round-03"
+    ],
+    "binary_sha256": "aed7f400c64ee31c6ac5dbecbb6b3802be0565dd600e963c4d06aea950249765",
+    "exit_code": 0,
+    "counts": {
+      "act_correct": 2535,
+      "act_items": 2535,
+      "decision_correct": 2844,
+      "interpretation_correct": 2844,
+      "interpretation_wrong": 156,
+      "items": 3000
+    },
+    "summary_path": "/data/opencnpj-data/intelligence/results/commercial-round-11/replay-round-03/summary.json"
+  },
+  "replay-round-04": {
+    "command": [
+      "/data/opencnpj-target/release/opencnpj-intel",
+      "eval-questions",
+      "--set",
+      "crates/opencnpj-lab/eval/commercial-round-04/questions.jsonl",
+      "--agg",
+      "/data/opencnpj-data/intelligence/agg/2026-10.ocagg",
+      "--history",
+      "/data/opencnpj-data/intelligence/backfill/aggregates",
+      "--interpret-only",
+      "--out",
+      "/data/opencnpj-data/intelligence/results/commercial-round-11/replay-round-04"
+    ],
+    "binary_sha256": "aed7f400c64ee31c6ac5dbecbb6b3802be0565dd600e963c4d06aea950249765",
+    "exit_code": 0,
+    "counts": {
+      "act_correct": 4225,
+      "act_items": 4225,
+      "decision_correct": 4826,
+      "interpretation_correct": 4826,
+      "interpretation_wrong": 174,
+      "items": 5000
+    },
+    "summary_path": "/data/opencnpj-data/intelligence/results/commercial-round-11/replay-round-04/summary.json"
+  },
+  "replay-round-05": {
+    "command": [
+      "/data/opencnpj-target/release/opencnpj-intel",
+      "eval-questions",
+      "--set",
+      "crates/opencnpj-lab/eval/commercial-round-05/questions.jsonl",
+      "--agg",
+      "/data/opencnpj-data/intelligence/agg/2026-10.ocagg",
+      "--history",
+      "/data/opencnpj-data/intelligence/backfill/aggregates",
+      "--interpret-only",
+      "--out",
+      "/data/opencnpj-data/intelligence/results/commercial-round-11/replay-round-05"
+    ],
+    "binary_sha256": "aed7f400c64ee31c6ac5dbecbb6b3802be0565dd600e963c4d06aea950249765",
+    "exit_code": 0,
+    "counts": {
+      "act_correct": 8450,
+      "act_items": 8450,
+      "decision_correct": 9654,
+      "interpretation_correct": 9654,
+      "interpretation_wrong": 346,
+      "items": 10000
+    },
+    "summary_path": "/data/opencnpj-data/intelligence/results/commercial-round-11/replay-round-05/summary.json"
+  },
+  "replay-round-06": {
+    "command": [
+      "/data/opencnpj-target/release/opencnpj-intel",
+      "eval-questions",
+      "--set",
+      "crates/opencnpj-lab/eval/commercial-round-06/questions.jsonl",
+      "--agg",
+      "/data/opencnpj-data/intelligence/agg/2026-10.ocagg",
+      "--history",
+      "/data/opencnpj-data/intelligence/backfill/aggregates",
+      "--interpret-only",
+      "--out",
+      "/data/opencnpj-data/intelligence/results/commercial-round-11/replay-round-06"
+    ],
+    "binary_sha256": "aed7f400c64ee31c6ac5dbecbb6b3802be0565dd600e963c4d06aea950249765",
+    "exit_code": 0,
+    "counts": {
+      "act_correct": 16900,
+      "act_items": 16900,
+      "decision_correct": 19312,
+      "interpretation_correct": 19312,
+      "interpretation_wrong": 688,
+      "items": 20000
+    },
+    "summary_path": "/data/opencnpj-data/intelligence/results/commercial-round-11/replay-round-06/summary.json"
+  },
+  "replay-round-07": {
+    "command": [
+      "/data/opencnpj-target/release/opencnpj-intel",
+      "eval-questions",
+      "--set",
+      "crates/opencnpj-lab/eval/commercial-round-07/questions.jsonl",
+      "--agg",
+      "/data/opencnpj-data/intelligence/agg/2026-10.ocagg",
+      "--history",
+      "/data/opencnpj-data/intelligence/backfill/aggregates",
+      "--interpret-only",
+      "--out",
+      "/data/opencnpj-data/intelligence/results/commercial-round-11/replay-round-07"
+    ],
+    "binary_sha256": "aed7f400c64ee31c6ac5dbecbb6b3802be0565dd600e963c4d06aea950249765",
+    "exit_code": 0,
+    "counts": {
+      "act_correct": 16900,
+      "act_items": 16900,
+      "decision_correct": 19312,
+      "interpretation_correct": 19312,
+      "interpretation_wrong": 688,
+      "items": 20000
+    },
+    "summary_path": "/data/opencnpj-data/intelligence/results/commercial-round-11/replay-round-07/summary.json"
+  },
+  "replay-round-08": {
+    "command": [
+      "/data/opencnpj-target/release/opencnpj-intel",
+      "eval-questions",
+      "--set",
+      "crates/opencnpj-lab/eval/commercial-round-08/questions.jsonl",
+      "--agg",
+      "/data/opencnpj-data/intelligence/agg/2026-10.ocagg",
+      "--history",
+      "/data/opencnpj-data/intelligence/backfill/aggregates",
+      "--interpret-only",
+      "--out",
+      "/data/opencnpj-data/intelligence/results/commercial-round-11/replay-round-08"
+    ],
+    "binary_sha256": "aed7f400c64ee31c6ac5dbecbb6b3802be0565dd600e963c4d06aea950249765",
+    "exit_code": 0,
+    "counts": {
+      "act_correct": 42250,
+      "act_items": 42250,
+      "decision_correct": 48259,
+      "interpretation_correct": 48259,
+      "interpretation_wrong": 1741,
+      "items": 50000
+    },
+    "summary_path": "/data/opencnpj-data/intelligence/results/commercial-round-11/replay-round-08/summary.json"
+  },
+  "replay-round-09": {
+    "command": [
+      "/data/opencnpj-target/release/opencnpj-intel",
+      "eval-questions",
+      "--set",
+      "crates/opencnpj-lab/eval/commercial-round-09/questions.jsonl",
+      "--agg",
+      "/data/opencnpj-data/intelligence/agg/2026-10.ocagg",
+      "--history",
+      "/data/opencnpj-data/intelligence/backfill/aggregates",
+      "--interpret-only",
+      "--out",
+      "/data/opencnpj-data/intelligence/results/commercial-round-11/replay-round-09"
+    ],
+    "binary_sha256": "aed7f400c64ee31c6ac5dbecbb6b3802be0565dd600e963c4d06aea950249765",
+    "exit_code": 0,
+    "counts": {
+      "act_correct": 40402,
+      "act_items": 40500,
+      "decision_correct": 49975,
+      "interpretation_correct": 49975,
+      "interpretation_wrong": 25,
+      "items": 50000,
+      "out_of_policy_execution": 25
+    },
+    "summary_path": "/data/opencnpj-data/intelligence/results/commercial-round-11/replay-round-09/summary.json"
+  },
+  "replay-round-10": {
+    "command": [
+      "/data/opencnpj-target/release/opencnpj-intel",
+      "eval-questions",
+      "--set",
+      "crates/opencnpj-lab/eval/commercial-round-10/questions.jsonl",
+      "--agg",
+      "/data/opencnpj-data/intelligence/agg/2026-10.ocagg",
+      "--history",
+      "/data/opencnpj-data/intelligence/backfill/aggregates",
+      "--interpret-only",
+      "--out",
+      "/data/opencnpj-data/intelligence/results/commercial-round-11/replay-round-10"
+    ],
+    "binary_sha256": "aed7f400c64ee31c6ac5dbecbb6b3802be0565dd600e963c4d06aea950249765",
+    "exit_code": 0,
+    "counts": {
+      "act_correct": 39400,
+      "act_items": 41000,
+      "decision_correct": 50000,
+      "interpretation_correct": 50000,
+      "items": 50000
+    },
+    "summary_path": "/data/opencnpj-data/intelligence/results/commercial-round-11/replay-round-10/summary.json"
+  }
+}
