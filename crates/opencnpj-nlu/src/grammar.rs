@@ -382,9 +382,18 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
                                 | "as"
                                 | "no"
                                 | "na"
+                                | "nos"
+                                | "nas"
                                 | "de"
                                 | "do"
                                 | "da"
+                                | "dos"
+                                | "das"
+                                | "e"
+                                | "cidades"
+                                | "municipios"
+                                | "estados"
+                                | "setores"
                                 | "incluir"
                                 | "contar"
                                 | "cidade"
@@ -1186,6 +1195,9 @@ fn filters(n: &str, m: &str, raw: &str, r: &mut Request, act: &mut String, popul
         }
         if !keep_mei && has(n, &["mei"]) {
             r.scope.mei = Tri::Any;
+        }
+        if has(n, &["capital", "limite de capital"]) && !has(n, &["mantenha o capital", "mantenha o limite de capital"]) {
+            r.scope.capital = None;
         }
         if has(n, &["porte", "portes"]) {
             r.scope.porte = PorteSet::ALL;

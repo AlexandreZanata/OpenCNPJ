@@ -670,3 +670,17 @@ fn round12_discourse_entre_does_not_require_capital_interval() {
     assert_eq!(r.scope.capital, Some(Range { from: Some(10_000_001), to: None }));
     assert_eq!(r.scope.porte, PorteSet::only(Porte::Small));
 }
+
+#[test]
+fn round13_compound_edit_can_clear_capital_ceiling() {
+    let engine = interpreter();
+    let mut state = Conversation::default();
+    engine.interpret("Quantas padarias ativas existem na cidade de Sorriso/MT?", &mut state);
+    engine.interpret("Agora so MEI com capital social de ate 50000 reais em Sorriso/MT.", &mut state);
+    assert_eq!(state.last.as_ref().unwrap().scope.capital, Some(Range { from: None, to: Some(5_000_000) }));
+    let out = engine.interpret("Na verdade mantenha o MEI, tire o limite de capital e troque para Sinop/MT.", &mut state);
+    assert_eq!(out.act, "compound_edit");
+    let r = out.request.unwrap();
+    assert_eq!(r.scope.capital, None);
+    assert_eq!(r.scope.mei, Tri::Yes);
+}

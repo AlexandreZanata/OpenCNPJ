@@ -93,7 +93,7 @@ since = "v1"
 [[sector]]
 id = "auto_mechanic"
 display = { sing = "oficina mecânica", plural = "oficinas mecânicas", gender = "f" }
-aliases = ["mecânico de automóveis", "mecânica de automóveis", "oficina", "oficinas", "mecânica", "mecânicas", "retífica", "retíficas"]
+aliases = ["mecânico de automóveis", "mecânica de automóveis", "oficina", "oficinas", "mecânica", "mecânicas", "retífica", "retíficas", "autocenter", "autocenters", "autocentro", "autocentros", "troca de óleo", "trocas de óleo"]
 cnae_core = ["4520001"]
 cnae_extended = []
 scope = "main"
@@ -1647,7 +1647,7 @@ since = "v1"
 [[sector]]
 id = "supermarket"
 display = { sing = "supermercado", plural = "supermercados", gender = "m" }
-aliases = ["supermercado alimentar", "mercado", "mercados"]
+aliases = ["supermercado alimentar", "mercado", "mercados", "atacarejo", "atacarejos"]
 cnae_core = ["4711302"]
 cnae_extended = ["4711301"]
 scope = "main"
@@ -1683,7 +1683,7 @@ since = "v1"
 [[sector]]
 id = "tire_repair"
 display = { sing = "borracharia", plural = "borracharias", gender = "f" }
-aliases = ["borracheiro", "borracheira", "borracheiros", "borracheiras"]
+aliases = ["borracheiro", "borracheira", "borracheiros", "borracheiras", "vulcanizadora", "vulcanizadoras"]
 cnae_core = ["4520006"]
 cnae_extended = []
 scope = "main"
@@ -1701,7 +1701,7 @@ since = "v1"
 [[sector]]
 id = "tobacco_shop"
 display = { sing = "tabacaria", plural = "tabacarias", gender = "f" }
-aliases = ["loja de produtos de fumo"]
+aliases = ["loja de produtos de fumo", "charutaria", "charutarias"]
 cnae_core = ["4729601"]
 cnae_extended = []
 scope = "main"
