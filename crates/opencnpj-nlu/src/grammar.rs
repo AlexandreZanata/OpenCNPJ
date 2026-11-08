@@ -1072,6 +1072,17 @@ fn list_limit(n: &str) -> Option<u16> {
         {
             return u16::try_from(q).ok();
         }
+        if matches!(t[i].as_str(), "lista" | "listagem" | "relacao") {
+            let mut j = i + 1;
+            if t.get(j).is_some_and(|s| s == "de" || s == "com") {
+                j += 1;
+            }
+            if let Some((q, _)) = time::quantity(&t, j)
+                && q <= 1000
+            {
+                return u16::try_from(q).ok();
+            }
+        }
     }
     None
 }
@@ -1142,11 +1153,23 @@ fn filters(n: &str, m: &str, raw: &str, r: &mut Request, act: &mut String, popul
     );
     if clear {
         *act = "remove_filter".into();
-        if has(m, &["matriz", "filiais", "filial", "matrizes"]) {
+        let keep_head_office = has(
+            n,
+            &[
+                "mantenha o filtro de matriz",
+                "mantenha o filtro de matrizes",
+                "mantenha matriz",
+                "mantenha as matrizes",
+                "mantem o filtro de matriz",
+                "mantem matriz",
+            ],
+        );
+        let keep_mei = has(n, &["mantenha o filtro de mei", "mantenha o mei", "mantem o filtro de mei", "mantem o mei"]);
+        if !keep_head_office && has(m, &["matriz", "filiais", "filial", "matrizes"]) {
             r.scope.head_office = Tri::Any;
             r.unit = Unit::Establishments;
         }
-        if has(n, &["mei"]) {
+        if !keep_mei && has(n, &["mei"]) {
             r.scope.mei = Tri::Any;
         }
         if has(n, &["porte", "portes"]) {

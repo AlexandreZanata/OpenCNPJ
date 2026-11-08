@@ -557,3 +557,55 @@ fn commercial_round_09_grammar_regressions() {
         assert_eq!(parse(text).decision, Decision::Clarify, "{text}");
     }
 }
+
+#[test]
+fn commercial_round_10_prefix_and_scope_edit_regressions() {
+    let mut engine = interpreter();
+    engine.pack.municipality(MunicipalityId(30), UfId(25), "Cruzeiro", &[]);
+    engine.pack.municipality(MunicipalityId(31), UfId(17), "Cruzeiro do Oeste", &[]);
+    engine.pack.municipality(MunicipalityId(32), UfId(0), "Cruzeiro do Sul", &[]);
+    engine.pack.municipality(MunicipalityId(33), UfId(22), "Cruzeiro do Sul", &[]);
+    engine.pack.municipality(MunicipalityId(34), UfId(22), "Santa Rosa", &[]);
+    engine.pack.municipality(MunicipalityId(35), UfId(10), "Santa Rosa da Serra", &[]);
+    engine.pack.sector(SectorId(3), &["transportadora".into(), "transportadoras".into()], SmallSet::new([CnaeCode::Subclass(4930201)]));
+
+    // Longest-match preserves the exact single-word municipality and does not
+    // widen it to longer names that merely share the prefix.
+    let r = engine.interpret("Quantas padarias em Cruzeiro?", &mut Conversation::default()).request.unwrap();
+    assert_eq!(r.scope.place, PlaceFilter::Municipalities(SmallSet::new([MunicipalityId(30)])));
+    let r = engine.interpret("Quantas padarias em Cruzeiro do Oeste?", &mut Conversation::default()).request.unwrap();
+    assert_eq!(r.scope.place, PlaceFilter::Municipalities(SmallSet::new([MunicipalityId(31)])));
+    assert_eq!(engine.interpret("Quantas padarias em Cruzeiro do Sul?", &mut Conversation::default()).decision, Decision::Clarify);
+    let r = engine.interpret("Quantas padarias em Santa Rosa?", &mut Conversation::default()).request.unwrap();
+    assert_eq!(r.scope.place, PlaceFilter::Municipalities(SmallSet::new([MunicipalityId(34)])));
+    let r = engine.interpret("Quantas padarias em Santa Rosa da Serra?", &mut Conversation::default()).request.unwrap();
+    assert_eq!(r.scope.place, PlaceFilter::Municipalities(SmallSet::new([MunicipalityId(35)])));
+
+    // Abbreviated list imperative keeps the explicit limit and head-office filter.
+    let r = engine.interpret("Mostre as matrizes de transportadora em Sorriso", &mut Conversation::default()).request.unwrap();
+    assert_eq!(r.op, Op::List { order: ListOrder::Cnpj, limit: 20 });
+    assert_eq!(r.scope.head_office, Tri::Yes);
+    assert_eq!(
+        r.scope.activity,
+        ActivityFilter::Sectors {
+            ids: SmallSet::new([SectorId(3)]),
+            cnaes: SmallSet::new([CnaeCode::Subclass(4930201)]),
+            scope: CnaeScope::Main,
+        }
+    );
+    let r =
+        engine.interpret("Me passa a lista de 10 transportadoras com telefone em Sorriso", &mut Conversation::default()).request.unwrap();
+    assert_eq!(r.op, Op::List { order: ListOrder::Cnpj, limit: 10 });
+    assert_eq!(r.scope.contact, ContactNeed::Phone);
+
+    // Multi-turn compound edit: "mantenha matriz" must survive "tire o MEI".
+    let mut state = Conversation::default();
+    engine.interpret("Quantas padarias ativas existem em Sorriso/MT?", &mut state);
+    engine.interpret("Agora só matrizes e sem MEI.", &mut state);
+    assert_eq!(state.last.as_ref().unwrap().scope.head_office, Tri::Yes);
+    assert_eq!(state.last.as_ref().unwrap().scope.mei, Tri::No);
+    let r = engine.interpret("Na verdade mantenha o filtro de matriz, tire o MEI e troque para Sinop/MT.", &mut state).request.unwrap();
+    assert_eq!(r.scope.head_office, Tri::Yes);
+    assert_eq!(r.scope.mei, Tri::Any);
+    assert_eq!(r.scope.place, PlaceFilter::Municipalities(SmallSet::new([MunicipalityId(2)])));
+}

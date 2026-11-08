@@ -1,5 +1,5 @@
 # Word-bounded phrases. Catalogue aliases are supplied by the host.
-list = ["liste", "listar", "lista", "listagem", "traga", "tragam", "traz", "trazem", "relacao de", "me mostra", "me mostre", "cade", "quero saber as", "quero saber os", "quero ver", "mostre as empresas", "mostre os estabelecimentos"]
+list = ["liste", "listar", "lista", "listagem", "traga", "tragam", "traz", "trazem", "relacao de", "me mostra", "me mostre", "cade", "quero saber as", "quero saber os", "quero ver", "mostre as empresas", "mostre os estabelecimentos", "mostre as", "mostra as", "mostre os", "mostra os", "me passa a lista", "me passe a lista"]
 count = ["quantos", "quantas", "conte", "contar", "contagem", "numero", "quantidade", "densidade", "total", "estoque", "tem", "existem", "saldo", "qual o saldo", "taxa por 10 mil", "por 10 mil habitantes"]
 compare = ["compare", "comparar", "compara", "comparacao", "versus", "vs"]
 rank = ["top", "quais os", "quais cidades", "quais municipios", "quais estados", "quais setores", "quais as", "qual cidade", "qual municipio", "onde tem", "ranking", "maior concentracao", "menor concentracao"]

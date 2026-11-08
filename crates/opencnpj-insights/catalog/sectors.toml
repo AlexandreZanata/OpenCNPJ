@@ -21,7 +21,7 @@ since = "v1"
 [[sector]]
 id = "advertising_printing"
 display = { sing = "gráfica publicitária", plural = "gráficas publicitárias", gender = "f" }
-aliases = ["impressão de material publicitário", "impressão de panfletos"]
+aliases = ["impressão de material publicitário", "impressão de panfletos", "gráfica", "gráficas"]
 cnae_core = ["1813001"]
 cnae_extended = []
 scope = "main"
@@ -93,7 +93,7 @@ since = "v1"
 [[sector]]
 id = "auto_mechanic"
 display = { sing = "oficina mecânica", plural = "oficinas mecânicas", gender = "f" }
-aliases = ["mecânico de automóveis", "mecânica de automóveis"]
+aliases = ["mecânico de automóveis", "mecânica de automóveis", "oficina", "oficinas", "mecânica", "mecânicas"]
 cnae_core = ["4520001"]
 cnae_extended = []
 scope = "main"
@@ -193,7 +193,7 @@ since = "v1"
 [[sector]]
 id = "body_shop"
 display = { sing = "oficina de funilaria", plural = "oficinas de funilaria", gender = "f" }
-aliases = ["lanternagem", "funilaria e pintura"]
+aliases = ["lanternagem", "funilaria", "funilarias", "funilaria e pintura"]
 cnae_core = ["4520002"]
 cnae_extended = []
 scope = "main"
@@ -535,7 +535,7 @@ since = "v1"
 [[sector]]
 id = "electrical_installation"
 display = { sing = "serviço de instalação elétrica", plural = "serviços de instalação elétrica", gender = "m" }
-aliases = ["eletricista predial", "eletricistas prediais"]
+aliases = ["eletricista predial", "eletricistas prediais", "eletricista", "eletricistas"]
 cnae_core = ["4321500"]
 cnae_extended = []
 scope = "main"
@@ -701,7 +701,7 @@ since = "v1"
 [[sector]]
 id = "fuel_station"
 display = { sing = "posto de combustível", plural = "postos de combustível", gender = "m" }
-aliases = ["posto de gasolina", "postos de gasolina"]
+aliases = ["posto de gasolina", "postos de gasolina", "posto", "postos"]
 cnae_core = ["4731800"]
 cnae_extended = []
 scope = "main"
@@ -1296,7 +1296,7 @@ since = "v1"
 [[sector]]
 id = "pet_shop"
 display = { sing = "pet shop", plural = "pet shops", gender = "m" }
-aliases = ["loja pet", "lojas pet"]
+aliases = ["loja pet", "lojas pet", "pet", "pets"]
 cnae_core = ["4789004"]
 cnae_extended = ["9609207", "9609208"]
 scope = "main"
@@ -1485,7 +1485,7 @@ since = "v1"
 [[sector]]
 id = "restaurant"
 display = { sing = "restaurante", plural = "restaurantes", gender = "m" }
-aliases = ["casa de refeições", "casas de refeições"]
+aliases = ["casa de refeições", "casas de refeições", "pizzaria", "pizzarias"]
 cnae_core = ["5611201"]
 cnae_extended = []
 scope = "main"
@@ -1941,5 +1941,14 @@ display = { sing = "empresa de transporte de passageiros", plural = "empresas de
 aliases = ["transporte de passageiros", "transporte coletivo"]
 cnae_core = ["4921301", "4921302", "4922101", "4922102", "4922103", "4929901", "4929902", "4929903", "4929904", "4929999"]
 cnae_extended = ["4923001", "4923002"]
+scope = "main"
+since = "v1"
+
+[[sector]]
+id = "meat_processing"
+display = { sing = "frigorífico", plural = "frigoríficos", gender = "m" }
+aliases = ["frigorifico", "frigorificos", "abatedouro", "abatedouros", "abate de bovinos", "abate de suínos", "abate de aves"]
+cnae_core = ["1011201", "1011202", "1011203", "1011204", "1011205", "1012101", "1012102", "1012103", "1012104", "1012105"]
+cnae_extended = []
 scope = "main"
 since = "v1"
