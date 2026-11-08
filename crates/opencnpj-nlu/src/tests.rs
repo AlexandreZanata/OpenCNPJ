@@ -480,3 +480,79 @@ fn commercial_round_03_grammar_regressions() {
     assert_eq!(r.scope.place, PlaceFilter::Ufs(SmallSet::new([UfId(12)])));
     assert_eq!(r.scope.exclude.municipalities, SmallSet::new([MunicipalityId(2)]));
 }
+
+#[test]
+fn commercial_round_09_grammar_regressions() {
+    let mut engine = interpreter();
+    engine.pack.municipality(MunicipalityId(20), UfId(1), "Matriz de Camaragibe", &[]);
+    engine.pack.municipality(MunicipalityId(21), UfId(17), "Dois Vizinhos", &[]);
+    engine.pack.municipality(MunicipalityId(22), UfId(14), "Logradouro", &[]);
+    engine.pack.municipality(MunicipalityId(23), UfId(10), "Passos", &[]);
+
+    // "Quantos habitantes por estabelecimento..." selects InhabitantsPer.
+    let r = req(
+        "Quantos habitantes por estabelecimento ativo de padaria existem na cidade de Sorriso/MT, usando a população estimada IBGE 2026?",
+    );
+    assert_eq!(r.op, Op::Count { metric: Metric::InhabitantsPer(PopulationRef::IbgeEstimate(2026)) });
+
+    // "Qual o saldo de registros menos baixas..." selects NetRegistrations count.
+    let r = req("Qual o saldo de registros menos baixas cadastrais de estabelecimentos de padaria na cidade de Sorriso/MT em 2025?");
+    assert_eq!(r.op, Op::Count { metric: Metric::Flow(FlowMetric::NetRegistrations) });
+
+    // Capital range filter survives when the list is also ordered by largest capital social.
+    let r = req(
+        "Liste os 20 primeiros estabelecimentos ativos de padaria na cidade de Sorriso/MT com capital social acima de 100 mil reais, ordenados pelo maior capital social.",
+    );
+    assert_eq!(r.op, Op::List { order: ListOrder::CapitalDesc, limit: 20 });
+    assert_eq!(r.scope.capital, Some(Range { from: Some(10_000_001), to: None }));
+
+    // All-uppercase preposition "PARA" in "DOS MAIS ANTIGOS PARA OS MAIS NOVOS" is not the UF Pará.
+    let r = req("LISTE OS 20 PRIMEIROS ESTABELECIMENTOS ATIVOS DE PADARIA EM SORRISO/MT DOS MAIS ANTIGOS PARA OS MAIS NOVOS.");
+    assert_eq!(r.op, Op::List { order: ListOrder::OldestFirst, limit: 20 });
+    assert_eq!(r.scope.place, PlaceFilter::Municipalities(SmallSet::new([MunicipalityId(1)])));
+
+    // Municipality names containing "Matriz", "Vizinhos", or "Passos" do not trigger command filters.
+    let r = engine
+        .interpret("Quantos estabelecimentos ativos de padaria existem na cidade de Matriz de Camaragibe/AL?", &mut Conversation::default())
+        .request
+        .unwrap();
+    assert_eq!(r.scope.place, PlaceFilter::Municipalities(SmallSet::new([MunicipalityId(20)])));
+    assert_eq!(r.scope.head_office, Tri::Any);
+
+    let r = engine
+        .interpret("Quantos estabelecimentos ativos de padaria existem na cidade de Dois Vizinhos/PR?", &mut Conversation::default())
+        .request
+        .unwrap();
+    assert_eq!(r.scope.place, PlaceFilter::Municipalities(SmallSet::new([MunicipalityId(21)])));
+
+    let r = engine
+        .interpret(
+            "Quantos estabelecimentos ativos de padaria existem na cidade de Sorriso/MT e nos municípios vizinhos em até 1 passos?",
+            &mut Conversation::default(),
+        )
+        .request
+        .unwrap();
+    assert_eq!(r.scope.place, PlaceFilter::Near { center: MunicipalityId(1), rule: NearRule::Neighbours(1) });
+
+    // Sub-municipal "no logradouro principal" is rejected even when Logradouro/PB is in the lexicon.
+    let res = engine.interpret(
+        "Quantos estabelecimentos ativos de padaria existem no logradouro principal de Sorriso/MT?",
+        &mut Conversation::default(),
+    );
+    assert_eq!(res.decision, Decision::Reject);
+
+    // External statistical metrics (IBGE PAM/PPM/CEMPRE, Pearson correlation) are rejected.
+    for text in [
+        "Qual a correlação de Pearson entre estabelecimentos de padaria e a produção agrícola da PAM IBGE em Sorriso/MT?",
+        "Qual a área plantada de soja na PAM IBGE para Sorriso/MT?",
+        "Qual o salário médio mensal no CEMPRE IBGE das padarias em Sorriso/MT?",
+    ] {
+        assert_eq!(parse(text).decision, Decision::Reject, "{text}");
+    }
+
+    // Umbrella agro and subjective market-saturation terms trigger clarification.
+    for text in ["Quantas empresas de agronegócio existem em Sorriso/MT?", "O mercado de padaria está saturado na cidade de Sorriso/MT?"]
+    {
+        assert_eq!(parse(text).decision, Decision::Clarify, "{text}");
+    }
+}

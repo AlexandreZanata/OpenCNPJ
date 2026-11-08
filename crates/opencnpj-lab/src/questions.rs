@@ -316,6 +316,7 @@ pub fn evaluate(args: EvalArgs) -> Result<()> {
     let mut predictions = BufWriter::new(File::create(args.out.join("predictions.jsonl"))?);
     let mut counts = BTreeMap::new();
     let mut slices: BTreeMap<String, BTreeMap<String, u64>> = BTreeMap::new();
+    let mut exec_cache: BTreeMap<String, Json> = BTreeMap::new();
     let mut state = Conversation::default();
     let mut previous_session = String::new();
     for (index, item) in items.iter().enumerate() {
@@ -349,10 +350,26 @@ pub fn evaluate(args: EvalArgs) -> Result<()> {
             "{}",
             json!({"id":item.id,"decision":serde_json::to_value(prediction.decision)?,"intent":pred_json.as_ref().and_then(|ir|ir.get("op")).and_then(|op|op.get("kind")),"ir":pred_json,"confidence":prediction.evidence})
         )?;
-        let execute =
-            |r: &ValidRequest| assets.execute(r, true).unwrap_or_else(|error| json!({"status":"error","error":error.to_string()}));
+        let mut execute = |r: &ValidRequest| {
+            let key = serde_json::to_string(r).expect("ValidRequest serializes");
+            if let Some(cached) = exec_cache.get(&key) {
+                let mut reused = cached.clone();
+                if let Some(obj) = reused.as_object_mut() {
+                    obj.insert("execution_provenance".into(), json!("reused_identical_ir_and_data"));
+                }
+                increment(&mut counts, "execution_reused_identical_ir");
+                return reused;
+            }
+            let mut fresh = assets.execute(r, true).unwrap_or_else(|error| json!({"status":"error","error":error.to_string()}));
+            if let Some(obj) = fresh.as_object_mut() {
+                obj.insert("execution_provenance".into(), json!("fresh"));
+            }
+            increment(&mut counts, "execution_fresh");
+            exec_cache.insert(key, fresh.clone());
+            fresh
+        };
         let oracle = if !args.interpret_only && (assets.aggregates.is_some() || assets.snapshot.is_some()) {
-            expected.as_ref().map(execute)
+            expected.as_ref().map(&mut execute)
         } else {
             None
         };
@@ -360,7 +377,7 @@ pub fn evaluate(args: EvalArgs) -> Result<()> {
         let actual = if correct {
             oracle.clone()
         } else if !args.interpret_only && (assets.aggregates.is_some() || assets.snapshot.is_some()) {
-            prediction.request.as_ref().map(execute)
+            prediction.request.as_ref().map(&mut execute)
         } else {
             None
         };

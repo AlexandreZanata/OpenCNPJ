@@ -107,6 +107,13 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
                 "cnae",
                 "cnaes",
                 "microempresas",
+                "microempresa",
+                "matriz",
+                "matrizes",
+                "filial",
+                "filiais",
+                "porte",
+                "optantes",
                 "mei",
                 "simples",
                 "capital social",
@@ -122,13 +129,35 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
         return Err(reject("Esse pedido não é uma pesquisa cadastral de empresas. Posso contar, listar e comparar estabelecimentos."));
     }
     let mut hits = preliminary;
-    // A UF acronym must be uppercase in the original, next to a place, or geographically introduced.
+    let has_lowercase = text.chars().any(char::is_lowercase);
+    // A UF acronym must be uppercase in a mixed-case original, next to a place, or geographically introduced.
+    // The token "para" is the preposition "para" unless introduced as the state of Pará ("no Pará", "do Pará", "estado do Pará").
     hits.retain(|h| {
+        if h.end - h.start == 1
+            && words[h.start] == "logradouro"
+            && !has(n, &["cidade de logradouro", "municipio de logradouro", "logradouro pb"])
+        {
+            return false;
+        }
+        if h.end - h.start == 1
+            && words[h.start] == "passos"
+            && h.start > 0
+            && (time::number(&words[h.start - 1]).is_some() || words[h.start - 1] == "ate")
+        {
+            return false;
+        }
         !h.values.iter().all(|e| matches!(e, Entity::Uf(_))) || h.end - h.start > 1 || {
             let token = &words[h.start];
-            text.split(|c: char| !c.is_alphanumeric()).any(|t| t == token.to_uppercase())
-                || h.start > 0 && matches!(words[h.start - 1].as_str(), "em" | "no" | "na" | "de" | "do" | "da" | "estado" | "exceto" | "e")
-                || hits_adjacent_place(pack, &words, h.start)
+            (token != "para"
+                && ((has_lowercase && text.split(|c: char| !c.is_alphanumeric()).any(|t| t == token.to_uppercase()))
+                    || hits_adjacent_place(pack, &words, h.start)))
+                || h.start > 0
+                    && matches!(words[h.start - 1].as_str(), "em" | "no" | "na" | "de" | "do" | "da" | "estado" | "exceto" | "e")
+                    && (token != "para"
+                        || matches!(words[h.start - 1].as_str(), "no" | "do" | "estado")
+                        || h.start >= 2 && words[h.start - 2] == "estado"
+                        || text.contains('á')
+                        || text.contains('Á'))
         }
     });
     // Mask entity spans, retaining date punctuation. Short UF hits must not
@@ -189,6 +218,29 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
                             | "segunda"
                             | "terceira"
                             | "primeira"
+                            | "primeiro"
+                            | "segundo"
+                            | "terceiro"
+                            | "quarto"
+                            | "trimestre"
+                            | "semestre"
+                            | "ano"
+                            | "mes"
+                            | "meses"
+                            | "dias"
+                            | "ate"
+                            | "toneladas"
+                            | "muxirum"
+                            | "muchirum"
+                            | "cadeia"
+                            | "corredor"
+                            | "eixo"
+                            | "praca"
+                            | "retrato"
+                            | "levantamento"
+                            | "fotografia"
+                            | "cnae"
+                            | "cnaes"
                             | "pagina"
                             | "situacao"
                             | "cadastro"
@@ -252,7 +304,9 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
             && !hits.iter().any(|h| h.start <= i + 1 && i + 1 < h.end)
             && !matches!(
                 next.as_str(),
-                "empresas"
+                "quantos"
+                    | "quantas"
+                    | "empresas"
                     | "empresa"
                     | "estabelecimentos"
                     | "estabelecimento"
@@ -280,6 +334,11 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
                     | "microempresa"
                     | "somente"
                     | "apenas"
+                    | "habitantes"
+                    | "habitante"
+                    | "tem"
+                    | "ha"
+                    | "existem"
             )
         {
             return Err(clarify("Qual atividade você quer pesquisar? Não reconheci esse setor no catálogo."));
@@ -305,6 +364,7 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
                     "duplicar",
                     "mudar atividade",
                     "separar",
+                    "quis dizer",
                 ],
             ) || hits.iter().any(|h| {
                 h.start > i
@@ -450,7 +510,7 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
                     "fora",
                 ],
             );
-        let geographic = has(&before, &["cidade", "municipio", "em", "no", "na", "sem", "exceto", "menos", "vs"])
+        let geographic = has(&before, &["cidade", "municipio", "em", "no", "na", "sem", "exceto", "menos", "vs", "quis dizer"])
             && !(has_sector && activity_context && !city);
         if !geographic && !city && cue(&words[hit.start..hit.end].join(" "), &cues.count) {
             continue;
@@ -562,6 +622,11 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
                     "dessas",
                     "desses",
                     "delas",
+                    "as duas",
+                    "os dois",
+                    "qual das duas",
+                    "entre as duas",
+                    "entre elas",
                     "na verdade",
                     "quis dizer",
                     "tira",
@@ -687,7 +752,7 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
     {
         return Err(clarify("Qual atividade e município você quer pesquisar?"));
     }
-    filters(n, &raw, &mut request, &mut act, population)?;
+    filters(n, m, &raw, &mut request, &mut act, population)?;
     if has(n, &["nao estao ativas", "nao estao ativos", "nao tao ativas", "nao tao ativos"]) {
         notes.push("Considerei suspensas, inaptas e baixadas; situação nula não foi incluída.".into());
     }
@@ -1054,7 +1119,7 @@ fn explicit_cnae(n: &str, raw: &str, r: &mut Request) -> Result<(), Box<Interpre
     Ok(())
 }
 
-fn filters(n: &str, raw: &str, r: &mut Request, act: &mut String, population: PopulationRef) -> Result<(), Box<Interpretation>> {
+fn filters(n: &str, m: &str, raw: &str, r: &mut Request, act: &mut String, population: PopulationRef) -> Result<(), Box<Interpretation>> {
     let clear = has(
         n,
         &[
@@ -1077,7 +1142,7 @@ fn filters(n: &str, raw: &str, r: &mut Request, act: &mut String, population: Po
     );
     if clear {
         *act = "remove_filter".into();
-        if has(n, &["matriz", "filiais", "filial", "matrizes"]) {
+        if has(m, &["matriz", "filiais", "filial", "matrizes"]) {
             r.scope.head_office = Tri::Any;
             r.unit = Unit::Establishments;
         }
@@ -1091,16 +1156,16 @@ fn filters(n: &str, raw: &str, r: &mut Request, act: &mut String, population: Po
             r.scope.capital = None;
         }
     } else {
-        if has(n, &["matrizes", "matriz", "sediadas", "sediados", "sede"]) {
+        if has(m, &["matrizes", "matriz", "sediadas", "sediados", "sede"]) {
             r.scope.head_office = Tri::Yes;
         }
-        if has(n, &["sediadas", "sediados", "quantas matrizes", "quantas sao matrizes"]) {
+        if has(m, &["sediadas", "sediados", "quantas matrizes", "quantas sao matrizes"]) {
             r.unit = Unit::HeadOffices;
             r.scope.head_office = Tri::Any;
         }
-        if has(n, &["filiais", "filial"]) && !has(n, &["matrizes e filiais", "matriz e filial"]) {
+        if has(m, &["filiais", "filial"]) && !has(m, &["matrizes e filiais", "matriz e filial"]) {
             r.scope.head_office = if has(
-                n,
+                m,
                 &[
                     "sem filiais",
                     "sem filial",
@@ -1122,7 +1187,7 @@ fn filters(n: &str, raw: &str, r: &mut Request, act: &mut String, population: Po
         if r.scope.head_office == Tri::No {
             r.unit = Unit::Establishments;
         }
-        if has(n, &["matrizes e filiais", "matriz e filial"]) {
+        if has(m, &["matrizes e filiais", "matriz e filial"]) {
             r.scope.head_office = Tri::Any;
         }
         if has(n, &["mei"]) {
@@ -1261,10 +1326,12 @@ fn filters(n: &str, raw: &str, r: &mut Request, act: &mut String, population: Po
         r.scope.natureza = SmallSet::new([NaturezaCode::Group(2)]);
     }
     if has(n, &["capital social"])
-        && !has(n, &["pelo maior capital", "por maior capital", "ordenados pelo maior capital"])
-        && let Some(at) = t.iter().position(|s| s == "social")
+        && let Some(at) = (1..t.len()).find(|&i| {
+            t[i] == "social" && t[i - 1] == "capital" && i.checked_sub(2).is_none_or(|prev| !matches!(t[prev].as_str(), "maior" | "mais"))
+        })
     {
-        let nums: Vec<_> = (at + 1..t.len())
+        let window_end = (at + 8).min(t.len());
+        let nums: Vec<_> = (at + 1..window_end)
             .filter_map(|i| time::money_quantity(&t, i))
             .filter(|(_, end)| t.get(*end).is_none_or(|s| s != "habitantes"))
             .map(|(n, _)| n)
@@ -1314,7 +1381,7 @@ fn filters(n: &str, raw: &str, r: &mut Request, act: &mut String, population: Po
             r.scope.population_ref = Some(population);
         }
     }
-    if has(n, &["vizinhos", "vizinhas", "vizinhanca", "centroide", "proximas", "proximos", "regiao de"])
+    if has(m, &["vizinhos", "vizinhas", "vizinhanca", "centroide", "proximas", "proximos", "regiao de"])
         && let PlaceFilter::Municipalities(ids) = &r.scope.place
         && let Some(&center) = ids.first()
     {
