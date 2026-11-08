@@ -1,0 +1,343 @@
+{
+  "round": "commercial-round-09",
+  "version": "1.0.0",
+  "entries": [
+    {
+      "id": "reg_mt_vote",
+      "term": "vôte",
+      "variants": [
+        "vôte",
+        "vote"
+      ],
+      "region_scope": "Mato Grosso (Baixada Cuiabana, Pantanal, statewide)",
+      "uf_focus": "MT",
+      "source_ids": [
+        "REG-MT-01",
+        "REG-MT-03"
+      ],
+      "url": "https://www.detran.mt.gov.br/web/mt/w/10050222-dancas-artes-comidas-e-costumes-dao-identidade-a-mato-grosso",
+      "accessed_at": "2026-11-08",
+      "meaning_en": "Traditional Mato Grosso interjection expressing surprise, astonishment, or emphasis.",
+      "uncertainty": "low",
+      "nlu_behavior": "discourse_marker_preserve_intent",
+      "semantic_rule": "When used as a conversational opener or interjection before/after an explicit cadastral question, ignore the interjection and execute the cadastral intent; if used alone without a cadastral question, reject.",
+      "minimal_pair": {
+        "execute_example": "Vôte, quantas farmácias ativas existem na cidade de Cuiabá/MT?",
+        "reject_or_clarify_example": "Vôte, como tá o movimento hoje em Cuiabá?"
+      },
+      "reuse_rights": "Lexical item only; synthetic utterance."
+    },
+    {
+      "id": "reg_mt_tcha_por_deus",
+      "term": "tchá por Deus",
+      "variants": [
+        "tchá por deus",
+        "tcha por deus",
+        "tchá por dios",
+        "tcha por dios"
+      ],
+      "region_scope": "Mato Grosso (Cuiabá, Várzea Grande, Baixada Cuiabana)",
+      "uf_focus": "MT",
+      "source_ids": [
+        "REG-MT-01",
+        "REG-MT-02",
+        "REG-MT-03"
+      ],
+      "url": "https://periodicos.unemat.br/index.php/reacl/article/view/12250",
+      "accessed_at": "2026-11-08",
+      "meaning_en": "Cuiabano discourse marker of surprise, admiration, or emphasis.",
+      "uncertainty": "low",
+      "nlu_behavior": "discourse_marker_preserve_intent",
+      "semantic_rule": "Do not treat 'Deus'/'Dios' or 'Tchá' as an unknown place or sector when part of 'tchá por deus/dios'. Preserve the underlying cadastral query.",
+      "minimal_pair": {
+        "execute_example": "Tchá por Deus, quantos estabelecimentos ativos de supermercado existem na cidade de Várzea Grande/MT?",
+        "reject_or_clarify_example": "Tchá por Deus, será que compensa abrir loja lá?"
+      },
+      "reuse_rights": "CC BY 4.0 lexical reference; synthetic utterance."
+    },
+    {
+      "id": "reg_mt_e_mato",
+      "term": "é mato",
+      "variants": [
+        "é mato",
+        "e mato"
+      ],
+      "region_scope": "Mato Grosso and Central Brazil",
+      "uf_focus": "MT",
+      "source_ids": [
+        "REG-MT-03"
+      ],
+      "url": "https://www.detran.mt.gov.br/web/mt/w/10050222-dancas-artes-comidas-e-costumes-dao-identidade-a-mato-grosso",
+      "accessed_at": "2026-11-08",
+      "meaning_en": "Predicate metaphor meaning 'is abundant / exists in large numbers'.",
+      "uncertainty": "low",
+      "nlu_behavior": "abundance_metaphor_clarify_unless_metric_explicit",
+      "semantic_rule": "When a user asks whether a sector 'é mato' in a place without specifying an explicit cadastral metric, return clarify asking whether they want active count, density per 10k inhabitants, or a city comparison. When followed by an explicit count/density question, execute.",
+      "minimal_pair": {
+        "execute_example": "Falam que oficina é mato por lá: quantos estabelecimentos ativos de oficina mecânica existem na cidade de Sorriso/MT?",
+        "reject_or_clarify_example": "Em Sorriso/MT oficina mecânica é mato mesmo?"
+      },
+      "reuse_rights": "Lexical item only; synthetic utterance."
+    },
+    {
+      "id": "reg_mt_pau_rodado",
+      "term": "pau-rodado",
+      "variants": [
+        "pau-rodado",
+        "pau rodado"
+      ],
+      "region_scope": "Mato Grosso",
+      "uf_focus": "MT",
+      "source_ids": [
+        "REG-MT-03"
+      ],
+      "url": "https://www.detran.mt.gov.br/web/mt/w/10050222-dancas-artes-comidas-e-costumes-dao-identidade-a-mato-grosso",
+      "accessed_at": "2026-11-08",
+      "meaning_en": "Person born outside Mato Grosso who migrated to and settled in the state.",
+      "uncertainty": "low",
+      "nlu_behavior": "context_preserve_or_partner_attribute_reject",
+      "semantic_rule": "When used as biographical self-description by the speaker, ignore and execute the explicit cadastral query. When requested as a filter on company owners/partners ('empresas de sócio pau-rodado'), reject because partner birthplace/origin is not in public cadastral query scope.",
+      "minimal_pair": {
+        "execute_example": "Cheguei como pau-rodado em Sinop/MT: quantos estabelecimentos ativos de contabilidade existem na cidade de Sinop/MT?",
+        "reject_or_clarify_example": "Quantas empresas em Sinop/MT pertencem a sócios pau-rodados?"
+      },
+      "reuse_rights": "Lexical item only; synthetic utterance."
+    },
+    {
+      "id": "reg_mt_quebra_torto",
+      "term": "quebra-torto",
+      "variants": [
+        "quebra-torto",
+        "quebra torto"
+      ],
+      "region_scope": "Mato Grosso (Pantanal, Baixada Cuiabana, rural estates)",
+      "uf_focus": "MT",
+      "source_ids": [
+        "REG-MT-03"
+      ],
+      "url": "https://www.detran.mt.gov.br/web/mt/w/10050222-dancas-artes-comidas-e-costumes-dao-identidade-a-mato-grosso",
+      "accessed_at": "2026-11-08",
+      "meaning_en": "Traditional early-morning reinforced meal in Mato Grosso and Pantanal.",
+      "uncertainty": "low",
+      "nlu_behavior": "ambiguous_activity_unless_sector_explicit",
+      "semantic_rule": "If used as the sole activity description ('casas de quebra-torto'), return clarify because it maps to multiple food service CNAEs (padaria, restaurante, lanchonete). If the catalogue sector is explicitly named, execute.",
+      "minimal_pair": {
+        "execute_example": "Pensando no café e quebra-torto em Poconé/MT: quantos estabelecimentos ativos de padaria existem na cidade de Poconé/MT?",
+        "reject_or_clarify_example": "Quantos lugares de quebra-torto existem em Poconé/MT?"
+      },
+      "reuse_rights": "Lexical item only; synthetic utterance."
+    },
+    {
+      "id": "reg_mt_muxirum",
+      "term": "muxirum",
+      "variants": [
+        "muxirum",
+        "muchirum"
+      ],
+      "region_scope": "Mato Grosso (Baixada Cuiabana and interior)",
+      "uf_focus": "MT",
+      "source_ids": [
+        "REG-MT-03"
+      ],
+      "url": "https://www.detran.mt.gov.br/web/mt/w/10050222-dancas-artes-comidas-e-costumes-dao-identidade-a-mato-grosso",
+      "accessed_at": "2026-11-08",
+      "meaning_en": "Collective work effort (mutirão) in Mato Grosso cultural tradition.",
+      "uncertainty": "low",
+      "nlu_behavior": "discourse_marker_preserve_intent",
+      "semantic_rule": "When used to describe a team prospecting effort before an explicit cadastral question, preserve the cadastral query.",
+      "minimal_pair": {
+        "execute_example": "No muxirum da equipe comercial: quantos estabelecimentos ativos de loja de materiais de construção existem na cidade de Cáceres/MT?",
+        "reject_or_clarify_example": "Quem organizou o muxirum das empresas de Cáceres/MT?"
+      },
+      "reuse_rights": "Lexical item only; synthetic utterance."
+    },
+    {
+      "id": "reg_mt_informal_subregions",
+      "term": "Baixada Cuiabana / Nortão / Vale do Araguaia",
+      "variants": [
+        "baixada cuiabana",
+        "nortao",
+        "nortão",
+        "vale do araguaia",
+        "medio norte",
+        "médio norte"
+      ],
+      "region_scope": "Mato Grosso subregions",
+      "uf_focus": "MT",
+      "source_ids": [
+        "REG-MT-03"
+      ],
+      "url": "https://www.detran.mt.gov.br/web/mt/w/10050222-dancas-artes-comidas-e-costumes-dao-identidade-a-mato-grosso",
+      "accessed_at": "2026-11-08",
+      "meaning_en": "Regional designations within Mato Grosso that are not single municipalities or IBGE macro-regions.",
+      "uncertainty": "medium",
+      "nlu_behavior": "subregion_clarify_unless_municipalities_named",
+      "semantic_rule": "When used as the sole geographic filter ('no Nortão', 'na Baixada Cuiabana') without naming specific municipalities or asking for the whole UF, return clarify asking which municipalities to include. When specific municipalities are named ('no Nortão, em Sinop/MT e Sorriso/MT'), execute on the named municipalities.",
+      "minimal_pair": {
+        "execute_example": "Olhando o eixo do Nortão: compare Sorriso/MT e Sinop/MT em estabelecimentos ativos de armazém geral.",
+        "reject_or_clarify_example": "Quantas transportadoras ativas existem no Nortão?"
+      },
+      "reuse_rights": "Geographic vernacular; synthetic utterance."
+    },
+    {
+      "id": "reg_mg_uai_trem",
+      "term": "uai / sô / trem",
+      "variants": [
+        "uai",
+        "sô",
+        "so",
+        "trem"
+      ],
+      "region_scope": "Minas Gerais and Goiás/Triângulo Mineiro",
+      "uf_focus": "MG",
+      "source_ids": [
+        "REG-BR-01"
+      ],
+      "url": "https://www.academia.org.br/nossa-lingua/busca-no-vocabulario",
+      "accessed_at": "2026-11-08",
+      "meaning_en": "Mineiro discourse markers ('uai', 'sô') and placeholder noun ('trem').",
+      "uncertainty": "low",
+      "nlu_behavior": "discourse_marker_preserve_vs_placeholder_clarify",
+      "semantic_rule": "'Uai' acts as a conversational discourse marker and preserves explicit cadastral queries; 'trem' replacing the activity name requires clarification of the CNAE sector.",
+      "minimal_pair": {
+        "execute_example": "Uai, quantos estabelecimentos ativos de padaria existem na cidade de Uberlândia/MG?",
+        "reject_or_clarify_example": "Uai, quantas empresas daquele trem existem em Uberlândia/MG?"
+      },
+      "reuse_rights": "Public domain regionalism; synthetic utterance."
+    },
+    {
+      "id": "reg_rs_bah_tche",
+      "term": "bah / tchê",
+      "variants": [
+        "bah",
+        "tchê",
+        "tche"
+      ],
+      "region_scope": "Rio Grande do Sul and western Santa Catarina/Paraná",
+      "uf_focus": "RS",
+      "source_ids": [
+        "REG-BR-01"
+      ],
+      "url": "https://www.academia.org.br/nossa-lingua/busca-no-vocabulario",
+      "accessed_at": "2026-11-08",
+      "meaning_en": "Gaúcho discourse markers of emphasis or direct address.",
+      "uncertainty": "low",
+      "nlu_behavior": "discourse_marker_preserve_intent",
+      "semantic_rule": "'Bah' and 'tchê' do not alter the cadastral query when an explicit place and activity are provided.",
+      "minimal_pair": {
+        "execute_example": "Bah, tchê, quantos estabelecimentos ativos de frigorífico existem na cidade de Passo Fundo/RS?",
+        "reject_or_clarify_example": "Bah, tchê, qual é o melhor frigorífico de Passo Fundo/RS?"
+      },
+      "reuse_rights": "Public domain regionalism; synthetic utterance."
+    },
+    {
+      "id": "reg_ne_oxe_oxente_visse",
+      "term": "oxe / oxente / visse / arretado",
+      "variants": [
+        "oxe",
+        "oxente",
+        "visse",
+        "arretado",
+        "arretada"
+      ],
+      "region_scope": "Northeast Brazil (PE, BA, CE, PB, RN, AL, SE, MA, PI)",
+      "uf_focus": "PE",
+      "source_ids": [
+        "REG-BR-01"
+      ],
+      "url": "https://www.academia.org.br/nossa-lingua/busca-no-vocabulario",
+      "accessed_at": "2026-11-08",
+      "meaning_en": "Northeastern discourse markers ('oxe', 'oxente', 'visse') and quality adjective ('arretado').",
+      "uncertainty": "low",
+      "nlu_behavior": "discourse_marker_preserve_vs_quality_clarify",
+      "semantic_rule": "'Oxe', 'oxente', and 'visse' preserve explicit cadastral queries; 'arretado/arretada' as a ranking criterion requires clarification of the cadastral metric.",
+      "minimal_pair": {
+        "execute_example": "Oxe, quantos estabelecimentos ativos de farmácia existem na cidade de Recife/PE, visse?",
+        "reject_or_clarify_example": "Oxe, quais são as farmácias mais arretadas de Recife/PE?"
+      },
+      "reuse_rights": "Public domain regionalism; synthetic utterance."
+    },
+    {
+      "id": "reg_no_egua",
+      "term": "égua",
+      "variants": [
+        "égua",
+        "egua"
+      ],
+      "region_scope": "North Brazil (PA, AM, AP, RR, RO, AC, TO)",
+      "uf_focus": "PA",
+      "source_ids": [
+        "REG-BR-01"
+      ],
+      "url": "https://www.academia.org.br/nossa-lingua/busca-no-vocabulario",
+      "accessed_at": "2026-11-08",
+      "meaning_en": "Northern discourse interjection of surprise ('égua!').",
+      "uncertainty": "low",
+      "nlu_behavior": "discourse_marker_preserve_intent",
+      "semantic_rule": "When used as a sentence-initial interjection ('Égua, quantas...'), ignore and execute the explicit cadastral query.",
+      "minimal_pair": {
+        "execute_example": "Égua, quantos estabelecimentos ativos de restaurante existem na cidade de Belém/PA?",
+        "reject_or_clarify_example": "Égua, onde vende o melhor açaí de Belém/PA?"
+      },
+      "reuse_rights": "Public domain regionalism; synthetic utterance."
+    },
+    {
+      "id": "biz_amb_revenda_agro",
+      "term": "revenda agro / agronegócio / empresa do agro",
+      "variants": [
+        "revenda agro",
+        "revendas agro",
+        "agronegocio",
+        "agronegócio",
+        "empresa do agro",
+        "empresas do agro"
+      ],
+      "region_scope": "Mato Grosso and agricultural frontier UFs",
+      "uf_focus": "MT",
+      "source_ids": [
+        "REG-MT-03",
+        "REG-BR-01"
+      ],
+      "url": "https://www.ibge.gov.br/estatisticas/economicas/agricultura-e-pecuaria/9117-producao-agricola-municipal-culturas-temporarias-e-permanentes.html",
+      "accessed_at": "2026-11-08",
+      "meaning_en": "Umbrella commercial terms spanning multiple distinct CNAEs (inputs, machinery, grain wholesale, storage, cattle, support services).",
+      "uncertainty": "low",
+      "nlu_behavior": "ambiguous_activity_clarify",
+      "semantic_rule": "Unless disambiguated by a concrete catalogue sector or explicit CNAE code, return clarify asking which specific activity is meant.",
+      "minimal_pair": {
+        "execute_example": "Quantos estabelecimentos ativos de loja de insumos agrícolas existem na cidade de Sorriso/MT?",
+        "reject_or_clarify_example": "Quantas revendas agro ativas existem na cidade de Sorriso/MT?"
+      },
+      "reuse_rights": "Commercial domain terminology; synthetic utterance."
+    },
+    {
+      "id": "biz_amb_saturation",
+      "term": "cabe mais uma / tá saturado / tem espaço pra mais",
+      "variants": [
+        "cabe mais uma",
+        "cabe mais um",
+        "ta saturado",
+        "tá saturado",
+        "mercado saturado",
+        "tem espaco pra mais",
+        "tem espaço pra mais"
+      ],
+      "region_scope": "National commercial prospecting",
+      "uf_focus": "ALL",
+      "source_ids": [
+        "REG-BR-01"
+      ],
+      "url": "https://www.academia.org.br/nossa-lingua/busca-no-vocabulario",
+      "accessed_at": "2026-11-08",
+      "meaning_en": "Commercial saturation judgment without a specified cadastral threshold.",
+      "uncertainty": "low",
+      "nlu_behavior": "ambiguous_quality_clarify",
+      "semantic_rule": "When a user asks whether a local market is saturated or has room for one more establishment without specifying a metric, return clarify asking whether to check total active establishments, density per 10k inhabitants, or inhabitants per establishment.",
+      "minimal_pair": {
+        "execute_example": "Qual a densidade por 10 mil habitantes de farmácia em Sinop/MT?",
+        "reject_or_clarify_example": "O mercado de farmácia em Sinop/MT já tá saturado ou cabe mais uma?"
+      },
+      "reuse_rights": "Commercial domain terminology; synthetic utterance."
+    }
+  ]
+}
