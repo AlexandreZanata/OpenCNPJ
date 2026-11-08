@@ -649,3 +649,15 @@ fn round10_sector_ranking_is_cadastral_domain() {
     let r = req("Quais os 10 setores com maior estoque ativo no Brasil?");
     assert!(matches!(r.op, Op::Rank { dim: Dim::Sector, .. }));
 }
+
+#[test]
+fn round11_followup_preserves_inherited_place_exclusion() {
+    let engine = interpreter();
+    let mut state = Conversation::default();
+    engine.interpret("Quantas padarias ativas existem na cidade de Sorriso/MT?", &mut state);
+    engine.interpret("Agora conte o estado de MT inteiro, exceto a cidade de Sorriso/MT.", &mut state);
+    assert_eq!(state.last.as_ref().unwrap().scope.exclude.municipalities, SmallSet::new([MunicipalityId(1)]));
+    let out = engine.interpret("E liste 10 padarias com telefone nesse estado.", &mut state);
+    let r = out.request.unwrap();
+    assert_eq!(r.scope.exclude.municipalities, SmallSet::new([MunicipalityId(1)]));
+}

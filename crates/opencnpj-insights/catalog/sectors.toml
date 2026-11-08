@@ -175,7 +175,7 @@ since = "v1"
 [[sector]]
 id = "beverage_retail"
 display = { sing = "loja de bebidas", plural = "lojas de bebidas", gender = "f" }
-aliases = ["depósito de bebidas", "depósitos de bebidas"]
+aliases = ["depósito de bebidas", "depósitos de bebidas", "adega", "adegas"]
 cnae_core = ["4723700"]
 cnae_extended = []
 scope = "main"
@@ -1485,7 +1485,7 @@ since = "v1"
 [[sector]]
 id = "restaurant"
 display = { sing = "restaurante", plural = "restaurantes", gender = "m" }
-aliases = ["casa de refeições", "casas de refeições", "pizzaria", "pizzarias"]
+aliases = ["casa de refeições", "casas de refeições", "pizzaria", "pizzarias", "churrascaria", "churrascarias"]
 cnae_core = ["5611201"]
 cnae_extended = []
 scope = "main"
@@ -1557,7 +1557,7 @@ since = "v1"
 [[sector]]
 id = "snack_bar"
 display = { sing = "lanchonete", plural = "lanchonetes", gender = "f" }
-aliases = ["casa de chá", "casa de sucos"]
+aliases = ["casa de chá", "casa de sucos", "hamburgueria", "hamburguerias", "cafeteria", "cafeterias", "sorveteria", "sorveterias"]
 cnae_core = ["5611203"]
 cnae_extended = []
 scope = "main"

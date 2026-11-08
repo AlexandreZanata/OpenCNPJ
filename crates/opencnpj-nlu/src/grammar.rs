@@ -235,6 +235,7 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
                             | "cadeia"
                             | "corredor"
                             | "eixo"
+                            | "cruzamento"
                             | "praca"
                             | "retrato"
                             | "levantamento"
@@ -314,6 +315,10 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
                     | "cnpjs"
                     | "os"
                     | "as"
+                    | "o"
+                    | "a"
+                    | "um"
+                    | "uma"
                     | "matriz"
                     | "filial"
                     | "matrizes"
@@ -712,9 +717,15 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
         request.scope.activity = ActivityFilter::Sectors { ids: SmallSet::new(ids), cnaes: SmallSet::default(), scope: CnaeScope::Main };
         act = "refer_to_result".into();
     }
-    request.scope.exclude.municipalities = SmallSet::new(excluded_muni);
-    request.scope.exclude.ufs = SmallSet::new(excluded_ufs);
-    request.scope.exclude.sectors = SmallSet::new(excluded_sectors);
+    if !followup || !excluded_muni.is_empty() {
+        request.scope.exclude.municipalities = SmallSet::new(excluded_muni);
+    }
+    if !followup || !excluded_ufs.is_empty() {
+        request.scope.exclude.ufs = SmallSet::new(excluded_ufs);
+    }
+    if !followup || !excluded_sectors.is_empty() {
+        request.scope.exclude.sectors = SmallSet::new(excluded_sectors);
+    }
     if !sectors.is_empty() {
         request.scope.activity = ActivityFilter::Sectors {
             ids: SmallSet::new(sectors.iter().copied()),
@@ -1156,7 +1167,7 @@ fn filters(n: &str, m: &str, raw: &str, r: &mut Request, act: &mut String, popul
         ],
     );
     if clear {
-        *act = "remove_filter".into();
+        *act = if has(n, &["mantenha", "mantem", "mantém"]) { "compound_edit" } else { "remove_filter" }.into();
         let keep_head_office = has(
             n,
             &[
@@ -1353,10 +1364,15 @@ fn filters(n: &str, m: &str, raw: &str, r: &mut Request, act: &mut String, popul
         r.scope.natureza = SmallSet::new([NaturezaCode::Group(2)]);
     }
     if has(n, &["capital social"])
-        && let Some(at) = (1..t.len()).find(|&i| {
+        && let Some(at0) = (1..t.len()).find(|&i| {
             t[i] == "social" && t[i - 1] == "capital" && i.checked_sub(2).is_none_or(|prev| !matches!(t[prev].as_str(), "maior" | "mais"))
         })
     {
+        let at = (at0..t.len())
+            .find(|&i| {
+                t[i] == "social" && t[i - 1] == "capital" && (i + 1..(i + 8).min(t.len())).any(|j| time::money_quantity(&t, j).is_some())
+            })
+            .unwrap_or(at0);
         let window_end = (at + 8).min(t.len());
         let nums: Vec<_> = (at + 1..window_end)
             .filter_map(|i| time::money_quantity(&t, i))
