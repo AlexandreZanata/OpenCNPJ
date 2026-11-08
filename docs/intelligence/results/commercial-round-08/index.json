@@ -1,0 +1,207 @@
+{
+  "round": "commercial-round-08",
+  "status": "complete",
+  "review_date": "2026-11-08",
+  "finalized_at_utc": "2026-11-08T12:58:21.050100+00:00",
+  "source_revision": "ec5a3d26c8cb391bd3e2827c63cf84cae1d9d95c",
+  "uncommitted_changes": true,
+  "human_validation": "deferred to product refinement",
+  "blind_set_used": false,
+  "production_readiness": "not established",
+  "set_sha256": "87c03bab5eb9a3a7a2682a8dd2dac379ad29218a554be2e8898af72d8eca77da",
+  "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b",
+  "final_binary_sha256": "f2548db4612830a20bbfb7472a4759238fa420fd749a93d63f06969ac35f210b",
+  "national_baseline": {
+    "act_correct": 42250,
+    "act_items": 42250,
+    "correct_executed_answer": 44614,
+    "decision_correct": 49864,
+    "gold_backend_ok": 44750,
+    "gold_empty_records": 1022,
+    "gold_zero_scalar": 5558,
+    "interpretation_correct": 49864,
+    "interpretation_wrong": 136,
+    "items": 50000,
+    "verification_engine_match": 27850,
+    "verification_marginal_match": 1750,
+    "verification_no_independent_reference": 750,
+    "verification_not_numeric": 2500,
+    "verification_single_backend": 11900
+  },
+  "final_frozen_label_agreement": {
+    "items": 50000,
+    "decision_correct": 48264,
+    "act_items": 42250,
+    "act_correct": 42250,
+    "interpretation_correct": 48264,
+    "interpretation_wrong": 1736
+  },
+  "mismatch_partition": {
+    "place_typos_requiring_clarification": 136,
+    "confirmed_closure_label_defects": 1600
+  },
+  "interpretation_changes_from_baseline": {
+    "changed_interpretations": 1600
+  },
+  "separate_adjudication_patch": {
+    "items": 1600,
+    "original_questions_modified": false,
+    "agreement_with_documented_replacement_labels": 49864,
+    "note": "Secondary development-set agreement after explicit semantic adjudication; not blind or human validation."
+  },
+  "backend_evidence_reuse": {
+    "identical_typed_requests_with_successful_baseline_execution": 43014,
+    "verification_engine_match": 27014,
+    "verification_single_backend": 11000,
+    "verification_no_independent_reference": 750,
+    "verification_marginal_match": 1750,
+    "verification_not_numeric": 2500
+  },
+  "backend_evidence_note": "Final texts were reinterpreted independently. Existing baseline backend results were reused only for exactly equal canonical typed requests on the same pinned artifacts; no second national backend run is claimed.",
+  "review_regressions": {
+    "correct_executed_answer": 13,
+    "decision_correct": 20,
+    "gold_backend_ok": 13,
+    "gold_zero_scalar": 1,
+    "interpretation_correct": 20,
+    "items": 20,
+    "verification_engine_match": 7,
+    "verification_no_independent_reference": 1,
+    "verification_single_backend": 5
+  },
+  "delivery_gate": {
+    "passed": 300,
+    "failed": 0,
+    "ignored": 5,
+    "fmt": 0,
+    "clippy": 0,
+    "test": 0,
+    "build": 0
+  },
+  "frozen_suites": {
+    "frozen-adv": {
+      "act_correct": 303,
+      "act_items": 304,
+      "decision_correct": 280,
+      "interpretation_correct": 210,
+      "interpretation_wrong": 94,
+      "items": 304
+    },
+    "frozen-informal": {
+      "act_correct": 201,
+      "act_items": 202,
+      "decision_correct": 167,
+      "interpretation_correct": 118,
+      "interpretation_wrong": 84,
+      "items": 202
+    },
+    "frozen-dialogues": {
+      "act_correct": 88,
+      "act_items": 122,
+      "decision_correct": 103,
+      "interpretation_correct": 81,
+      "interpretation_wrong": 41,
+      "items": 122
+    },
+    "frozen-ood": {
+      "act_correct": 400,
+      "act_items": 400,
+      "decision_correct": 377,
+      "interpretation_correct": 377,
+      "interpretation_wrong": 23,
+      "items": 400
+    }
+  },
+  "prior_round_replays": {
+    "replay-round-01": {
+      "act_correct": 50,
+      "act_items": 50,
+      "decision_correct": 1000,
+      "interpretation_correct": 1000,
+      "items": 1000
+    },
+    "replay-round-02": {
+      "act_correct": 845,
+      "act_items": 845,
+      "decision_correct": 950,
+      "interpretation_correct": 950,
+      "interpretation_wrong": 50,
+      "items": 1000
+    },
+    "replay-round-03": {
+      "act_correct": 2535,
+      "act_items": 2535,
+      "decision_correct": 2844,
+      "interpretation_correct": 2844,
+      "interpretation_wrong": 156,
+      "items": 3000
+    },
+    "replay-round-04": {
+      "act_correct": 4225,
+      "act_items": 4225,
+      "decision_correct": 4827,
+      "interpretation_correct": 4827,
+      "interpretation_wrong": 173,
+      "items": 5000
+    },
+    "replay-round-05": {
+      "act_correct": 8450,
+      "act_items": 8450,
+      "decision_correct": 9655,
+      "interpretation_correct": 9655,
+      "interpretation_wrong": 345,
+      "items": 10000
+    },
+    "replay-round-06": {
+      "act_correct": 16900,
+      "act_items": 16900,
+      "decision_correct": 19314,
+      "interpretation_correct": 19314,
+      "interpretation_wrong": 686,
+      "items": 20000
+    },
+    "replay-round-07": {
+      "act_correct": 16900,
+      "act_items": 16900,
+      "decision_correct": 19314,
+      "interpretation_correct": 19314,
+      "interpretation_wrong": 686,
+      "items": 20000
+    }
+  },
+  "prior_round_label_audit": {
+    "commercial-round-01": {
+      "closure_label_defects": 0,
+      "set_sha256": "65d962712b8e9a659bebe58da0b56ce9cbbd0b25d0b428ebb89e0e4f55bf4867"
+    },
+    "commercial-round-02": {
+      "closure_label_defects": 50,
+      "set_sha256": "683ac7a7cc1f2cb0c6daa07d1023cfe8c26b86969e8b0f34e9cecddd0e641715"
+    },
+    "commercial-round-03": {
+      "closure_label_defects": 150,
+      "set_sha256": "331d33f48d655469f2a3b1926fc5140dbc0fdb9c65f88614b82138983aa76d98"
+    },
+    "commercial-round-04": {
+      "closure_label_defects": 160,
+      "set_sha256": "a92650ceda7328a4bd500f94497d00df4e79a82f5d2c37b2827f1e3f899141dd"
+    },
+    "commercial-round-05": {
+      "closure_label_defects": 320,
+      "set_sha256": "113ad5d2b44bfcf4a90e33bda83612a000fde7b0816c4403fc005a7af1c3a09b"
+    },
+    "commercial-round-06": {
+      "closure_label_defects": 640,
+      "set_sha256": "bf6770362c83b7095e345a6af913291e379eed0daa5f382521c15b8c80df40ff"
+    },
+    "commercial-round-07": {
+      "closure_label_defects": 640,
+      "set_sha256": "a428268809cea38917247fa929c109d84da9339139f561b478bc18efaa6217af"
+    },
+    "commercial-round-08": {
+      "closure_label_defects": 1600,
+      "set_sha256": "87c03bab5eb9a3a7a2682a8dd2dac379ad29218a554be2e8898af72d8eca77da"
+    }
+  },
+  "counter_note": "The legacy out_of_policy_execution counter measures emitted executable requests; interpret-only evaluations do not execute backends."
+}

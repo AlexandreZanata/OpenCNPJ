@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "round": "commercial-round-04",
+  "authorship": "ai_synthetic_scenario",
+  "human_validated": false,
+  "data_anchor": "2026-10-11",
+  "competence": "2026-10",
+  "base_commit": "ec5a3d26c8cb391bd3e2827c63cf84cae1d9d95c",
+  "items": 5000,
+  "categories": 20,
+  "questions_per_category": 250,
+  "decisions": {
+    "execute": 4475,
+    "clarify": 250,
+    "reject": 275
+  },
+  "sha256": {
+    "crates/opencnpj-lab/eval/commercial-round-04/questions.jsonl": "a92650ceda7328a4bd500f94497d00df4e79a82f5d2c37b2827f1e3f899141dd",
+    "crates/opencnpj-lab/eval/commercial-round-04/questions.tsv": "2ce1e07767337882637c0e45bfa20960d43ab30ff31b1305f1ef6ea54162bf66",
+    "crates/opencnpj-insights/catalog/sectors.toml": "cb8960afc7b1b59c5be38ce514b5634a1a2cfe4b7225adfb61efcf80f5b1eea3",
+    "crates/opencnpj-insights/catalog/municipalities.tsv": "d0bc5bbe308d35ae3b7913e617f0928ca5ac187464c49d517e11b4048d74c2b5",
+    "crates/opencnpj-insights/catalog/cnae.tsv": "da1dce09b3a6a08ba922152f6760dabbd6c422907ff2ef3c8ce59795902b70f4"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "round": "commercial-round-07",
+  "place_typo_items": 120,
+  "place_typo_recovered": 74,
+  "place_typo_leftovers": 46,
+  "leftover_single_token": 16,
+  "leftover_multi_token": 30,
+  "all_leftovers_are_clarify": true,
+  "all_leftovers_are_market_size": true,
+  "examples": [
+    "Para o ciclo de expansão 05: quantos estabelecimentos ativos de fazenda de gado de corte existem em Maraabá/PA?",
+    "Para o ciclo de expansão 05: quantos estabelecimentos ativos e suspensos de tabacaria existem em Salvaador/BA?",
+    "Para o ciclo de expansão 05: quantas filiais ativas de loja de material elétrico existem em Três LLagoas/MS?",
+    "Como representante comercial, pergunto: quantos estabelecimentos ativos de hospital existem em Santtos/SP?",
+    "Como representante comercial, pergunto: quantas matrizes ativas de escritório de arquitetura há em São PPaulo/SP?"
+  ],
+  "rule": "Duplicated-letter place typo is recovered only for a single-token place followed by a UF and only when the fuzzy candidate is unique. Multi-word names and ambiguous candidates fail closed with a clarification; no label was changed to fit a prediction."
+}

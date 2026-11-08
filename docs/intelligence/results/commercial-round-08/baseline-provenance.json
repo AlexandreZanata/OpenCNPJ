@@ -1,0 +1,19 @@
+{
+  "recorded_at_utc": "2026-11-08T12:18:28.623086+00:00",
+  "active_baseline_pid": 3450706,
+  "sha256": {
+    "crates/opencnpj-nlu/src/grammar.rs": "fb888396fd91d8a8c2068381335a22323d0d831522db20c1815c108efc48471a",
+    "crates/opencnpj-nlu/src/normalize.rs": "9d9e5de90974903409a9d309ed81f012800bb240e399cdf24972d0bd4b8f7b2b",
+    "crates/opencnpj-nlu/src/time.rs": "a5556c2eaa04917ff5b9e8bc2d7c8f877cd47346a9cadc39c5430a14f7dc1234",
+    "crates/opencnpj-nlu/src/lib.rs": "b8bf5edb001e01296c28dcae0e4967b706dc8f2bcc4cfa5966e3c69f7f289f27",
+    "crates/opencnpj-nlu/src/context.rs": "f09db22ecee96536cddda30f0720b52015c0480708d3bc7d05734e0884f1fae7",
+    "crates/opencnpj-nlu/src/policy.rs": "e92a3fa04d6499e5c008052dff936517bd0c0a9b70890ef465ca04e3acc23517",
+    "crates/opencnpj-nlu/src/lang.rs": "d5ae062e2b35518c195681f0fffebeb92faedac631b71f522bfed8e39d0babc4",
+    "crates/opencnpj-nlu/src/tests.rs": "b4668e71655bb2404ec87ab5703e627e1f23ecd224b8829506365c7e4b239dfe",
+    "crates/opencnpj-nlu/src/spotter.rs": "defa8e2815e4bfe75737e1efb4bd6f266528f0724cf30700567e463f992b26e3",
+    "crates/opencnpj-nlu/lang/pt-BR/cues.toml": "dc9b8323dfb74cc751a7164f8926bc69f18135b1c38cf3edb2e32433862f5ca0",
+    "crates/opencnpj-nlu/lang/pt-BR/policy.toml": "c34f9262d1b729a7220d1571fc0443785fb4fec2471137744f769c606d3f5642",
+    "crates/opencnpj-lab/src/questions.rs": "b461a71dfdc778e792a3a9ed025e29371d4f6b03ce58f09d9fdf733710199eff",
+    "/data/opencnpj-target/release/opencnpj-intel": "65d6b730f11555429bdada4f21465e83e66e1ad53f7cbcebc118f11f146afcc6"
+  }
+}

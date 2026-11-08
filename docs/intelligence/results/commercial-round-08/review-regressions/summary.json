@@ -1,0 +1,27 @@
+{
+  "categories": {
+    "review_regression": {
+      "gold_backend_ok": 13,
+      "interpretation_correct": 20,
+      "items": 20
+    }
+  },
+  "counts": {
+    "correct_executed_answer": 13,
+    "decision_correct": 20,
+    "gold_backend_ok": 13,
+    "gold_zero_scalar": 1,
+    "interpretation_correct": 20,
+    "items": 20,
+    "verification_engine_match": 7,
+    "verification_no_independent_reference": 1,
+    "verification_single_backend": 5
+  },
+  "data_anchor": "2026-10-11",
+  "evidence_score": "Rule evidence is not a calibrated probability.",
+  "human_validation": "Not performed; human validation is deferred to product refinement.",
+  "method": "Actual text-only deterministic interpretation; gold IR used only for canonical scoring and separate backend reference, never as a prediction or conversation seed.",
+  "set": "crates/opencnpj-lab/eval/commercial-round-08/review-regressions.jsonl",
+  "set_sha256": "51120df60e1e4d775d7394afcb8baaa545526e993fdcca5d9bcd947aeda59a7e",
+  "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+}

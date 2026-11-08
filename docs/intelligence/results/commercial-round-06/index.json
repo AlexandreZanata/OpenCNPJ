@@ -1,0 +1,234 @@
+{
+ "blind_set_used": false,
+ "delivery_gate": {
+  "fmt_exit": 0,
+  "clippy_exit": 0,
+  "test_exit": 0,
+  "passed": 294,
+  "failed": 0,
+  "ignored": 5
+ },
+ "frozen_suites": {
+  "frozen-adv": {
+   "act_correct": 303,
+   "act_items": 304,
+   "decision_correct": 269,
+   "interpretation_correct": 198,
+   "interpretation_wrong": 106,
+   "items": 304,
+   "out_of_policy_execution": 12
+  },
+  "frozen-informal": {
+   "act_correct": 201,
+   "act_items": 202,
+   "decision_correct": 165,
+   "interpretation_correct": 116,
+   "interpretation_wrong": 86,
+   "items": 202,
+   "out_of_policy_execution": 2
+  },
+  "frozen-dialogues": {
+   "act_correct": 88,
+   "act_items": 122,
+   "decision_correct": 103,
+   "interpretation_correct": 81,
+   "interpretation_wrong": 41,
+   "items": 122
+  },
+  "frozen-ood": {
+   "act_correct": 400,
+   "act_items": 400,
+   "decision_correct": 377,
+   "interpretation_correct": 377,
+   "interpretation_wrong": 23,
+   "items": 400
+  }
+ },
+ "national": {
+  "categories": {
+   "activity": {
+    "gold_backend_ok": 1000,
+    "interpretation_correct": 1000,
+    "items": 1000
+   },
+   "capital_legal": {
+    "gold_backend_ok": 1000,
+    "interpretation_correct": 1000,
+    "items": 1000
+   },
+   "clarification": {
+    "interpretation_correct": 1000,
+    "items": 1000
+   },
+   "closures": {
+    "gold_backend_ok": 1000,
+    "interpretation_correct": 1000,
+    "items": 1000
+   },
+   "comparison": {
+    "gold_backend_ok": 1000,
+    "interpretation_correct": 1000,
+    "items": 1000
+   },
+   "density": {
+    "gold_backend_ok": 1000,
+    "interpretation_correct": 1000,
+    "items": 1000
+   },
+   "dialogue": {
+    "gold_backend_ok": 1000,
+    "interpretation_correct": 1000,
+    "items": 1000
+   },
+   "distribution": {
+    "gold_backend_ok": 1000,
+    "interpretation_correct": 1000,
+    "items": 1000
+   },
+   "exclusion": {
+    "gold_backend_ok": 1000,
+    "interpretation_correct": 1000,
+    "items": 1000
+   },
+   "geography": {
+    "gold_backend_ok": 1000,
+    "interpretation_correct": 1000,
+    "items": 1000
+   },
+   "historical": {
+    "gold_backend_ok": 1000,
+    "interpretation_correct": 1000,
+    "items": 1000
+   },
+   "lookup": {
+    "gold_backend_ok": 900,
+    "interpretation_correct": 1000,
+    "items": 1000
+   },
+   "market_size": {
+    "gold_backend_ok": 1000,
+    "interpretation_correct": 954,
+    "items": 1000
+   },
+   "methodology": {
+    "gold_backend_ok": 1000,
+    "interpretation_correct": 1000,
+    "items": 1000
+   },
+   "prospecting": {
+    "gold_backend_ok": 1000,
+    "interpretation_correct": 1000,
+    "items": 1000
+   },
+   "registrations": {
+    "gold_backend_ok": 1000,
+    "interpretation_correct": 1000,
+    "items": 1000
+   },
+   "structure_status": {
+    "gold_backend_ok": 1000,
+    "interpretation_correct": 1000,
+    "items": 1000
+   },
+   "tax_size": {
+    "gold_backend_ok": 1000,
+    "interpretation_correct": 1000,
+    "items": 1000
+   },
+   "trends": {
+    "gold_backend_ok": 1000,
+    "interpretation_correct": 1000,
+    "items": 1000
+   },
+   "unsupported": {
+    "interpretation_correct": 1000,
+    "items": 1000
+   }
+  },
+  "counts": {
+   "act_correct": 16900,
+   "act_items": 16900,
+   "correct_executed_answer": 17854,
+   "decision_correct": 19954,
+   "gold_backend_ok": 17900,
+   "gold_empty_records": 454,
+   "gold_zero_scalar": 2166,
+   "interpretation_correct": 19954,
+   "interpretation_wrong": 46,
+   "items": 20000,
+   "verification_engine_match": 11140,
+   "verification_marginal_match": 700,
+   "verification_no_independent_reference": 300,
+   "verification_not_numeric": 1000,
+   "verification_single_backend": 4760
+  },
+  "data_anchor": "2026-10-11",
+  "evidence_score": "Rule evidence is not a calibrated probability.",
+  "human_validation": "Not performed; human validation is deferred to product refinement.",
+  "method": "Actual text-only deterministic interpretation; gold IR used only for canonical scoring and separate backend reference, never as a prediction or conversation seed.",
+  "set": "crates/opencnpj-lab/eval/commercial-round-06/questions.jsonl",
+  "set_sha256": "bf6770362c83b7095e345a6af913291e379eed0daa5f382521c15b8c80df40ff",
+  "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+ },
+ "leftover_analysis": {
+  "round": "commercial-round-06",
+  "place_typo_items": 120,
+  "place_typo_recovered": 74,
+  "place_typo_leftovers": 46,
+  "leftover_single_token": 11,
+  "leftover_multi_token": 35,
+  "all_leftovers_are_clarify": true,
+  "all_leftovers_are_market_size": true,
+  "examples": [
+   "Como representante comercial, pergunto: quantos estabelecimentos ativos de construtora existem em Águas Lindaas de Goiás/GO?",
+   "Mapeando a carteira: quantos estabelecimentos ativos de posto de combustível existem em Lucas do RRio Verde/MT?",
+   "Para a campanha de vendas: quantos estabelecimentos ativos e suspensos de salão de beleza existem em Porto SSeguro/BA?",
+   "Para o ciclo de expansão 05: quantos estabelecimentos ativos e suspensos de empresa de software customizável existem em Cruzeiroo do Sul/AC?",
+   "Para a campanha de vendas: quantos estabelecimentos ativos de loja de pneus existem em Santtos/SP?"
+  ],
+  "rule": "Duplicated-letter place typo is recovered only for a single-token place followed by a UF and only when the fuzzy candidate is unique. Other typos fail closed with a clarification; no label was changed to fit a prediction."
+ },
+ "human_validation": "deferred to product refinement",
+ "production_readiness": "not established by synthetic evaluation",
+ "round": "commercial-round-06",
+ "source_revision": "ec5a3d26c8cb391bd3e2827c63cf84cae1d9d95c",
+ "uncommitted_changes": true,
+ "fixes": [
+  "trailing punctuation on a CNPJ lookup no longer forces clarification",
+  "sector/municipality homonym in an activity construction prefers the sector",
+  "entity-aware intent cues prevent place names such as Itaporanga d'Ajuda and Contagem from changing the intent",
+  "multi-word place typo probing fails closed instead of decomposing into unrelated municipalities"
+ ],
+ "prior_round_replays_interpret_only": {
+  "commercial-round-01": {
+   "items": 1000,
+   "interpretation_correct": 1000,
+   "interpretation_wrong": 0
+  },
+  "commercial-round-02": {
+   "items": 1000,
+   "interpretation_correct": 1000,
+   "interpretation_wrong": 0
+  },
+  "commercial-round-03": {
+   "items": 3000,
+   "interpretation_correct": 2994,
+   "interpretation_wrong": 6
+  },
+  "commercial-round-04": {
+   "items": 5000,
+   "interpretation_correct": 4987,
+   "interpretation_wrong": 13
+  },
+  "commercial-round-05": {
+   "items": 10000,
+   "interpretation_correct": 9975,
+   "interpretation_wrong": 25
+  }
+ },
+ "exempt_prior_overlap": {
+  "total": 217,
+  "dialogue_turns_2_4": 213,
+  "fixed_smalltalk": 4
+ }
+}

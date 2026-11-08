@@ -1,0 +1,11 @@
+{
+  "correct_executed_answer": 13,
+  "decision_correct": 20,
+  "gold_backend_ok": 13,
+  "gold_zero_scalar": 1,
+  "interpretation_correct": 20,
+  "items": 20,
+  "verification_engine_match": 7,
+  "verification_no_independent_reference": 1,
+  "verification_single_backend": 5
+}

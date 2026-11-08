@@ -1,0 +1,15 @@
+processed 50/304 correct 30
+processed 100/304 correct 68
+processed 150/304 correct 98
+processed 200/304 correct 135
+processed 250/304 correct 165
+processed 300/304 correct 195
+{
+  "act_correct": 303,
+  "act_items": 304,
+  "decision_correct": 269,
+  "interpretation_correct": 198,
+  "interpretation_wrong": 106,
+  "items": 304,
+  "out_of_policy_execution": 12
+}

@@ -1,0 +1,77 @@
+processed 50/3000 correct 44
+processed 100/3000 correct 94
+processed 150/3000 correct 144
+processed 200/3000 correct 194
+processed 250/3000 correct 244
+processed 300/3000 correct 294
+processed 350/3000 correct 344
+processed 400/3000 correct 394
+processed 450/3000 correct 444
+processed 500/3000 correct 494
+processed 550/3000 correct 544
+processed 600/3000 correct 594
+processed 650/3000 correct 644
+processed 700/3000 correct 694
+processed 750/3000 correct 744
+processed 800/3000 correct 794
+processed 850/3000 correct 844
+processed 900/3000 correct 894
+processed 950/3000 correct 944
+processed 1000/3000 correct 994
+processed 1050/3000 correct 1044
+processed 1100/3000 correct 1094
+processed 1150/3000 correct 1144
+processed 1200/3000 correct 1194
+processed 1250/3000 correct 1244
+processed 1300/3000 correct 1294
+processed 1350/3000 correct 1344
+processed 1400/3000 correct 1394
+processed 1450/3000 correct 1444
+processed 1500/3000 correct 1494
+processed 1550/3000 correct 1544
+processed 1600/3000 correct 1594
+processed 1650/3000 correct 1644
+processed 1700/3000 correct 1694
+processed 1750/3000 correct 1744
+processed 1800/3000 correct 1794
+processed 1850/3000 correct 1844
+processed 1900/3000 correct 1894
+processed 1950/3000 correct 1944
+processed 2000/3000 correct 1994
+processed 2050/3000 correct 2044
+processed 2100/3000 correct 2094
+processed 2150/3000 correct 2144
+processed 2200/3000 correct 2194
+processed 2250/3000 correct 2244
+processed 2300/3000 correct 2294
+processed 2350/3000 correct 2344
+processed 2400/3000 correct 2394
+processed 2450/3000 correct 2444
+processed 2500/3000 correct 2494
+processed 2550/3000 correct 2544
+processed 2600/3000 correct 2594
+processed 2650/3000 correct 2644
+processed 2700/3000 correct 2694
+processed 2750/3000 correct 2744
+processed 2800/3000 correct 2794
+processed 2850/3000 correct 2844
+processed 2900/3000 correct 2894
+processed 2950/3000 correct 2944
+processed 3000/3000 correct 2994
+{
+  "act_correct": 2535,
+  "act_items": 2535,
+  "correct_executed_answer": 2679,
+  "decision_correct": 2994,
+  "gold_backend_ok": 2685,
+  "gold_empty_records": 57,
+  "gold_zero_scalar": 282,
+  "interpretation_correct": 2994,
+  "interpretation_wrong": 6,
+  "items": 3000,
+  "verification_engine_match": 1619,
+  "verification_marginal_match": 97,
+  "verification_no_independent_reference": 53,
+  "verification_not_numeric": 150,
+  "verification_single_backend": 766
+}

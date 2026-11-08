@@ -1,0 +1,59 @@
+{
+  "categories": {
+    "clima": {
+      "interpretation_correct": 40,
+      "items": 40
+    },
+    "conversa": {
+      "interpretation_correct": 40,
+      "items": 40
+    },
+    "esporte": {
+      "interpretation_correct": 40,
+      "items": 40
+    },
+    "finanças": {
+      "interpretation_correct": 40,
+      "items": 40
+    },
+    "matemática": {
+      "interpretation_correct": 40,
+      "items": 40
+    },
+    "política": {
+      "interpretation_correct": 40,
+      "items": 40
+    },
+    "receita": {
+      "interpretation_correct": 40,
+      "items": 40
+    },
+    "saúde": {
+      "interpretation_correct": 37,
+      "items": 40
+    },
+    "tecnologia": {
+      "interpretation_correct": 30,
+      "items": 40
+    },
+    "viagem": {
+      "interpretation_correct": 30,
+      "items": 40
+    }
+  },
+  "counts": {
+    "act_correct": 400,
+    "act_items": 400,
+    "decision_correct": 377,
+    "interpretation_correct": 377,
+    "interpretation_wrong": 23,
+    "items": 400
+  },
+  "data_anchor": "2026-10-11",
+  "evidence_score": "Rule evidence is not a calibrated probability.",
+  "human_validation": "Not performed; human validation is deferred to product refinement.",
+  "method": "Actual text-only deterministic interpretation; gold IR used only for canonical scoring and separate backend reference, never as a prediction or conversation seed.",
+  "set": "crates/opencnpj-lab/eval/ood.jsonl",
+  "set_sha256": "c3eafa0206e53cd908de5ee71d81a5f7a6de4015f35c11b6036af207f158eb92",
+  "snapshot_sha256": null
+}

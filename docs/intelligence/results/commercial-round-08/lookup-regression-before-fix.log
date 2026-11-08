@@ -1,0 +1,373 @@
+   Compiling opencnpj-nlu v0.1.0 (/home/iiii/PESSOAL-PROJETOS-ALEXANDRE/OpenCNPJ/crates/opencnpj-nlu)
+   Compiling opencnpj-lab v0.1.0 (/home/iiii/PESSOAL-PROJETOS-ALEXANDRE/OpenCNPJ/crates/opencnpj-lab)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.76s
+     Running unittests src/lib.rs (/data/opencnpj-target/debug/deps/opencnpj-2f0e7cb028260b4c)
+
+running 14 tests
+test accounts::tests::calendar ... ok
+test autoupdate::tests::release_comparison ... ok
+test download::tests::propfind_parsing ... ok
+test gate::tests::credentials_and_kinds ... ok
+test metrics::tests::buckets_are_monotonic_and_tight ... ok
+test manage::tests::permissions_fail_closed ... ok
+test params::tests::errors ... ok
+test metrics::tests::percentiles ... ok
+test params::tests::filters_ranges_and_composites ... ok
+test download::tests::pointer_swap ... ok
+test gate::tests::response_cache_handover_roundtrip ... ok
+test accounts::tests::keys_are_well_formed_and_verified ... ok
+test accounts::tests::verified_key_handover ... ok
+test accounts::tests::lifecycle ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.48s
+
+     Running unittests src/main.rs (/data/opencnpj-target/debug/deps/opencnpj-d7eaf354cb0d6dd4)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/accounts_contract.rs (/data/opencnpj-target/debug/deps/accounts_contract-7b0f82ba8d55bc63)
+
+running 8 tests
+test required_auth_guards_data_routes_only ... ok
+test optional_and_off_modes ... ok
+test response_cache_coalesces_and_validates ... ok
+test usage_search_log_settings_and_updates ... ok
+test recovery_by_email ... ok
+test register_login_me_logout_rotate ... ok
+test plans_quotas_and_rate_limits ... ok
+test roles_and_moderation ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.82s
+
+     Running tests/search_contract.rs (/data/opencnpj-target/debug/deps/search_contract-aaa8cf2a79158135)
+
+running 66 tests
+test cpf_lookup_masked_partner_possible_match ... ok
+test cnpj_lookup_shape_and_values ... ok
+test cnpj_lookup_partners_simples_and_labels ... ok
+test cpf_lookup_limit_and_errors ... ok
+test cnpj_lookup_accepts_punctuation_case_and_alphanumeric ... ok
+test cpf_lookup_owner_exact_match ... ok
+test admin_router_merges_the_public_api ... ok
+test cnpj_lookup_errors ... ok
+test disable_export_flag ... ok
+test distribution_lists_files ... ok
+test downloads_full_and_ranges ... ok
+test cnpj_root_lookup_and_establishment_paging ... ok
+test export_csv ... ok
+test capital_bounds_in_reais ... ok
+test export_parameter_errors ... ok
+test export_max_rows_flag ... ok
+test export_ndjson ... ok
+test export_rejects_invalid_filter_values_before_streaming ... ok
+test campos_self_description ... ok
+test export_rows_are_establishments ... ok
+test date_bounds_formats ... ok
+test every_filter_field_is_accepted_with_exact_counts ... ok
+test health_and_readiness ... ok
+test hide_contacts_applies_to_export ... ok
+test hide_socios_applies_to_cpf_lookup ... ok
+test hide_contacts_flag ... ok
+test cnpj_prefix_filter ... ok
+test hide_socios_flag ... ok
+test cnae_hierarchy_prefixes_and_sections ... ok
+test code_prefixes_cep_natureza_and_star ... ok
+test legacy_empresas_search_honours_nome_fantasia_parameter ... ok
+test legacy_empresas_search_defaults_to_razao_social ... ok
+test reference_tables ... ok
+test identity_filters_cpf_and_partners ... ok
+test metrics_are_prometheus_text_per_matched_route ... ok
+test parameter_validation_errors ... ok
+test root_lists_endpoints_and_every_listed_endpoint_is_routed ... ok
+test every_numeric_column_supports_ranges_and_vazio ... ok
+test search_response_shape ... ok
+test lookup_aliases_share_the_contract ... ok
+test sort_rejects_unknown_direction ... ok
+test snapshot_info ... ok
+test search_route_aliases ... ok
+test stats_with_filters_and_text ... ok
+test stats_yearly_histograms ... ok
+test search_is_deterministic_and_cacheable ... ok
+test stats_group_by_every_groupable_field ... ok
+test text_with_filters ... ok
+test text_aliases_and_field_selection ... ok
+test unknown_route_is_404 ... ok
+test max_limit_flag ... ok
+test too_many_tokens_sets_expansion_truncated ... ok
+test max_offset_flag ... ok
+test value_normalization ... ok
+test text_matching_rules ... ok
+test limit_offset_defaults_and_errors ... ok
+test cursor_paging_for_filter_only_queries ... ok
+test filter_aliases ... ok
+test typo_tolerance_explicit_and_automatic ... ok
+test comma_values_are_or_and_repeated_parameters_are_and ... ok
+test composite_filters ... ok
+test every_search_hit_resolves_by_lookup ... ok
+test sort_by_numeric_columns ... ok
+test filtered_results_are_subsets ... ok
+test export_rows_match_search_totals ... ok
+test total_equals_rows_reached_by_paging ... ok
+
+test result: ok. 66 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.47s
+
+     Running unittests src/lib.rs (/data/opencnpj-target/debug/deps/opencnpj_core-7bdaa9a00bf9bf3c)
+
+running 16 tests
+test cnpj::tests::basico_parse ... ok
+test cnpj::tests::numeric_known_values ... ok
+test codec::tests::dates ... ok
+test codec::tests::dict ... ok
+test cnpj::tests::alphanumeric_reference_example ... ok
+test codec::tests::digits_and_lists ... ok
+test codec::tests::money ... ok
+test codec::tests::epoch_constant ... ok
+test schema::tests::column_counts_match_layout ... ok
+test text::tests::latin1 ... ok
+test text::tests::tokenization ... ok
+test varint::tests::rejects_truncated_and_overlong ... ok
+test varint::tests::roundtrip_edges ... ok
+test codec::tests::decode_never_panics ... ok
+test codec::tests::numeric_strings_roundtrip ... ok
+test codec::tests::any_string_roundtrips_for_every_kind ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running unittests src/lib.rs (/data/opencnpj-target/debug/deps/opencnpj_desktop-461ca5e3f674b89c)
+
+running 49 tests
+test config::tests::macos_uses_application_support ... ok
+test api::tests::client_debug_hides_token ... ok
+test api::tests::error_bodies ... ok
+test config::tests::only_url_and_username_are_written ... ok
+test format::tests::byte_units ... ok
+test format::tests::durations ... ok
+test config::tests::windows_uses_appdata ... ok
+test format::tests::integers ... ok
+test config::tests::unix_prefers_absolute_xdg_config_home ... ok
+test format::tests::json_values ... ok
+test format::tests::milliseconds_and_percent ... ok
+test api::tests::transport_error_when_server_is_down ... ok
+test format::tests::timestamps ... ok
+test format::tests::query_strings ... ok
+test format::tests::urls ... ok
+test models::tests::error_body ... ok
+test models::tests::login_and_whoami ... ok
+test models::tests::metrics_from_metrics_rs ... ok
+test models::tests::null_and_missing_fields_do_not_break_parsing ... ok
+test models::tests::plans ... ok
+test models::tests::overview_from_admin_rs ... ok
+test models::tests::searches_and_audit ... ok
+test models::tests::settings_updates_and_response_cache ... ok
+test models::tests::snapshots_and_jobs_from_admin_rs ... ok
+test models::tests::usage_report ... ok
+test models::tests::user_object_from_docs ... ok
+test models::tests::user_detail ... ok
+test screens::dashboard::tests::recent_rate_skips_the_current_second ... ok
+test models::tests::users_list_create_and_actions ... ok
+test screens::operations::tests::job_requests_carry_only_relevant_options ... ok
+test screens::operations::tests::months ... ok
+test screens::paging::tests::id_filters ... ok
+test screens::operations::tests::settings_diff ... ok
+test screens::paging::tests::page_paths ... ok
+test screens::tests::every_screen_needs_a_documented_permission ... ok
+test screens::plans::tests::form_round_trip_and_body ... ok
+test screens::usage::tests::by_kind_values ... ok
+test screens::users::tests::editor_patch_contains_only_changes ... ok
+test screens::users::tests::filter_query_string ... ok
+test screens::users::tests::usage_chart_data ... ok
+test screens::users::tests::usernames ... ok
+test theme::tests::status_colors ... ok
+test widgets::tests::category_labels ... ok
+test widgets::tests::kpi_grid_columns ... ok
+test widgets::tests::opt_num_maps_to_json_null ... ok
+test api::tests::task_reports_result_once ... ok
+test theme::tests::ui_glyphs_exist_in_default_fonts ... ok
+test config::tests::round_trip_and_defaults ... ok
+test icon::tests::icon_has_expected_shape ... ok
+
+test result: ok. 49 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/main.rs (/data/opencnpj-target/debug/deps/opencnpj_admin-bc7956bc77de9262)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/client.rs (/data/opencnpj-target/debug/deps/client-76e2c8b146b321d5)
+
+running 4 tests
+test invalid_key_is_a_401 ... ok
+test login_then_whoami_with_bearer_token ... ok
+test non_staff_account_is_refused_and_logged_out ... ok
+test verbs_bodies_and_text ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running unittests src/lib.rs (/data/opencnpj-target/debug/deps/opencnpj_ingest-0eb437de1e8ca069)
+
+running 5 tests
+test parse::tests::boundaries ... ok
+test parse::tests::single_field_garbage_does_not_swallow_next_record ... ok
+test parse::tests::embedded_newline_is_joined_and_bad_lines_are_kept ... ok
+test parse::tests::plain_records ... ok
+test parse::tests::unescaped_quotes_inside_values ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/end_to_end.rs (/data/opencnpj-target/debug/deps/end_to_end-fab2412edc769976)
+
+running 5 tests
+test doc_values_match_postings ... ok
+test corruption_is_detected ... ok
+test identity_ranges_and_hierarchies ... ok
+test build_query_and_integrity ... ok
+test random_corruption_never_panics ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.76s
+
+     Running unittests src/lib.rs (/data/opencnpj-target/debug/deps/opencnpj_insights-75360c84374909b7)
+
+running 17 tests
+test catalog::municipalities::tests::neighbour_links_require_existing_reverse_links ... ok
+test execute::tests::sections_match_the_engine ... ok
+test catalog::municipalities::tests::census_exception_does_not_fill_the_census_from_an_estimate ... ok
+test render::tests::cpf_embedded_in_names_is_masked ... ok
+test execute::tests::density_denominators_follow_the_same_filters ... ok
+test render::tests::formatters_handle_edges ... ok
+test render::tests::formatters_follow_pt_br ... ok
+test render::tests::missing_values_fail_instead_of_rendering_blanks ... ok
+test render::tests::template_lints_pass ... ok
+test render::tests::missing_denominators_never_become_numbers ... ok
+test render::tests::rank_direction_is_rendered ... ok
+test agg::format::tests::maps_cells_across_blocks_and_rejects_corruption ... ok
+test render::tests::filters_are_visible ... ok
+test render::tests::population_source_comes_from_the_metric ... ok
+test render::tests::registrations_are_not_called_openings ... ok
+test render::tests::no_invented_numbers ... ok
+test render::tests::golden_snapshots ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+
+     Running unittests src/main.rs (/data/opencnpj-target/debug/deps/opencnpj_intel-bc3881762863a49a)
+
+running 26 tests
+test eval::sets::wp_3_3_acceptance ... ignored, WP-3.3 sizes and coverage met on 2026-11-07, but the sets are AI-drafted; run with --include-ignored until people rewrite them
+test catalog::cnae::tests::tsv_quotes ... ok
+test catalog::cnae::tests::cnae_cells ... ok
+test backfill::tests::month_ranges ... ok
+test eval::tests::equal_confidences_form_a_single_point ... ok
+test catalog::cnae::tests::fold_matches_python ... ok
+test eval::tests::baseline_produces_expected_numbers ... ok
+test eval::tests::milestone_gates_h_blind ... ok
+test eval::tests::metrics_match_hand_computed_example ... ok
+test eval::tests::executing_clarify_or_reject_items_counts_as_error ... ok
+test eval::tests::negation_and_context_are_counted ... ok
+test eval::tests::dialogue_lines_expand_to_one_item_per_turn ... ok
+test oracle::tests::macro_regions_cover_every_uf_once ... ok
+test query::tests::lowering_an_unknown_municipality_is_an_error ... ok
+test synth::tests::noise_helpers_keep_words_and_digits ... ok
+test query::tests::http_client_uses_key_timeout_and_concurrency ... ok
+test synth::tests::families_are_complete ... ok
+test synth::tests::splits_do_not_leak ... ok
+test synth::tests::every_gold_ir_validates ... ok
+test synth::tests::manifest_reports_diversity ... ok
+test synth::tests::determinism ... ok
+test query::tests::registration_flow_preserves_an_explicit_current_status_filter ... ok
+test query::tests::records_preserve_exclusions_and_population_before_pagination ... ok
+test query::tests::fixture_lowering_and_differential ... ok
+test eval::sets::frozen_sets_validate_and_cover_rules ... ok
+test questions::tests::commercial_round_has_unique_questions_and_valid_frozen_labels ... ok
+
+test result: ok. 25 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 2.25s
+
+     Running tests/aggregate_fixture.rs (/data/opencnpj-target/debug/deps/aggregate_fixture-051f7cc7f25dcab3)
+
+running 1 test
+test aggregates_match_decoded_rows_and_engine ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s
+
+     Running tests/h_dev.rs (/data/opencnpj-target/debug/deps/h_dev-7055863d914212e9)
+
+running 2 tests
+test h_dev_matches_annotation_ir ... ignored, requires the local H-dev JSONL artifact
+test annotation_ir_rejects_invalid_filters_and_metrics ... ok
+
+test result: ok. 1 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/municipality_catalog.rs (/data/opencnpj-target/debug/deps/municipality_catalog-4a0ae6a290599f70)
+
+running 1 test
+test national_municipality_catalog_is_complete_and_reproducible ... ignored, requires two locally built national catalogues and the national snapshot
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/rfb_catalog.rs (/data/opencnpj-target/debug/deps/rfb_catalog-d7e02c63915fe341)
+
+running 2 tests
+test national_rfb_catalog_matches_stats ... ignored, requires the national snapshot and its local RFB extraction
+test fixture_rfb_catalog_matches_stats ... ok
+
+test result: ok. 1 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.14s
+
+     Running unittests src/lib.rs (/data/opencnpj-target/debug/deps/opencnpj_nlu-5984425f98ac43a6)
+
+running 39 tests
+test spotter::tests::edits_are_bounded ... ok
+test normalize::tests::word_rewrites_preserve_names ... ok
+test spotter::tests::longest_match_retains_homonyms ... ok
+test tests::available_historical_flows_do_not_require_an_old_stock_snapshot ... ok
+test tests::a_later_place_cannot_hide_an_unknown_negated_condition ... ok
+test tests::closure_dates_cannot_be_inferred_from_registration_dates ... ok
+test tests::commercial_round_05_grammar_regressions ... ok
+test tests::a_numeric_filter_is_not_a_cnpj_root_lookup ... FAILED
+test tests::count_nouns_are_not_automatically_the_city_of_contagem ... ok
+test tests::a_bare_topic_defaults_only_when_all_words_are_explained ... ok
+test tests::explicit_current_status_survives_a_registration_flow ... ok
+test tests::context_replaces_and_removes_and_resets ... ok
+test tests::complete_dates_survive_entity_masking_in_real_questions ... ok
+test tests::density_is_not_a_minimum_population_filter ... ok
+test tests::entity_month_names_cannot_change_the_requested_period ... ok
+test tests::excluding_mei_does_not_invert_an_explicit_branch_filter ... ok
+test tests::periods_use_calendar_months_and_explicit_dates ... ok
+test tests::followup_comparison_keeps_the_new_and_previous_places ... ok
+test tests::informal_company_size_is_still_ambiguous ... ok
+test tests::negation_and_legal_form_are_independent ... ok
+test tests::a_city_name_does_not_hide_a_large_company_ambiguity ... ok
+test tests::decimal_currency_and_literal_status_codes_are_not_dropped ... ok
+test tests::negation_attaches_to_its_target_and_cannot_leak_to_later_entities ... ok
+test tests::clarification_options_are_valid_and_can_be_answered ... ok
+test time::tests::anchor_and_quantities ... ok
+test tests::no_revenue_or_person_search_can_be_executed ... ok
+test tests::malformed_and_stale_input_never_executes ... ok
+test tests::historical_stock_requires_an_explicit_month ... ok
+test tests::references_use_actual_result_members ... ok
+test tests::short_geographic_exclusions_and_future_requests_do_not_silently_change_meaning ... ok
+test tests::list_order_pagination_and_capital_have_different_roles ... ok
+test tests::probe_baixas_debug ... ok
+test tests::registrations_and_active_stock_are_distinct ... ok
+test tests::registration_date_filters_are_not_dropped_from_lists_or_stock ... ok
+test tests::commercial_round_03_grammar_regressions ... ok
+test tests::unknown_geography_or_activity_never_broadens_the_query ... ok
+test tests::qualified_homonyms_and_city_words_do_not_trigger_quality ... ok
+test tests::commercial_round_02_grammar_regressions ... ok
+test tests::commercial_round_06_grammar_regressions ... ok
+
+failures:
+
+---- tests::a_numeric_filter_is_not_a_cnpj_root_lookup stdout ----
+
+thread 'tests::a_numeric_filter_is_not_a_cnpj_root_lookup' (3623811) panicked at crates/opencnpj-nlu/src/tests.rs:39:46:
+33000167: Interpretation { decision: Reject, request: None, act: "new_query", reason: "Não identifiquei empresas, atividades ou locais de uma pesquisa comercial.", notes: [], evidence: 0.0, options: [] }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    tests::a_numeric_filter_is_not_a_cnpj_root_lookup
+
+test result: FAILED. 38 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+error: test failed, to rerun pass `-p opencnpj-nlu --lib`

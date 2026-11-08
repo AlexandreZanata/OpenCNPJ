@@ -1,0 +1,13 @@
+processed 50/202 correct 18
+processed 100/202 correct 59
+processed 150/202 correct 83
+processed 200/202 correct 115
+{
+  "act_correct": 201,
+  "act_items": 202,
+  "decision_correct": 165,
+  "interpretation_correct": 116,
+  "interpretation_wrong": 86,
+  "items": 202,
+  "out_of_policy_execution": 2
+}

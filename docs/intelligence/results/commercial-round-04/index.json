@@ -1,0 +1,175 @@
+{
+ "round": "commercial-round-04",
+ "national": {
+  "categories": {
+   "activity": {
+    "gold_backend_ok": 250,
+    "interpretation_correct": 250,
+    "items": 250
+   },
+   "capital_legal": {
+    "gold_backend_ok": 250,
+    "interpretation_correct": 250,
+    "items": 250
+   },
+   "clarification": {
+    "interpretation_correct": 250,
+    "items": 250
+   },
+   "closures": {
+    "gold_backend_ok": 250,
+    "interpretation_correct": 250,
+    "items": 250
+   },
+   "comparison": {
+    "gold_backend_ok": 250,
+    "interpretation_correct": 250,
+    "items": 250
+   },
+   "density": {
+    "gold_backend_ok": 250,
+    "interpretation_correct": 250,
+    "items": 250
+   },
+   "dialogue": {
+    "gold_backend_ok": 250,
+    "interpretation_correct": 250,
+    "items": 250
+   },
+   "distribution": {
+    "gold_backend_ok": 250,
+    "interpretation_correct": 250,
+    "items": 250
+   },
+   "exclusion": {
+    "gold_backend_ok": 250,
+    "interpretation_correct": 250,
+    "items": 250
+   },
+   "geography": {
+    "gold_backend_ok": 250,
+    "interpretation_correct": 250,
+    "items": 250
+   },
+   "historical": {
+    "gold_backend_ok": 250,
+    "interpretation_correct": 250,
+    "items": 250
+   },
+   "lookup": {
+    "gold_backend_ok": 225,
+    "interpretation_correct": 250,
+    "items": 250
+   },
+   "market_size": {
+    "gold_backend_ok": 250,
+    "interpretation_correct": 237,
+    "items": 250
+   },
+   "methodology": {
+    "gold_backend_ok": 250,
+    "interpretation_correct": 250,
+    "items": 250
+   },
+   "prospecting": {
+    "gold_backend_ok": 250,
+    "interpretation_correct": 250,
+    "items": 250
+   },
+   "registrations": {
+    "gold_backend_ok": 250,
+    "interpretation_correct": 250,
+    "items": 250
+   },
+   "structure_status": {
+    "gold_backend_ok": 250,
+    "interpretation_correct": 250,
+    "items": 250
+   },
+   "tax_size": {
+    "gold_backend_ok": 250,
+    "interpretation_correct": 250,
+    "items": 250
+   },
+   "trends": {
+    "gold_backend_ok": 250,
+    "interpretation_correct": 249,
+    "items": 250
+   },
+   "unsupported": {
+    "interpretation_correct": 250,
+    "items": 250
+   }
+  },
+  "counts": {
+   "act_correct": 4225,
+   "act_items": 4225,
+   "correct_executed_answer": 4461,
+   "decision_correct": 4988,
+   "gold_backend_ok": 4475,
+   "gold_empty_records": 93,
+   "gold_zero_scalar": 541,
+   "interpretation_correct": 4986,
+   "interpretation_wrong": 14,
+   "items": 5000,
+   "verification_engine_match": 2789,
+   "verification_marginal_match": 175,
+   "verification_no_independent_reference": 75,
+   "verification_not_numeric": 250,
+   "verification_single_backend": 1186
+  },
+  "data_anchor": "2026-10-11",
+  "set": "crates/opencnpj-lab/eval/commercial-round-04/questions.jsonl",
+  "set_sha256": "a92650ceda7328a4bd500f94497d00df4e79a82f5d2c37b2827f1e3f899141dd",
+  "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+ },
+ "frozen_suites": {
+  "frozen-adv": {
+   "act_correct": 303,
+   "act_items": 304,
+   "decision_correct": 269,
+   "interpretation_correct": 198,
+   "interpretation_wrong": 106,
+   "items": 304,
+   "out_of_policy_execution": 12
+  },
+  "frozen-informal": {
+   "act_correct": 201,
+   "act_items": 202,
+   "decision_correct": 165,
+   "interpretation_correct": 116,
+   "interpretation_wrong": 86,
+   "items": 202,
+   "out_of_policy_execution": 2
+  },
+  "frozen-dialogues": {
+   "act_correct": 88,
+   "act_items": 122,
+   "decision_correct": 103,
+   "interpretation_correct": 81,
+   "interpretation_wrong": 41,
+   "items": 122
+  },
+  "frozen-ood": {
+   "act_correct": 400,
+   "act_items": 400,
+   "decision_correct": 377,
+   "interpretation_correct": 377,
+   "interpretation_wrong": 23,
+   "items": 400
+  }
+ },
+ "delivery_gate": {
+  "fmt_exit": 0,
+  "clippy_exit": 0,
+  "test_exit": 0,
+  "passed": 292,
+  "failed": 0,
+  "ignored": 5
+ },
+ "source_revision": "ec5a3d26c8cb391bd3e2827c63cf84cae1d9d95c",
+ "uncommitted_changes": true,
+ "human_validation": "deferred to product refinement",
+ "blind_set_used": false,
+ "production_readiness": "not established by synthetic evaluation"
+}
