@@ -189,3 +189,23 @@ documented in their own result directories; no frozen original was edited.
 - The 98 regular batch JSONL files are retained outside Git in
   `/data/opencnpj-data/intelligence/results/commercial-round-10/batches-snapshot/`; their hashes
   are in `batch-manifests.json`, and the merged `questions.jsonl`/`questions.tsv` are versioned.
+
+## 8. Correlation-Family Coverage (Descriptive, No Fabricated Coefficients)
+
+The seven correlation/association families requested by the expansion brief are covered by
+descriptive scenario groups; none of them estimates a statistical coefficient, and requests for
+Pearson/Spearman, p-values, regressions or external series fail closed.
+
+| Correlation family | Authored coverage | Status |
+|---|---:|---|
+| Complementary-sector ratios | `supply_compare_stock` 1,000 + `supply_union` 1,000 + `supply_rank_sectors` 1,000 | Descriptive comparison/union; no causal or supplier link claimed |
+| Registrations versus closures | `corr_supported_net_flow` 1,000 + `hist_trend_*` 1,000 | Net flow over aligned periods |
+| Capital distributions versus declared size | `tax_simples_nonmei_cap` 500 + `tax_hq_capital_between` 500 + `tax_porte_other_nat` 500 + capital-qualified prospecting | Bounded capital and size filters, not revenue |
+| Age versus current status | `hist_cohort_closure` 1,000 + `hist_active_change` 1,000 | Opening cohort and historical stock change |
+| Branch penetration versus population | `corp_head_offices` 800 + `corp_branches_only` 800 + `mkt_rank_popband` 1,000 + `corr_supported_pop_density_rank` 1,000 | Descriptive branch/head-office and per-10k population proxies |
+| Concentration versus stock change | `mkt_rank_popband` 1,000 + `hist_active_change` 1,000 + `supply_rank_sectors` 1,000 | Descriptive rankings/deltas; no unmet-demand or profitability claim |
+| CNAE co-occurrence and retail/wholesale/service mixes | `supply_cnae_breakdown` 1,000 + `geo_compare_muni` 1,000 + `supply_compare_*` 2,000 | Spatial/hierarchical descriptive mixes |
+
+Unsupported analytical requests are explicit: `corr_reject_stat` 1,000 (Pearson/regression/R²/
+p-value) and `corr_reject_external` 1,000 (IBGE CEMPRE/PAM/PPM or municipal income), both gold
+`reject` and verified with no executed answer.

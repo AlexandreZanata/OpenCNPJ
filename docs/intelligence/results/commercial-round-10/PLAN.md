@@ -34,3 +34,12 @@
 | **Exclusive Registers** | `conversational_professional` (`35,000`), `formal_technical` (`10,000`), `noisy_short` (`5,000`) |
 | **Exclusive Splits** | `synthetic_dev` (`35,000`), `synthetic_eval` (`10,000`), `synthetic_challenge` (`5,000`) partitioned by disjoint `scenario_family_id`, surface skeleton, CNPJ roots, and `session_id` |
 | **Overlapping Floors** | `>= 8,000` MT-context, `>= 4,000` other-UF regional, `>= 15,000` novel semantic constructions, `>= 5,000` `clarify`/`reject` |
+
+## 5. Correlation-family coverage
+
+Seven descriptive association families are covered without statistical coefficients:
+complementary-sector ratios; registrations versus closures; capital versus declared size; age
+versus current status; branch penetration versus population; concentration versus stock change;
+and CNAE spatial co-occurrence / retail-wholesale-service mixes. Pearson/Spearman, p-values,
+linear regression, elasticity and unintegrated IBGE CEMPRE/PAM/PPM series remain explicit
+`reject` outcomes. Scenario-level counts are listed in `REPORT.md` section 8.
