@@ -738,6 +738,10 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
                 "mei",
                 "simples",
                 "capital social",
+                "setor",
+                "setores",
+                "atividade",
+                "atividades",
             ],
         );
     if !domain && !followup && meta.is_none() {
@@ -748,7 +752,7 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
         && !followup
         && meta.is_none()
         && lookup(&raw).is_none()
-        && !has(n, &["empresas", "estabelecimentos", "cnpj", "cnpjs", "mei", "simples"])
+        && !has(n, &["empresas", "estabelecimentos", "cnpj", "cnpjs", "mei", "simples", "setor", "setores", "atividade", "atividades"])
     {
         return Err(clarify("Qual atividade e município você quer pesquisar?"));
     }
@@ -1362,7 +1366,7 @@ fn filters(n: &str, m: &str, raw: &str, r: &mut Request, act: &mut String, popul
         // Scale words are not parsed as independent quantities.
         if let Some(&value) = nums.first() {
             let cents = value;
-            let (from, to) = if has(n, &["entre"]) {
+            let (from, to) = if has(m, &["entre"]) {
                 (Some(cents), Some(*nums.get(1).ok_or_else(|| clarify("Informe os dois limites de capital social."))?))
             } else if has(n, &["ate", "no maximo"]) {
                 (None, Some(cents))

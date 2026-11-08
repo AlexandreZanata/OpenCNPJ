@@ -568,6 +568,7 @@ fn commercial_round_10_prefix_and_scope_edit_regressions() {
     engine.pack.municipality(MunicipalityId(34), UfId(22), "Santa Rosa", &[]);
     engine.pack.municipality(MunicipalityId(35), UfId(10), "Santa Rosa da Serra", &[]);
     engine.pack.sector(SectorId(3), &["transportadora".into(), "transportadoras".into()], SmallSet::new([CnaeCode::Subclass(4930201)]));
+    engine.pack.municipality(MunicipalityId(36), UfId(10), "Desterro de Entre Rios", &[]);
 
     // Longest-match preserves the exact single-word municipality and does not
     // widen it to longer names that merely share the prefix.
@@ -626,4 +627,25 @@ fn round10_lowercase_para_in_state_list_is_para_uf() {
     assert!(matches!(r.op, Op::Compare { dim: Dim::Uf, .. }));
     let Op::Compare { members, .. } = r.op else { panic!("expected compare") };
     assert!(members.iter().any(|m| *m == Member::Uf(UfId(13))));
+}
+
+#[test]
+fn round10_place_name_entre_does_not_force_capital_interval() {
+    let mut engine = interpreter();
+    engine.pack.municipality(MunicipalityId(36), UfId(10), "Desterro de Entre Rios", &[]);
+    let r = engine
+        .interpret(
+            "Liste 20 padarias ativas no municipio de Desterro de Entre Rios/MG que sejam matriz, com telefone e capital social acima de 50000 reais, ordenados do maior capital para o menor.",
+            &mut Conversation::default(),
+        )
+        .request
+        .unwrap();
+    assert_eq!(r.scope.capital, Some(Range { from: Some(5_000_001), to: None }));
+    assert_eq!(r.op, Op::List { order: ListOrder::CapitalDesc, limit: 20 });
+}
+
+#[test]
+fn round10_sector_ranking_is_cadastral_domain() {
+    let r = req("Quais os 10 setores com maior estoque ativo no Brasil?");
+    assert!(matches!(r.op, Op::Rank { dim: Dim::Sector, .. }));
 }
