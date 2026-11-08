@@ -1,44 +1,6 @@
 {
-  "generated_at": "unix:1794170890",
-  "inconsistencies": [
-    {
-      "action": "Quarantine or repair the source field; do not join it as a valid CNPJ.",
-      "dataset_id": "pgfn-fgts-2026Q3",
-      "kind": "record_cnpj_invalid_check_digits",
-      "sample": [
-        "00013637851920"
-      ],
-      "severity": "high"
-    },
-    {
-      "action": "Quarantine or repair the source field; do not join it as a valid CNPJ.",
-      "dataset_id": "pgfn-previdenciario-2026Q3",
-      "kind": "record_cnpj_invalid_check_digits",
-      "sample": [
-        "07676892000108",
-        "07676892000108",
-        "05593893000187",
-        "50561075000100",
-        "89858591000100",
-        "46341673000100",
-        "88473210000100",
-        "88473210000100",
-        "88473210000100",
-        "88473210000100",
-        "88473210000100",
-        "88473210000100",
-        "88473210000100",
-        "88473210000100",
-        "21565684000014",
-        "42043067000000",
-        "16666372000172",
-        "07323900000190",
-        "30134977000000",
-        "02581389000162"
-      ],
-      "severity": "high"
-    }
-  ],
+  "generated_at": "unix:1794174986",
+  "inconsistencies": [],
   "sample_per_store": 500,
   "snapshot": "/data/opencnpj-data/snapshots/2026-10-balanced.ocnpj",
   "stores": [
@@ -80,10 +42,10 @@
       "cnpj_checked_against_snapshot": 500,
       "dataset_id": "cnes-estabelecimentos",
       "invalid_cnpj_sample": [],
-      "records": 641928,
+      "records": 642268,
       "source_sha256": "32fc3f981d0c3e93049ff2aeaf83d3ac2a6781d1972af894eb35e32f7a40f07a",
-      "store_sha256": "055ad700d361e8232f08fcf00d223cf67b8208075b49eca2e87c4385fa7e8818",
-      "unique_cnpjs": 345326,
+      "store_sha256": "0cfb37bf7d0b9f94f6e33436271c3fe609855fbb1ee0d24a1118fa0797cb75ed",
+      "unique_cnpjs": 345458,
       "unmatched_geographies": 0
     },
     {
@@ -101,12 +63,10 @@
       "absent_cnpj_sample": [],
       "cnpj_checked_against_snapshot": 500,
       "dataset_id": "pgfn-fgts-2026Q3",
-      "invalid_cnpj_sample": [
-        "00013637851920"
-      ],
+      "invalid_cnpj_sample": [],
       "records": 549458,
       "source_sha256": "a011daf66131376f5d68271181e3179a25189633a1a4d79f31850740811b7356",
-      "store_sha256": "de8bd16f72256c33f6c07c8e16c09370a15e6cb8d9d6b8af5cf7decbd7730eed",
+      "store_sha256": "859e78a36eccd86c91ea39100a8f1fb691752eb6dfacf18eeee0ae39ccd987de",
       "unique_cnpjs": 309267,
       "unmatched_geographies": 0
     },
@@ -114,31 +74,10 @@
       "absent_cnpj_sample": [],
       "cnpj_checked_against_snapshot": 500,
       "dataset_id": "pgfn-previdenciario-2026Q3",
-      "invalid_cnpj_sample": [
-        "07676892000108",
-        "07676892000108",
-        "05593893000187",
-        "50561075000100",
-        "89858591000100",
-        "46341673000100",
-        "88473210000100",
-        "88473210000100",
-        "88473210000100",
-        "88473210000100",
-        "88473210000100",
-        "88473210000100",
-        "88473210000100",
-        "88473210000100",
-        "21565684000014",
-        "42043067000000",
-        "16666372000172",
-        "07323900000190",
-        "30134977000000",
-        "02581389000162"
-      ],
+      "invalid_cnpj_sample": [],
       "records": 3287586,
       "source_sha256": "149d857cfa4aa748017838ed24f29dcf1dc878309c6b2221a6d4cb6e0cb54c26",
-      "store_sha256": "fa18994994d98920f9d2b9f0499660b56cba8ac3222a472292149321257213c3",
+      "store_sha256": "83974068f76a5e4758c2c8c8d6ee86a548ea53afba714a9f0b84768cb2ab03d1",
       "unique_cnpjs": 824940,
       "unmatched_geographies": 0
     }

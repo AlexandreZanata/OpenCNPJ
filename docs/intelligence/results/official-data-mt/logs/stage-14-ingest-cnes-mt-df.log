@@ -1,0 +1,3 @@
+raw	/data/opencnpj-data/intelligence/official/ingest/raw/cnes_estabelecimentos_csv.zip	bytes=56828038	sha256=32fc3f981d0c3e93049ff2aeaf83d3ac2a6781d1972af894eb35e32f7a40f07a
+published	/data/opencnpj-data/intelligence/official/ingest/mt/cnes-estabelecimentos.ocrec	rows=14101	total=642268	out_of_scope=628167	rejected=0	duplicates=0	bytes=20938752	sha256=30f997e4044c29b9e53ed132120f941d69ef0e3c3affdbe6af2e913b8ad97ac5
+elapsed 31.37 s maxrss 252032 KB

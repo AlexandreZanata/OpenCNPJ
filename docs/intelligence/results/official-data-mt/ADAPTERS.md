@@ -59,18 +59,19 @@ Measured full national runs:
 |---|---:|---:|---:|
 | INEP 2024 | 215,545 | ~10.5 GB | 238 MB |
 | PGFN Previdenciário | 3,287,586 | ~10.7 GB | 198 MB |
-| PGFN FGTS | 549,458 | ~1.9 GB | 65 MB |
+| PGFN FGTS | 549,458 | ~1.9 GB | 66 MB |
+| ANEEL GD (raw CSV now streamed) | 15,651 MT | ~1.5 GB | 25 MB |
 
 ## MT runs
 
 | Dataset | Records | Source rows | Out of scope | Rejected | Store bytes | Store SHA-256 |
 |---|---:|---:|---:|---:|---:|---|
 | `antt-rntrc-veiculos` | 4,533 | 98,119 | 93,586 | 0 | 1,916,928 | `1364a79e4fc0ab7958ca788f96c341e1a65dc18209fab38f20d7522bc64520c4` |
-| `cnes-estabelecimentos` | 14,101 | 642,268 | 628,167 | 0 | 20,938,752 | `eb673a1917c1a6d076978c28a622e9a03c331ad5a412ea3bd1f5cbe358735386` |
+| `cnes-estabelecimentos` | 14,101 | 642,268 | 628,167 | 0 | 20,938,752 | `30f997e4044c29b9e53ed132120f941d69ef0e3c3affdbe6af2e913b8ad97ac5` |
 | `inep-censo-escolar-2024` | 3,191 | 215,545 | 212,354 | 0 | 39,591,936 | `9bbc05425c87d85afd5a386ffe78a5388976c154522fa9606c86526bc5b814e0` |
-| `pgfn-fgts-2026Q3` | 7,598 | 552,079 | 544,481 | 0 | 6,250,496 | `dca95fe3a47233f784add9996135fb9d2b2c20c587f0b62bcce5cfe8ba0f7962` |
-| `pgfn-previdenciario-2026Q3` | 81,870 | 3,397,082 | 3,315,212 | 0 | 60,026,880 | `54fc88b5836a788e969a8eb3f5dc6cff170b9b89554f972f4cb3b57b9fa23e57` |
-| `aneel-gd` | 15,651 | 4,735,908 | 4,720,257 | 0 | 22,953,984 | `2f5f63995f9265838d6facabf0fe183f8c9852bf4f8f8c9bc5198f8814b470a9` |
+| `pgfn-fgts-2026Q3` | 7,598 | 552,079 | 544,481 | 0 | 6,250,496 | `ba8571e80f450a15613fb63926e8eba1c0d94a640038410fa4a1e1fac7700d54` |
+| `pgfn-previdenciario-2026Q3` | 81,870 | 3,397,082 | 3,315,212 | 0 | 60,026,880 | `26c1fe34645c697b3255610a406702231df995c63d956f553fa46493f2c198c4` |
+| `aneel-gd` | 15,651 | 4,735,908 | 4,720,257 | 0 | 22,953,984 | `3498eed2b3790b23feec2d9188d83d87236b257791ce60d09255aec092a2507b` |
 | `anp-precos-revenda` | 843 | 47,555 | 46,712 | 0 | 618,496 | `a7b392fe8aae94f15b0e9d71d3f7f77dfdb5ff126067230425ca183dfa938502` |
 | `comex-exp-2025-mun` | 13,271 | 1,207,088 | 1,193,817 | 0 | 4,296,704 | `25fa3903acb29e7327325e3f4951f0304caf73ccb90fedb2ae0985e533d43620` |
 | `mt-convenios-2024` | 79 | 79 | 0 | 0 | 114,688 | `f075bb13b29ea8e062064d4616976da495c29705c0de9fcde3e8a21ef908370b` |
@@ -80,10 +81,10 @@ Measured full national runs:
 | Dataset | Records | Source rows | Out of scope | Rejected | Store bytes | Store SHA-256 |
 |---|---:|---:|---:|---:|---:|---|
 | `antt-rntrc-veiculos` | 98,119 | 98,119 | 0 | 0 | 41,459,712 | `012bc71670b3db2216e3856920b87ffc631620735962b0418cd91585fd93f69f` |
-| `cnes-estabelecimentos` | 641,928 | 642,268 | 0 | 340 | 954,036,224 | `055ad700d361e8232f08fcf00d223cf67b8208075b49eca2e87c4385fa7e8818` |
+| `cnes-estabelecimentos` | 642,268 | 642,268 | 0 | 0 | 954,687,488 | `0cfb37bf7d0b9f94f6e33436271c3fe609855fbb1ee0d24a1118fa0797cb75ed` |
 | `inep-censo-escolar-2024` | 215,545 | 215,545 | 0 | 0 | 2,673,111,040 | `40ae4bb680f96c1d5451e9791bc40612973e183913ad7f3f6711793a27c870df` |
-| `pgfn-fgts-2026Q3` | 549,458 | 552,079 | 2,621 | 0 | 451,731,456 | `de8bd16f72256c33f6c07c8e16c09370a15e6cb8d9d6b8af5cf7decbd7730eed` |
-| `pgfn-previdenciario-2026Q3` | 3,287,586 | 3,397,082 | 109,496 | 0 | 2,416,336,896 | `fa18994994d98920f9d2b9f0499660b56cba8ac3222a472292149321257213c3` |
+| `pgfn-fgts-2026Q3` | 549,458 | 552,079 | 2,621 | 0 | 451,620,864 | `859e78a36eccd86c91ea39100a8f1fb691752eb6dfacf18eeee0ae39ccd987de` |
+| `pgfn-previdenciario-2026Q3` | 3,287,586 | 3,397,082 | 109,496 | 0 | 2,417,074,176 | `83974068f76a5e4758c2c8c8d6ee86a548ea53afba714a9f0b84768cb2ab03d1` |
 | `bcb-sgs-1` | 2,471 | 2,471 | 0 | 0 | 442,368 | `a1a01ad73087fbd6d698d3195814b38cc1a653b2db26ec19b2c194b56c3364e2` |
 | `bcb-sgs-433` | 561 | 561 | 0 | 0 | 126,976 | `240bb6584a3c9327e6a92a4642eaab046b909cc16c2067c6604d45de2bfc2aa8` |
 
@@ -97,17 +98,22 @@ are 6.1 GB and remain outside Git.
 
 - CNES: 345,326 unique CNPJs; sampled CNPJs all present in the 2026-10 snapshot.
 - INEP: 35,385 unique CNPJs; 2 sampled CNPJs absent from the snapshot.
-- PGFN FGTS: 309,267 unique CNPJs; 1 invalid check-digit CNPJ found.
-- PGFN Previdenciário: 824,940 unique CNPJs; 20 invalid check-digit CNPJs found.
+- PGFN FGTS: 309,267 unique CNPJs; invalid check-digit rows are stored without
+  CNPJ identity and counted in the manifest (1 in the national sample).
+- PGFN Previdenciário: 824,940 unique CNPJs; invalid check-digit rows are stored
+  without CNPJ identity (20 in the national sample).
+- ANEEL: invalid check-digit rows are stored without CNPJ identity; 1 valid CNPJ
+  in the MT sample is absent from the 2026-10 snapshot and remains an explicit
+  crosswalk exception.
 - ANTT: no CNPJ identity in this aggregate resource.
 - ANEEL: 1 invalid check-digit CNPJ and 1 CNPJ absent from the snapshot in the MT sample.
 - ANP: all 126 unique MT CNPJs sampled were present; no invalid CNPJ found.
 - MT convenios: all 68 unique CNPJs sampled were present.
 - Comex Stat: no CNPJ identity; municipal export totals only.
 - BCB: national series, no CNPJ.
-- CNES national: 340 rows rejected because they use DF administrative-region
-  codes (`530040`, `530050`, …) that are not in the IBGE municipality catalogue.
-  The sample is recorded in the manifest limitations.
+- CNES national: 340 DF administrative-region codes are now explicitly collapsed
+  to Brasília (5300108) for IBGE municipality compatibility; the count is recorded
+  in the manifest limitations.
 - INEP `99999999999999` sentinels are normalized to missing and are not joined.
 
 Invalid or absent source CNPJs are kept flagged in the audit, not silently
@@ -115,8 +121,9 @@ repaired. They require source-side or crosswalk normalization before any join.
 
 ## Limitations
 
-- The record writer is streaming. Large raw CSV entries are still buffered per
-  file (ANEEL: ~1.5 GB) before row iteration, but records are not accumulated.
+- The record writer is streaming. ANEEL now streams its 1.5 GB CSV entry with a
+  chunked CSV reader (25 MB RSS). CNES/INEP still buffer the compressed entry
+  (under 250 MB); PGFN buffers one CSV entry at a time (under 25 MB).
 - `--scope MT` still reads every source row; out-of-scope rows are counted.
 - PGFN natural-person records are excluded from this business slice.
 - ANTT records are aggregate, not identified company fleets.

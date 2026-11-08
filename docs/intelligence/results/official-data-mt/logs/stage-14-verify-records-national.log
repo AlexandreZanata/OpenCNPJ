@@ -1,0 +1,8 @@
+/data/opencnpj-data/intelligence/official/ingest/national/antt-rntrc-veiculos.ocrec	antt-rntrc-veiculos	records=98119	total=98119	out_of_scope=0	rejected=0	duplicates=0	sha256=012bc71670b3db2216e3856920b87ffc631620735962b0418cd91585fd93f69f
+/data/opencnpj-data/intelligence/official/ingest/national/bcb-sgs-1.ocrec	bcb-sgs-1	records=2471	total=2471	out_of_scope=0	rejected=0	duplicates=0	sha256=a1a01ad73087fbd6d698d3195814b38cc1a653b2db26ec19b2c194b56c3364e2
+/data/opencnpj-data/intelligence/official/ingest/national/bcb-sgs-433.ocrec	bcb-sgs-433	records=561	total=561	out_of_scope=0	rejected=0	duplicates=0	sha256=240bb6584a3c9327e6a92a4642eaab046b909cc16c2067c6604d45de2bfc2aa8
+/data/opencnpj-data/intelligence/official/ingest/national/cnes-estabelecimentos.ocrec	cnes-estabelecimentos	records=642268	total=642268	out_of_scope=0	rejected=0	duplicates=0	sha256=0cfb37bf7d0b9f94f6e33436271c3fe609855fbb1ee0d24a1118fa0797cb75ed
+/data/opencnpj-data/intelligence/official/ingest/national/inep-censo-escolar-2024.ocrec	inep-censo-escolar-2024	records=215545	total=215545	out_of_scope=0	rejected=0	duplicates=0	sha256=40ae4bb680f96c1d5451e9791bc40612973e183913ad7f3f6711793a27c870df
+/data/opencnpj-data/intelligence/official/ingest/national/pgfn-fgts-2026Q3.ocrec	pgfn-fgts-2026Q3	records=549458	total=552079	out_of_scope=2621	rejected=0	duplicates=0	sha256=859e78a36eccd86c91ea39100a8f1fb691752eb6dfacf18eeee0ae39ccd987de
+/data/opencnpj-data/intelligence/official/ingest/national/pgfn-previdenciario-2026Q3.ocrec	pgfn-previdenciario-2026Q3	records=3287586	total=3397082	out_of_scope=109496	rejected=0	duplicates=0	sha256=83974068f76a5e4758c2c8c8d6ee86a548ea53afba714a9f0b84768cb2ab03d1
+elapsed 233.91 s

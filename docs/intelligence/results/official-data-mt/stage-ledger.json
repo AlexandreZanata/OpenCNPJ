@@ -214,10 +214,26 @@
         "docs/intelligence/results/official-data-mt/logs/stage-13-stream-inep-national.log",
         "docs/intelligence/results/official-data-mt/logs/stage-13-stream-pgfn-prev-national.log"
       ],
+      "blockers": []
+    },
+    {
+      "id": 14,
+      "name": "Close streaming, CNES DF crosswalk and invalid-CNPJ quarantine",
+      "status": "complete",
+      "evidence": [
+        "crates/opencnpj-lab/src/official/adapters.rs",
+        "docs/intelligence/results/official-data-mt/ADAPTERS.md",
+        "docs/intelligence/results/official-data-mt/INCONSISTENCIES.md",
+        "docs/intelligence/results/official-data-mt/ingest/records-cnpj-audit-mt.json",
+        "docs/intelligence/results/official-data-mt/ingest/records-cnpj-audit-national.json",
+        "docs/intelligence/results/official-data-mt/logs/stage-14-ingest-aneel-stream.log",
+        "docs/intelligence/results/official-data-mt/logs/stage-14-ingest-cnes-national-df.log",
+        "docs/intelligence/results/official-data-mt/logs/stage-14-ingest-pgfn-prev-national.log",
+        "docs/intelligence/results/official-data-mt/logs/stage-14-audit-records-national.log"
+      ],
       "blockers": [
-        "ANEEL raw CSV entry is still buffered per file (~1.5 GB RSS).",
-        "CNES DF administrative-region codes need a verified crosswalk.",
-        "Invalid PGFN/ANEEL CNPJs need source/crosswalk normalization before joins."
+        "One valid ANEEL CNPJ (14955450001890) is absent from the 2026-10 snapshot and remains an explicit crosswalk exception.",
+        "The CNES DF collapse to Brasília is an intentional municipality-level normalization; it is not an administrative-region identity."
       ]
     }
   ]

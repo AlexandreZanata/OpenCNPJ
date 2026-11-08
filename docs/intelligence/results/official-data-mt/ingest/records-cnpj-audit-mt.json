@@ -1,15 +1,6 @@
 {
-  "generated_at": "unix:1794170950",
+  "generated_at": "unix:1794174685",
   "inconsistencies": [
-    {
-      "action": "Quarantine or repair the source field; do not join it as a valid CNPJ.",
-      "dataset_id": "aneel-gd",
-      "kind": "record_cnpj_invalid_check_digits",
-      "sample": [
-        "01367173400014"
-      ],
-      "severity": "high"
-    },
     {
       "action": "Check the source year and CNPJ root/establishment; keep unmatched rows explicit.",
       "dataset_id": "aneel-gd",
@@ -29,12 +20,10 @@
       ],
       "cnpj_checked_against_snapshot": 5000,
       "dataset_id": "aneel-gd",
-      "invalid_cnpj_sample": [
-        "01367173400014"
-      ],
+      "invalid_cnpj_sample": [],
       "records": 15651,
       "source_sha256": "4d8d7c0871582542f35108bcd1f39282d6c944e20b46da61dee940ec047485ba",
-      "store_sha256": "2f5f63995f9265838d6facabf0fe183f8c9852bf4f8f8c9bc5198f8814b470a9",
+      "store_sha256": "3498eed2b3790b23feec2d9188d83d87236b257791ce60d09255aec092a2507b",
       "unique_cnpjs": 12186,
       "unmatched_geographies": 0
     },
@@ -67,7 +56,7 @@
       "invalid_cnpj_sample": [],
       "records": 14101,
       "source_sha256": "32fc3f981d0c3e93049ff2aeaf83d3ac2a6781d1972af894eb35e32f7a40f07a",
-      "store_sha256": "eb673a1917c1a6d076978c28a622e9a03c331ad5a412ea3bd1f5cbe358735386",
+      "store_sha256": "30f997e4044c29b9e53ed132120f941d69ef0e3c3affdbe6af2e913b8ad97ac5",
       "unique_cnpjs": 8140,
       "unmatched_geographies": 0
     },
@@ -111,7 +100,7 @@
       "invalid_cnpj_sample": [],
       "records": 7598,
       "source_sha256": "a011daf66131376f5d68271181e3179a25189633a1a4d79f31850740811b7356",
-      "store_sha256": "dca95fe3a47233f784add9996135fb9d2b2c20c587f0b62bcce5cfe8ba0f7962",
+      "store_sha256": "ba8571e80f450a15613fb63926e8eba1c0d94a640038410fa4a1e1fac7700d54",
       "unique_cnpjs": 4161,
       "unmatched_geographies": 0
     },
@@ -122,7 +111,7 @@
       "invalid_cnpj_sample": [],
       "records": 81870,
       "source_sha256": "149d857cfa4aa748017838ed24f29dcf1dc878309c6b2221a6d4cb6e0cb54c26",
-      "store_sha256": "54fc88b5836a788e969a8eb3f5dc6cff170b9b89554f972f4cb3b57b9fa23e57",
+      "store_sha256": "26c1fe34645c697b3255610a406702231df995c63d956f553fa46493f2c198c4",
       "unique_cnpjs": 20497,
       "unmatched_geographies": 0
     }

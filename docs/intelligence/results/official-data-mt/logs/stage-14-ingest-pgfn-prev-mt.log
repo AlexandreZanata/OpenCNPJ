@@ -1,0 +1,3 @@
+raw	/data/opencnpj-data/intelligence/official/ingest/raw/pgfn_previdenciario_2026Q3.zip	bytes=78597920	sha256=149d857cfa4aa748017838ed24f29dcf1dc878309c6b2221a6d4cb6e0cb54c26
+published	/data/opencnpj-data/intelligence/official/ingest/mt/pgfn-previdenciario-2026Q3.ocrec	rows=81870	total=3397082	out_of_scope=3315212	rejected=0	duplicates=0	bytes=60026880	sha256=26c1fe34645c697b3255610a406702231df995c63d956f553fa46493f2c198c4
+elapsed 68.09 s maxrss 197768 KB

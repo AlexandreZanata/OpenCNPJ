@@ -61,14 +61,14 @@ Full national runs produced 98,119 ANTT, 641,928 CNES, 215,545 INEP and
 3,837,044 PGFN records. The stores are outside Git.
 
 The record writer is now a true streaming sink: full national INEP dropped from
-~10.5 GB to 238 MB RSS and PGFN Previdenciário from ~10.7 GB to 198 MB. The raw
-CSV entry for ANEEL is still buffered per file (~1.5 GB).
+~10.5 GB to 238 MB RSS and PGFN Previdenciário from ~10.7 GB to 198 MB. ANEEL
+now streams its 1.5 GB CSV entry with a chunked reader (25 MB RSS).
 
-Record-level CNPJ audit: CNES/INEP/PGFN/ANP/MT sampled CNPJs are present in the
-CNPJ snapshot except 2 INEP and 1 ANEEL CNPJs; PGFN and ANEEL contain invalid
-check-digit CNPJs. CNES has 340 DF administrative-region codes without an IBGE
-municipality match. These are flagged for later normalization, not silently
-repaired. See `ADAPTERS.md`.
+Record-level CNPJ audit: invalid check-digit CNPJs from PGFN and ANEEL are now
+stored without CNPJ identity and counted in the manifest limitations. CNES DF
+administrative-region codes are collapsed explicitly to Brasília (5300108).
+National audit is clean; the only remaining crosswalk exception is one valid
+ANEEL CNPJ absent from the 2026-10 snapshot. See `ADAPTERS.md`.
 
 ## Additional source and CNPJ crosswalk audit
 
@@ -95,7 +95,7 @@ Evidence: `SOURCE-AUDIT.md`, `INCONSISTENCIES.md`,
 |---|---|
 | `cargo fmt --all --check` | exit 0 |
 | `cargo clippy --workspace --all-targets -- -D warnings` | exit 0 |
-| `cargo test --workspace` | 329 passed, 0 failed (29 suites, including doc tests) |
+| `cargo test --workspace` | 331 passed, 0 failed (29 suites, including doc tests) |
 | MT acceptance corpus | 261/261 passed |
 | HTTP API smoke | `/api/v1/official/sources` and `/api/v1/official/query` returned source-backed answer |
 

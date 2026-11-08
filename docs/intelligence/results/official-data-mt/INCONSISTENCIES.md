@@ -30,11 +30,10 @@ Generated from `audit/cnpj-crosswalk-audit.json` and `audit/source-audit.json`.
 
 | Finding | Severity | Proposed resolution |
 |---|---|---|
-| CNES has 340 rows with DF administrative-region codes (`530040`, `530050`, …) absent from the IBGE municipality catalogue | high | Add a verified DF-region crosswalk or keep the rows rejected; never assign them to Brasília by name |
+| CNES DF administrative-region codes | resolved | Collapsed explicitly to Brasília (5300108) and recorded in the manifest limitations |
+| PGFN/ANEEL invalid check-digit CNPJs | resolved | Stored without CNPJ identity, raw field preserved; count in manifest limitations |
+| ANEEL has 1 valid CNPJ absent from the 2026-10 snapshot (`14955450001890`) | medium | Check a newer snapshot/source year; keep unmatched explicit |
 | INEP has 2 sampled CNPJs absent from the 2026-10 snapshot | medium | Check source year/root; keep unmatched explicit |
-| PGFN FGTS has 1 invalid check-digit CNPJ | high | Quarantine before any CNPJ join; preserve the raw field |
-| PGFN Previdenciário has 20 invalid check-digit CNPJs in the sample | high | Quarantine before any CNPJ join; preserve the raw field |
-| ANEEL has 1 invalid check-digit CNPJ and 1 sampled CNPJ absent from the snapshot | medium | Quarantine the invalid value; check the absent source year/root |
 | ANP sample: 126 unique MT CNPJs, all present; no invalid CNPJ | info | No action |
 | MT convenios sample: 68 unique CNPJs, all present | info | No action |
 | INEP uses `99999999999999` as a CNPJ sentinel | info | Normalized to missing; recorded in adapter limitations |
