@@ -1071,6 +1071,8 @@ fn dimension(n: &str) -> Option<Dim> {
         Some(Dim::Cnae(CnaeLevel::Section))
     } else if has(n, &["divisao cnae", "divisoes"]) {
         Some(Dim::Cnae(CnaeLevel::Division))
+    } else if has(n, &["grupo cnae", "grupos cnae"]) {
+        Some(Dim::Cnae(CnaeLevel::Group))
     } else if has(n, &["subclasse cnae", "subclasses"]) {
         Some(Dim::Cnae(CnaeLevel::Subclass))
     } else if has(n, &["por porte", "grupos de porte"]) {

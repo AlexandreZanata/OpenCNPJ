@@ -193,7 +193,7 @@ since = "v1"
 [[sector]]
 id = "body_shop"
 display = { sing = "oficina de funilaria", plural = "oficinas de funilaria", gender = "f" }
-aliases = ["lanternagem", "funilaria", "funilarias", "funilaria e pintura"]
+aliases = ["lanternagem", "funilaria", "funilarias", "funilaria e pintura", "funileiro", "funileiros", "lanterneiro", "lanterneiros"]
 cnae_core = ["4520002"]
 cnae_extended = []
 scope = "main"
@@ -265,7 +265,7 @@ since = "v1"
 [[sector]]
 id = "candy_store"
 display = { sing = "loja de doces", plural = "lojas de doces", gender = "f" }
-aliases = ["bomboniere", "bombonieres", "doceria", "docerias"]
+aliases = ["bomboniere", "bombonieres", "doceria", "docerias", "confeiteiro", "confeiteiros", "confeitaria", "confeitarias", "doceiro", "doceiros"]
 cnae_core = ["4721104"]
 cnae_extended = []
 scope = "main"
@@ -963,7 +963,7 @@ since = "v1"
 [[sector]]
 id = "landscaping"
 display = { sing = "serviço de paisagismo", plural = "serviços de paisagismo", gender = "m" }
-aliases = ["paisagista", "paisagistas"]
+aliases = ["paisagista", "paisagistas", "jardineiro", "jardineiros"]
 cnae_core = ["8130300"]
 cnae_extended = []
 scope = "main"

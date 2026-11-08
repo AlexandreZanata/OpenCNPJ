@@ -684,3 +684,9 @@ fn round13_compound_edit_can_clear_capital_ceiling() {
     assert_eq!(r.scope.capital, None);
     assert_eq!(r.scope.mei, Tri::Yes);
 }
+
+#[test]
+fn round15_cnae_group_breakdown_is_supported() {
+    let r = req("Distribua as padarias ativas em Sorriso/MT por grupo CNAE.");
+    assert!(matches!(r.op, Op::Breakdown { dim: Dim::Cnae(CnaeLevel::Group), .. }));
+}
