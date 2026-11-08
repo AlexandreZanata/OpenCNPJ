@@ -2530,6 +2530,7 @@ dependencies = [
  "moka",
  "opencnpj-core",
  "opencnpj-ingest",
+ "opencnpj-insights",
  "opencnpj-store",
  "rayon",
  "reqwest",

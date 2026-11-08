@@ -131,18 +131,107 @@ async fn login(e: &Env, key: &str) -> String {
 }
 
 #[tokio::test(flavor = "multi_thread")]
+async fn official_sources_and_query_are_exposed() {
+    use opencnpj_insights::official::{
+        model::{CellStatus, DatasetManifest, Observation},
+        store::write_store,
+    };
+    let official = tempfile::tempdir().unwrap();
+    let rows = vec![Observation {
+        dataset_id: "ibge-6579".into(),
+        variable_id: "populacao_estimada".into(),
+        variable_label: "População residente estimada".into(),
+        unit: "Pessoas".into(),
+        classification_id: String::new(),
+        classification_label: String::new(),
+        category_id: String::new(),
+        category_label: String::new(),
+        geography_level: "N6".into(),
+        geography_code: "5107925".into(),
+        geography_name: "Sorriso".into(),
+        period: "2024".into(),
+        value: Some(120_985.0),
+        status: CellStatus::Observed,
+        source_url: "https://servicodados.ibge.gov.br/api/v3/agregados/6579".into(),
+    }];
+    let manifest = DatasetManifest {
+        format_version: 1,
+        source_id: "ibge".into(),
+        dataset_id: "ibge-6579".into(),
+        title: "População residente estimada".into(),
+        publisher: "IBGE".into(),
+        source_url: "https://servicodados.ibge.gov.br/api/v3/agregados/6579".into(),
+        metadata_url: "https://servicodados.ibge.gov.br/api/v3/agregados/6579/metadados".into(),
+        licence: "IBGE public statistics".into(),
+        licence_url: "https://www.ibge.gov.br/acesso-informacao/termos-de-uso.html".into(),
+        licence_status: "review_required".into(),
+        attribution: "Fonte: IBGE".into(),
+        retrieved_at: "unix:0".into(),
+        publication: None,
+        coverage: "Mato Grosso".into(),
+        unit: "Pessoas".into(),
+        period_from: Some("2024".into()),
+        period_to: Some("2024".into()),
+        raw_sha256: "0".repeat(64),
+        raw_bytes: 1,
+        row_count: 1,
+        accepted_rows: 1,
+        rejected_rows: 0,
+        duplicate_rows: 0,
+        malformed_rows: 0,
+        state: "queryable".into(),
+        limitations: vec!["A municipal statistic is not a CNPJ fact.".into()],
+    };
+    write_store(official.path().join("ibge-6579.ocind"), &manifest, rows).unwrap();
+    let e = env(&["--official-dir", official.path().to_str().unwrap(), "--auth", "off"]);
+    let sources = get(&e.public, "/api/v1/official/sources", None).await;
+    assert_eq!(sources.status, StatusCode::OK);
+    assert!(sources.json()["datasets"].as_array().unwrap().iter().any(|row| row["dataset_id"] == "ibge-6579"));
+
+    let answer =
+        get(&e.public, "/api/v1/official/query?operation=lookup&variable=populacao_estimada&geography=5107925&period=2024", None).await;
+    assert_eq!(answer.status, StatusCode::OK, "{}", answer.text);
+    let body = answer.json();
+    assert_eq!(body["status"], "ok");
+    assert_eq!(body["unit"], "Pessoas");
+    assert_eq!(body["rows"][0]["value"], 120985.0);
+    assert_eq!(body["sources"][0]["licence_status"], "review_required");
+
+    let unavailable = get(&e.public, "/api/v1/official/query?variable=populacao_estimada&geography=5107925&period=2023", None).await;
+    assert_eq!(unavailable.status, StatusCode::OK);
+    assert_eq!(unavailable.json()["status"], "empty");
+
+    let bad = get(&e.public, "/api/v1/official/query?operation=rank&variable=populacao_estimada&limit=101", None).await;
+    assert_eq!(bad.status, StatusCode::BAD_REQUEST);
+}
+
+#[tokio::test(flavor = "multi_thread")]
 async fn required_auth_guards_data_routes_only() {
     let e = env(&[]);
     let r = get(&e.public, "/api/v1/search?uf=SP", None).await;
     assert_eq!(r.status, StatusCode::UNAUTHORIZED);
     assert_eq!(r.json()["error"], "unauthenticated");
     assert!(r.header("www-authenticate").unwrap().starts_with("Bearer"));
-    for uri in
-        ["/api/v1/cnpj/00000000000191", "/api/v1/cpf/12345678901", "/api/v1/stats", "/api/v1/export?uf=SP", "/downloads/fixture.ocnpj"]
-    {
+    for uri in [
+        "/api/v1/cnpj/00000000000191",
+        "/api/v1/cpf/12345678901",
+        "/api/v1/stats",
+        "/api/v1/export?uf=SP",
+        "/downloads/fixture.ocnpj",
+        "/api/v1/official/query?variable=populacao_estimada",
+    ] {
         assert_eq!(get(&e.public, uri, None).await.status, StatusCode::UNAUTHORIZED, "{uri}");
     }
-    for uri in ["/", "/healthz", "/readyz", "/api/v1/campos", "/api/v1/dominios", "/api/v1/snapshot", "/api/v1/distribution"] {
+    for uri in [
+        "/",
+        "/healthz",
+        "/readyz",
+        "/api/v1/campos",
+        "/api/v1/dominios",
+        "/api/v1/snapshot",
+        "/api/v1/distribution",
+        "/api/v1/official/sources",
+    ] {
         assert_eq!(get(&e.public, uri, None).await.status, StatusCode::OK, "{uri}");
     }
     assert_eq!(get(&e.public, "/metrics", None).await.status, StatusCode::NOT_FOUND, "metrics move to the admin listener");
