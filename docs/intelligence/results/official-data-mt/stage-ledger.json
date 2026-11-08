@@ -53,23 +53,50 @@
     {
       "id": 3,
       "name": "Novo Caged and RAIS",
-      "status": "pending",
-      "evidence": [],
-      "blockers": []
+      "status": "partial",
+      "evidence": [
+        "crates/opencnpj-lab/src/official.rs",
+        "crates/opencnpj-lab/src/official/xlsx.rs",
+        "crates/opencnpj-insights/official/sources.toml",
+        "docs/intelligence/results/official-data-mt/STAGE-3.md",
+        "docs/intelligence/results/official-data-mt/REAL-DATA.md",
+        "docs/intelligence/results/official-data-mt/logs/stage-3-rais-import.log",
+        "docs/intelligence/results/official-data-mt/logs/stage-3-rais-query.log"
+      ],
+      "blockers": [
+        "Novo Caged monthly aggregate blocked: no admitted stable small municipal endpoint; PDET FTP microdata and Google Drive tables not used to fabricate a series."
+      ]
     },
     {
       "id": 4,
       "name": "MT agriculture: PAM, PPM, LSPA",
-      "status": "pending",
-      "evidence": [],
+      "status": "complete",
+      "evidence": [
+        "crates/opencnpj-lab/src/official.rs",
+        "crates/opencnpj-insights/official/sources.toml",
+        "docs/intelligence/results/official-data-mt/STAGE-4.md",
+        "docs/intelligence/results/official-data-mt/REAL-DATA.md",
+        "docs/intelligence/results/official-data-mt/logs/stage-2-real-queries.log"
+      ],
       "blockers": []
     },
     {
       "id": 5,
       "name": "MT fleet and ANTT transport specialization",
-      "status": "pending",
-      "evidence": [],
-      "blockers": []
+      "status": "partial",
+      "evidence": [
+        "crates/opencnpj-lab/src/official.rs",
+        "crates/opencnpj-lab/src/official/xlsx.rs",
+        "crates/opencnpj-insights/official/sources.toml",
+        "docs/intelligence/results/official-data-mt/STAGE-5.md",
+        "docs/intelligence/results/official-data-mt/REAL-DATA.md",
+        "docs/intelligence/results/official-data-mt/logs/stage-5-senatran-import.log",
+        "docs/intelligence/results/official-data-mt/logs/stage-5-senatran-queries.log"
+      ],
+      "blockers": [
+        "ANTT RNTRC aggregate/identified schemas not admitted; no CNPJ fleet ownership link.",
+        "Vehicles per related establishment requires an explicit CNPJ cross-source operation, not implemented."
+      ]
     },
     {
       "id": 6,

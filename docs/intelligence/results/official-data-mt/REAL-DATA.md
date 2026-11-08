@@ -86,3 +86,60 @@ or borrow another year.
 - Municipal income from the 2022 Census was not found in an admitted municipal
   API resource; it is not substituted with GDP, payroll or another unit.
 - Municipal GDP per capita is not household income or purchasing power.
+
+## Stage 3 - RAIS 2024
+
+Source: official `RAIS Complementar - Tabelas 2023x2024.xlsx`, sheet `TABELA 4`.
+The workbook uses six-digit municipality codes; the importer bridges them to the
+seven-digit IBGE code through the versioned municipality catalogue. For the MT
+slice, 142 municipalities matched.
+
+| Dataset | Variable | Geography | Period | Value | Unit |
+|---|---|---|---|---:|---|
+| `mte-rais-2024` | `rais_emprego_total` | Sorriso (5107925) | 2023 | 38783 | Vínculos |
+| `mte-rais-2024` | `rais_emprego_total` | Sorriso (5107925) | 2024 | 39482 | Vínculos |
+
+Independent extraction from `C5324 = 510792`, `Y5324 = 38783`, `Z5324 = 39482`
+in the official workbook. Store rows: 1704 (142 municipalities x 6 variables x
+2 years). Raw SHA-256
+`175c696341bb2821dc6a210367ccd20ba8e9e5f9d790daef195b76b3ee90ab38`; store
+SHA-256 `b646cc727c9f97b9d415a464a8fd7afe1c69211e356488cdf62be4fc0009a8cb`.
+
+Novo Caged monthly aggregates remain blocked: no small verified municipal
+aggregate endpoint was admitted. The public microdata are on the PDET FTP server
+and the monthly tables are distributed through a Google Drive folder. Neither is
+used to fabricate a monthly series here.
+
+## Stage 4 - PAM, PPM and LSPA
+
+| Dataset | Source variable / class / category | Geography | Period | Value | Unit |
+|---|---|---|---|---:|---|
+| `ibge-1612` | area planted `109`, class `81`, soybean `2713` | Sorriso | 2024 | 600000 | Hectares |
+| `ibge-1612` | production `214`, class `81`, soybean `2713` | Sorriso | 2024 | 2084520 | Toneladas |
+| `ibge-1613` | production `214`, class `82`, coffee `2723` | MT municipalities | 2020-2025 | imported | Toneladas |
+| `ibge-3939` | herd `105`, class `79`, bovine `2670` | Sorriso | 2024 | 99790 | Cabeças |
+| `ibge-6588` | production `35`, class `48`, soybean `39443` | Mato Grosso (51) | 202609 | 50665337 | Toneladas |
+
+`ibge-6588` is state-level for this resource. No monthly municipal production was
+synthesized from the annual PAM figure. LSPA raw SHA-256
+`06db7f7beb3d1b07be86dfec9b05eb04ea81c22daf845b9276c20a2781409fcd`; store
+SHA-256 `bb4ca2f93c41d379a308828c7d74c792ad8a04305fad1d797e5de064acb90527`.
+
+## Stage 5 - Senatran registered fleet, September 2026
+
+| Dataset | Variable | Geography | Period | Value | Unit |
+|---|---|---|---|---:|---|
+| `senatran-frota-2026-09` | `frota_total` | Sorriso (5107925) | 202609 | 112951 | Veículos |
+| `senatran-frota-2026-09` | `frota_caminhao` | Sorriso (5107925) | 202609 | 3794 | Veículos |
+| `senatran-frota-2026-09` | `frota_caminhao` | Sinop (5107909) | 202609 | 5588 | Veículos |
+
+The official sheet has UF + municipality name, not an IBGE code. The importer
+bridges names to seven-digit IBGE codes through the versioned catalogue and
+records unmatched rows. One known spelling difference
+(`VILA BELA DA SANTISSIMA TRINDA`) is handled by an explicit alias with evidence;
+after that, all 142 MT municipalities matched. Store rows: 3124 (142 x 22 types).
+Raw SHA-256 `889d133da1ee2c301ad9a3e6b41b24fbb94286b4ba483c15cb706775bef5e16a`;
+store SHA-256 `c3d9e04c44c466a07d222b158cced91eb7ae84cbf567c0f5f4c3c63f04d452b6`.
+
+ANTT RNTRC remains not admitted: aggregate history and identified resources have
+different schemas and coverage. No CNPJ/fleet ownership link is claimed.
