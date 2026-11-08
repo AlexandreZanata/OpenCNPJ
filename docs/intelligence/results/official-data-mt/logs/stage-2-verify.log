@@ -1,0 +1,8 @@
+/data/opencnpj-data/intelligence/official/ibge-1612.ocind	ibge-1612	rows=25560	period=Some("2020")..Some("2025")	sha256=c84ccb1bdd6460223b8eeae41ac6907ee596d499fc2c98a7d51e0bbc38b576c9
+/data/opencnpj-data/intelligence/official/ibge-1613.ocind	ibge-1613	rows=4200	period=Some("2020")..Some("2025")	sha256=84f307874bc1d3765bb23be0a721993de2d316dd8de167c442d15772add704f2
+/data/opencnpj-data/intelligence/official/ibge-3939.ocind	ibge-3939	rows=3408	period=Some("2020")..Some("2025")	sha256=752f9a21f795bc59611154bfbf0611121485ab9a889c9fbc75745dd945503542
+/data/opencnpj-data/intelligence/official/ibge-5938.ocind	ibge-5938	rows=12496	period=Some("2002")..Some("2023")	sha256=59331e4f04128b1b7326cae346f64e3e351f864b7ac0d5745023cb65f6bb82f9
+/data/opencnpj-data/intelligence/official/ibge-6579.ocind	ibge-6579	rows=3146	period=Some("2001")..Some("2026")	sha256=63d176628036c6312a052384d933b22f22192ac5c5390fdc7ba51b25403607a7
+/data/opencnpj-data/intelligence/official/ibge-6588.ocind	ibge-6588	rows=723	period=Some("200609")..Some("202609")	sha256=bb4ca2f93c41d379a308828c7d74c792ad8a04305fad1d797e5de064acb90527
+/data/opencnpj-data/intelligence/official/ibge-9509.ocind	ibge-9509	rows=2538	period=Some("2022")..Some("2024")	sha256=61d2b28179b385eb63f2605cb3a1feeb3bf15ca6c97c9b8a7fc542c932317d27
+/data/opencnpj-data/intelligence/official/ibge-9922.ocind	ibge-9922	rows=423	period=Some("2022")..Some("2022")	sha256=02fd9b5166057eeea83b05189808b1081b0ca5c4f141ad51fb9e24cb90098afc

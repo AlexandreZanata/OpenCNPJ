@@ -1,0 +1,24 @@
+raw	/data/opencnpj-data/intelligence/official/raw/ibge-6579.raw.json	bytes=61636	sha256=d648c74d9153752ed1faf72398bb4b96cc0f2b53fa2d96ecc3ddb00facd44314
+published	/data/opencnpj-data/intelligence/official/ibge-6579.ocind	rows=3146	duplicates=0	malformed=0	bytes=1007616	sha256=63d176628036c6312a052384d933b22f22192ac5c5390fdc7ba51b25403607a7
+raw	/data/opencnpj-data/intelligence/official/raw/ibge-5938.raw.json	bytes=251537	sha256=f383c5d6efcce56f63c1fc7cb2b9f7a2ab8500f04e965f08f56591bbe0523701
+published	/data/opencnpj-data/intelligence/official/ibge-5938.ocind	rows=12496	duplicates=0	malformed=0	bytes=4022272	sha256=59331e4f04128b1b7326cae346f64e3e351f864b7ac0d5745023cb65f6bb82f9
+raw	/data/opencnpj-data/intelligence/official/raw/ibge-9509.raw.json	bytes=130712	sha256=98227236b559fac5c5bd8b26d3ac5a41899d912ee7d2f5ca17fd69058e501661
+published	/data/opencnpj-data/intelligence/official/ibge-9509.ocind	rows=2538	duplicates=0	malformed=0	bytes=888832	sha256=61d2b28179b385eb63f2605cb3a1feeb3bf15ca6c97c9b8a7fc542c932317d27
+raw	/data/opencnpj-data/intelligence/official/raw/ibge-9922.raw.json	bytes=53387	sha256=43d88e2711fb05f8af685df31e7e804cc7a6d70fa0d7921002446a0376bb3a67
+published	/data/opencnpj-data/intelligence/official/ibge-9922.ocind	rows=423	duplicates=0	malformed=0	bytes=188416	sha256=02fd9b5166057eeea83b05189808b1081b0ca5c4f141ad51fb9e24cb90098afc
+raw	/data/opencnpj-data/intelligence/official/raw/ibge-1612.raw.json	bytes=133138	sha256=a07a130a512ec07baa0fd6731ccf29a899abf604d1f7aff27bc5e6919ff325f7
+raw	/data/opencnpj-data/intelligence/official/raw/ibge-1612.raw.json.1	bytes=131827	sha256=7e0d61f3228edcd24e024540659f0438909484785caf8ada9c0dd9f89d88a4a4
+raw	/data/opencnpj-data/intelligence/official/raw/ibge-1612.raw.json.2	bytes=131142	sha256=b54f7a70542bcf642718577052c3829c2ecd29905866e832ca93220b11c191a7
+raw	/data/opencnpj-data/intelligence/official/raw/ibge-1612.raw.json.3	bytes=131222	sha256=6598e929148dc218a01c6dc04c7ac7ffd32ea1f8ee3d8208c8c3f100344075e3
+raw	/data/opencnpj-data/intelligence/official/raw/ibge-1612.raw.json.4	bytes=141632	sha256=7822482341d2f4c2ee03a9d98263629f30ffc2d1117579d47bef8f4b16db163d
+raw	/data/opencnpj-data/intelligence/official/raw/ibge-1612.raw.json.5	bytes=142037	sha256=755bfe9a7efe214f4c33c0b139a7b3291cdbd37fb699dc885ac07cc2c820b5c5
+published	/data/opencnpj-data/intelligence/official/ibge-1612.ocind	rows=25560	duplicates=0	malformed=0	bytes=10084352	sha256=c84ccb1bdd6460223b8eeae41ac6907ee596d499fc2c98a7d51e0bbc38b576c9
+raw	/data/opencnpj-data/intelligence/official/raw/ibge-1613.raw.json	bytes=127534	sha256=892deaf9fb019293e4b1f58b47be5ccb92526073e58a9c17393e2b8c6724787e
+published	/data/opencnpj-data/intelligence/official/ibge-1613.ocind	rows=4200	duplicates=0	malformed=0	bytes=1736704	sha256=84f307874bc1d3765bb23be0a721993de2d316dd8de167c442d15772add704f2
+raw	/data/opencnpj-data/intelligence/official/raw/ibge-3939.raw.json	bytes=29239	sha256=1fb2f0771431694cc09579ab6faa22009e4bb417c72cd55678e67e67a6492acd
+raw	/data/opencnpj-data/intelligence/official/raw/ibge-3939.raw.json.1	bytes=28744	sha256=037ef334f66f0e56ac8d1f0f95866d0950071ac6146948d9006c944c683b0847
+raw	/data/opencnpj-data/intelligence/official/raw/ibge-3939.raw.json.2	bytes=27678	sha256=b044b3ce4835c4ed3ed3ed4ede1f4b13ae57bcb8dc45b8dd57492e638a0e3137
+raw	/data/opencnpj-data/intelligence/official/raw/ibge-3939.raw.json.3	bytes=27927	sha256=daefb8449069b95fe3edd81831aba33f7bcdbf99258b1d34d5a6c11e1465b14f
+published	/data/opencnpj-data/intelligence/official/ibge-3939.ocind	rows=3408	duplicates=0	malformed=0	bytes=1155072	sha256=752f9a21f795bc59611154bfbf0611121485ab9a889c9fbc75745dd945503542
+raw	/data/opencnpj-data/intelligence/official/raw/ibge-6588.raw.json	bytes=14223	sha256=06db7f7beb3d1b07be86dfec9b05eb04ea81c22daf845b9276c20a2781409fcd
+published	/data/opencnpj-data/intelligence/official/ibge-6588.ocind	rows=723	duplicates=0	malformed=0	bytes=270336	sha256=bb4ca2f93c41d379a308828c7d74c792ad8a04305fad1d797e5de064acb90527

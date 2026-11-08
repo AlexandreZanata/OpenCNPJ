@@ -1,0 +1,47 @@
+$ official ask "Qual a população estimada de Sorriso em 2024?"
+Consulta: População residente estimada
+Período: 2024.
+Unidade: Pessoas.
+Sorriso - MT (5107925) [2024]: 120.985
+Cobertura: Mato Grosso and its municipalities.
+Fonte: IBGE - População residente estimada (ibge-6579, https://servicodados.ibge.gov.br/api/v3/agregados/6579). Licença: IBGE public statistics; resource-level terms require review (review_required).
+Limitação: A municipal population is not a count of an individual CNPJ's customers.
+Limitação: Population estimates are annual and are not a 2022 Census observation.
+Limitação: Uma estatística municipal não é um fato observado sobre um CNPJ individual.
+
+$ official ask "Compare Sorriso e Sinop na população de 2024"
+Comparação: População residente estimada
+Período: 2024.
+Unidade: Pessoas.
+Sorriso - MT (5107925) [2024]: 120.985
+Sinop - MT (5107909) [2024]: 216.029
+Cobertura: Mato Grosso and its municipalities.
+Fonte: IBGE - População residente estimada (ibge-6579, https://servicodados.ibge.gov.br/api/v3/agregados/6579). Licença: IBGE public statistics; resource-level terms require review (review_required).
+Limitação: A municipal population is not a count of an individual CNPJ's customers.
+Limitação: Associação, ranking ou tendência não prova causalidade, demanda ou vínculo comercial.
+Limitação: Population estimates are annual and are not a 2022 Census observation.
+Limitação: Uma estatística municipal não é um fato observado sobre um CNPJ individual.
+
+$ official ask "Evolução da produção de soja em Sorriso entre 2020 e 2024"
+Série temporal: Quantidade produzida
+Período: 2020, 2021, 2022, 2023, 2024.
+Unidade: Toneladas.
+Sorriso - MT (5107925) [2020] - Soja (em grão): 2.283.300
+Sorriso - MT (5107925) [2021] - Soja (em grão): 2.010.960
+Sorriso - MT (5107925) [2022] - Soja (em grão): 2.118.690
+Sorriso - MT (5107925) [2023] - Soja (em grão): 2.244.375
+Sorriso - MT (5107925) [2024] - Soja (em grão): 2.084.520
+Cálculo: observações ordenadas pelo período de referência publicado.
+Cobertura: Mato Grosso municipalities.
+Fonte: IBGE - PAM lavouras temporárias (ibge-1612, https://servicodados.ibge.gov.br/api/v3/agregados/1612). Licença: IBGE public statistics; resource-level terms require review (review_required).
+Limitação: A production total does not identify a farm, a CNPJ's land, machinery or purchasing intent.
+Limitação: Annual municipal production cannot be divided into monthly municipal production.
+Limitação: Associação, ranking ou tendência não prova causalidade, demanda ou vínculo comercial.
+Limitação: Produção agropecuária regional não identifica propriedade rural, rebanho ou intenção de compra de um CNPJ.
+Limitação: Uma estatística municipal não é um fato observado sobre um CNPJ individual.
+
+$ official ask "Quantos funcionários tem o CNPJ de Sorriso?"
+Não há contagem de funcionários por CNPJ nas fontes admitidas. Estatísticas municipais de emprego não descrevem um CNPJ individual.
+
+$ official ask --dir /tmp/missing ...
+Não foi possível responder: Nenhum ativo oficial foi importado: read /tmp/missing

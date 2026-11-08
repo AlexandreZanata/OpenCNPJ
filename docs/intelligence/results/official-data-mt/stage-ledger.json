@@ -32,9 +32,23 @@
     {
       "id": 2,
       "name": "Essential IBGE context for MT",
-      "status": "pending",
-      "evidence": [],
-      "blockers": []
+      "status": "complete",
+      "evidence": [
+        "crates/opencnpj-lab/src/official.rs",
+        "crates/opencnpj-lab/src/official/ask.rs",
+        "crates/opencnpj-insights/src/official/",
+        "crates/opencnpj-insights/official/sources.toml",
+        "docs/intelligence/results/official-data-mt/STAGE-2.md",
+        "docs/intelligence/results/official-data-mt/REAL-DATA.md",
+        "docs/intelligence/results/official-data-mt/logs/stage-2-imports.log",
+        "docs/intelligence/results/official-data-mt/logs/stage-2-real-queries.log",
+        "docs/intelligence/results/official-data-mt/logs/stage-2-real-ask.log",
+        "docs/intelligence/results/official-data-mt/logs/stage-2-verify.log"
+      ],
+      "blockers": [
+        "2022 Census municipal household income not found in an admitted municipal API resource; not substituted.",
+        "IBGE reuse terms returned HTTP 403 to the automated check; licence remains review_required."
+      ]
     },
     {
       "id": 3,

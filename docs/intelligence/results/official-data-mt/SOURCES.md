@@ -48,7 +48,8 @@ manifest. It stores:
 - retrieval time and optional publication time;
 - coverage, reference periods, unit and limitations;
 - raw-response SHA-256 and byte count;
-- total, accepted, rejected, duplicate and malformed row counts;
+- total, accepted, rejected, duplicate and malformed row counts. Malformed numeric
+  cells are stored with status `malformed`; duplicates are not inserted;
 - normalized observations with explicit cell state: `observed`, `missing`,
   `suppressed`, `not_available` or `malformed`.
 
