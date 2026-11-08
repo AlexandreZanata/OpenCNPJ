@@ -114,7 +114,7 @@ impl Registry {
         let mut datasets = BTreeMap::new();
         for dataset in file.dataset {
             ensure!(sources.contains_key(&dataset.source_id), "dataset {} references unknown source", dataset.id);
-            validate_url(&dataset.api_url)?;
+            validate_data_url(&dataset.api_url)?;
             validate_url(&dataset.metadata_url)?;
             ensure!(SOURCE_STATES.contains(&dataset.state.as_str()), "unknown dataset state '{}'", dataset.state);
             ensure!(!dataset.category.is_empty(), "dataset {} has no category", dataset.id);
@@ -179,6 +179,13 @@ impl Registry {
 fn validate_url(url: &str) -> Result<()> {
     if !url.starts_with("https://") {
         bail!("registry URL must be HTTPS: {url}");
+    }
+    Ok(())
+}
+
+fn validate_data_url(url: &str) -> Result<()> {
+    if !url.starts_with("https://") && !url.starts_with("http://") {
+        bail!("registry data URL must be HTTP(S): {url}");
     }
     Ok(())
 }

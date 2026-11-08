@@ -833,3 +833,88 @@ source_variable = "ONIBUS"
 label = "Frota registrada de ônibus"
 unit = "Veículos"
 synonyms = ["onibus", "frota de onibus"]
+
+[[dataset]]
+id = "antt-rntrc-veiculos"
+category = "transport"
+source_id = "antt"
+title = "ANTT RNTRC - veículos por UF e categoria"
+aggregate = "rntrc-veiculos"
+api_url = "https://dados.antt.gov.br/dataset/2b564396-5593-4b5c-ba2c-3de3fa0a92c0/resource/c1367dd9-2874-4d97-bca3-3940e70bf224/download/rntrc-veiculos.json"
+metadata_url = "https://dados.antt.gov.br/dataset/rntrc-veiculos"
+cadence = "periodic; check the dataset page"
+coverage = "Brazil by UF and vehicle category; this adapter keeps the MT slice"
+state = "verified"
+limitations = [
+  "RNTRC vehicle data are aggregate records by transport category, not identified company fleets.",
+  "Operational registration is not service quality or a client list.",
+  "A vehicle record does not identify a CNPJ owner."
+]
+
+[[dataset]]
+id = "cnes-estabelecimentos"
+category = "health"
+source_id = "cnes"
+title = "CNES - estabelecimentos de saúde"
+aggregate = "cnes-estabelecimentos"
+api_url = "https://s3.sa-east-1.amazonaws.com/ckan.saude.gov.br/CNES/cnes_estabelecimentos_csv.zip"
+metadata_url = "https://dadosabertos.saude.gov.br/dataset/cnes-cadastro-nacional-de-estabelecimentos-de-saude"
+cadence = "monthly"
+coverage = "Brazil; this adapter keeps the MT slice"
+state = "verified"
+limitations = [
+  "CNES IDs are not CNPJs; the CNPJ fields are links where present.",
+  "Personal-professional fields are out of scope.",
+  "National publication and completeness can lag."
+]
+
+[[dataset]]
+id = "inep-censo-escolar-2024"
+category = "education"
+source_id = "inep"
+title = "INEP Censo Escolar 2024 - escolas"
+aggregate = "censo-escolar-2024"
+api_url = "http://download.inep.gov.br/dados_abertos/microdados_censo_escolar_2024.zip"
+metadata_url = "https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/microdados/censo-escolar"
+cadence = "annual"
+coverage = "Brazil; this adapter keeps the MT slice"
+state = "verified"
+limitations = [
+  "School codes are not CNPJs.",
+  "Student-level information is out of scope.",
+  "The INEP HTTPS certificate chain failed verification on the check date; the official HTTP endpoint is used."
+]
+
+[[dataset]]
+id = "pgfn-fgts-2026Q3"
+category = "fiscal"
+source_id = "pgfn"
+title = "PGFN - dívida ativa FGTS 2026Q3"
+aggregate = "divida-ativa-fgts-2026Q3"
+api_url = "https://dadosabertos.pgfn.gov.br/2026_trimestre_03/Dados_abertos_FGTS.zip"
+metadata_url = "https://www.gov.br/pgfn/pt-br/assuntos/divida-ativa-da-uniao/transparencia-fiscal-1/dados-abertos"
+cadence = "quarterly"
+coverage = "Brazil; this adapter keeps the MT legal-person slice"
+state = "verified"
+limitations = [
+  "Federal/FGTS scope; not every tax liability.",
+  "A debt record is not insolvency, a credit score or a current tax-clearance certificate.",
+  "Natural-person records are excluded from this business-prospecting slice."
+]
+
+[[dataset]]
+id = "pgfn-previdenciario-2026Q3"
+category = "fiscal"
+source_id = "pgfn"
+title = "PGFN - dívida ativa previdenciária 2026Q3"
+aggregate = "divida-ativa-previdenciario-2026Q3"
+api_url = "https://dadosabertos.pgfn.gov.br/2026_trimestre_03/Dados_abertos_Previdenciario.zip"
+metadata_url = "https://www.gov.br/pgfn/pt-br/assuntos/divida-ativa-da-uniao/transparencia-fiscal-1/dados-abertos"
+cadence = "quarterly"
+coverage = "Brazil; this adapter keeps the MT legal-person slice"
+state = "verified"
+limitations = [
+  "Federal/FGTS scope; not every tax liability.",
+  "A debt record is not insolvency, a credit score or a current tax-clearance certificate.",
+  "Natural-person records are excluded from this business-prospecting slice."
+]

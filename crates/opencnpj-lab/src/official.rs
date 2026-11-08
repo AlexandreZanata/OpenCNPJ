@@ -13,6 +13,7 @@ use clap::{Args, Subcommand};
 use opencnpj_insights::{
     agg::{Aggregate, MUNICIPALITY_MISSING, Section, Table},
     catalog::municipalities::{MunicipalityCatalogue, Place, fold_name},
+    official::records::{RECORD_EXTENSION, RecordStore},
     official::{
         model::{CellStatus, DatasetManifest, Observation},
         query::{self, Answer, CategoryFilter, Request},
@@ -20,12 +21,14 @@ use opencnpj_insights::{
         store::{StoreSet, missing_dataset_message, sha256_file, write_store},
     },
 };
+use opencnpj_store::Snapshot;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sha2::{Digest, Sha256};
 
 const AUDIT_PROBES_TOML: &str = include_str!("../../opencnpj-insights/official/audit-probes.toml");
 
+mod adapters;
 mod ask;
 mod xlsx;
 
@@ -63,6 +66,15 @@ pub(crate) enum OfficialCommand {
     AuditCnpj(AuditCnpjArgs),
     /// Revalidate every registered source and catalog downloaded samples exactly as received.
     AuditSources(AuditSourcesArgs),
+    /// Ingest a record-level official source into an immutable `.ocrec` store.
+    Ingest(adapters::IngestArgs),
+    /// Verify record-level `.ocrec` stores, their manifests and row accounting.
+    VerifyRecords {
+        #[arg(long)]
+        dir: PathBuf,
+    },
+    /// Check record-level CNPJs and geographies against the CNPJ snapshot and IBGE catalogue.
+    AuditRecords(AuditRecordsArgs),
     /// Execute an admitted indicator operation.
     Query(QueryArgs),
     /// Interpret a Portuguese question and execute it against published stores.
@@ -84,6 +96,9 @@ pub(crate) fn run_official(command: OfficialCommand) -> Result<()> {
         OfficialCommand::ImportSenatran(args) => import_senatran(args),
         OfficialCommand::AuditCnpj(args) => audit_cnpj(args),
         OfficialCommand::AuditSources(args) => audit_sources(args),
+        OfficialCommand::Ingest(args) => adapters::run(args),
+        OfficialCommand::VerifyRecords { dir } => verify_records(&dir),
+        OfficialCommand::AuditRecords(args) => audit_records(args),
         OfficialCommand::Query(args) => run_query(args),
         OfficialCommand::Ask(args) => run_ask(args),
     }
@@ -189,6 +204,166 @@ fn status(dir: Option<&Path>, json: bool) -> Result<()> {
                 row.licence_status
             );
         }
+    }
+    Ok(())
+}
+
+fn audit_records(args: AuditRecordsArgs) -> Result<()> {
+    ensure!(args.sample > 0, "sample must be positive");
+    let snapshot = Snapshot::open(&args.snapshot)?;
+    let catalogue = MunicipalityCatalogue::load(&args.catalog)?;
+    let mut paths = Vec::new();
+    for entry in fs::read_dir(&args.dir).with_context(|| format!("read {}", args.dir.display()))? {
+        let path = entry?.path();
+        if path.extension().and_then(|value| value.to_str()) == Some(RECORD_EXTENSION) {
+            paths.push(path);
+        }
+    }
+    paths.sort();
+    ensure!(!paths.is_empty(), "no .{RECORD_EXTENSION} stores in {}", args.dir.display());
+    let mut reports = Vec::new();
+    let mut inconsistencies = Vec::new();
+    for path in paths {
+        let store = RecordStore::open(&path)?;
+        store.verify()?;
+        let manifest = store.manifest();
+        let records = store.records()?;
+        let mut cnpjs = BTreeSet::new();
+        let mut invalid_cnpj = Vec::new();
+        let mut absent_cnpj = Vec::new();
+        let mut checked = 0_usize;
+        let mut unmatched_geography = Vec::new();
+        for record in &records {
+            if record.geography_level == "N6"
+                && record.geography_code.len() == 7
+                && record.geography_code.parse::<u32>().ok().is_none_or(|code| catalogue.by_ibge(code).is_none())
+            {
+                unmatched_geography.push(json!({"code": record.geography_code, "name": record.geography_name}));
+            }
+            if record.cnpj.len() != 14 {
+                continue;
+            }
+            if !valid_cnpj(&record.cnpj) {
+                if invalid_cnpj.len() < 20 {
+                    invalid_cnpj.push(record.cnpj.clone());
+                }
+                continue;
+            }
+            cnpjs.insert(record.cnpj.clone());
+            if checked < args.sample {
+                checked += 1;
+                if snapshot.cnpj_prefix_docs(&record.cnpj)?.is_empty() && absent_cnpj.len() < 50 {
+                    absent_cnpj.push(record.cnpj.clone());
+                }
+            }
+        }
+        if !invalid_cnpj.is_empty() {
+            inconsistencies.push(json!({
+                "kind": "record_cnpj_invalid_check_digits",
+                "severity": "high",
+                "dataset_id": manifest.dataset_id,
+                "sample": invalid_cnpj,
+                "action": "Quarantine or repair the source field; do not join it as a valid CNPJ."
+            }));
+        }
+        if !absent_cnpj.is_empty() {
+            inconsistencies.push(json!({
+                "kind": "record_cnpj_absent_from_snapshot",
+                "severity": "medium",
+                "dataset_id": manifest.dataset_id,
+                "sample": absent_cnpj,
+                "action": "Check the source year and CNPJ root/establishment; keep unmatched rows explicit."
+            }));
+        }
+        if !unmatched_geography.is_empty() {
+            inconsistencies.push(json!({
+                "kind": "record_geography_not_in_catalogue",
+                "severity": "high",
+                "dataset_id": manifest.dataset_id,
+                "sample": unmatched_geography.iter().take(50).collect::<Vec<_>>(),
+                "action": "Add a verified crosswalk or exclude the row."
+            }));
+        }
+        reports.push(json!({
+            "dataset_id": manifest.dataset_id,
+            "records": manifest.accepted_rows,
+            "unique_cnpjs": cnpjs.len(),
+            "cnpj_checked_against_snapshot": checked,
+            "invalid_cnpj_sample": invalid_cnpj,
+            "absent_cnpj_sample": absent_cnpj,
+            "unmatched_geographies": unmatched_geography.len(),
+            "source_sha256": manifest.raw_sha256,
+            "store_sha256": sha256_file(&path)?,
+        }));
+    }
+    let report = json!({
+        "generated_at": now(),
+        "snapshot": args.snapshot.display().to_string(),
+        "sample_per_store": args.sample,
+        "stores": reports,
+        "inconsistencies": inconsistencies,
+    });
+    if let Some(parent) = args.out.parent().filter(|parent| !parent.as_os_str().is_empty()) {
+        fs::create_dir_all(parent)?;
+    }
+    fs::write(&args.out, serde_json::to_vec_pretty(&report)?)?;
+    println!(
+        "record audit written to {}: {} stores, {} inconsistencies",
+        args.out.display(),
+        report["stores"].as_array().map(Vec::len).unwrap_or(0),
+        report["inconsistencies"].as_array().map(Vec::len).unwrap_or(0)
+    );
+    Ok(())
+}
+
+fn valid_cnpj(cnpj: &str) -> bool {
+    if cnpj.len() != 14 || !cnpj.chars().all(|character| character.is_ascii_digit()) {
+        return false;
+    }
+    let digits = cnpj.bytes().map(|byte| u32::from(byte - b'0')).collect::<Vec<_>>();
+    let weights1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+    let sum1 = weights1.iter().zip(&digits[..12]).map(|(weight, digit)| weight * digit).sum::<u32>();
+    let dv1 = {
+        let remainder = sum1 % 11;
+        if remainder < 2 { 0 } else { 11 - remainder }
+    };
+    if dv1 != digits[12] {
+        return false;
+    }
+    let weights2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+    let sum2 = weights2.iter().zip(&digits[..13]).map(|(weight, digit)| weight * digit).sum::<u32>();
+    let dv2 = {
+        let remainder = sum2 % 11;
+        if remainder < 2 { 0 } else { 11 - remainder }
+    };
+    dv2 == digits[13]
+}
+
+fn verify_records(dir: &Path) -> Result<()> {
+    let mut paths = Vec::new();
+    for entry in fs::read_dir(dir).with_context(|| format!("read {}", dir.display()))? {
+        let path = entry?.path();
+        if path.extension().and_then(|value| value.to_str()) == Some(RECORD_EXTENSION) {
+            paths.push(path);
+        }
+    }
+    paths.sort();
+    ensure!(!paths.is_empty(), "no .{RECORD_EXTENSION} stores in {}", dir.display());
+    for path in paths {
+        let store = RecordStore::open(&path)?;
+        store.verify()?;
+        let manifest = store.manifest();
+        println!(
+            "{}\t{}\trecords={}\ttotal={}\tout_of_scope={}\trejected={}\tduplicates={}\tsha256={}",
+            path.display(),
+            manifest.dataset_id,
+            manifest.accepted_rows,
+            manifest.row_count,
+            manifest.out_of_scope_rows,
+            manifest.rejected_rows,
+            manifest.duplicate_rows,
+            sha256_file(&path)?
+        );
     }
     Ok(())
 }
@@ -313,6 +488,25 @@ pub(crate) struct AuditSourcesArgs {
     only: Option<String>,
     #[arg(long, default_value_t = 60)]
     timeout_seconds: u64,
+}
+
+#[derive(Args)]
+pub(crate) struct AuditRecordsArgs {
+    /// Directory containing .ocrec stores.
+    #[arg(long)]
+    dir: PathBuf,
+    /// CNPJ snapshot used for existence checks.
+    #[arg(long)]
+    snapshot: PathBuf,
+    /// IBGE municipality catalogue.
+    #[arg(long, default_value = "crates/opencnpj-insights/catalog/municipalities.tsv")]
+    catalog: PathBuf,
+    /// Maximum records checked per store.
+    #[arg(long, default_value_t = 5000)]
+    sample: usize,
+    /// JSON output.
+    #[arg(long)]
+    out: PathBuf,
 }
 
 #[derive(Args)]
@@ -1695,7 +1889,7 @@ fn write_raw(path: &Path, bytes: &[u8]) -> Result<String> {
     Ok(hex::encode(hasher.finalize()))
 }
 
-fn now() -> String {
+pub(crate) fn now() -> String {
     let seconds = SystemTime::now().duration_since(UNIX_EPOCH).map(|duration| duration.as_secs()).unwrap_or(0);
     format!("unix:{seconds}")
 }
