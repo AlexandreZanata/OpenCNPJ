@@ -1,0 +1,112 @@
+$ official query lookup populacao_estimada 5107925 2024
+Consulta: População residente estimada
+Período: 2024.
+Unidade: Pessoas.
+Sorriso - MT (5107925) [2024]: 120.985
+Cobertura: Mato Grosso and its municipalities.
+Fonte: IBGE - População residente estimada (ibge-6579, https://servicodados.ibge.gov.br/api/v3/agregados/6579). Licença: IBGE public statistics; resource-level terms require review (review_required).
+Limitação: A municipal population is not a count of an individual CNPJ's customers.
+Limitação: Population estimates are annual and are not a 2022 Census observation.
+Limitação: Uma estatística municipal não é um fato observado sobre um CNPJ individual.
+
+$ official query compare populacao_estimada 5107925 5107909 2024
+Comparação: População residente estimada
+Período: 2024.
+Unidade: Pessoas.
+Sorriso - MT (5107925) [2024]: 120.985
+Sinop - MT (5107909) [2024]: 216.029
+Cobertura: Mato Grosso and its municipalities.
+Fonte: IBGE - População residente estimada (ibge-6579, https://servicodados.ibge.gov.br/api/v3/agregados/6579). Licença: IBGE public statistics; resource-level terms require review (review_required).
+Limitação: A municipal population is not a count of an individual CNPJ's customers.
+Limitação: Associação, ranking ou tendência não prova causalidade, demanda ou vínculo comercial.
+Limitação: Population estimates are annual and are not a 2022 Census observation.
+Limitação: Uma estatística municipal não é um fato observado sobre um CNPJ individual.
+
+$ official query rank populacao_estimada 2024 MT 5
+Ranking: População residente estimada
+Período: 2024.
+Unidade: Pessoas.
+Cuiabá - MT (5103403) [2024]: 682.932
+Várzea Grande - MT (5108402) [2024]: 314.627
+Rondonópolis - MT (5107602) [2024]: 259.167
+Sinop - MT (5107909) [2024]: 216.029
+Sorriso - MT (5107925) [2024]: 120.985
+Cálculo: ordenado por valor decrescente; células sem valor observado não entram no ranking.
+Cobertura: Mato Grosso and its municipalities.
+Fonte: IBGE - População residente estimada (ibge-6579, https://servicodados.ibge.gov.br/api/v3/agregados/6579). Licença: IBGE public statistics; resource-level terms require review (review_required).
+Limitação: A municipal population is not a count of an individual CNPJ's customers.
+Limitação: Associação, ranking ou tendência não prova causalidade, demanda ou vínculo comercial.
+Limitação: Population estimates are annual and are not a 2022 Census observation.
+Limitação: Uma estatística municipal não é um fato observado sobre um CNPJ individual.
+Observação: 1 células sem valor observado foram excluídas do ranking.
+
+$ official query trend populacao_estimada 5107925
+Série temporal: População residente estimada
+Período: 2020, 2021, 2024.
+Unidade: Pessoas.
+Sorriso - MT (5107925) [2020]: 92.769
+Sorriso - MT (5107925) [2021]: 94.941
+Sorriso - MT (5107925) [2024]: 120.985
+Cálculo: observações ordenadas pelo período de referência publicado.
+Cobertura: Mato Grosso and its municipalities.
+Fonte: IBGE - População residente estimada (ibge-6579, https://servicodados.ibge.gov.br/api/v3/agregados/6579). Licença: IBGE public statistics; resource-level terms require review (review_required).
+Limitação: A municipal population is not a count of an individual CNPJ's customers.
+Limitação: Associação, ranking ou tendência não prova causalidade, demanda ou vínculo comercial.
+Limitação: Population estimates are annual and are not a 2022 Census observation.
+Limitação: Uma estatística municipal não é um fato observado sobre um CNPJ individual.
+
+$ official query ratio pib_municipal populacao_estimada 5107925
+Razão: Produto Interno Bruto a preços correntes por População residente estimada
+Período: 2021.
+Unidade: Mil Reais por Pessoas.
+Sorriso - MT (5107925) [2021]: 131,89
+Cálculo: (Produto Interno Bruto a preços correntes / População residente estimada) × 1.
+Cobertura: Mato Grosso and its municipalities.
+Fonte: IBGE - PIB dos municípios (ibge-5938, https://servicodados.ibge.gov.br/api/v3/agregados/5938). Licença: IBGE public statistics; resource-level terms require review (review_required).
+Fonte: IBGE - População residente estimada (ibge-6579, https://servicodados.ibge.gov.br/api/v3/agregados/6579). Licença: IBGE public statistics; resource-level terms require review (review_required).
+Limitação: A municipal population is not a count of an individual CNPJ's customers.
+Limitação: PIB municipal e valor adicionado não são renda domiciliar nem poder de compra.
+Limitação: PIB municipal per capita is not household income or purchasing power.
+Limitação: Population estimates are annual and are not a 2022 Census observation.
+Limitação: The 2022-2023 edition does not provide every traditional sector detail uniformly across years.
+Limitação: Uma estatística municipal não é um fato observado sobre um CNPJ individual.
+
+$ official query lookup pam_producao 81[2713] 5107925 2024
+Consulta: Quantidade produzida
+Período: 2024.
+Unidade: Toneladas.
+Sorriso - MT (5107925) [2024] - Soja (em grão): 2.084.520
+Cobertura: Mato Grosso municipalities.
+Fonte: IBGE - PAM lavouras temporárias (ibge-1612, https://servicodados.ibge.gov.br/api/v3/agregados/1612). Licença: IBGE public statistics; resource-level terms require review (review_required).
+Limitação: A production total does not identify a farm, a CNPJ's land, machinery or purchasing intent.
+Limitação: Annual municipal production cannot be divided into monthly municipal production.
+Limitação: Produção agropecuária regional não identifica propriedade rural, rebanho ou intenção de compra de um CNPJ.
+Limitação: Uma estatística municipal não é um fato observado sobre um CNPJ individual.
+
+$ official query lookup ppm_efetivo 79[2670] 5107925 2024
+Consulta: Efetivo dos rebanhos
+Período: 2024.
+Unidade: Cabeças.
+Sorriso - MT (5107925) [2024] - Bovino: 99.790
+Cobertura: Mato Grosso municipalities.
+Fonte: IBGE - PPM efetivo dos rebanhos (ibge-3939, https://servicodados.ibge.gov.br/api/v3/agregados/3939). Licença: IBGE public statistics; resource-level terms require review (review_required).
+Limitação: Animal categories are distinct and must not be summed without an explicit rule.
+Limitação: Herd totals do not identify ownership, a rural property or a CNPJ.
+Limitação: Produção agropecuária regional não identifica propriedade rural, rebanho ou intenção de compra de um CNPJ.
+Limitação: Uma estatística municipal não é um fato observado sobre um CNPJ individual.
+
+$ official query trend lspa_producao 48[39443] MT 202601 202605 202609
+Série temporal: Produção
+Período: 202601, 202605, 202609.
+Unidade: Toneladas.
+Mato Grosso (51) [202601] - 1.17 Soja: 48.532.919
+Mato Grosso (51) [202605] - 1.17 Soja: 50.652.656
+Mato Grosso (51) [202609] - 1.17 Soja: 50.665.337
+Cálculo: observações ordenadas pelo período de referência publicado.
+Cobertura: Mato Grosso state; municipal detail is not released by this resource.
+Fonte: IBGE - LSPA série histórica (ibge-6588, https://servicodados.ibge.gov.br/api/v3/agregados/6588). Licença: IBGE public statistics; resource-level terms require review (review_required).
+Limitação: Associação, ranking ou tendência não prova causalidade, demanda ou vínculo comercial.
+Limitação: Do not synthesize monthly municipal production by dividing an annual municipal figure.
+Limitação: LSPA is monthly only at the published geographic levels.
+Limitação: Produção agropecuária regional não identifica propriedade rural, rebanho ou intenção de compra de um CNPJ.
+Limitação: Uma estatística municipal não é um fato observado sobre um CNPJ individual.

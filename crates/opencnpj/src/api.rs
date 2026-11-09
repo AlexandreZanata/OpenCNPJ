@@ -20,10 +20,17 @@ use axum::middleware::{self, Next};
 use axum::response::{IntoResponse, Response};
 use axum::routing::get;
 use axum::{Json, Router};
+use opencnpj_insights::official::{
+    self,
+    query::{CategoryFilter, Request as OfficialRequest},
+    registry::Registry,
+    store::StoreSet,
+};
 use opencnpj_store::Snapshot;
 use opencnpj_store::numeric::{self, NumField};
 use opencnpj_store::postings::Field;
 use opencnpj_store::search::{self, Limits, Query, TextField};
+use serde::Deserialize;
 use serde_json::{Value, json};
 use tokio::io::{AsyncReadExt, AsyncSeekExt};
 use tokio::sync::Semaphore;
@@ -66,6 +73,9 @@ pub struct ServeArgs {
     /// Rows per export (0 = no limit).
     #[arg(long, default_value_t = 0)]
     pub export_max_rows: u64,
+    /// Directory containing official `.ocind` indicator stores.
+    #[arg(long)]
+    pub official_dir: Option<PathBuf>,
     /// Decoded-postings cache budget in MiB.
     #[arg(long, default_value_t = 512)]
     pub postings_cache_mib: usize,
@@ -153,6 +163,8 @@ pub struct AppState {
     pub jobs: crate::admin::Jobs,
     /// `info --index` is a full term-dictionary scan: computed once per snapshot.
     pub index_breakdown: Mutex<Option<(PathBuf, Value)>>,
+    /// Official indicator stores, when configured.
+    pub official_dir: Option<PathBuf>,
     pub gate: Arc<Gate>,
     pub mailer: Option<Arc<crate::mail::Mailer>>,
     pub updater: crate::autoupdate::Updater,
@@ -517,6 +529,128 @@ impl std::io::Write for ChannelWriter {
     }
 }
 
+#[derive(Debug, Deserialize)]
+pub struct OfficialQuery {
+    pub variable: String,
+    pub operation: Option<String>,
+    pub denominator: Option<String>,
+    pub geography: Option<String>,
+    pub period: Option<String>,
+    pub classification: Option<String>,
+    pub category: Option<String>,
+    pub level: Option<String>,
+    pub uf: Option<String>,
+    pub limit: Option<usize>,
+    pub ascending: Option<bool>,
+    pub scale: Option<f64>,
+}
+
+async fn official_sources(State(st): State<Shared>) -> ApiResult {
+    let registry = Registry::builtin()?;
+    let stores = st.official_dir.as_ref().and_then(|dir| StoreSet::open_dir(dir).ok());
+    let manifests =
+        stores.as_ref().map(|stores| stores.stores().iter().map(|store| store.manifest().clone()).collect::<Vec<_>>()).unwrap_or_default();
+    let published = manifests.iter().map(|manifest| (manifest.dataset_id.as_str(), manifest)).collect::<std::collections::BTreeMap<_, _>>();
+    let datasets = registry
+        .datasets()
+        .map(|dataset| {
+            let source = registry.source(&dataset.source_id).expect("validated source");
+            let manifest = published.get(dataset.id.as_str());
+            json!({
+                "source_id": dataset.source_id,
+                "dataset_id": dataset.id,
+                "title": dataset.title,
+                "publisher": source.publisher,
+                "state": if manifest.is_some() { "queryable" } else { dataset.state.as_str() },
+                "licence": source.licence,
+                "licence_status": source.licence_status,
+                "licence_url": source.licence_url,
+                "attribution": source.attribution,
+                "cadence": dataset.cadence,
+                "coverage": dataset.coverage,
+                "imported": manifest.is_some(),
+                "rows": manifest.map(|manifest| manifest.accepted_rows),
+                "period_from": manifest.and_then(|manifest| manifest.period_from.clone()),
+                "period_to": manifest.and_then(|manifest| manifest.period_to.clone()),
+                "raw_sha256": manifest.map(|manifest| manifest.raw_sha256.clone()),
+            })
+        })
+        .collect::<Vec<_>>();
+    Ok(Json(json!({
+        "official_dir": st.official_dir.as_ref().map(|dir| dir.display().to_string()),
+        "imported_stores": manifests.len(),
+        "datasets": datasets,
+    }))
+    .into_response())
+}
+
+async fn official_query(State(st): State<Shared>, UrlQuery(params): UrlQuery<OfficialQuery>) -> ApiResult {
+    let dir = st
+        .official_dir
+        .as_ref()
+        .ok_or_else(|| ApiError::new(StatusCode::SERVICE_UNAVAILABLE, "official_unavailable", "serve without --official-dir"))?;
+    ensure_official_limit(params.limit)?;
+    let category = match (&params.classification, &params.category) {
+        (Some(classification), Some(category)) => Some(CategoryFilter::new(classification, category)),
+        (None, None) => None,
+        _ => return Err(ApiError::bad("classification and category must be supplied together")),
+    };
+    let uf_code =
+        params.uf.as_deref().map(|uf| if uf.len() == 2 { official::query::uf_code(uf).unwrap_or(uf).to_string() } else { uf.to_string() });
+    let geographies = split_values(params.geography.as_deref());
+    let periods = split_values(params.period.as_deref());
+    let request = match params.operation.as_deref().unwrap_or("lookup") {
+        "lookup" => OfficialRequest::Lookup { variable: params.variable, geographies, periods, category },
+        "compare" => OfficialRequest::Compare { variable: params.variable, geographies, period: periods.first().cloned(), category },
+        "rank" => OfficialRequest::Rank {
+            variable: params.variable,
+            period: periods.first().cloned(),
+            geography_level: params.level.unwrap_or_else(|| "N6".into()),
+            uf_code,
+            category,
+            limit: params.limit.unwrap_or(10),
+            descending: !params.ascending.unwrap_or(false),
+        },
+        "trend" => OfficialRequest::Trend {
+            variable: params.variable,
+            geography: geographies.first().cloned().ok_or_else(|| ApiError::bad("trend needs geography"))?,
+            periods,
+            category,
+        },
+        "ratio" => OfficialRequest::Ratio {
+            numerator: params.variable,
+            denominator: params.denominator.ok_or_else(|| ApiError::bad("ratio needs denominator"))?,
+            geographies,
+            period: periods.first().cloned(),
+            category,
+            scale: params.scale.unwrap_or(1.0),
+        },
+        other => return Err(ApiError::bad(format!("unknown official operation {other}"))),
+    };
+    let registry = Registry::builtin()?;
+    let stores = StoreSet::open_dir(dir)
+        .map_err(|error| ApiError::new(StatusCode::SERVICE_UNAVAILABLE, "official_unavailable", error.to_string()))?;
+    let answer = official::query::execute(&stores, &registry, &request).map_err(|error| ApiError::bad(error.to_string()))?;
+    Ok(Json(
+        serde_json::to_value(answer)
+            .map_err(|error| ApiError::new(StatusCode::INTERNAL_SERVER_ERROR, "internal_error", error.to_string()))?,
+    )
+    .into_response())
+}
+
+fn split_values(value: Option<&str>) -> Vec<String> {
+    value.into_iter().flat_map(|value| value.split(',')).map(str::trim).filter(|value| !value.is_empty()).map(str::to_string).collect()
+}
+
+fn ensure_official_limit(limit: Option<usize>) -> Result<(), ApiError> {
+    if let Some(limit) = limit
+        && (limit == 0 || limit > 100)
+    {
+        return Err(ApiError::bad("official limit must be between 1 and 100"));
+    }
+    Ok(())
+}
+
 async fn snapshot_info(State(st): State<Shared>) -> ApiResult {
     let s = st.snapshot();
     let mut v = output::info(&s);
@@ -734,6 +868,7 @@ pub fn router(st: Shared) -> Router {
         .route("/api/v1/empresas/search", get(legacy_empresas_search))
         .route("/api/v1/estabelecimentos/search", get(search_route))
         .route("/api/v1/stats", get(stats))
+        .route("/api/v1/official/query", get(official_query))
         .route_layer(middleware::from_fn_with_state(st.clone(), crate::gate::cache));
     let data = Router::new()
         .route("/api/v1/export", get(export))
@@ -745,6 +880,7 @@ pub fn router(st: Shared) -> Router {
         .route("/api/v1/campos", get(campos))
         .route("/api/v1/snapshot", get(snapshot_info))
         .route("/api/v1/distribution", get(distribution))
+        .route("/api/v1/official/sources", get(official_sources))
         .route("/api/v1/dominios", get(dominios))
         .route("/api/v1/dominios/{tabela}", get(dominio))
         .route("/healthz", get(healthz))
@@ -799,6 +935,7 @@ pub fn state(args: ServeArgs) -> Result<Shared> {
         snapshots_dir,
         jobs: crate::admin::Jobs::new(jobs_dir),
         index_breakdown: Mutex::new(None),
+        official_dir: args.official_dir.clone(),
         gate,
         mailer,
         updater: crate::autoupdate::Updater::default(),

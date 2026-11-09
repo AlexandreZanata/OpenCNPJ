@@ -1,0 +1,126 @@
+{
+  "categories": {
+    "activity": {
+      "gold_backend_ok": 1000,
+      "interpretation_correct": 1000,
+      "items": 1000
+    },
+    "capital_legal": {
+      "gold_backend_ok": 1000,
+      "interpretation_correct": 1000,
+      "items": 1000
+    },
+    "clarification": {
+      "interpretation_correct": 1000,
+      "items": 1000
+    },
+    "closures": {
+      "gold_backend_ok": 1000,
+      "interpretation_correct": 1000,
+      "items": 1000
+    },
+    "comparison": {
+      "gold_backend_ok": 1000,
+      "interpretation_correct": 1000,
+      "items": 1000
+    },
+    "density": {
+      "gold_backend_ok": 1000,
+      "interpretation_correct": 1000,
+      "items": 1000
+    },
+    "dialogue": {
+      "gold_backend_ok": 1000,
+      "interpretation_correct": 1000,
+      "items": 1000
+    },
+    "distribution": {
+      "gold_backend_ok": 1000,
+      "interpretation_correct": 1000,
+      "items": 1000
+    },
+    "exclusion": {
+      "gold_backend_ok": 1000,
+      "interpretation_correct": 1000,
+      "items": 1000
+    },
+    "geography": {
+      "gold_backend_ok": 1000,
+      "interpretation_correct": 1000,
+      "items": 1000
+    },
+    "historical": {
+      "gold_backend_ok": 1000,
+      "interpretation_correct": 1000,
+      "items": 1000
+    },
+    "lookup": {
+      "gold_backend_ok": 900,
+      "interpretation_correct": 1000,
+      "items": 1000
+    },
+    "market_size": {
+      "gold_backend_ok": 1000,
+      "interpretation_correct": 954,
+      "items": 1000
+    },
+    "methodology": {
+      "gold_backend_ok": 1000,
+      "interpretation_correct": 1000,
+      "items": 1000
+    },
+    "prospecting": {
+      "gold_backend_ok": 1000,
+      "interpretation_correct": 1000,
+      "items": 1000
+    },
+    "registrations": {
+      "gold_backend_ok": 1000,
+      "interpretation_correct": 1000,
+      "items": 1000
+    },
+    "structure_status": {
+      "gold_backend_ok": 1000,
+      "interpretation_correct": 1000,
+      "items": 1000
+    },
+    "tax_size": {
+      "gold_backend_ok": 1000,
+      "interpretation_correct": 1000,
+      "items": 1000
+    },
+    "trends": {
+      "gold_backend_ok": 1000,
+      "interpretation_correct": 1000,
+      "items": 1000
+    },
+    "unsupported": {
+      "interpretation_correct": 1000,
+      "items": 1000
+    }
+  },
+  "counts": {
+    "act_correct": 16900,
+    "act_items": 16900,
+    "correct_executed_answer": 17854,
+    "decision_correct": 19954,
+    "gold_backend_ok": 17900,
+    "gold_empty_records": 406,
+    "gold_zero_scalar": 2166,
+    "interpretation_correct": 19954,
+    "interpretation_wrong": 46,
+    "items": 20000,
+    "verification_engine_match": 11140,
+    "verification_marginal_match": 700,
+    "verification_no_independent_reference": 300,
+    "verification_not_numeric": 1000,
+    "verification_single_backend": 4760
+  },
+  "data_anchor": "2026-10-11",
+  "evidence_score": "Rule evidence is not a calibrated probability.",
+  "human_validation": "Not performed; human validation is deferred to product refinement.",
+  "method": "Actual text-only deterministic interpretation; gold IR used only for canonical scoring and separate backend reference, never as a prediction or conversation seed.",
+  "set": "crates/opencnpj-lab/eval/commercial-round-07/questions.jsonl",
+  "set_sha256": "a428268809cea38917247fa929c109d84da9339139f561b478bc18efaa6217af",
+  "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+}

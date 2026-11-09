@@ -1,0 +1,85 @@
+{
+  "generated_at": "unix:1794174986",
+  "inconsistencies": [],
+  "sample_per_store": 500,
+  "snapshot": "/data/opencnpj-data/snapshots/2026-10-balanced.ocnpj",
+  "stores": [
+    {
+      "absent_cnpj_sample": [],
+      "cnpj_checked_against_snapshot": 0,
+      "dataset_id": "antt-rntrc-veiculos",
+      "invalid_cnpj_sample": [],
+      "records": 98119,
+      "source_sha256": "9bd0f0acb5412482670c9e1c8ef370171013cb3c36840b085f4669b8bf7de159",
+      "store_sha256": "012bc71670b3db2216e3856920b87ffc631620735962b0418cd91585fd93f69f",
+      "unique_cnpjs": 0,
+      "unmatched_geographies": 0
+    },
+    {
+      "absent_cnpj_sample": [],
+      "cnpj_checked_against_snapshot": 0,
+      "dataset_id": "bcb-sgs-1",
+      "invalid_cnpj_sample": [],
+      "records": 2471,
+      "source_sha256": "4a19974f841d1808885ad1d47fde240c22ffdd069612199221d157b4e70ab250",
+      "store_sha256": "a1a01ad73087fbd6d698d3195814b38cc1a653b2db26ec19b2c194b56c3364e2",
+      "unique_cnpjs": 0,
+      "unmatched_geographies": 0
+    },
+    {
+      "absent_cnpj_sample": [],
+      "cnpj_checked_against_snapshot": 0,
+      "dataset_id": "bcb-sgs-433",
+      "invalid_cnpj_sample": [],
+      "records": 561,
+      "source_sha256": "540656f19548e17043022e1de473236a4db6cbac569ef07b369b8a9bb0f0cd70",
+      "store_sha256": "240bb6584a3c9327e6a92a4642eaab046b909cc16c2067c6604d45de2bfc2aa8",
+      "unique_cnpjs": 0,
+      "unmatched_geographies": 0
+    },
+    {
+      "absent_cnpj_sample": [],
+      "cnpj_checked_against_snapshot": 500,
+      "dataset_id": "cnes-estabelecimentos",
+      "invalid_cnpj_sample": [],
+      "records": 642268,
+      "source_sha256": "32fc3f981d0c3e93049ff2aeaf83d3ac2a6781d1972af894eb35e32f7a40f07a",
+      "store_sha256": "0cfb37bf7d0b9f94f6e33436271c3fe609855fbb1ee0d24a1118fa0797cb75ed",
+      "unique_cnpjs": 345458,
+      "unmatched_geographies": 0
+    },
+    {
+      "absent_cnpj_sample": [],
+      "cnpj_checked_against_snapshot": 500,
+      "dataset_id": "inep-censo-escolar-2024",
+      "invalid_cnpj_sample": [],
+      "records": 215545,
+      "source_sha256": "ae29d81d45ddecef59e11eda39788cbfd30dfa1cc71be9d29f23051fc2d640db",
+      "store_sha256": "40ae4bb680f96c1d5451e9791bc40612973e183913ad7f3f6711793a27c870df",
+      "unique_cnpjs": 35385,
+      "unmatched_geographies": 0
+    },
+    {
+      "absent_cnpj_sample": [],
+      "cnpj_checked_against_snapshot": 500,
+      "dataset_id": "pgfn-fgts-2026Q3",
+      "invalid_cnpj_sample": [],
+      "records": 549458,
+      "source_sha256": "a011daf66131376f5d68271181e3179a25189633a1a4d79f31850740811b7356",
+      "store_sha256": "859e78a36eccd86c91ea39100a8f1fb691752eb6dfacf18eeee0ae39ccd987de",
+      "unique_cnpjs": 309267,
+      "unmatched_geographies": 0
+    },
+    {
+      "absent_cnpj_sample": [],
+      "cnpj_checked_against_snapshot": 500,
+      "dataset_id": "pgfn-previdenciario-2026Q3",
+      "invalid_cnpj_sample": [],
+      "records": 3287586,
+      "source_sha256": "149d857cfa4aa748017838ed24f29dcf1dc878309c6b2221a6d4cb6e0cb54c26",
+      "store_sha256": "83974068f76a5e4758c2c8c8d6ee86a548ea53afba714a9f0b84768cb2ab03d1",
+      "unique_cnpjs": 824940,
+      "unmatched_geographies": 0
+    }
+  ]
+}

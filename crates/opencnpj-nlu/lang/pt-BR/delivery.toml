@@ -1,0 +1,134 @@
+# Vocabulary of file requests ("me manda um Excel com...", "bah, tchê, me passa uma
+# planilha", "oxe, gera um CSV aí, visse?").
+#
+# Every list is a set of word-bounded phrases, compared after accent folding and the
+# colloquial rewrites of `normalize` ("pra" -> "para", "vc" -> "voce"). An item "@name"
+# includes the list `name` from [lists], recursively; an unknown name or a cycle is an
+# error when the interpreter starts. Regional words are only cut next to a file request:
+# they never change how a data question is read.
+
+[lists]
+# Courtesy and hedges around a request.
+cortesia = [
+    "por favor", "por gentileza", "faz favor", "faz o favor", "fazendo favor", "se possivel", "se puder", "se der",
+    "pf", "pfv", "pfvr", "obrigado", "obrigada", "obg", "valeu", "agradeco", "desde ja", "grato", "grata",
+]
+pronome = ["me", "mim", "para mim", "nos", "a gente", "para a gente", "para nos", "voce", "ocê", "tu"]
+# Modal openers: "dá pra", "tem como", "consegue", "você pode".
+modal = [
+    "pode", "poderia", "podes", "consegue", "conseguiria", "da para", "daria para", "tem como", "teria como", "seria possivel",
+    "e possivel", "gostaria", "gostaria de", "queria", "quero", "quero que", "preciso", "preciso de", "precisava", "precisava de",
+    "necessito", "to precisando", "estou precisando", "to querendo", "estou querendo", "manda ver", "manda bala",
+]
+# Verbs that hand something over.
+envio = [
+    "mande", "manda", "mandar", "mandem", "manda ai", "manda para", "envie", "envia", "enviar", "enviem", "encaminhe", "encaminha",
+    "passe", "passa", "passar", "repasse", "repassa", "joga", "joga ai", "jogue", "bota", "bote", "botar", "coloque", "coloca",
+    "colocar", "solta", "solte", "solta ai", "devolva", "devolve", "retorne", "retorna", "entregue", "entrega", "me alcanca",
+    "alcanca", "arruma", "arrume", "arranja", "arranje", "descola", "providencia", "providencie",
+]
+# Verbs that make or extract a file.
+geracao = [
+    "gere", "gera", "gerar", "gerem", "crie", "cria", "criar", "monte", "monta", "montar", "prepare", "prepara", "preparar", "faca",
+    "faz", "fazer", "faz ai", "tira", "tire", "puxa", "puxe", "puxar", "extraia", "extrai", "extrair", "baixe", "baixa", "baixar",
+    "salve", "salva", "salvar", "exporte", "exporta", "exportar", "exportem", "exportacao", "download", "da um download",
+]
+# Regional and informal openers, interjections and tags (cut only around a file request).
+regional_centro_oeste = ["vote", "tcha por deus", "ixi", "la ele", "vixe", "eita"]
+regional_mineiro = ["uai so", "uai", "o trem bao", "nossa", "nossa senhora", "ce pode", "ce consegue", "ocê pode"]
+regional_nordeste = ["oxe", "oxente", "eita", "vixe", "visse", "arretado", "massa", "ave maria", "meu rei", "minha filha", "meu filho", "painho", "mainha"]
+regional_sul = ["bah", "tche", "barbaridade", "guri", "guria", "capaz", "tri", "bagual"]
+regional_sudeste = ["mano", "meu", "veio", "vei", "mermao", "parceiro", "qual foi", "da hora", "suave", "firmeza", "fala ai", "fala"]
+regional_norte = ["egua", "pai d egua", "maninho", "maninha", "mana", "mano velho"]
+regional = ["@regional_centro_oeste", "@regional_mineiro", "@regional_nordeste", "@regional_sul", "@regional_sudeste", "@regional_norte"]
+interjeicao = ["ola", "oi", "opa", "e ai", "bom dia", "boa tarde", "boa noite", "ai", "ae", "rapidinho", "rapidao", "ja", "logo", "entao"]
+pedido = ["@cortesia", "@pronome", "@modal", "@envio", "@geracao", "@regional", "@interjeicao"]
+
+excel = [
+    "excel", "exel", "excell", "ecxel", "escel", "exsel", "eccel", "xlsx", "xls", "planilha", "planilhas", "planilhinha", "panilha",
+    "planilia", "planiha", "planilha do excel", "planilha excel", "planilha eletronica", "google sheets", "sheets", "planilha do google",
+]
+csv = ["csv", "cvs", "arquivo csv", "separado por virgula", "separado por ponto e virgula", "valores separados por virgula"]
+txt = ["txt", "arquivo de texto", "arquivo texto", "texto simples", "texto puro", "bloco de notas", "notepad", "formato de texto", "formato texto"]
+
+[formats]
+xlsx = ["@excel"]
+csv = ["@csv"]
+txt = ["@txt"]
+# Formats the service cannot write: the answer asks for one it can.
+unsupported = ["pdf", "word", "docx", "doc", "powerpoint", "pptx", "ppt", "json", "xml", "parquet", "odt"]
+
+[roles]
+# Words cut around a delivery phrase.
+request = ["@pedido"]
+# Verbs that hand over or make something: with one before "uma tabela", "um relatório" or
+# "um arquivo", the question asks for a file.
+actions = ["@envio", "@geracao"]
+# Verbs that ask for a file even without naming its format (Excel is used, with a note).
+export_verbs = ["exporte", "exporta", "exportar", "exportem", "exportacao", "download", "da um download"]
+# A file without a format; with a request verb before it, it asks for a file.
+file_nouns = [
+    "arquivo", "arquivos", "arquivinho", "tabela", "tabelinha", "relatorio", "relatoriozinho", "documento", "anexo", "lista para baixar",
+    "lista em arquivo", "base", "base de dados", "dados para baixar",
+]
+# Articles and prepositions between the request and the format ("em um", "no formato").
+left_glue = [
+    "um", "uma", "o", "a", "num", "numa", "em", "no", "na", "para", "como", "via", "de", "do", "formato", "no formato", "em formato",
+    "tipo",
+]
+# Words joining the format to the data question ("um Excel com as padarias").
+right_glue = ["com", "contendo", "de", "do", "da", "dos", "das", "sobre", "listando", "mostrando", "trazendo", "que tenha", "que traga"]
+# Phrases that open a column list on their own.
+intros = [
+    "contendo apenas", "contendo somente", "com as colunas", "com os campos", "com as informacoes", "com apenas", "com somente",
+    "so com", "apenas com", "somente com", "contendo", "apenas", "somente", "so", "unicamente", "exclusivamente", "colunas", "campos",
+    "so quero", "quero so", "quero apenas", "traz so", "traga so", "traga apenas",
+]
+articles = ["o", "a", "os", "as", "seu", "sua", "seus", "suas"]
+# Words of a follow-up that only point at the previous answer ("agora manda isso").
+previous = [
+    "agora", "isso", "isto", "esse", "essa", "esses", "essas", "este", "esta", "estes", "estas", "resultado", "resultados", "lista",
+    "listagem", "relacao", "tabela", "dados", "mesmo", "mesma", "mesmos", "mesmas", "tambem", "e", "o", "a", "os", "as", "aqui",
+    "agr", "de novo", "novamente", "denovo", "tudo", "ai",
+]
+# Courtesy and regional tags cut at the end of a file request ("…, visse?").
+tail = ["@cortesia", "@regional", "ai", "ae", "rapidinho", "rapidao", "por gentileza"]
+
+[fields]
+all = [
+    "todos os dados disponiveis", "todos os dados", "todas as colunas", "todos os campos", "todas as informacoes", "dados completos",
+    "tudo que tiver", "tudo o que tiver", "completo", "completa", "ficha completa",
+]
+cnpj = ["numero do cnpj", "numero de cnpj", "numero de inscricao", "cnpjs", "cnpj", "inscricao", "documento da empresa"]
+# "número" alone is the CNPJ number; the answer says so.
+cnpj_number = ["numero", "numeros", "numerozinho"]
+razao_social = ["razao social", "nome empresarial", "nome da empresa", "nome das empresas", "nomes das empresas", "nome", "nomes"]
+nome_fantasia = ["nome fantasia", "nomes fantasia", "fantasia", "nome de fachada"]
+matriz_filial = ["matriz ou filial", "matriz filial", "tipo de unidade"]
+situacao = ["situacao cadastral", "situacao", "status"]
+data_situacao = [
+    "data da situacao cadastral", "data da situacao", "data da baixa", "data de baixa", "data do encerramento", "data de encerramento",
+    "data do fechamento", "quando fechou", "quando fecharam",
+]
+motivo_situacao = ["motivo da baixa", "motivo da situacao", "motivo"]
+data_inicio = [
+    "data de inicio de atividade", "data de inicio da atividade", "data de inicio", "inicio de atividade", "inicio da atividade",
+    "data de abertura", "data da abertura", "data de fundacao", "abertura", "fundacao", "quando abriu", "quando abriram",
+]
+cnae_principal = ["cnae principal", "codigo cnae", "codigo da atividade", "cnaes", "cnae"]
+cnae_descricao = ["descricao da atividade", "atividade principal", "ramo de atividade", "atividade", "ramo"]
+natureza_juridica = ["natureza juridica", "natureza", "tipo juridico"]
+porte = ["porte", "porte da empresa", "tamanho"]
+capital_social = ["capital social", "capital"]
+simples = ["opcao pelo simples", "simples nacional", "simples"]
+mei = ["opcao pelo mei", "mei"]
+endereco = ["enderecos", "endereco", "logradouro", "rua"]
+bairro = ["bairro", "bairros"]
+cep = ["cep", "ceps"]
+municipio = ["municipio", "cidade"]
+uf = ["uf", "estado"]
+telefone = ["numero de telefone", "numero do telefone", "numeros de telefone", "telefones", "telefone", "fone", "celular", "zap", "whatsapp", "contato telefonico"]
+email = ["e mail", "emails", "email", "correio eletronico"]
+# Phrases that stand for several columns.
+contacts = ["contatos", "contato", "formas de contato"]
+full_address = ["endereco completo", "localizacao completa"]

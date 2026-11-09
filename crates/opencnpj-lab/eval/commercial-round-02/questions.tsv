@@ -1,0 +1,1001 @@
+id	category	decision	intent	question
+commercial-r02-0001	market_size	execute	count	Para ampliar minha carteira: quantos estabelecimentos ativos de loja de autopeças existem na cidade de Arapiraca/AL?
+commercial-r02-0002	market_size	execute	count	Para ampliar minha carteira: quantos estabelecimentos ativos de fazenda de gado de corte existem na cidade de Salvador/BA?
+commercial-r02-0003	market_size	execute	count	Para ampliar minha carteira: quantos estabelecimentos ativos de loja de materiais de construção existem na cidade de Serra/ES?
+commercial-r02-0004	market_size	execute	count	Para ampliar minha carteira: quantos estabelecimentos ativos de serviço de carga e descarga existem na cidade de Imperatriz/MA?
+commercial-r02-0005	market_size	execute	count	Para ampliar minha carteira: quantos estabelecimentos ativos de assistência técnica de computadores existem na cidade de Cuiabá/MT?
+commercial-r02-0006	market_size	execute	count	Para ampliar minha carteira: quantos estabelecimentos ativos de fazenda de milho existem na cidade de Campina Grande/PB?
+commercial-r02-0007	market_size	execute	count	Para ampliar minha carteira: quantos estabelecimentos ativos de fazenda de gado leiteiro existem na cidade de Curitiba/PR?
+commercial-r02-0008	market_size	execute	count	Para ampliar minha carteira: quantos estabelecimentos ativos de loja de material elétrico existem na cidade de Mossoró/RN?
+commercial-r02-0009	market_size	execute	count	Para ampliar minha carteira: quantos estabelecimentos ativos de casa de festas existem na cidade de Porto Alegre/RS?
+commercial-r02-0010	market_size	execute	count	Para ampliar minha carteira: quantos estabelecimentos ativos de serviço de aplicação de revestimentos existem na cidade de Nossa Senhora do Socorro/SE?
+commercial-r02-0011	market_size	execute	count	Para ampliar minha carteira: quantos estabelecimentos ativos de facção de vestuário existem na cidade de Campinas/SP?
+commercial-r02-0012	market_size	execute	count	Para ampliar minha carteira: quantos estabelecimentos ativos de armarinho existem na cidade de Sorocaba/SP?
+commercial-r02-0013	market_size	execute	count	Para ampliar minha carteira: quantos estabelecimentos ativos de hotel existem na cidade de Arapiraca/AL?
+commercial-r02-0014	market_size	execute	count	Para ampliar minha carteira: quantos estabelecimentos ativos de consultoria de TI existem na cidade de Salvador/BA?
+commercial-r02-0015	market_size	execute	count	Para ampliar minha carteira: quantos estabelecimentos ativos de escritório de advocacia existem na cidade de Serra/ES?
+commercial-r02-0016	market_size	execute	count	Para ampliar minha carteira: quantos estabelecimentos ativos de consultoria de gestão existem na cidade de Imperatriz/MA?
+commercial-r02-0017	market_size	execute	count	Para ampliar minha carteira: quantos estabelecimentos ativos de fábrica de esquadrias metálicas existem na cidade de Cuiabá/MT?
+commercial-r02-0018	market_size	execute	count	Para ampliar minha carteira: quantos estabelecimentos ativos de produtora musical existem na cidade de Campina Grande/PB?
+commercial-r02-0019	market_size	execute	count	Para ampliar minha carteira: quantos estabelecimentos ativos de loja de tintas existem na cidade de Curitiba/PR?
+commercial-r02-0020	market_size	execute	count	Para ampliar minha carteira: quantos estabelecimentos ativos de farmácia existem na cidade de Mossoró/RN?
+commercial-r02-0021	market_size	execute	count	Sou representante comercial: quantas matrizes ativas de pré-escola há na cidade de Porto Alegre/RS?
+commercial-r02-0022	market_size	execute	count	Sou representante comercial: quantas matrizes ativas de consultório de psicologia há na cidade de Nossa Senhora do Socorro/SE?
+commercial-r02-0023	market_size	execute	count	Sou representante comercial: quantas matrizes ativas de loja de conveniência há na cidade de Campinas/SP?
+commercial-r02-0024	market_size	execute	count	Sou representante comercial: quantas matrizes ativas de lanchonete há na cidade de Sorocaba/SP?
+commercial-r02-0025	market_size	execute	count	Sou representante comercial: quantas matrizes ativas de marmoraria há na cidade de Arapiraca/AL?
+commercial-r02-0026	market_size	execute	count	Sou representante comercial: quantas matrizes ativas de borracharia há na cidade de Salvador/BA?
+commercial-r02-0027	market_size	execute	count	Sou representante comercial: quantas matrizes ativas de agência de viagens há na cidade de Serra/ES?
+commercial-r02-0028	market_size	execute	count	Sou representante comercial: quantas matrizes ativas de loja de variedades há na cidade de Imperatriz/MA?
+commercial-r02-0029	market_size	execute	count	Sou representante comercial: quantas matrizes ativas de portal de conteúdo há na cidade de Cuiabá/MT?
+commercial-r02-0030	market_size	execute	count	Sou representante comercial: quantas matrizes ativas de agência de publicidade há na cidade de Campina Grande/PB?
+commercial-r02-0031	market_size	execute	count	Minha equipe de vendas quer saber: quantas filiais ativas de escritório de arquitetura existem na cidade de Curitiba/PR?
+commercial-r02-0032	market_size	execute	count	Minha equipe de vendas quer saber: quantas filiais ativas de bar com entretenimento existem na cidade de Mossoró/RN?
+commercial-r02-0033	market_size	execute	count	Minha equipe de vendas quer saber: quantas filiais ativas de editora de livros existem na cidade de Porto Alegre/RS?
+commercial-r02-0034	market_size	execute	count	Minha equipe de vendas quer saber: quantas filiais ativas de loja de doces existem na cidade de Nossa Senhora do Socorro/SE?
+commercial-r02-0035	market_size	execute	count	Minha equipe de vendas quer saber: quantas filiais ativas de confecção de roupas existem na cidade de Campinas/SP?
+commercial-r02-0036	market_size	execute	count	Minha equipe de vendas quer saber: quantas filiais ativas de construtora existem na cidade de Sorocaba/SP?
+commercial-r02-0037	market_size	execute	count	Minha equipe de vendas quer saber: quantas filiais ativas de empresa de software sob encomenda existem na cidade de Arapiraca/AL?
+commercial-r02-0038	market_size	execute	count	Minha equipe de vendas quer saber: quantas filiais ativas de loja de departamentos existem na cidade de Salvador/BA?
+commercial-r02-0039	market_size	execute	count	Minha equipe de vendas quer saber: quantas filiais ativas de bufê existem na cidade de Serra/ES?
+commercial-r02-0040	market_size	execute	count	Minha equipe de vendas quer saber: quantas filiais ativas de serviço de preparação de terreno e colheita existem na cidade de Imperatriz/MA?
+commercial-r02-0041	market_size	execute	count	Estou prospectando: quantos estabelecimentos inaptas de serviço de montagem de móveis existem na cidade de Cuiabá/MT?
+commercial-r02-0042	market_size	execute	count	Estou prospectando: quantos estabelecimentos suspensas de serviço de acabamento gráfico existem na cidade de Campina Grande/PB?
+commercial-r02-0043	market_size	execute	count	Estou prospectando: quantos estabelecimentos inaptas de farmácia homeopática existem na cidade de Curitiba/PR?
+commercial-r02-0044	market_size	execute	count	Estou prospectando: quantos estabelecimentos suspensas de serviço de manutenção de refrigeração industrial existem na cidade de Mossoró/RN?
+commercial-r02-0045	market_size	execute	count	Estou prospectando: quantos estabelecimentos inaptas de serviço de paisagismo existem na cidade de Porto Alegre/RS?
+commercial-r02-0046	market_size	execute	count	Estou prospectando: quantos estabelecimentos suspensas de frete rodoviário intermunicipal existem na cidade de Nossa Senhora do Socorro/SE?
+commercial-r02-0047	market_size	execute	count	Estou prospectando: quantos estabelecimentos inaptas de consultório médico existem na cidade de Campinas/SP?
+commercial-r02-0048	market_size	execute	count	Estou prospectando: quantos estabelecimentos suspensas de fábrica de peças de moto existem na cidade de Sorocaba/SP?
+commercial-r02-0049	market_size	execute	count	Estou prospectando: quantos estabelecimentos inaptas de serviço de apoio administrativo existem na cidade de Arapiraca/AL?
+commercial-r02-0050	market_size	execute	count	Estou prospectando: quantos estabelecimentos suspensas de hotel para animais domésticos existem na cidade de Salvador/BA?
+commercial-r02-0051	prospecting	execute	list	Traga 5 estabelecimentos ativos de lava-jato na cidade de Santana/AP, com telefone cadastrado, em ordem de CNPJ, para a equipe de vendas.
+commercial-r02-0052	prospecting	execute	list	Traga 10 estabelecimentos ativos de confecção de roupas na cidade de Fortaleza/CE, com e-mail cadastrado, dos mais novos para os mais antigos, para a equipe de vendas.
+commercial-r02-0053	prospecting	execute	list	Traga 15 estabelecimentos ativos de curso de informática na cidade de Serra/ES, com telefone e e-mail cadastrados, por maior capital social, para a equipe de vendas.
+commercial-r02-0054	prospecting	execute	list	Traga 20 estabelecimentos ativos de fazenda de milho na cidade de Aparecida de Goiânia/GO, com telefone cadastrado, dos mais antigos para os mais novos, para a equipe de vendas.
+commercial-r02-0055	prospecting	execute	list	Traga 25 estabelecimentos ativos de empresa de software customizável na cidade de Belo Horizonte/MG, com e-mail cadastrado, em ordem de CNPJ, para a equipe de vendas.
+commercial-r02-0056	prospecting	execute	list	Traga 30 estabelecimentos ativos de clínica odontológica na cidade de Dourados/MS, com telefone e e-mail cadastrados, dos mais novos para os mais antigos, para a equipe de vendas.
+commercial-r02-0057	prospecting	execute	list	Traga 5 estabelecimentos ativos de fábrica de eletrônicos na cidade de Belém/PA, com telefone cadastrado, por maior capital social, para a equipe de vendas.
+commercial-r02-0058	prospecting	execute	list	Traga 10 estabelecimentos ativos de organizadora de eventos na cidade de Campina Grande/PB, com e-mail cadastrado, dos mais antigos para os mais novos, para a equipe de vendas.
+commercial-r02-0059	prospecting	execute	list	Traga 15 estabelecimentos ativos de serviço de preparação de terreno e colheita na cidade de Teresina/PI, com telefone e e-mail cadastrados, em ordem de CNPJ, para a equipe de vendas.
+commercial-r02-0060	prospecting	execute	list	Traga 20 estabelecimentos ativos de atacado de alimentos na cidade de Londrina/PR, com telefone cadastrado, dos mais novos para os mais antigos, para a equipe de vendas.
+commercial-r02-0061	prospecting	execute	list	Traga 25 estabelecimentos ativos de facção de vestuário na cidade de Natal/RN, com e-mail cadastrado, por maior capital social, para a equipe de vendas.
+commercial-r02-0062	prospecting	execute	list	Traga 30 estabelecimentos ativos de mercadinho na cidade de Ji-Paraná/RO, com telefone e e-mail cadastrados, dos mais antigos para os mais novos, para a equipe de vendas.
+commercial-r02-0063	prospecting	execute	list	Traga 5 estabelecimentos ativos de loja de cama mesa e banho na cidade de Porto Alegre/RS, com telefone cadastrado, em ordem de CNPJ, para a equipe de vendas.
+commercial-r02-0064	prospecting	execute	list	Traga 10 estabelecimentos ativos de hipermercado na cidade de Florianópolis/SC, com e-mail cadastrado, dos mais novos para os mais antigos, para a equipe de vendas.
+commercial-r02-0065	prospecting	execute	list	Traga 15 estabelecimentos ativos de serviço de design de interiores na cidade de São Paulo/SP, com telefone e e-mail cadastrados, por maior capital social, para a equipe de vendas.
+commercial-r02-0066	prospecting	execute	list	Traga 20 estabelecimentos ativos de serviço de paisagismo na cidade de Araguaína/TO, com telefone cadastrado, dos mais antigos para os mais novos, para a equipe de vendas.
+commercial-r02-0067	prospecting	execute	list	Traga 25 estabelecimentos ativos de frete rodoviário municipal na cidade de Nova Iguaçu/RJ, com e-mail cadastrado, em ordem de CNPJ, para a equipe de vendas.
+commercial-r02-0068	prospecting	execute	list	Traga 30 estabelecimentos ativos de consultoria de gestão na cidade de Sorocaba/SP, com telefone e e-mail cadastrados, dos mais novos para os mais antigos, para a equipe de vendas.
+commercial-r02-0069	prospecting	execute	list	Traga 5 estabelecimentos ativos de clínica médica com exames complementares na cidade de Cruzeiro do Sul/AC, com telefone cadastrado, por maior capital social, para a equipe de vendas.
+commercial-r02-0070	prospecting	execute	list	Traga 10 estabelecimentos ativos de loja de peças para motocicletas na cidade de Manaus/AM, com e-mail cadastrado, dos mais antigos para os mais novos, para a equipe de vendas.
+commercial-r02-0071	prospecting	execute	list	Traga 15 estabelecimentos ativos de creche na cidade de Santana/AP, com telefone e e-mail cadastrados, em ordem de CNPJ, para a equipe de vendas.
+commercial-r02-0072	prospecting	execute	list	Traga 20 estabelecimentos ativos de ótica na cidade de Fortaleza/CE, com telefone cadastrado, dos mais novos para os mais antigos, para a equipe de vendas.
+commercial-r02-0073	prospecting	execute	list	Traga 25 estabelecimentos ativos de hotel para animais domésticos na cidade de Serra/ES, com e-mail cadastrado, por maior capital social, para a equipe de vendas.
+commercial-r02-0074	prospecting	execute	list	Traga 30 estabelecimentos ativos de estúdio fotográfico na cidade de Aparecida de Goiânia/GO, com telefone e e-mail cadastrados, dos mais antigos para os mais novos, para a equipe de vendas.
+commercial-r02-0075	prospecting	execute	list	Traga 5 estabelecimentos ativos de pré-escola na cidade de Belo Horizonte/MG, com telefone cadastrado, em ordem de CNPJ na segunda página, para a equipe de vendas.
+commercial-r02-0076	prospecting	execute	list	Traga 10 estabelecimentos ativos de administradora de imóveis na cidade de Dourados/MS, com e-mail cadastrado, dos mais novos para os mais antigos, para a equipe de vendas.
+commercial-r02-0077	prospecting	execute	list	Traga 15 estabelecimentos ativos de incorporadora imobiliária na cidade de Belém/PA, com telefone e e-mail cadastrados, por maior capital social, para a equipe de vendas.
+commercial-r02-0078	prospecting	execute	list	Traga 20 estabelecimentos ativos de serviço de carro com motorista na cidade de Campina Grande/PB, com telefone cadastrado, dos mais antigos para os mais novos, para a equipe de vendas.
+commercial-r02-0079	prospecting	execute	list	Traga 25 estabelecimentos ativos de serviço de monitoramento eletrônico de segurança na cidade de Teresina/PI, com e-mail cadastrado, em ordem de CNPJ, para a equipe de vendas.
+commercial-r02-0080	prospecting	execute	list	Traga 30 estabelecimentos ativos de loja de artigos esportivos na cidade de Londrina/PR, com telefone e e-mail cadastrados, dos mais novos para os mais antigos, para a equipe de vendas.
+commercial-r02-0081	prospecting	execute	list	Traga 5 estabelecimentos ativos de fazenda de cana-de-açúcar na cidade de Natal/RN, com telefone cadastrado, por maior capital social, para a equipe de vendas.
+commercial-r02-0082	prospecting	execute	list	Traga 10 estabelecimentos ativos de borracharia na cidade de Ji-Paraná/RO, com e-mail cadastrado, dos mais antigos para os mais novos, para a equipe de vendas.
+commercial-r02-0083	prospecting	execute	list	Traga 15 estabelecimentos ativos de serviço de tradução na cidade de Porto Alegre/RS, com telefone e e-mail cadastrados, em ordem de CNPJ, para a equipe de vendas.
+commercial-r02-0084	prospecting	execute	list	Traga 20 estabelecimentos ativos de pronto-socorro na cidade de Florianópolis/SC, com telefone cadastrado, dos mais novos para os mais antigos, para a equipe de vendas.
+commercial-r02-0085	prospecting	execute	list	Traga 25 estabelecimentos ativos de loja de medicamentos veterinários na cidade de São Paulo/SP, com e-mail cadastrado, por maior capital social, para a equipe de vendas.
+commercial-r02-0086	prospecting	execute	list	Traga 30 estabelecimentos ativos de serviço de hospedagem de sites na cidade de Araguaína/TO, com telefone e e-mail cadastrados, dos mais antigos para os mais novos, para a equipe de vendas.
+commercial-r02-0087	prospecting	execute	list	Traga 5 estabelecimentos ativos de empresa de construção civil na cidade de Nova Iguaçu/RJ, com telefone cadastrado, em ordem de CNPJ, para a equipe de vendas.
+commercial-r02-0088	prospecting	execute	list	Traga 10 estabelecimentos ativos de companhia aérea regular na cidade de Sorocaba/SP, com e-mail cadastrado, dos mais novos para os mais antigos, para a equipe de vendas.
+commercial-r02-0089	prospecting	execute	list	Traga 15 estabelecimentos ativos de escritório de arquitetura na cidade de Cruzeiro do Sul/AC, com telefone e e-mail cadastrados, por maior capital social, para a equipe de vendas.
+commercial-r02-0090	prospecting	execute	list	Traga 20 estabelecimentos ativos de padaria na cidade de Manaus/AM, com telefone cadastrado, dos mais antigos para os mais novos, para a equipe de vendas.
+commercial-r02-0091	prospecting	execute	list	Traga 25 estabelecimentos ativos de fazenda de gado de corte na cidade de Santana/AP, com e-mail cadastrado, em ordem de CNPJ, para a equipe de vendas.
+commercial-r02-0092	prospecting	execute	list	Traga 30 estabelecimentos ativos de livraria na cidade de Fortaleza/CE, com telefone e e-mail cadastrados, dos mais novos para os mais antigos, para a equipe de vendas.
+commercial-r02-0093	prospecting	execute	list	Traga 5 estabelecimentos ativos de açougue na cidade de Serra/ES, com telefone cadastrado, por maior capital social, para a equipe de vendas.
+commercial-r02-0094	prospecting	execute	list	Traga 10 estabelecimentos ativos de serviço de climatização central na cidade de Aparecida de Goiânia/GO, com e-mail cadastrado, dos mais antigos para os mais novos, para a equipe de vendas.
+commercial-r02-0095	prospecting	execute	list	Traga 15 estabelecimentos ativos de farmácia de manipulação na cidade de Belo Horizonte/MG, com telefone e e-mail cadastrados, em ordem de CNPJ, para a equipe de vendas.
+commercial-r02-0096	prospecting	execute	list	Traga 20 estabelecimentos ativos de construtora na cidade de Dourados/MS, com telefone cadastrado, dos mais novos para os mais antigos, para a equipe de vendas.
+commercial-r02-0097	prospecting	execute	list	Traga 25 estabelecimentos ativos de loja de cosméticos na cidade de Belém/PA, com e-mail cadastrado, por maior capital social, para a equipe de vendas.
+commercial-r02-0098	prospecting	execute	list	Traga 30 estabelecimentos ativos de fazenda de gado leiteiro na cidade de Campina Grande/PB, com telefone e e-mail cadastrados, dos mais antigos para os mais novos, para a equipe de vendas.
+commercial-r02-0099	prospecting	execute	list	Traga 5 estabelecimentos ativos de empresa de marketing direto na cidade de Teresina/PI, com telefone cadastrado, em ordem de CNPJ, para a equipe de vendas.
+commercial-r02-0100	prospecting	execute	list	Traga 10 estabelecimentos ativos de escritório de engenharia na cidade de Londrina/PR, com e-mail cadastrado, dos mais novos para os mais antigos na segunda página, para a equipe de vendas.
+commercial-r02-0101	tax_size	execute	count	Quantos estabelecimentos ativos de fazenda de gado leiteiro na cidade de Caucaia/CE são optantes pelo MEI?
+commercial-r02-0102	tax_size	execute	count	Quantos estabelecimentos ativos de clínica odontológica na cidade de Imperatriz/MA não são optantes pelo MEI?
+commercial-r02-0103	tax_size	execute	count	Quantos estabelecimentos ativos de serviço de instalação elétrica na cidade de Belém/PA são optantes pelo Simples?
+commercial-r02-0104	tax_size	execute	count	Quantos estabelecimentos ativos de escola de ensino fundamental na cidade de Parnaíba/PI não são optantes pelo Simples?
+commercial-r02-0105	tax_size	execute	count	Quantos estabelecimentos ativos de serviço de filmagem de eventos de micro porte existem na cidade de Porto Velho/RO?
+commercial-r02-0106	tax_size	execute	count	Quantos estabelecimentos ativos de curso preparatório para concursos na cidade de Florianópolis/SC são optantes pelo MEI?
+commercial-r02-0107	tax_size	execute	count	Quantos estabelecimentos ativos de serviço de preparação de terreno e colheita na cidade de Campinas/SP não são optantes pelo MEI?
+commercial-r02-0108	tax_size	execute	count	Quantos estabelecimentos ativos de serviço de aplicação de revestimentos na cidade de Rio Branco/AC são optantes pelo Simples?
+commercial-r02-0109	tax_size	execute	count	Quantos estabelecimentos ativos de posto de combustível na cidade de Santana/AP não são optantes pelo Simples?
+commercial-r02-0110	tax_size	execute	count	Quantos estabelecimentos ativos de loja de móveis de pequeno porte existem na cidade de Vila Velha/ES?
+commercial-r02-0111	tax_size	execute	count	Quantos estabelecimentos ativos de loja de artesanato na cidade de Campo Grande/MS são optantes pelo MEI?
+commercial-r02-0112	tax_size	execute	count	Quantos estabelecimentos ativos de mercadinho na cidade de Campina Grande/PB não são optantes pelo MEI?
+commercial-r02-0113	tax_size	execute	count	Quantos estabelecimentos ativos de loja de ferragens na cidade de Rio de Janeiro/RJ são optantes pelo Simples?
+commercial-r02-0114	tax_size	execute	count	Quantos estabelecimentos ativos de farmácia homeopática na cidade de Rorainópolis/RR não são optantes pelo Simples?
+commercial-r02-0115	tax_size	execute	count	Quantos estabelecimentos ativos de hotel na cidade de São Paulo/SP são com porte cadastral demais?
+commercial-r02-0116	tax_size	execute	count	Quantos estabelecimentos ativos de serviço de instalação de máquinas industriais na cidade de São Bernardo do Campo/SP são optantes pelo MEI?
+commercial-r02-0117	tax_size	execute	count	Quantos estabelecimentos ativos de serviço de design de interiores na cidade de Arapiraca/AL não são optantes pelo MEI?
+commercial-r02-0118	tax_size	execute	count	Quantos estabelecimentos ativos de serviço de suporte de TI na cidade de Fortaleza/CE são optantes pelo Simples?
+commercial-r02-0119	tax_size	execute	count	Quantos estabelecimentos ativos de escola de idiomas na cidade de São Luís/MA não são optantes pelo Simples?
+commercial-r02-0120	tax_size	execute	count	Quantos estabelecimentos ativos de fábrica de lingerie na cidade de Várzea Grande/MT são com porte não informado?
+commercial-r02-0121	tax_size	execute	count	Quantos estabelecimentos ativos de frete rodoviário intermunicipal na cidade de Teresina/PI são optantes pelo MEI?
+commercial-r02-0122	tax_size	execute	count	Quantos estabelecimentos ativos de consultoria de gestão na cidade de Mossoró/RN não são optantes pelo MEI?
+commercial-r02-0123	tax_size	execute	count	Quantos estabelecimentos ativos de empresa de refeições para entrega na cidade de Joinville/SC são optantes pelo Simples?
+commercial-r02-0124	tax_size	execute	count	Quantos estabelecimentos ativos de loja de artigos médicos e ortopédicos na cidade de Araguaína/TO não são optantes pelo Simples?
+commercial-r02-0125	tax_size	execute	count	Quantos estabelecimentos ativos de fábrica de motocicletas de micro porte existem na cidade de Osasco/SP?
+commercial-r02-0126	tax_size	execute	count	Quantos estabelecimentos ativos de oficina de motocicletas na cidade de Macapá/AP são optantes pelo MEI?
+commercial-r02-0127	tax_size	execute	count	Quantos estabelecimentos ativos de creche na cidade de Serra/ES não são optantes pelo MEI?
+commercial-r02-0128	tax_size	execute	count	Quantos estabelecimentos ativos de serviço de apoio administrativo na cidade de Uberlândia/MG são optantes pelo Simples?
+commercial-r02-0129	tax_size	execute	count	Quantos estabelecimentos ativos de loja de tintas na cidade de João Pessoa/PB não são optantes pelo Simples?
+commercial-r02-0130	tax_size	execute	count	Quantos estabelecimentos ativos de fábrica de massas alimentícias de pequeno porte existem na cidade de Londrina/PR?
+commercial-r02-0131	tax_size	execute	count	Quantos estabelecimentos ativos de pet shop na cidade de Boa Vista/RR são optantes pelo MEI?
+commercial-r02-0132	tax_size	execute	count	Quantos estabelecimentos ativos de estúdio fotográfico na cidade de Nossa Senhora do Socorro/SE não são optantes pelo MEI?
+commercial-r02-0133	tax_size	execute	count	Quantos estabelecimentos ativos de serviço de instalação hidráulica na cidade de Nova Iguaçu/RJ são optantes pelo Simples?
+commercial-r02-0134	tax_size	execute	count	Quantos estabelecimentos ativos de empresa de vigilância na cidade de Maceió/AL não são optantes pelo Simples?
+commercial-r02-0135	tax_size	execute	count	Quantos estabelecimentos ativos de curso de desenvolvimento profissional na cidade de Feira de Santana/BA são com porte cadastral demais?
+commercial-r02-0136	tax_size	execute	count	Quantos estabelecimentos ativos de consultório de psicologia na cidade de Aparecida de Goiânia/GO são optantes pelo MEI?
+commercial-r02-0137	tax_size	execute	count	Quantos estabelecimentos ativos de incorporadora imobiliária na cidade de Cuiabá/MT não são optantes pelo MEI?
+commercial-r02-0138	tax_size	execute	count	Quantos estabelecimentos ativos de restaurante na cidade de Jaboatão dos Guararapes/PE são optantes pelo Simples?
+commercial-r02-0139	tax_size	execute	count	Quantos estabelecimentos ativos de fazenda de seringueira na cidade de Natal/RN não são optantes pelo Simples?
+commercial-r02-0140	tax_size	execute	count	Quantos estabelecimentos ativos de serviço de transporte escolar na cidade de Caxias do Sul/RS são com porte não informado?
+commercial-r02-0141	tax_size	execute	count	Quantos estabelecimentos ativos de serviço de sonorização e iluminação na cidade de Palmas/TO são optantes pelo MEI?
+commercial-r02-0142	tax_size	execute	count	Quantos estabelecimentos ativos de loja de artigos esportivos na cidade de Sorocaba/SP não são optantes pelo MEI?
+commercial-r02-0143	tax_size	execute	count	Quantos estabelecimentos ativos de marmoraria na cidade de Itacoatiara/AM são optantes pelo Simples?
+commercial-r02-0144	tax_size	execute	count	Quantos estabelecimentos ativos de supermercado na cidade de Brasília/DF não são optantes pelo Simples?
+commercial-r02-0145	tax_size	execute	count	Quantos estabelecimentos ativos de serviço de táxi de micro porte existem na cidade de Belo Horizonte/MG?
+commercial-r02-0146	tax_size	execute	count	Quantos estabelecimentos ativos de tabacaria na cidade de Ananindeua/PA são optantes pelo MEI?
+commercial-r02-0147	tax_size	execute	count	Quantos estabelecimentos ativos de serviço de tradução na cidade de Curitiba/PR não são optantes pelo MEI?
+commercial-r02-0148	tax_size	execute	count	Quantos estabelecimentos ativos de transportadora rodoviária de cargas na cidade de Ji-Paraná/RO são optantes pelo Simples?
+commercial-r02-0149	tax_size	execute	count	Quantos estabelecimentos ativos de loja de autopeças usadas na cidade de Aracaju/SE não são optantes pelo Simples?
+commercial-r02-0150	tax_size	execute	count	Quantos estabelecimentos ativos de loja de variedades de pequeno porte existem na cidade de Duque de Caxias/RJ?
+commercial-r02-0151	structure_status	execute	count	Quantos estabelecimentos ativos de serviço de preparação de terreno e colheita que são matrizes existem na cidade de Serra/ES?
+commercial-r02-0152	structure_status	execute	count	Quantos estabelecimentos ativos de distribuidora de gás liquefeito que são filiais existem na cidade de Várzea Grande/MT?
+commercial-r02-0153	structure_status	execute	count	Quantas matrizes de produtores de hortaliças existem na cidade de Rio de Janeiro/RJ com situação ativa?
+commercial-r02-0154	structure_status	execute	count	Quantos estabelecimentos suspensos de serviço de suporte de TI existem na cidade de Florianópolis/SC?
+commercial-r02-0155	structure_status	execute	count	Quantos estabelecimentos inaptos de serviço de usinagem existem na cidade de Santo André/SP?
+commercial-r02-0156	structure_status	execute	count	Quantos estabelecimentos ativos de loja de peças para motocicletas que são matrizes existem na cidade de Salvador/BA?
+commercial-r02-0157	structure_status	execute	count	Quantos estabelecimentos ativos de loja de tintas que são filiais existem na cidade de Belo Horizonte/MG?
+commercial-r02-0158	structure_status	execute	count	Quantas matrizes de serviços de gesso existem na cidade de Jaboatão dos Guararapes/PE com situação ativa?
+commercial-r02-0159	structure_status	execute	count	Quantos estabelecimentos suspensos de fábrica de pratos prontos existem na cidade de Boa Vista/RR?
+commercial-r02-0160	structure_status	execute	count	Quantos estabelecimentos inaptos de serviço de transporte escolar existem na cidade de Araguaína/TO?
+commercial-r02-0161	structure_status	execute	count	Quantos estabelecimentos ativos de fazenda de cana-de-açúcar que são matrizes existem na cidade de Arapiraca/AL?
+commercial-r02-0162	structure_status	execute	count	Quantos estabelecimentos ativos de serviço de transporte que são filiais existem na cidade de Vila Velha/ES?
+commercial-r02-0163	structure_status	execute	count	Quantas matrizes de estúdios de pós-produção de vídeo existem na cidade de Belém/PA com situação ativa?
+commercial-r02-0164	structure_status	execute	count	Quantos estabelecimentos suspensos de agência de publicidade existem na cidade de São Gonçalo/RJ?
+commercial-r02-0165	structure_status	execute	count	Quantos estabelecimentos inaptos de atacado de autopeças existem na cidade de Aracaju/SE?
+commercial-r02-0166	structure_status	execute	count	Quantos estabelecimentos ativos de livraria que são matrizes existem na cidade de Sorocaba/SP?
+commercial-r02-0167	structure_status	execute	count	Quantos estabelecimentos ativos de loja de produtos de limpeza que são filiais existem na cidade de Feira de Santana/BA?
+commercial-r02-0168	structure_status	execute	count	Quantas matrizes de revendas de gás de cozinha existem na cidade de Uberlândia/MG com situação ativa?
+commercial-r02-0169	structure_status	execute	count	Quantos estabelecimentos suspensos de clínica odontológica existem na cidade de Teresina/PI?
+commercial-r02-0170	structure_status	execute	count	Quantos estabelecimentos inaptos de casa de festas existem na cidade de Rorainópolis/RR?
+commercial-r02-0171	structure_status	execute	count	Quantos estabelecimentos ativos de serviço de montagem de móveis que são matrizes existem na cidade de Campinas/SP?
+commercial-r02-0172	structure_status	execute	count	Quantos estabelecimentos ativos de loja de ferragens que são filiais existem na cidade de Manaus/AM?
+commercial-r02-0173	structure_status	execute	count	Quantas matrizes de corretoras de seguros existem na cidade de Goiânia/GO com situação ativa?
+commercial-r02-0174	structure_status	execute	count	Quantos estabelecimentos suspensos de frete rodoviário municipal existem na cidade de Ananindeua/PA?
+commercial-r02-0175	structure_status	execute	count	Quantos estabelecimentos inaptos de loja de artigos médicos e ortopédicos existem na cidade de Natal/RN?
+commercial-r02-0176	structure_status	execute	count	Quantos estabelecimentos ativos de loja de equipamentos para escritório que são matrizes existem na cidade de Nossa Senhora do Socorro/SE?
+commercial-r02-0177	structure_status	execute	count	Quantos estabelecimentos ativos de farmácia que são filiais existem na cidade de Osasco/SP?
+commercial-r02-0178	structure_status	execute	count	Quantas matrizes de cursos de desenvolvimento profissional existem na cidade de Fortaleza/CE com situação ativa?
+commercial-r02-0179	structure_status	execute	count	Quantos estabelecimentos suspensos de serviço de carro com motorista existem na cidade de Campo Grande/MS?
+commercial-r02-0180	structure_status	execute	count	Quantos estabelecimentos inaptos de papelaria existem na cidade de Parnaíba/PI?
+commercial-r02-0181	structure_status	execute	count	Quantos estabelecimentos ativos de tabacaria que são matrizes existem na cidade de Porto Alegre/RS?
+commercial-r02-0182	structure_status	execute	count	Quantos estabelecimentos ativos de loja de artigos usados que são filiais existem na cidade de Duque de Caxias/RJ?
+commercial-r02-0183	structure_status	execute	count	Quantas matrizes de escolas existem na cidade de Itacoatiara/AM com situação ativa?
+commercial-r02-0184	structure_status	execute	count	Quantos estabelecimentos suspensos de escritório de arquitetura existem na cidade de Aparecida de Goiânia/GO?
+commercial-r02-0185	structure_status	execute	count	Quantos estabelecimentos inaptos de loja de bebidas existem na cidade de João Pessoa/PB?
+commercial-r02-0186	structure_status	execute	count	Quantos estabelecimentos ativos de locadora de carros que são matrizes existem na cidade de Mossoró/RN?
+commercial-r02-0187	structure_status	execute	count	Quantos estabelecimentos ativos de curso de informática que são filiais existem na cidade de São Paulo/SP?
+commercial-r02-0188	structure_status	execute	count	Quantas matrizes de editoras de jornais diários existem na cidade de Rio Branco/AC com situação ativa?
+commercial-r02-0189	structure_status	execute	count	Quantos estabelecimentos suspensos de escritório de engenharia existem na cidade de Caucaia/CE?
+commercial-r02-0190	structure_status	execute	count	Quantos estabelecimentos inaptos de serviço de aplicação de revestimentos existem na cidade de Dourados/MS?
+commercial-r02-0191	structure_status	execute	count	Quantos estabelecimentos ativos de serviço de acabamento gráfico que são matrizes existem na cidade de Curitiba/PR?
+commercial-r02-0192	structure_status	execute	count	Quantos estabelecimentos ativos de hipermercado que são filiais existem na cidade de Caxias do Sul/RS?
+commercial-r02-0193	structure_status	execute	count	Quantas matrizes de escolas de idiomas existem na cidade de Nova Iguaçu/RJ com situação ativa?
+commercial-r02-0194	structure_status	execute	count	Quantos estabelecimentos suspensos de loja de colchões existem na cidade de Macapá/AP?
+commercial-r02-0195	structure_status	execute	count	Quantos estabelecimentos inaptos de empresa de mudanças existem na cidade de São Luís/MA?
+commercial-r02-0196	structure_status	execute	count	Quantos estabelecimentos ativos de fábrica de massas alimentícias que são matrizes existem na cidade de Campina Grande/PB?
+commercial-r02-0197	structure_status	execute	count	Quantos estabelecimentos ativos de pré-escola que são filiais existem na cidade de Porto Velho/RO?
+commercial-r02-0198	structure_status	execute	count	Quantas matrizes de agências de recrutamento existem na cidade de Guarulhos/SP com situação ativa?
+commercial-r02-0199	structure_status	execute	count	Quantos estabelecimentos suspensos de serviço de sonorização e iluminação existem na cidade de Cruzeiro do Sul/AC?
+commercial-r02-0200	structure_status	execute	count	Quantos estabelecimentos inaptos de estúdio de tatuagem existem na cidade de Brasília/DF?
+commercial-r02-0201	capital_legal	execute	count	Conte os estabelecimentos ativos de fábrica de produtos de panificação com capital social de pelo menos R$ 200 mil na cidade de São Luís/MA?
+commercial-r02-0202	capital_legal	execute	count	Quantos estabelecimentos ativos de fábrica de lingerie de sociedade empresária limitada (2062) existem na cidade de Jaboatão dos Guararapes/PE?
+commercial-r02-0203	capital_legal	execute	count	Conte os estabelecimentos ativos de fábrica de esquadrias metálicas com capital social de até R$ 100 mil na cidade de Porto Alegre/RS?
+commercial-r02-0204	capital_legal	execute	count	Quantos estabelecimentos ativos de ótica de empresário individual (2135) existem na cidade de São Bernardo do Campo/SP?
+commercial-r02-0205	capital_legal	execute	count	Conte os estabelecimentos ativos de serviço de instalação hidráulica com capital social entre R$ 50 mil e R$ 200 mil na cidade de Feira de Santana/BA?
+commercial-r02-0206	capital_legal	execute	count	Quantos estabelecimentos ativos de agência de recrutamento de sociedade anônima fechada (2054) existem na cidade de Dourados/MS?
+commercial-r02-0207	capital_legal	execute	count	Conte os estabelecimentos ativos de clube esportivo com capital social de pelo menos R$ 5 milhões na cidade de Rio de Janeiro/RJ?
+commercial-r02-0208	capital_legal	execute	count	Quantos estabelecimentos ativos de tabacaria de entidades empresariais (grupo 2) existem na cidade de Nossa Senhora do Socorro/SE?
+commercial-r02-0209	capital_legal	execute	count	Conte os estabelecimentos ativos de loja de medicamentos veterinários com capital social de até R$ 10 mil na cidade de Cruzeiro do Sul/AC?
+commercial-r02-0210	capital_legal	execute	count	Quantos estabelecimentos ativos de agência de publicidade de sociedade empresária limitada (2062) existem na cidade de Vila Velha/ES?
+commercial-r02-0211	capital_legal	execute	count	Conte os estabelecimentos ativos de bar com capital social de pelo menos R$ 200 mil na cidade de João Pessoa/PB?
+commercial-r02-0212	capital_legal	execute	count	Quantos estabelecimentos ativos de serviço de fretamento de ônibus de empresário individual (2135) existem na cidade de Ji-Paraná/RO?
+commercial-r02-0213	capital_legal	execute	count	Conte os estabelecimentos ativos de loja de informática com capital social de até R$ 100 mil na cidade de Campinas/SP?
+commercial-r02-0214	capital_legal	execute	count	Quantos estabelecimentos ativos de fazenda de gado leiteiro de sociedade anônima fechada (2054) existem na cidade de Macapá/AP?
+commercial-r02-0215	capital_legal	execute	count	Conte os estabelecimentos ativos de organizadora de eventos com capital social entre R$ 50 mil e R$ 200 mil na cidade de Belo Horizonte/MG?
+commercial-r02-0216	capital_legal	execute	count	Quantos estabelecimentos ativos de serviço de conserto de móveis de entidades empresariais (grupo 2) existem na cidade de Parnaíba/PI?
+commercial-r02-0217	capital_legal	execute	count	Conte os estabelecimentos ativos de farmácia homeopática com capital social de pelo menos R$ 5 milhões na cidade de Joinville/SC?
+commercial-r02-0218	capital_legal	execute	count	Quantos estabelecimentos ativos de joalheria de sociedade empresária limitada (2062) existem na cidade de Sorocaba/SP?
+commercial-r02-0219	capital_legal	execute	count	Conte os estabelecimentos ativos de loja de colchões com capital social de até R$ 10 mil na cidade de Caucaia/CE?
+commercial-r02-0220	capital_legal	execute	count	Quantos estabelecimentos ativos de creche de empresário individual (2135) existem na cidade de Várzea Grande/MT?
+commercial-r02-0221	capital_legal	execute	count	Conte os estabelecimentos ativos de farmácia com capital social de pelo menos R$ 200 mil na cidade de Natal/RN?
+commercial-r02-0222	capital_legal	execute	count	Quantos estabelecimentos ativos de empresa de aluguel de imóveis próprios de sociedade anônima fechada (2054) existem na cidade de Guarulhos/SP?
+commercial-r02-0223	capital_legal	execute	count	Conte os estabelecimentos ativos de serviço de transporte escolar com capital social de até R$ 100 mil na cidade de Arapiraca/AL?
+commercial-r02-0224	capital_legal	execute	count	Quantos estabelecimentos ativos de ateliê de costura sob medida de entidades empresariais (grupo 2) existem na cidade de Aparecida de Goiânia/GO?
+commercial-r02-0225	capital_legal	execute	count	Conte os estabelecimentos ativos de pronto-socorro com capital social entre R$ 50 mil e R$ 200 mil na cidade de Recife/PE?
+commercial-r02-0226	capital_legal	execute	count	Quantos estabelecimentos ativos de fábrica de uniformes profissionais de sociedade empresária limitada (2062) existem na cidade de Rorainópolis/RR?
+commercial-r02-0227	capital_legal	execute	count	Conte os estabelecimentos ativos de oficina de elétrica automotiva com capital social de pelo menos R$ 5 milhões na cidade de Nova Iguaçu/RJ?
+commercial-r02-0228	capital_legal	execute	count	Quantos estabelecimentos ativos de editora de livros de empresário individual (2135) existem na cidade de Salvador/BA?
+commercial-r02-0229	capital_legal	execute	count	Conte os estabelecimentos ativos de laboratório de análises clínicas com capital social de até R$ 10 mil na cidade de Campo Grande/MS?
+commercial-r02-0230	capital_legal	execute	count	Quantos estabelecimentos ativos de loja de cosméticos de sociedade anônima fechada (2054) existem na cidade de Londrina/PR?
+commercial-r02-0231	capital_legal	execute	count	Conte os estabelecimentos ativos de fábrica de eletrônicos com capital social de pelo menos R$ 200 mil na cidade de Aracaju/SE?
+commercial-r02-0232	capital_legal	execute	count	Quantos estabelecimentos ativos de serviço de aplicação de revestimentos de entidades empresariais (grupo 2) existem na cidade de Rio Branco/AC?
+commercial-r02-0233	capital_legal	execute	count	Conte os estabelecimentos ativos de academia de ginástica com capital social de até R$ 100 mil na cidade de Serra/ES?
+commercial-r02-0234	capital_legal	execute	count	Quantos estabelecimentos ativos de corretora de seguros de sociedade empresária limitada (2062) existem na cidade de Ananindeua/PA?
+commercial-r02-0235	capital_legal	execute	count	Conte os estabelecimentos ativos de frete rodoviário intermunicipal com capital social entre R$ 50 mil e R$ 200 mil na cidade de Porto Velho/RO?
+commercial-r02-0236	capital_legal	execute	count	Quantos estabelecimentos ativos de loja de peças para motocicletas de empresário individual (2135) existem na cidade de Araguaína/TO?
+commercial-r02-0237	capital_legal	execute	count	Conte os estabelecimentos ativos de locadora de utensílios para festas com capital social de pelo menos R$ 5 milhões na cidade de Itacoatiara/AM?
+commercial-r02-0238	capital_legal	execute	count	Quantos estabelecimentos ativos de empresa de vigilância de sociedade anônima fechada (2054) existem na cidade de Imperatriz/MA?
+commercial-r02-0239	capital_legal	execute	count	Conte os estabelecimentos ativos de loja de conveniência com capital social de até R$ 10 mil na cidade de Teresina/PI?
+commercial-r02-0240	capital_legal	execute	count	Quantos estabelecimentos ativos de serviço de revestimento de metais de entidades empresariais (grupo 2) existem na cidade de Caxias do Sul/RS?
+commercial-r02-0241	capital_legal	execute	count	Conte os estabelecimentos ativos de serviço de tradução com capital social de pelo menos R$ 200 mil na cidade de Santo André/SP?
+commercial-r02-0242	capital_legal	execute	count	Quantos estabelecimentos ativos de armazém geral de sociedade empresária limitada (2062) existem na cidade de Fortaleza/CE?
+commercial-r02-0243	capital_legal	execute	count	Conte os estabelecimentos ativos de loja de roupas com capital social de até R$ 100 mil na cidade de Cuiabá/MT?
+commercial-r02-0244	capital_legal	execute	count	Quantos estabelecimentos ativos de salão de beleza de empresário individual (2135) existem na cidade de São Gonçalo/RJ?
+commercial-r02-0245	capital_legal	execute	count	Conte os estabelecimentos ativos de locadora de carros com capital social entre R$ 50 mil e R$ 200 mil na cidade de São Paulo/SP?
+commercial-r02-0246	capital_legal	execute	count	Quantos estabelecimentos ativos de construtora de sociedade anônima fechada (2054) existem na cidade de Maceió/AL?
+commercial-r02-0247	capital_legal	execute	count	Conte os estabelecimentos ativos de clínica odontológica com capital social de pelo menos R$ 5 milhões na cidade de Goiânia/GO?
+commercial-r02-0248	capital_legal	execute	count	Quantos estabelecimentos ativos de serviço de entrega rápida de entidades empresariais (grupo 2) existem na cidade de Campina Grande/PB?
+commercial-r02-0249	capital_legal	execute	count	Conte os estabelecimentos ativos de distribuidora de gás liquefeito com capital social de até R$ 10 mil na cidade de Boa Vista/RR?
+commercial-r02-0250	capital_legal	execute	count	Quantos estabelecimentos ativos de hotel de sociedade empresária limitada (2062) existem na cidade de Duque de Caxias/RJ?
+commercial-r02-0251	registrations	execute	count	Quantos estabelecimentos de atacado de roupas foram registrados com início de atividade em 2025 na cidade de Belo Horizonte/MG?
+commercial-r02-0252	registrations	execute	count	Quantos estabelecimentos de editora de livros foram registrados com início de atividade nos últimos 12 meses na cidade de São Gonçalo/RJ?
+commercial-r02-0253	registrations	execute	count	Quantos estabelecimentos de assistência técnica de computadores foram registrados com início de atividade em 2025 na cidade de Campinas/SP?
+commercial-r02-0254	registrations	execute	count	Quantos estabelecimentos de clínica odontológica foram registrados com início de atividade nos últimos 12 meses na cidade de Fortaleza/CE?
+commercial-r02-0255	registrations	execute	count	Quantos estabelecimentos de serviço de instalação de portas e divisórias foram registrados com início de atividade em 2025 na cidade de João Pessoa/PB?
+commercial-r02-0256	registrations	execute	count	Quantos estabelecimentos de serviço de assistência domiciliar à saúde foram registrados com início de atividade nos últimos 12 meses na cidade de Caxias do Sul/RS?
+commercial-r02-0257	registrations	execute	count	Quantos estabelecimentos de escola de idiomas foram registrados com início de atividade em 2025 na cidade de Cruzeiro do Sul/AC?
+commercial-r02-0258	registrations	execute	count	Quantos estabelecimentos de serralheria foram registrados com início de atividade nos últimos 12 meses na cidade de Imperatriz/MA?
+commercial-r02-0259	registrations	execute	count	Quantos estabelecimentos de hotel para animais domésticos foram registrados com início de atividade em 2025 na cidade de Rio de Janeiro/RJ?
+commercial-r02-0260	registrations	execute	count	Quantos estabelecimentos de consultório de psicologia foram registrados com início de atividade nos últimos 12 meses na cidade de Araguaína/TO?
+commercial-r02-0261	registrations	execute	count	Quantos estabelecimentos de clube esportivo foram registrados com início de atividade em 2025 na cidade de Feira de Santana/BA?
+commercial-r02-0262	registrations	execute	count	Quantos estabelecimentos de serviço de transporte foram registrados com início de atividade nos últimos 12 meses na cidade de Ananindeua/PA?
+commercial-r02-0263	registrations	execute	count	Quantos estabelecimentos de fábrica de uniformes profissionais foram registrados com início de atividade em 2025 na cidade de Porto Alegre/RS?
+commercial-r02-0264	registrations	execute	count	Quantos estabelecimentos de padaria foram registrados com início de atividade nos últimos 12 meses na cidade de Rio Branco/AC?
+commercial-r02-0265	registrations	execute	count	Quantos estabelecimentos de locadora de carros foram registrados com início de atividade em 2025 na cidade de São Luís/MA?
+commercial-r02-0266	registrations	execute	count	Quantos estabelecimentos de empresa de alimentação corporativa foram registrados com início de atividade nos últimos 12 meses na cidade de Londrina/PR?
+commercial-r02-0267	registrations	execute	count	Quantos estabelecimentos de bufê foram registrados com início de atividade em 2025 na cidade de Palmas/TO?
+commercial-r02-0268	registrations	execute	count	Quantos estabelecimentos de facção de vestuário foram registrados com início de atividade nos últimos 12 meses na cidade de Salvador/BA?
+commercial-r02-0269	registrations	execute	count	Quantos estabelecimentos de serviço de instalação de máquinas industriais foram registrados com início de atividade em 2025 na cidade de Belém/PA?
+commercial-r02-0270	registrations	execute	count	Quantos estabelecimentos de serviço de usinagem foram registrados com início de atividade nos últimos 12 meses na cidade de Rorainópolis/RR?
+commercial-r02-0271	registrations	execute	count	Quantos estabelecimentos de serviço de preparação de documentos foram registrados com início de atividade em 2025 na cidade de Osasco/SP?
+commercial-r02-0272	registrations	execute	count	Quantos estabelecimentos de serviço de instalação hidráulica foram registrados com início de atividade nos últimos 12 meses na cidade de Aparecida de Goiânia/GO?
+commercial-r02-0273	registrations	execute	count	Quantos estabelecimentos de serviço de carro com motorista foram registrados com início de atividade em 2025 na cidade de Curitiba/PR?
+commercial-r02-0274	registrations	execute	count	Quantos estabelecimentos de ateliê de costura sob medida foram registrados com início de atividade nos últimos 12 meses na cidade de Guarulhos/SP?
+commercial-r02-0275	registrations	execute	count	Quantos estabelecimentos de loja de variedades foram registrados com início de atividade em 2025 na cidade de Santana/AP?
+commercial-r02-0276	registrations	execute	count	Quantos estabelecimentos de loja de roupas foram registrados com início de atividade nos últimos 12 meses na cidade de Várzea Grande/MT?
+commercial-r02-0277	registrations	execute	count	Quantos estabelecimentos de oficina de funilaria foram registrados com início de atividade em 2025 na cidade de Boa Vista/RR?
+commercial-r02-0278	registrations	execute	count	Quantos estabelecimentos de farmácia de manipulação foram registrados com início de atividade nos últimos 12 meses na cidade de Sorocaba/SP?
+commercial-r02-0279	registrations	execute	count	Quantos estabelecimentos de empresa de cobrança foram registrados com início de atividade em 2025 na cidade de Goiânia/GO?
+commercial-r02-0280	registrations	execute	count	Quantos estabelecimentos de peixaria foram registrados com início de atividade nos últimos 12 meses na cidade de Parnaíba/PI?
+commercial-r02-0281	registrations	execute	count	Quantos estabelecimentos de loja de ferragens foram registrados com início de atividade em 2025 na cidade de São Paulo/SP?
+commercial-r02-0282	registrations	execute	count	Quantos estabelecimentos de serviço de paisagismo foram registrados com início de atividade nos últimos 12 meses na cidade de Macapá/AP?
+commercial-r02-0283	registrations	execute	count	Quantos estabelecimentos de fábrica de esquadrias metálicas foram registrados com início de atividade em 2025 na cidade de Cuiabá/MT?
+commercial-r02-0284	registrations	execute	count	Quantos estabelecimentos de fábrica de massas alimentícias foram registrados com início de atividade nos últimos 12 meses na cidade de Ji-Paraná/RO?
+commercial-r02-0285	registrations	execute	count	Quantos estabelecimentos de empresa de aluguel de imóveis próprios foram registrados com início de atividade em 2025 na cidade de Santo André/SP?
+commercial-r02-0286	registrations	execute	count	Quantos estabelecimentos de fazenda de soja foram registrados com início de atividade nos últimos 12 meses na cidade de Vila Velha/ES?
+commercial-r02-0287	registrations	execute	count	Quantos estabelecimentos de serviço de tradução foram registrados com início de atividade em 2025 na cidade de Teresina/PI?
+commercial-r02-0288	registrations	execute	count	Quantos estabelecimentos de fábrica de móveis de madeira foram registrados com início de atividade nos últimos 12 meses na cidade de Nossa Senhora do Socorro/SE?
+commercial-r02-0289	registrations	execute	count	Quantos estabelecimentos de atacado de autopeças foram registrados com início de atividade em 2025 na cidade de Itacoatiara/AM?
+commercial-r02-0290	registrations	execute	count	Quantos estabelecimentos de loja de doces foram registrados com início de atividade nos últimos 12 meses na cidade de Dourados/MS?
+commercial-r02-0291	registrations	execute	count	Quantos estabelecimentos de fazenda de milho foram registrados com início de atividade em 2025 na cidade de Porto Velho/RO?
+commercial-r02-0292	registrations	execute	count	Quantos estabelecimentos de escritório de engenharia foram registrados com início de atividade nos últimos 12 meses na cidade de São Bernardo do Campo/SP?
+commercial-r02-0293	registrations	execute	count	Quantos estabelecimentos de loja de móveis foram registrados com início de atividade em 2025 na cidade de Serra/ES?
+commercial-r02-0294	registrations	execute	count	Quantos estabelecimentos de fábrica de produtos de panificação foram registrados com início de atividade nos últimos 12 meses na cidade de Jaboatão dos Guararapes/PE?
+commercial-r02-0295	registrations	execute	count	Quantos estabelecimentos de madeireira foram registrados com início de atividade em 2025 na cidade de Aracaju/SE?
+commercial-r02-0296	registrations	execute	count	Quantos estabelecimentos de creche foram registrados com início de atividade nos últimos 12 meses na cidade de Manaus/AM?
+commercial-r02-0297	registrations	execute	count	Quantos estabelecimentos de serviço de gesso foram registrados com início de atividade em 2025 na cidade de Campo Grande/MS?
+commercial-r02-0298	registrations	execute	count	Quantos estabelecimentos de loja de conveniência foram registrados com início de atividade nos últimos 12 meses na cidade de Mossoró/RN?
+commercial-r02-0299	registrations	execute	count	Quantos estabelecimentos de supermercado foram registrados com início de atividade em 2025 na cidade de Nova Iguaçu/RJ?
+commercial-r02-0300	registrations	execute	count	Quantos estabelecimentos de loja de artigos usados foram registrados com início de atividade nos últimos 12 meses na cidade de Brasília/DF?
+commercial-r02-0301	closures	execute	count	Quantos estabelecimentos de livraria tiveram baixa cadastral com início de atividade em 2025 na cidade de Cuiabá/MT?
+commercial-r02-0302	closures	execute	count	Quantos estabelecimentos de condomínio predial tiveram baixa cadastral com início de atividade nos últimos 12 meses na cidade de Rorainópolis/RR?
+commercial-r02-0303	closures	execute	count	Quantos estabelecimentos de fábrica de eletrônicos tiveram baixa cadastral com início de atividade em 2025 na cidade de Cruzeiro do Sul/AC?
+commercial-r02-0304	closures	execute	count	Quantos estabelecimentos de loja de móveis tiveram baixa cadastral com início de atividade nos últimos 12 meses na cidade de Uberlândia/MG?
+commercial-r02-0305	closures	execute	count	Quantos estabelecimentos de serviço de manutenção de refrigeração industrial tiveram baixa cadastral com início de atividade em 2025 na cidade de Porto Velho/RO?
+commercial-r02-0306	closures	execute	count	Quantos estabelecimentos de loja de colchões tiveram baixa cadastral com início de atividade nos últimos 12 meses na cidade de Sorocaba/SP?
+commercial-r02-0307	closures	execute	count	Quantos estabelecimentos de loja de tintas tiveram baixa cadastral com início de atividade em 2025 na cidade de São Luís/MA?
+commercial-r02-0308	closures	execute	count	Quantos estabelecimentos de administradora de imóveis tiveram baixa cadastral com início de atividade nos últimos 12 meses na cidade de São Gonçalo/RJ?
+commercial-r02-0309	closures	execute	count	Quantos estabelecimentos de clube esportivo tiveram baixa cadastral com início de atividade em 2025 na cidade de Nova Iguaçu/RJ?
+commercial-r02-0310	closures	execute	count	Quantos estabelecimentos de transportadora rodoviária de cargas tiveram baixa cadastral com início de atividade nos últimos 12 meses na cidade de Vila Velha/ES?
+commercial-r02-0311	closures	execute	count	Quantos estabelecimentos de escritório de contabilidade tiveram baixa cadastral com início de atividade em 2025 na cidade de Curitiba/PR?
+commercial-r02-0312	closures	execute	count	Quantos estabelecimentos de loja de bebidas tiveram baixa cadastral com início de atividade nos últimos 12 meses na cidade de Araguaína/TO?
+commercial-r02-0313	closures	execute	count	Quantos estabelecimentos de farmácia de manipulação tiveram baixa cadastral com início de atividade em 2025 na cidade de Caucaia/CE?
+commercial-r02-0314	closures	execute	count	Quantos estabelecimentos de loja de departamentos tiveram baixa cadastral com início de atividade nos últimos 12 meses na cidade de Jaboatão dos Guararapes/PE?
+commercial-r02-0315	closures	execute	count	Quantos estabelecimentos de atacado de alimentos tiveram baixa cadastral com início de atividade em 2025 na cidade de São Paulo/SP?
+commercial-r02-0316	closures	execute	count	Quantos estabelecimentos de hotel tiveram baixa cadastral com início de atividade nos últimos 12 meses na cidade de Salvador/BA?
+commercial-r02-0317	closures	execute	count	Quantos estabelecimentos de madeireira tiveram baixa cadastral com início de atividade em 2025 na cidade de João Pessoa/PB?
+commercial-r02-0318	closures	execute	count	Quantos estabelecimentos de loja de equipamentos para escritório tiveram baixa cadastral com início de atividade nos últimos 12 meses na cidade de Florianópolis/SC?
+commercial-r02-0319	closures	execute	count	Quantos estabelecimentos de empresa de vigilância tiveram baixa cadastral com início de atividade em 2025 na cidade de Itacoatiara/AM?
+commercial-r02-0320	closures	execute	count	Quantos estabelecimentos de serviço de monitoramento eletrônico de segurança tiveram baixa cadastral com início de atividade nos últimos 12 meses na cidade de Várzea Grande/MT?
+commercial-r02-0321	closures	execute	count	Quantos estabelecimentos de loja de brinquedos tiveram baixa cadastral com início de atividade em 2025 na cidade de Porto Alegre/RS?
+commercial-r02-0322	closures	execute	count	Quantos estabelecimentos de fábrica de uniformes profissionais tiveram baixa cadastral com início de atividade nos últimos 12 meses na cidade de Maceió/AL?
+commercial-r02-0323	closures	execute	count	Quantos estabelecimentos de bar com entretenimento tiveram baixa cadastral com início de atividade em 2025 na cidade de Campo Grande/MS?
+commercial-r02-0324	closures	execute	count	Quantos estabelecimentos de loja de produtos de limpeza tiveram baixa cadastral com início de atividade nos últimos 12 meses na cidade de Ji-Paraná/RO?
+commercial-r02-0325	closures	execute	count	Quantos estabelecimentos de fazenda de gado leiteiro tiveram baixa cadastral com início de atividade em 2025 na cidade de Osasco/SP?
+commercial-r02-0326	closures	execute	count	Quantos estabelecimentos de peixaria tiveram baixa cadastral com início de atividade nos últimos 12 meses na cidade de Imperatriz/MA?
+commercial-r02-0327	closures	execute	count	Quantos estabelecimentos de loja de cama mesa e banho tiveram baixa cadastral com início de atividade em 2025 na cidade de Natal/RN?
+commercial-r02-0328	closures	execute	count	Quantos estabelecimentos de fábrica de lingerie tiveram baixa cadastral com início de atividade nos últimos 12 meses na cidade de São Bernardo do Campo/SP?
+commercial-r02-0329	closures	execute	count	Quantos estabelecimentos de empresa de mudanças tiveram baixa cadastral com início de atividade em 2025 na cidade de Goiânia/GO?
+commercial-r02-0330	closures	execute	count	Quantos estabelecimentos de serviço de gesso tiveram baixa cadastral com início de atividade nos últimos 12 meses na cidade de Londrina/PR?
+commercial-r02-0331	closures	execute	count	Quantos estabelecimentos de fazenda de seringueira tiveram baixa cadastral com início de atividade em 2025 na cidade de Campinas/SP?
+commercial-r02-0332	closures	execute	count	Quantos estabelecimentos de borracharia tiveram baixa cadastral com início de atividade nos últimos 12 meses na cidade de Brasília/DF?
+commercial-r02-0333	closures	execute	count	Quantos estabelecimentos de empresa de coleta de resíduos comuns tiveram baixa cadastral com início de atividade em 2025 na cidade de Teresina/PI?
+commercial-r02-0334	closures	execute	count	Quantos estabelecimentos de loja de autopeças tiveram baixa cadastral com início de atividade nos últimos 12 meses na cidade de Guarulhos/SP?
+commercial-r02-0335	closures	execute	count	Quantos estabelecimentos de locadora de carros tiveram baixa cadastral com início de atividade em 2025 na cidade de Feira de Santana/BA?
+commercial-r02-0336	closures	execute	count	Quantos estabelecimentos de serviço de malote tiveram baixa cadastral com início de atividade nos últimos 12 meses na cidade de Campina Grande/PB?
+commercial-r02-0337	closures	execute	count	Quantos estabelecimentos de curso preparatório para concursos tiveram baixa cadastral com início de atividade em 2025 na cidade de Aracaju/SE?
+commercial-r02-0338	closures	execute	count	Quantos estabelecimentos de academia de ginástica tiveram baixa cadastral com início de atividade nos últimos 12 meses na cidade de Macapá/AP?
+commercial-r02-0339	closures	execute	count	Quantos estabelecimentos de serviço de paisagismo tiveram baixa cadastral com início de atividade em 2025 na cidade de Belém/PA?
+commercial-r02-0340	closures	execute	count	Quantos estabelecimentos de fábrica de motocicletas tiveram baixa cadastral com início de atividade nos últimos 12 meses na cidade de Caxias do Sul/RS?
+commercial-r02-0341	closures	execute	count	Quantos estabelecimentos de farmácia tiveram baixa cadastral com início de atividade em 2025 na cidade de Arapiraca/AL?
+commercial-r02-0342	closures	execute	count	Quantos estabelecimentos de organização religiosa tiveram baixa cadastral com início de atividade nos últimos 12 meses na cidade de Dourados/MS?
+commercial-r02-0343	closures	execute	count	Quantos estabelecimentos de supermercado tiveram baixa cadastral com início de atividade em 2025 na cidade de Boa Vista/RR?
+commercial-r02-0344	closures	execute	count	Quantos estabelecimentos de loja de medicamentos veterinários tiveram baixa cadastral com início de atividade nos últimos 12 meses na cidade de Rio Branco/AC?
+commercial-r02-0345	closures	execute	count	Quantos estabelecimentos de loja de eletrodomésticos tiveram baixa cadastral com início de atividade em 2025 na cidade de Belo Horizonte/MG?
+commercial-r02-0346	closures	execute	count	Quantos estabelecimentos de serviço de pintura predial tiveram baixa cadastral com início de atividade nos últimos 12 meses na cidade de Mossoró/RN?
+commercial-r02-0347	closures	execute	count	Quantos estabelecimentos de revenda de gás de cozinha tiveram baixa cadastral com início de atividade em 2025 na cidade de Santo André/SP?
+commercial-r02-0348	closures	execute	count	Quantos estabelecimentos de bufê tiveram baixa cadastral com início de atividade nos últimos 12 meses na cidade de Aparecida de Goiânia/GO?
+commercial-r02-0349	closures	execute	count	Quantos estabelecimentos de loja de artesanato tiveram baixa cadastral com início de atividade em 2025 na cidade de Rio de Janeiro/RJ?
+commercial-r02-0350	closures	execute	count	Quantos estabelecimentos de consultoria de TI tiveram baixa cadastral com início de atividade nos últimos 12 meses na cidade de Duque de Caxias/RJ?
+commercial-r02-0351	trends	execute	trend	Mostre a evolução mensal em 2025 de registros de início de atividade de estabelecimentos de curso de informática na cidade de Recife/PE.
+commercial-r02-0352	trends	execute	trend	Mostre a evolução mensal em 2025 de baixas cadastrais de estabelecimentos de bufê na cidade de Araguaína/TO.
+commercial-r02-0353	trends	execute	trend	Mostre a evolução mensal em 2025 de saldo de registros menos baixas cadastrais de estabelecimentos de academia de ginástica na cidade de Goiânia/GO.
+commercial-r02-0354	trends	execute	trend	Mostre a evolução mensal em 2025 de opções pelo MEI de estabelecimentos de fábrica de lingerie na cidade de Mossoró/RN.
+commercial-r02-0355	trends	execute	trend	Mostre a evolução mensal em 2025 de exclusões do MEI de estabelecimentos de loja de equipamentos para escritório na cidade de Cruzeiro do Sul/AC.
+commercial-r02-0356	trends	execute	trend	Mostre a evolução anual de 2025 a 2026 até a data da base de registros de início de atividade de estabelecimentos de administradora de imóveis na cidade de Várzea Grande/MT.
+commercial-r02-0357	trends	execute	trend	Mostre a evolução anual de 2025 a 2026 até a data da base de baixas cadastrais de estabelecimentos de marmoraria na cidade de Aracaju/SE.
+commercial-r02-0358	trends	execute	trend	Mostre a evolução anual de 2025 a 2026 até a data da base de saldo de registros menos baixas cadastrais de estabelecimentos de clínica veterinária na cidade de Fortaleza/CE.
+commercial-r02-0359	trends	execute	trend	Mostre a evolução anual de 2025 a 2026 até a data da base de opções pelo MEI de estabelecimentos de atacado de autopeças na cidade de Curitiba/PR.
+commercial-r02-0360	trends	execute	trend	Mostre a evolução anual de 2025 a 2026 até a data da base de exclusões do MEI de estabelecimentos de laboratório de análises clínicas na cidade de São Bernardo do Campo/SP.
+commercial-r02-0361	trends	execute	trend	Mostre a evolução mensal em 2025 de registros de início de atividade de estabelecimentos de empresa de marketing direto na cidade de Belo Horizonte/MG.
+commercial-r02-0362	trends	execute	trend	Mostre a evolução mensal em 2025 de baixas cadastrais de estabelecimentos de facção de vestuário na cidade de Rorainópolis/RR.
+commercial-r02-0363	trends	execute	trend	Mostre a evolução mensal em 2025 de saldo de registros menos baixas cadastrais de estabelecimentos de serviço de suporte de TI na cidade de Itacoatiara/AM.
+commercial-r02-0364	trends	execute	trend	Mostre a evolução mensal em 2025 de opções pelo MEI de estabelecimentos de fábrica de peças de moto na cidade de Campina Grande/PB.
+commercial-r02-0365	trends	execute	trend	Mostre a evolução mensal em 2025 de exclusões do MEI de estabelecimentos de serviço de pré-impressão na cidade de Palmas/TO.
+commercial-r02-0366	trends	execute	trend	Mostre a evolução anual de 2025 a 2026 até a data da base de registros de início de atividade de estabelecimentos de serviço de sonorização e iluminação na cidade de Vila Velha/ES.
+commercial-r02-0367	trends	execute	trend	Mostre a evolução anual de 2025 a 2026 até a data da base de baixas cadastrais de estabelecimentos de pronto-socorro na cidade de Natal/RN.
+commercial-r02-0368	trends	execute	trend	Mostre a evolução anual de 2025 a 2026 até a data da base de saldo de registros menos baixas cadastrais de estabelecimentos de assistência técnica de eletrodomésticos na cidade de Rio Branco/AC.
+commercial-r02-0369	trends	execute	trend	Mostre a evolução anual de 2025 a 2026 até a data da base de opções pelo MEI de estabelecimentos de loja de doces na cidade de Cuiabá/MT.
+commercial-r02-0370	trends	execute	trend	Mostre a evolução anual de 2025 a 2026 até a data da base de exclusões do MEI de estabelecimentos de editora de jornal diário na cidade de Florianópolis/SC.
+commercial-r02-0371	trends	execute	trend	Mostre a evolução mensal em 2025 de registros de início de atividade de estabelecimentos de floricultura na cidade de Feira de Santana/BA.
+commercial-r02-0372	trends	execute	trend	Mostre a evolução mensal em 2025 de baixas cadastrais de estabelecimentos de serviço de instalação de máquinas industriais na cidade de Parnaíba/PI.
+commercial-r02-0373	trends	execute	trend	Mostre a evolução mensal em 2025 de saldo de registros menos baixas cadastrais de estabelecimentos de clínica médica com exames complementares na cidade de Nova Iguaçu/RJ.
+commercial-r02-0374	trends	execute	trend	Mostre a evolução mensal em 2025 de opções pelo MEI de estabelecimentos de farmácia na cidade de Imperatriz/MA.
+commercial-r02-0375	trends	execute	trend	Mostre a evolução mensal em 2025 de exclusões do MEI de estabelecimentos de fazenda de seringueira na cidade de Boa Vista/RR.
+commercial-r02-0376	trends	execute	trend	Mostre a evolução anual de 2025 a 2026 até a data da base de registros de início de atividade de estabelecimentos de loja de brinquedos na cidade de Manaus/AM.
+commercial-r02-0377	trends	execute	trend	Mostre a evolução anual de 2025 a 2026 até a data da base de baixas cadastrais de estabelecimentos de escritório de contabilidade na cidade de João Pessoa/PB.
+commercial-r02-0378	trends	execute	trend	Mostre a evolução anual de 2025 a 2026 até a data da base de saldo de registros menos baixas cadastrais de estabelecimentos de livraria na cidade de Guarulhos/SP.
+commercial-r02-0379	trends	execute	trend	Mostre a evolução anual de 2025 a 2026 até a data da base de opções pelo MEI de estabelecimentos de fazenda de milho na cidade de Serra/ES.
+commercial-r02-0380	trends	execute	trend	Mostre a evolução anual de 2025 a 2026 até a data da base de exclusões do MEI de estabelecimentos de serviço de entrega rápida na cidade de São Gonçalo/RJ.
+commercial-r02-0381	trends	execute	trend	Mostre a evolução mensal em 2025 de registros de início de atividade de estabelecimentos de farmácia homeopática na cidade de Osasco/SP.
+commercial-r02-0382	trends	execute	trend	Mostre a evolução mensal em 2025 de baixas cadastrais de estabelecimentos de serviço de usinagem na cidade de Dourados/MS.
+commercial-r02-0383	trends	execute	trend	Mostre a evolução mensal em 2025 de saldo de registros menos baixas cadastrais de estabelecimentos de estacionamento na cidade de Joinville/SC.
+commercial-r02-0384	trends	execute	trend	Mostre a evolução mensal em 2025 de opções pelo MEI de estabelecimentos de incorporadora imobiliária na cidade de Salvador/BA.
+commercial-r02-0385	trends	execute	trend	Mostre a evolução mensal em 2025 de exclusões do MEI de estabelecimentos de estúdio de tatuagem na cidade de Teresina/PI.
+commercial-r02-0386	trends	execute	trend	Mostre a evolução anual de 2025 a 2026 até a data da base de registros de início de atividade de estabelecimentos de portal de conteúdo na cidade de Duque de Caxias/RJ.
+commercial-r02-0387	trends	execute	trend	Mostre a evolução anual de 2025 a 2026 até a data da base de baixas cadastrais de estabelecimentos de salão de beleza na cidade de São Luís/MA.
+commercial-r02-0388	trends	execute	trend	Mostre a evolução anual de 2025 a 2026 até a data da base de saldo de registros menos baixas cadastrais de estabelecimentos de loja de informática na cidade de Ji-Paraná/RO.
+commercial-r02-0389	trends	execute	trend	Mostre a evolução anual de 2025 a 2026 até a data da base de opções pelo MEI de estabelecimentos de escritório de engenharia na cidade de Arapiraca/AL.
+commercial-r02-0390	trends	execute	trend	Mostre a evolução anual de 2025 a 2026 até a data da base de exclusões do MEI de estabelecimentos de mercadinho na cidade de Ananindeua/PA.
+commercial-r02-0391	trends	execute	trend	Mostre a evolução mensal em 2025 de registros de início de atividade de estabelecimentos de escritório de advocacia na cidade de São Paulo/SP.
+commercial-r02-0392	trends	execute	trend	Mostre a evolução mensal em 2025 de baixas cadastrais de estabelecimentos de serviço de preparação de documentos na cidade de Brasília/DF.
+commercial-r02-0393	trends	execute	trend	Mostre a evolução mensal em 2025 de saldo de registros menos baixas cadastrais de estabelecimentos de curso de desenvolvimento profissional na cidade de Rio de Janeiro/RJ.
+commercial-r02-0394	trends	execute	trend	Mostre a evolução mensal em 2025 de opções pelo MEI de estabelecimentos de serviço de revestimento de metais na cidade de Sorocaba/SP.
+commercial-r02-0395	trends	execute	trend	Mostre a evolução mensal em 2025 de exclusões do MEI de estabelecimentos de loja de medicamentos veterinários na cidade de Campo Grande/MS.
+commercial-r02-0396	trends	execute	trend	Mostre a evolução anual de 2025 a 2026 até a data da base de registros de início de atividade de estabelecimentos de loja de autopeças na cidade de Caxias do Sul/RS.
+commercial-r02-0397	trends	execute	trend	Mostre a evolução anual de 2025 a 2026 até a data da base de baixas cadastrais de estabelecimentos de loja de produtos de limpeza na cidade de Santana/AP.
+commercial-r02-0398	trends	execute	trend	Mostre a evolução anual de 2025 a 2026 até a data da base de saldo de registros menos baixas cadastrais de estabelecimentos de loja de departamentos na cidade de Jaboatão dos Guararapes/PE.
+commercial-r02-0399	trends	execute	trend	Mostre a evolução anual de 2025 a 2026 até a data da base de opções pelo MEI de estabelecimentos de loja de móveis na cidade de Campinas/SP.
+commercial-r02-0400	trends	execute	trend	Mostre a evolução anual de 2025 a 2026 até a data da base de exclusões do MEI de estabelecimentos de serviço de tecnologia da informação na cidade de Aparecida de Goiânia/GO.
+commercial-r02-0401	historical	execute	count	Quantos estabelecimentos de casa de festas estavam ativos na cidade de Teresina/PI na competência 2024-12, segundo o arquivo daquele mês?
+commercial-r02-0402	historical	execute	count	Quantos estabelecimentos de hipermercado estavam ativos em AP na competência 2025-06, segundo o arquivo daquele mês?
+commercial-r02-0403	historical	execute	count	Quantos estabelecimentos de fábrica de motocicletas estavam ativos na cidade de Curitiba/PR na competência 2025-12, segundo o arquivo daquele mês?
+commercial-r02-0404	historical	execute	count	Quantos estabelecimentos de atacado de frutas e verduras estavam ativos em MA na competência 2026-03, segundo o arquivo daquele mês?
+commercial-r02-0405	historical	execute	count	Quantos estabelecimentos de ateliê de costura sob medida estavam ativos na cidade de Rio de Janeiro/RJ na competência 2026-07, segundo o arquivo daquele mês?
+commercial-r02-0406	historical	execute	count	Quantos estabelecimentos de empresa de transporte de passageiros estavam ativos em PE na competência 2024-12, segundo o arquivo daquele mês?
+commercial-r02-0407	historical	execute	count	Quantos estabelecimentos de açougue estavam ativos na cidade de Natal/RN na competência 2025-06, segundo o arquivo daquele mês?
+commercial-r02-0408	historical	execute	count	Quantos estabelecimentos de loja de departamentos estavam ativos em RR na competência 2025-12, segundo o arquivo daquele mês?
+commercial-r02-0409	historical	execute	count	Quantos estabelecimentos de mercadinho estavam ativos na cidade de Porto Velho/RO na competência 2026-03, segundo o arquivo daquele mês?
+commercial-r02-0410	historical	execute	count	Quantos estabelecimentos de serviço de usinagem estavam ativos em AC na competência 2026-07, segundo o arquivo daquele mês?
+commercial-r02-0411	historical	execute	count	Quantos estabelecimentos de farmácia estavam ativos na cidade de Boa Vista/RR na competência 2024-12, segundo o arquivo daquele mês?
+commercial-r02-0412	historical	execute	count	Quantos estabelecimentos de serviço de sonorização e iluminação estavam ativos em DF na competência 2025-06, segundo o arquivo daquele mês?
+commercial-r02-0413	historical	execute	count	Quantos estabelecimentos de clínica veterinária estavam ativos na cidade de Porto Alegre/RS na competência 2025-12, segundo o arquivo daquele mês?
+commercial-r02-0414	historical	execute	count	Quantos estabelecimentos de fazenda de gado de corte estavam ativos em MT na competência 2026-03, segundo o arquivo daquele mês?
+commercial-r02-0415	historical	execute	count	Quantos estabelecimentos de empresa de alimentação corporativa estavam ativos na cidade de Joinville/SC na competência 2026-07, segundo o arquivo daquele mês?
+commercial-r02-0416	historical	execute	count	Quantos estabelecimentos de atacado de alimentos estavam ativos em RJ na competência 2024-12, segundo o arquivo daquele mês?
+commercial-r02-0417	historical	execute	count	Quantos estabelecimentos de joalheria estavam ativos na cidade de Aracaju/SE na competência 2025-06, segundo o arquivo daquele mês?
+commercial-r02-0418	historical	execute	count	Quantos estabelecimentos de serviço de apoio administrativo estavam ativos em SE na competência 2025-12, segundo o arquivo daquele mês?
+commercial-r02-0419	historical	execute	count	Quantos estabelecimentos de organização religiosa estavam ativos na cidade de São Paulo/SP na competência 2026-03, segundo o arquivo daquele mês?
+commercial-r02-0420	historical	execute	count	Quantos estabelecimentos de serviço de transporte estavam ativos em AP na competência 2026-07, segundo o arquivo daquele mês?
+commercial-r02-0421	historical	execute	count	Quantos estabelecimentos de escritório de arquitetura estavam ativos na cidade de Palmas/TO na competência 2024-12, segundo o arquivo daquele mês?
+commercial-r02-0422	historical	execute	count	Quantos estabelecimentos de assistência técnica de equipamentos de comunicação estavam ativos em MA na competência 2025-06, segundo o arquivo daquele mês?
+commercial-r02-0423	historical	execute	count	Quantos estabelecimentos de organizadora de eventos estavam ativos na cidade de Campinas/SP na competência 2025-12, segundo o arquivo daquele mês?
+commercial-r02-0424	historical	execute	count	Quantos estabelecimentos de hotel estavam ativos em PE na competência 2026-03, segundo o arquivo daquele mês?
+commercial-r02-0425	historical	execute	count	Quantos estabelecimentos de serralheria estavam ativos na cidade de Nova Iguaçu/RJ na competência 2026-07, segundo o arquivo daquele mês?
+commercial-r02-0426	historical	execute	count	Quantos estabelecimentos de hortifruti estavam ativos em RR na competência 2024-12, segundo o arquivo daquele mês?
+commercial-r02-0427	historical	execute	count	Quantos estabelecimentos de supermercado estavam ativos na cidade de Santo André/SP na competência 2025-06, segundo o arquivo daquele mês?
+commercial-r02-0428	historical	execute	count	Quantos estabelecimentos de empresa de construção civil estavam ativos em AC na competência 2025-12, segundo o arquivo daquele mês?
+commercial-r02-0429	historical	execute	count	Quantos estabelecimentos de serviço de fretamento de ônibus estavam ativos na cidade de Osasco/SP na competência 2026-03, segundo o arquivo daquele mês?
+commercial-r02-0430	historical	execute	count	Quantos estabelecimentos de clínica odontológica estavam ativos em DF na competência 2026-07, segundo o arquivo daquele mês?
+commercial-r02-0431	historical	execute	count	Quantos estabelecimentos de serviço de acabamento gráfico estavam ativos na cidade de Cruzeiro do Sul/AC na competência 2024-12, segundo o arquivo daquele mês?
+commercial-r02-0432	historical	execute	count	Quantos estabelecimentos de madeireira estavam ativos em MT na competência 2025-06, segundo o arquivo daquele mês?
+commercial-r02-0433	historical	execute	count	Quantos estabelecimentos de pet shop estavam ativos na cidade de Arapiraca/AL na competência 2025-12, segundo o arquivo daquele mês?
+commercial-r02-0434	historical	execute	count	Quantos estabelecimentos de lanchonete estavam ativos em RJ na competência 2026-03, segundo o arquivo daquele mês?
+commercial-r02-0435	historical	execute	count	Quantos estabelecimentos de loja de medicamentos veterinários estavam ativos na cidade de Itacoatiara/AM na competência 2026-07, segundo o arquivo daquele mês?
+commercial-r02-0436	historical	execute	rank	Quais os 5 setores de AL com maior variação absoluta de estabelecimentos ativos entre 2026-04 e 2026-10, com base inicial de pelo menos 30?
+commercial-r02-0437	historical	execute	rank	Quais os 5 setores de DF com maior variação absoluta de estabelecimentos ativos entre 2026-05 e 2026-10, com base inicial de pelo menos 30?
+commercial-r02-0438	historical	execute	rank	Quais os 5 setores de MS com maior variação absoluta de estabelecimentos ativos entre 2026-06 e 2026-10, com base inicial de pelo menos 30?
+commercial-r02-0439	historical	execute	rank	Quais os 5 setores de PI com maior variação absoluta de estabelecimentos ativos entre 2025-03 e 2026-10, com base inicial de pelo menos 30?
+commercial-r02-0440	historical	execute	rank	Quais os 5 setores de RR com maior variação absoluta de estabelecimentos ativos entre 2025-04 e 2026-10, com base inicial de pelo menos 30?
+commercial-r02-0441	historical	execute	rank	Quais os 5 setores de TO com maior variação absoluta de estabelecimentos ativos entre 2026-04 e 2026-10, com base inicial de pelo menos 30?
+commercial-r02-0442	historical	execute	rank	Quais os 5 setores de BA com maior variação absoluta de estabelecimentos ativos entre 2026-05 e 2026-10, com base inicial de pelo menos 30?
+commercial-r02-0443	historical	execute	rank	Quais os 5 setores de MA com maior variação absoluta de estabelecimentos ativos entre 2026-06 e 2026-10, com base inicial de pelo menos 30?
+commercial-r02-0444	historical	execute	rank	Quais os 5 setores de PB com maior variação absoluta de estabelecimentos ativos entre 2025-03 e 2026-10, com base inicial de pelo menos 30?
+commercial-r02-0445	historical	execute	rank	Quais os 5 setores de RN com maior variação absoluta de estabelecimentos ativos entre 2025-04 e 2026-10, com base inicial de pelo menos 30?
+commercial-r02-0446	historical	execute	rank	Quais os 5 setores de SE com maior variação absoluta de estabelecimentos ativos entre 2026-04 e 2026-10, com base inicial de pelo menos 30?
+commercial-r02-0447	historical	execute	rank	Quais os 5 setores de AM com maior variação absoluta de estabelecimentos ativos entre 2026-05 e 2026-10, com base inicial de pelo menos 30?
+commercial-r02-0448	historical	execute	rank	Quais os 5 setores de ES com maior variação absoluta de estabelecimentos ativos entre 2026-06 e 2026-10, com base inicial de pelo menos 30?
+commercial-r02-0449	historical	execute	rank	Quais os 5 setores de MT com maior variação absoluta de estabelecimentos ativos entre 2025-03 e 2026-10, com base inicial de pelo menos 30?
+commercial-r02-0450	historical	execute	rank	Quais os 5 setores de PR com maior variação absoluta de estabelecimentos ativos entre 2025-04 e 2026-10, com base inicial de pelo menos 30?
+commercial-r02-0451	geography	execute	count	Quantos estabelecimentos ativos de loja de ferragens existem na cidade de Natal/RN e nos municípios alcançados por até 1 passos de vizinhança?
+commercial-r02-0452	geography	execute	count	Quantos estabelecimentos ativos de consultório médico existem na cidade de Macapá/AP e nos municípios alcançados por até 2 passos de vizinhança?
+commercial-r02-0453	geography	execute	count	Quantos estabelecimentos ativos de pré-escola existem na cidade de Rio de Janeiro/RJ e nos municípios alcançados por até 3 passos de vizinhança?
+commercial-r02-0454	geography	execute	count	Conte os estabelecimentos ativos de supermercado em municípios de AM com centroide a até 30 km do centroide da cidade de Manaus/AM.
+commercial-r02-0455	geography	execute	count	Conte os estabelecimentos ativos de escritório de contabilidade em municípios de PR com centroide a até 60 km do centroide da cidade de Curitiba/PR.
+commercial-r02-0456	geography	execute	count	Conte os estabelecimentos ativos de lava-jato em municípios de AL com centroide a até 100 km do centroide da cidade de Maceió/AL.
+commercial-r02-0457	geography	execute	count	Quantos estabelecimentos ativos de escola de ensino fundamental existem na cidade de Teresina/PI e nos municípios alcançados por até 1 passos de vizinhança?
+commercial-r02-0458	geography	execute	count	Quantos estabelecimentos ativos de produtor de hortaliças existem na cidade de Rio Branco/AC e nos municípios alcançados por até 2 passos de vizinhança?
+commercial-r02-0459	geography	execute	count	Quantos estabelecimentos ativos de serralheria existem na cidade de Recife/PE e nos municípios alcançados por até 3 passos de vizinhança?
+commercial-r02-0460	geography	execute	count	Conte os estabelecimentos ativos de curso de desenvolvimento profissional em municípios de SP com centroide a até 30 km do centroide da cidade de Sorocaba/SP.
+commercial-r02-0461	geography	execute	count	Conte os estabelecimentos ativos de borracharia em municípios de PB com centroide a até 60 km do centroide da cidade de João Pessoa/PB.
+commercial-r02-0462	geography	execute	count	Conte os estabelecimentos ativos de loja de roupas em municípios de SP com centroide a até 100 km do centroide da cidade de São Bernardo do Campo/SP.
+commercial-r02-0463	geography	execute	count	Quantos estabelecimentos ativos de laboratório de análises clínicas existem na cidade de Belém/PA e nos municípios alcançados por até 1 passos de vizinhança?
+commercial-r02-0464	geography	execute	count	Quantos estabelecimentos ativos de organizadora de eventos existem na cidade de Duque de Caxias/RJ e nos municípios alcançados por até 2 passos de vizinhança?
+commercial-r02-0465	geography	execute	count	Quantos estabelecimentos ativos de fábrica de produtos de panificação existem na cidade de Cuiabá/MT e nos municípios alcançados por até 3 passos de vizinhança?
+commercial-r02-0466	geography	execute	count	Conte os estabelecimentos ativos de oficina de motocicletas em municípios de TO com centroide a até 30 km do centroide da cidade de Araguaína/TO.
+commercial-r02-0467	geography	execute	count	Conte os estabelecimentos ativos de fábrica de pratos prontos em municípios de MS com centroide a até 60 km do centroide da cidade de Campo Grande/MS.
+commercial-r02-0468	geography	execute	count	Conte os estabelecimentos ativos de loja de brinquedos em municípios de SP com centroide a até 100 km do centroide da cidade de Guarulhos/SP.
+commercial-r02-0469	geography	execute	count	Quantos estabelecimentos ativos de escritório de arquitetura existem na cidade de Belo Horizonte/MG e nos municípios alcançados por até 1 passos de vizinhança?
+commercial-r02-0470	geography	execute	count	Quantos estabelecimentos ativos de assistência técnica de computadores existem na cidade de Nossa Senhora do Socorro/SE e nos municípios alcançados por até 2 passos de vizinhança?
+commercial-r02-0471	geography	execute	count	Quantos estabelecimentos ativos de loja de tecidos existem na cidade de São Luís/MA e nos municípios alcançados por até 3 passos de vizinhança?
+commercial-r02-0472	geography	execute	count	Conte os estabelecimentos ativos de serviço de design de interiores em municípios de SC com centroide a até 30 km do centroide da cidade de Florianópolis/SC.
+commercial-r02-0473	geography	execute	count	Conte os estabelecimentos ativos de serviço de preparação de documentos em municípios de GO com centroide a até 60 km do centroide da cidade de Goiânia/GO.
+commercial-r02-0474	geography	execute	count	Conte os estabelecimentos ativos de organização religiosa em municípios de RS com centroide a até 100 km do centroide da cidade de Caxias do Sul/RS.
+commercial-r02-0475	geography	execute	count	Quantos estabelecimentos ativos de transportadora rodoviária de cargas existem na cidade de Serra/ES e nos municípios alcançados por até 1 passos de vizinhança?
+commercial-r02-0476	geography	execute	count	Quantos estabelecimentos ativos de atacado de autopeças existem na cidade de Rorainópolis/RR e nos municípios alcançados por até 2 passos de vizinhança?
+commercial-r02-0477	geography	execute	count	Quantos estabelecimentos ativos de construtora existem na cidade de Caucaia/CE e nos municípios alcançados por até 3 passos de vizinhança?
+commercial-r02-0478	geography	execute	count	Conte os estabelecimentos ativos de serviço de aplicação de revestimentos em municípios de RO com centroide a até 30 km do centroide da cidade de Ji-Paraná/RO.
+commercial-r02-0479	geography	execute	count	Conte os estabelecimentos ativos de joalheria em municípios de BA com centroide a até 60 km do centroide da cidade de Feira de Santana/BA.
+commercial-r02-0480	geography	execute	count	Conte os estabelecimentos ativos de ótica em municípios de RN com centroide a até 100 km do centroide da cidade de Mossoró/RN.
+commercial-r02-0481	geography	execute	count	Conte os estabelecimentos ativos de serviço de design de interiores em municípios de RR com centroide a até 30 km do centroide da cidade de Boa Vista/RR.
+commercial-r02-0482	geography	execute	count	Conte os estabelecimentos ativos de estacionamento em municípios de DF com centroide a até 60 km do centroide da cidade de Brasília/DF.
+commercial-r02-0483	geography	execute	count	Conte os estabelecimentos ativos de clube esportivo em municípios de RS com centroide a até 100 km do centroide da cidade de Porto Alegre/RS.
+commercial-r02-0484	geography	execute	count	Conte os estabelecimentos ativos de empresa de transporte de passageiros em municípios de ES com centroide a até 30 km do centroide da cidade de Vila Velha/ES.
+commercial-r02-0485	geography	execute	count	Conte os estabelecimentos ativos de confecção de roupas em municípios de SC com centroide a até 60 km do centroide da cidade de Joinville/SC.
+commercial-r02-0486	geography	execute	count	Conte os estabelecimentos ativos de serviço de instalação de portas e divisórias em municípios de GO com centroide a até 100 km do centroide da cidade de Aparecida de Goiânia/GO.
+commercial-r02-0487	geography	execute	count	Conte os estabelecimentos ativos de fábrica de lingerie em municípios de SE com centroide a até 30 km do centroide da cidade de Aracaju/SE.
+commercial-r02-0488	geography	execute	count	Conte os estabelecimentos ativos de clínica de fisioterapia em municípios de MA com centroide a até 60 km do centroide da cidade de Imperatriz/MA.
+commercial-r02-0489	geography	execute	count	Conte os estabelecimentos ativos de estúdio de tatuagem em municípios de SP com centroide a até 100 km do centroide da cidade de São Paulo/SP.
+commercial-r02-0490	geography	execute	count	Conte os estabelecimentos ativos de escritório de arquitetura em municípios de MG com centroide a até 30 km do centroide da cidade de Uberlândia/MG.
+commercial-r02-0491	geography	execute	count	Conte os estabelecimentos ativos de revenda de gás de cozinha em municípios de TO com centroide a até 60 km do centroide da cidade de Palmas/TO.
+commercial-r02-0492	geography	execute	count	Conte os estabelecimentos ativos de distribuidora de gás liquefeito em municípios de MS com centroide a até 100 km do centroide da cidade de Dourados/MS.
+commercial-r02-0493	geography	execute	count	Quantos estabelecimentos ativos de creche existem na região Norte do Brasil?
+commercial-r02-0494	geography	execute	count	Quantos estabelecimentos ativos de lanchonete existem na região Nordeste do Brasil?
+commercial-r02-0495	geography	execute	count	Quantos estabelecimentos ativos de escritório de contabilidade existem na região Sudeste do Brasil?
+commercial-r02-0496	geography	execute	count	Quantos estabelecimentos ativos de curso de informática existem na região Sul do Brasil?
+commercial-r02-0497	geography	execute	count	Quantos estabelecimentos ativos de distribuidora de gás liquefeito existem na região Centro-Oeste do Brasil?
+commercial-r02-0498	geography	execute	count	Quantos estabelecimentos ativos de fábrica de esquadrias metálicas existem na região Norte do Brasil?
+commercial-r02-0499	geography	execute	count	Quantos estabelecimentos ativos de restaurante existem na região Nordeste do Brasil?
+commercial-r02-0500	geography	execute	count	Quantos estabelecimentos ativos de empresa de coleta de resíduos comuns existem na região Sudeste do Brasil?
+commercial-r02-0501	density	execute	count	Qual a densidade por 10 mil habitantes de loja de eletrodomésticos na cidade de Porto Alegre/RS, usando estimativa IBGE 2026?
+commercial-r02-0502	density	execute	count	Qual a densidade de habitantes por estabelecimento de empresa de software sob encomenda na cidade de Uberlândia/MG, usando estimativa IBGE 2026?
+commercial-r02-0503	density	execute	count	Qual a densidade por 10 mil habitantes de produtor de hortaliças na cidade de Santo André/SP, usando Censo IBGE 2022?
+commercial-r02-0504	density	execute	count	Qual a densidade de habitantes por estabelecimento de ótica na cidade de Londrina/PR, usando Censo IBGE 2022?
+commercial-r02-0505	density	execute	count	Qual a densidade por 10 mil habitantes de marmoraria na cidade de Caucaia/CE, usando estimativa IBGE 2026?
+commercial-r02-0506	density	execute	count	Qual a densidade de habitantes por estabelecimento de oficina de elétrica automotiva na cidade de Nossa Senhora do Socorro/SE, usando estimativa IBGE 2026?
+commercial-r02-0507	density	execute	count	Qual a densidade por 10 mil habitantes de editora de jornal diário na cidade de Belém/PA, usando Censo IBGE 2022?
+commercial-r02-0508	density	execute	count	Qual a densidade de habitantes por estabelecimento de hotel na cidade de Maceió/AL, usando Censo IBGE 2022?
+commercial-r02-0509	density	execute	count	Qual a densidade por 10 mil habitantes de estacionamento na cidade de Porto Velho/RO, usando estimativa IBGE 2026?
+commercial-r02-0510	density	execute	count	Qual a densidade de habitantes por estabelecimento de fazenda de cana-de-açúcar na cidade de Aparecida de Goiânia/GO, usando estimativa IBGE 2026?
+commercial-r02-0511	density	execute	rank	Quais os 10 grupos de municípios com menor densidade de loja de bebidas em AM com até 30 mil habitantes, usando IBGE 2026?
+commercial-r02-0512	density	execute	rank	Quais os 10 grupos de municípios com menor número de habitantes por estabelecimento de organizadora de eventos em MA, usando IBGE 2026?
+commercial-r02-0513	density	execute	rank	Quais os 10 grupos de municípios com maior densidade de frete rodoviário intermunicipal em PI com mais de 100 mil habitantes, usando IBGE 2026?
+commercial-r02-0514	density	execute	rank	Quais os 10 grupos de municípios com maior número de habitantes por estabelecimento de corretor de imóveis em SC, usando IBGE 2026?
+commercial-r02-0515	density	execute	rank	Quais os 10 grupos de municípios com menor densidade de portal de conteúdo em AP com até 30 mil habitantes, usando IBGE 2026?
+commercial-r02-0516	density	execute	rank	Quais os 10 grupos de municípios com menor número de habitantes por estabelecimento de curso de informática em MG, usando IBGE 2026?
+commercial-r02-0517	density	execute	rank	Quais os 10 grupos de municípios com maior densidade de armarinho em PR com mais de 100 mil habitantes, usando IBGE 2026?
+commercial-r02-0518	density	execute	rank	Quais os 10 grupos de municípios com maior número de habitantes por estabelecimento de laboratório óptico em SE, usando IBGE 2026?
+commercial-r02-0519	density	execute	rank	Quais os 10 grupos de municípios com menor densidade de supermercado em BA com até 30 mil habitantes, usando IBGE 2026?
+commercial-r02-0520	density	execute	rank	Quais os 10 grupos de municípios com menor número de habitantes por estabelecimento de clínica de estética em MS, usando IBGE 2026?
+commercial-r02-0521	density	execute	rank	Quais os 10 grupos de municípios com maior densidade de escritório de engenharia em RJ com mais de 100 mil habitantes, usando IBGE 2026?
+commercial-r02-0522	density	execute	rank	Quais os 10 grupos de municípios com maior número de habitantes por estabelecimento de fábrica de lingerie em SP, usando IBGE 2026?
+commercial-r02-0523	density	execute	rank	Quais os 10 grupos de municípios com menor densidade de empresa de aluguel de imóveis próprios em CE com até 30 mil habitantes, usando IBGE 2026?
+commercial-r02-0524	density	execute	rank	Quais os 10 grupos de municípios com menor número de habitantes por estabelecimento de armazém geral em MT, usando IBGE 2026?
+commercial-r02-0525	density	execute	rank	Quais os 10 grupos de municípios com maior densidade de farmácia de manipulação em RN com mais de 100 mil habitantes, usando IBGE 2026?
+commercial-r02-0526	density	execute	rank	Quais os 10 grupos de municípios com maior número de habitantes por estabelecimento de serviço de acabamento gráfico em TO, usando IBGE 2026?
+commercial-r02-0527	density	execute	rank	Quais os 10 grupos de municípios com menor densidade de serviço de preparação de documentos em DF com até 30 mil habitantes, usando IBGE 2026?
+commercial-r02-0528	density	execute	rank	Quais os 10 grupos de municípios com menor número de habitantes por estabelecimento de marmoraria em PA, usando IBGE 2026?
+commercial-r02-0529	density	execute	rank	Quais os 10 grupos de municípios com maior densidade de padaria em RO com mais de 100 mil habitantes, usando IBGE 2026?
+commercial-r02-0530	density	execute	rank	Quais os 10 grupos de municípios com maior número de habitantes por estabelecimento de loja de material elétrico em AC, usando IBGE 2026?
+commercial-r02-0531	density	execute	rank	Quais os 10 grupos de municípios com menor densidade de escola de idiomas em ES com até 30 mil habitantes, usando IBGE 2026?
+commercial-r02-0532	density	execute	rank	Quais os 10 grupos de municípios com menor número de habitantes por estabelecimento de atacado de frutas e verduras em PB, usando IBGE 2026?
+commercial-r02-0533	density	execute	rank	Quais os 10 grupos de municípios com maior densidade de loja de medicamentos veterinários em RR com mais de 100 mil habitantes, usando IBGE 2026?
+commercial-r02-0534	density	execute	rank	Quais os 10 grupos de municípios com maior número de habitantes por estabelecimento de laboratório de análises clínicas em AL, usando IBGE 2026?
+commercial-r02-0535	density	execute	rank	Quais os 10 grupos de municípios com menor densidade de distribuidora de gás liquefeito em GO com até 30 mil habitantes, usando IBGE 2026?
+commercial-r02-0536	density	execute	rank	Quais os 10 grupos de municípios com menor número de habitantes por estabelecimento de empresa de mudanças em PE, usando IBGE 2026?
+commercial-r02-0537	density	execute	rank	Quais os 10 grupos de municípios com maior densidade de loja de artigos esportivos em RS com mais de 100 mil habitantes, usando IBGE 2026?
+commercial-r02-0538	density	execute	rank	Quais os 10 grupos de municípios com maior número de habitantes por estabelecimento de oficina mecânica em AM, usando IBGE 2026?
+commercial-r02-0539	density	execute	rank	Quais os 10 grupos de municípios com menor densidade de loja de departamentos em MA com até 30 mil habitantes, usando IBGE 2026?
+commercial-r02-0540	density	execute	rank	Quais os 10 grupos de municípios com menor número de habitantes por estabelecimento de serviço de suporte de TI em PI, usando IBGE 2026?
+commercial-r02-0541	density	execute	rank	Quais os 10 grupos de municípios com maior densidade de pré-escola em SC com mais de 100 mil habitantes, usando IBGE 2026?
+commercial-r02-0542	density	execute	rank	Quais os 10 grupos de municípios com maior número de habitantes por estabelecimento de revenda de carros usados em AP, usando IBGE 2026?
+commercial-r02-0543	density	execute	rank	Quais os 10 grupos de municípios com menor densidade de serviço de carga e descarga em MG com até 30 mil habitantes, usando IBGE 2026?
+commercial-r02-0544	density	execute	rank	Quais os 10 grupos de municípios com menor número de habitantes por estabelecimento de serviço de conserto de móveis em PR, usando IBGE 2026?
+commercial-r02-0545	density	execute	rank	Quais os 10 grupos de municípios com maior densidade de loja de peças para motocicletas em SE com mais de 100 mil habitantes, usando IBGE 2026?
+commercial-r02-0546	density	execute	rank	Quais os 10 grupos de municípios com maior número de habitantes por estabelecimento de serviço de sonorização e iluminação em BA, usando IBGE 2026?
+commercial-r02-0547	density	execute	rank	Quais os 10 grupos de municípios com menor densidade de loja de eletrodomésticos em MS com até 30 mil habitantes, usando IBGE 2026?
+commercial-r02-0548	density	execute	rank	Quais os 10 grupos de municípios com menor número de habitantes por estabelecimento de loja de laticínios e frios em RJ, usando IBGE 2026?
+commercial-r02-0549	density	execute	rank	Quais os 10 grupos de municípios com maior densidade de serviço de design de interiores em SP com mais de 100 mil habitantes, usando IBGE 2026?
+commercial-r02-0550	density	execute	rank	Quais os 10 grupos de municípios com maior número de habitantes por estabelecimento de serviço de gesso em CE, usando IBGE 2026?
+commercial-r02-0551	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de loja de doces entre a cidade de Aracaju/SE e a cidade de Nossa Senhora do Socorro/SE.
+commercial-r02-0552	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de distribuidora de gás liquefeito entre AM e MS.
+commercial-r02-0553	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de laboratórios ópticos e de fábricas de massas alimentícias na cidade de Nova Iguaçu/RJ.
+commercial-r02-0554	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de tabacaria entre a cidade de Campinas/SP e a cidade de Duque de Caxias/RJ.
+commercial-r02-0555	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de açougue entre GO e PR.
+commercial-r02-0556	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de facções de vestuário e de mercadinhos na cidade de Sorocaba/SP.
+commercial-r02-0557	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de serviço de apoio administrativo entre a cidade de Osasco/SP e a cidade de Rio Branco/AC.
+commercial-r02-0558	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de loja de pneus entre PB e SC.
+commercial-r02-0559	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de serviços de fretamento de ônibus e de serviços de carga e descarga na cidade de Cruzeiro do Sul/AC.
+commercial-r02-0560	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de loja de móveis entre a cidade de Itacoatiara/AM e a cidade de Macapá/AP.
+commercial-r02-0561	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de loja de equipamentos para escritório entre RO e AM.
+commercial-r02-0562	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de borracharias e de serviços de tradução na cidade de Manaus/AM.
+commercial-r02-0563	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de serviço de pintura predial entre a cidade de Caucaia/CE e a cidade de Brasília/DF.
+commercial-r02-0564	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de serviço de conserto de móveis entre TO e GO.
+commercial-r02-0565	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de serviços de preparação de documentos e de lojas de tintas na cidade de Santana/AP.
+commercial-r02-0566	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de serviço de táxi entre a cidade de São Luís/MA e a cidade de Imperatriz/MA.
+commercial-r02-0567	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de loja de materiais de construção entre CE e PB.
+commercial-r02-0568	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de serviços de montagem de móveis e de lojas de artesanato na cidade de Fortaleza/CE.
+commercial-r02-0569	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de creche entre a cidade de Cuiabá/MT e a cidade de Várzea Grande/MT.
+commercial-r02-0570	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de estúdio de tatuagem entre MS e RO.
+commercial-r02-0571	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de serviços de limpeza predial e de lojas de doces na cidade de Serra/ES.
+commercial-r02-0572	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de posto de combustível entre a cidade de Recife/PE e a cidade de Jaboatão dos Guararapes/PE.
+commercial-r02-0573	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de produtora musical entre PR e TO.
+commercial-r02-0574	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de ateliês de costura sob medida e de tabacarias na cidade de Aparecida de Goiânia/GO.
+commercial-r02-0575	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de livraria entre a cidade de Rio de Janeiro/RJ e a cidade de São Gonçalo/RJ.
+commercial-r02-0576	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de atacado de alimentos entre SC e CE.
+commercial-r02-0577	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de empresas de mudanças e de serviços de apoio administrativo na cidade de Belo Horizonte/MG.
+commercial-r02-0578	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de supermercado entre a cidade de Boa Vista/RR e a cidade de Rorainópolis/RR.
+commercial-r02-0579	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de editora de livros entre AM e MS.
+commercial-r02-0580	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de floriculturas e de lojas de móveis na cidade de Dourados/MS.
+commercial-r02-0581	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de oficina de motocicletas entre a cidade de Aracaju/SE e a cidade de Nossa Senhora do Socorro/SE.
+commercial-r02-0582	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de fazenda de cana-de-açúcar entre GO e PR.
+commercial-r02-0583	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de oficinas de funilaria e de serviços de pintura predial na cidade de Belém/PA.
+commercial-r02-0584	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de serviço de aplicação de revestimentos entre a cidade de Campinas/SP e a cidade de Duque de Caxias/RJ.
+commercial-r02-0585	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de fábrica de peças de moto entre PB e SC.
+commercial-r02-0586	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de serviços ambulantes de alimentação e de serviços de táxi na cidade de Campina Grande/PB.
+commercial-r02-0587	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de bicicletaria entre a cidade de Osasco/SP e a cidade de Rio Branco/AC.
+commercial-r02-0588	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de serviço de instalação de portas e divisórias entre RO e AM.
+commercial-r02-0589	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de lojas de peças para motocicletas e de creches na cidade de Teresina/PI.
+commercial-r02-0590	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de marmoraria entre a cidade de Itacoatiara/AM e a cidade de Macapá/AP.
+commercial-r02-0591	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de loja de bebidas entre TO e GO.
+commercial-r02-0592	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de peixarias e de postos de combustível na cidade de Londrina/PR.
+commercial-r02-0593	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de fábrica de motocicletas entre a cidade de Caucaia/CE e a cidade de Brasília/DF.
+commercial-r02-0594	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de serviço de revestimento de metais entre CE e PB.
+commercial-r02-0595	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de fazendas de gado de corte e de livrarias na cidade de Natal/RN.
+commercial-r02-0596	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de serviço de preparação de terreno e colheita entre a cidade de São Luís/MA e a cidade de Imperatriz/MA.
+commercial-r02-0597	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de serralheria entre MS e RO.
+commercial-r02-0598	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de papelarias e de supermercados na cidade de Ji-Paraná/RO.
+commercial-r02-0599	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de salão de beleza entre a cidade de Cuiabá/MT e a cidade de Várzea Grande/MT.
+commercial-r02-0600	comparison	execute	compare	Compare a quantidade de estabelecimentos ativos de loja de tecidos entre PR e TO.
+commercial-r02-0601	distribution	execute	breakdown	Distribua os estabelecimentos ativos da cidade de Osasco/SP por porte cadastral, com quantidade e participação percentual.
+commercial-r02-0602	distribution	execute	breakdown	Distribua os estabelecimentos ativos da cidade de Macapá/AP por situação cadastral, com quantidade e participação percentual.
+commercial-r02-0603	distribution	execute	breakdown	Distribua os estabelecimentos ativos da cidade de Serra/ES por matriz e filial, com quantidade e participação percentual.
+commercial-r02-0604	distribution	execute	breakdown	Distribua os estabelecimentos ativos da cidade de Uberlândia/MG por opção pelo MEI, com quantidade e participação percentual.
+commercial-r02-0605	distribution	execute	breakdown	Distribua os estabelecimentos ativos da cidade de João Pessoa/PB por seção CNAE, com quantidade e participação percentual.
+commercial-r02-0606	distribution	execute	breakdown	Distribua os estabelecimentos ativos da cidade de Londrina/PR por porte cadastral, com quantidade e participação percentual.
+commercial-r02-0607	distribution	execute	breakdown	Distribua os estabelecimentos ativos da cidade de Boa Vista/RR por situação cadastral, com quantidade e participação percentual.
+commercial-r02-0608	distribution	execute	breakdown	Distribua os estabelecimentos ativos da cidade de Nossa Senhora do Socorro/SE por matriz e filial, com quantidade e participação percentual.
+commercial-r02-0609	distribution	execute	breakdown	Distribua os estabelecimentos ativos da cidade de Nova Iguaçu/RJ por opção pelo MEI, com quantidade e participação percentual.
+commercial-r02-0610	distribution	execute	breakdown	Distribua os estabelecimentos ativos da cidade de Maceió/AL por seção CNAE, com quantidade e participação percentual.
+commercial-r02-0611	distribution	execute	breakdown	Distribua os estabelecimentos ativos da cidade de Feira de Santana/BA por porte cadastral, com quantidade e participação percentual.
+commercial-r02-0612	distribution	execute	breakdown	Distribua os estabelecimentos ativos da cidade de Aparecida de Goiânia/GO por situação cadastral, com quantidade e participação percentual.
+commercial-r02-0613	distribution	execute	breakdown	Distribua os estabelecimentos ativos da cidade de Cuiabá/MT por matriz e filial, com quantidade e participação percentual.
+commercial-r02-0614	distribution	execute	breakdown	Distribua os estabelecimentos ativos da cidade de Jaboatão dos Guararapes/PE por opção pelo MEI, com quantidade e participação percentual.
+commercial-r02-0615	distribution	execute	breakdown	Distribua os estabelecimentos ativos da cidade de Natal/RN por seção CNAE, com quantidade e participação percentual.
+commercial-r02-0616	distribution	execute	breakdown	Distribua os estabelecimentos ativos da cidade de Caxias do Sul/RS por porte cadastral, com quantidade e participação percentual.
+commercial-r02-0617	distribution	execute	breakdown	Distribua os estabelecimentos ativos da cidade de Palmas/TO por situação cadastral, com quantidade e participação percentual.
+commercial-r02-0618	distribution	execute	breakdown	Distribua os estabelecimentos ativos da cidade de Sorocaba/SP por matriz e filial, com quantidade e participação percentual.
+commercial-r02-0619	distribution	execute	breakdown	Distribua os estabelecimentos ativos da cidade de Itacoatiara/AM por opção pelo MEI, com quantidade e participação percentual.
+commercial-r02-0620	distribution	execute	breakdown	Distribua os estabelecimentos ativos da cidade de Brasília/DF por seção CNAE, com quantidade e participação percentual.
+commercial-r02-0621	distribution	execute	breakdown	Distribua os estabelecimentos ativos da cidade de Belo Horizonte/MG por porte cadastral, com quantidade e participação percentual.
+commercial-r02-0622	distribution	execute	breakdown	Distribua os estabelecimentos ativos da cidade de Ananindeua/PA por situação cadastral, com quantidade e participação percentual.
+commercial-r02-0623	distribution	execute	breakdown	Distribua os estabelecimentos ativos da cidade de Curitiba/PR por matriz e filial, com quantidade e participação percentual.
+commercial-r02-0624	distribution	execute	breakdown	Distribua os estabelecimentos ativos da cidade de Ji-Paraná/RO por opção pelo MEI, com quantidade e participação percentual.
+commercial-r02-0625	distribution	execute	breakdown	Distribua os estabelecimentos ativos da cidade de Aracaju/SE por seção CNAE, com quantidade e participação percentual.
+commercial-r02-0626	distribution	execute	rank	Quais os 10 grupos de setor curado com mais estabelecimentos ativos na cidade de Cruzeiro do Sul/AC?
+commercial-r02-0627	distribution	execute	rank	Quais os 10 grupos de setor curado com mais estabelecimentos ativos na cidade de Macapá/AP?
+commercial-r02-0628	distribution	execute	rank	Quais os 10 grupos de setor curado com mais estabelecimentos ativos na cidade de Caucaia/CE?
+commercial-r02-0629	distribution	execute	rank	Quais os 10 grupos de setor curado com mais estabelecimentos ativos na cidade de Aparecida de Goiânia/GO?
+commercial-r02-0630	distribution	execute	rank	Quais os 10 grupos de setor curado com mais estabelecimentos ativos na cidade de Campo Grande/MS?
+commercial-r02-0631	distribution	execute	rank	Quais os 10 grupos de setor curado com mais estabelecimentos ativos na cidade de Ananindeua/PA?
+commercial-r02-0632	distribution	execute	rank	Quais os 10 grupos de setor curado com mais estabelecimentos ativos na cidade de Teresina/PI?
+commercial-r02-0633	distribution	execute	rank	Quais os 10 grupos de setor curado com mais estabelecimentos ativos na cidade de São Gonçalo/RJ?
+commercial-r02-0634	distribution	execute	rank	Quais os 10 grupos de município com mais estabelecimentos ativos de serviço de táxi em SE?
+commercial-r02-0635	distribution	execute	rank	Quais os 10 grupos de município com mais estabelecimentos ativos de lava-jato em AC?
+commercial-r02-0636	distribution	execute	rank	Quais os 10 grupos de município com mais estabelecimentos ativos de serviço de assistência domiciliar à saúde em AP?
+commercial-r02-0637	distribution	execute	rank	Quais os 10 grupos de município com mais estabelecimentos ativos de serviço de instalação hidráulica em DF?
+commercial-r02-0638	distribution	execute	rank	Quais os 10 grupos de município com mais estabelecimentos ativos de fábrica de móveis de madeira em MA?
+commercial-r02-0639	distribution	execute	rank	Quais os 10 grupos de município com mais estabelecimentos ativos de loja de laticínios e frios em MT?
+commercial-r02-0640	distribution	execute	rank	Quais os 10 grupos de município com mais estabelecimentos ativos de frete rodoviário intermunicipal em PE?
+commercial-r02-0641	distribution	execute	rank	Quais os 10 grupos de município com mais estabelecimentos ativos de lanchonete em RJ?
+commercial-r02-0642	distribution	execute	rank	Quais os 10 grupos de município com mais estabelecimentos ativos de fazenda de gado de corte em RR?
+commercial-r02-0643	distribution	execute	rank	Quais os 10 grupos de UF com mais estabelecimentos ativos de clínica médica com exames complementares no Brasil?
+commercial-r02-0644	distribution	execute	rank	Quais os 10 grupos de UF com mais estabelecimentos ativos de supermercado no Brasil?
+commercial-r02-0645	distribution	execute	rank	Quais os 10 grupos de UF com mais estabelecimentos ativos de locadora de carros no Brasil?
+commercial-r02-0646	distribution	execute	rank	Quais os 10 grupos de divisão CNAE com mais estabelecimentos ativos na cidade de Boa Vista/RR?
+commercial-r02-0647	distribution	execute	rank	Quais os 10 grupos de divisão CNAE com mais estabelecimentos ativos na cidade de Florianópolis/SC?
+commercial-r02-0648	distribution	execute	rank	Quais os 10 grupos de divisão CNAE com mais estabelecimentos ativos na cidade de Palmas/TO?
+commercial-r02-0649	distribution	execute	rank	Quais os 10 grupos de subclasse CNAE com mais estabelecimentos ativos na cidade de São Bernardo do Campo/SP?
+commercial-r02-0650	distribution	execute	rank	Quais os 10 grupos de subclasse CNAE com mais estabelecimentos ativos na cidade de Cruzeiro do Sul/AC?
+commercial-r02-0651	activity	execute	count	Quantos estabelecimentos ativos na cidade de Santana/AP têm CNAE principal na subclasse 8512100?
+commercial-r02-0652	activity	execute	count	Quantos estabelecimentos ativos na cidade de Vila Velha/ES têm CNAE principal na subclasse 4642701?
+commercial-r02-0653	activity	execute	count	Quantos estabelecimentos ativos na cidade de Campo Grande/MS têm CNAE principal na subclasse 4722902?
+commercial-r02-0654	activity	execute	count	Quantos estabelecimentos ativos na cidade de Campina Grande/PB têm CNAE principal na subclasse 7729202?
+commercial-r02-0655	activity	execute	count	Quantos estabelecimentos ativos na cidade de Rio de Janeiro/RJ têm CNAE principal na subclasse 6311900?
+commercial-r02-0656	activity	execute	count	Quantos estabelecimentos ativos na cidade de Rorainópolis/RR têm CNAE principal na subclasse 4742300?
+commercial-r02-0657	activity	execute	count	Quantos estabelecimentos ativos na cidade de São Paulo/SP têm CNAE principal na subclasse 3091102?
+commercial-r02-0658	activity	execute	count	Quantos estabelecimentos ativos na cidade de São Bernardo do Campo/SP têm CNAE principal na subclasse 4930202?
+commercial-r02-0659	activity	execute	count	Quantos estabelecimentos ativos na cidade de Arapiraca/AL têm CNAE principal na subclasse 4772500?
+commercial-r02-0660	activity	execute	count	Quantos estabelecimentos ativos na cidade de Fortaleza/CE têm CNAE principal na subclasse 2539001?
+commercial-r02-0661	activity	execute	count	Quantos estabelecimentos ativos na cidade de São Luís/MA têm CNAE principal na subclasse 4711302?
+commercial-r02-0662	activity	execute	count	Quantos estabelecimentos ativos na cidade de Várzea Grande/MT têm CNAE principal na subclasse 1412601?
+commercial-r02-0663	activity	execute	count	Quantos estabelecimentos ativos na cidade de Teresina/PI têm CNAE principal na subclasse 6201501?
+commercial-r02-0664	activity	execute	count	Quantos estabelecimentos ativos na cidade de Mossoró/RN têm CNAE principal na subclasse 4924800?
+commercial-r02-0665	activity	execute	count	Quantos estabelecimentos ativos na cidade de Joinville/SC têm CNAE principal na subclasse 8121400?
+commercial-r02-0666	activity	execute	count	Quantos estabelecimentos ativos na cidade de Araguaína/TO têm CNAE principal na subclasse 4755503?
+commercial-r02-0667	activity	execute	count	Quantos estabelecimentos ativos na cidade de Osasco/SP têm CNAE principal na subclasse 8650003?
+commercial-r02-0668	activity	execute	count	Quantos estabelecimentos ativos na cidade de Macapá/AP têm CNAE principal na subclasse 4530701?
+commercial-r02-0669	activity	execute	count	Quantos estabelecimentos ativos na cidade de Serra/ES têm CNAE principal na subclasse 9529105?
+commercial-r02-0670	activity	execute	count	Quantos estabelecimentos ativos na cidade de Uberlândia/MG têm CNAE principal na subclasse 7420001?
+commercial-r02-0671	activity	execute	count	Quantos estabelecimentos ativos na cidade de João Pessoa/PB têm CNAE principal na subclasse 6920601?
+commercial-r02-0672	activity	execute	count	Quantos estabelecimentos ativos na cidade de Londrina/PR têm CNAE principal na subclasse 8230002?
+commercial-r02-0673	activity	execute	count	Quantos estabelecimentos ativos na cidade de Boa Vista/RR têm CNAE principal na subclasse 8211300?
+commercial-r02-0674	activity	execute	count	Quantos estabelecimentos ativos na cidade de Nossa Senhora do Socorro/SE têm CNAE principal na subclasse 4771704?
+commercial-r02-0675	activity	execute	count	Quantos estabelecimentos ativos na cidade de Nova Iguaçu/RJ têm CNAE principal na subclasse 8291100?
+commercial-r02-0676	activity	execute	count	Quantos estabelecimentos ativos na cidade de Maceió/AL têm CNAE principal na subclasse 4773300?
+commercial-r02-0677	activity	execute	count	Quantos estabelecimentos ativos na cidade de Feira de Santana/BA têm CNAE principal na subclasse 5229002?
+commercial-r02-0678	activity	execute	count	Quantos estabelecimentos ativos na cidade de Aparecida de Goiânia/GO têm CNAE principal na subclasse 4120400?
+commercial-r02-0679	activity	execute	count	Quantos estabelecimentos ativos na cidade de Cuiabá/MT têm CNAE principal na subclasse 1411801?
+commercial-r02-0680	activity	execute	count	Quantos estabelecimentos ativos na cidade de Jaboatão dos Guararapes/PE têm CNAE principal na subclasse 4761003?
+commercial-r02-0681	activity	execute	count	Quantos estabelecimentos ativos na cidade de Natal/RN têm CNAE principal na subclasse 4520005?
+commercial-r02-0682	activity	execute	count	Quantos estabelecimentos ativos na cidade de Caxias do Sul/RS têm CNAE principal na subclasse 3321000?
+commercial-r02-0683	activity	execute	count	Quantos estabelecimentos ativos na cidade de Palmas/TO têm CNAE principal na subclasse 4729602?
+commercial-r02-0684	activity	execute	count	Quantos estabelecimentos ativos na cidade de Sorocaba/SP têm CNAE principal na subclasse 4723700?
+commercial-r02-0685	activity	execute	count	Quantos estabelecimentos ativos na cidade de Itacoatiara/AM têm CNAE principal na subclasse 4712100?
+commercial-r02-0686	activity	execute	count	Quantos estabelecimentos ativos na cidade de Brasília/DF têm CNAE principal na classe 47245?
+commercial-r02-0687	activity	execute	count	Quantos estabelecimentos ativos na cidade de Belo Horizonte/MG têm CNAE principal na classe 47539?
+commercial-r02-0688	activity	execute	count	Quantos estabelecimentos ativos na cidade de Ananindeua/PA têm CNAE principal na classe 43304?
+commercial-r02-0689	activity	execute	count	Quantos estabelecimentos ativos na cidade de Curitiba/PR têm CNAE principal na classe 96092?
+commercial-r02-0690	activity	execute	count	Quantos estabelecimentos ativos na cidade de Ji-Paraná/RO têm CNAE principal na classe 31012?
+commercial-r02-0691	activity	execute	count	Quantos estabelecimentos ativos na cidade de Aracaju/SE têm CNAE principal na classe 85139?
+commercial-r02-0692	activity	execute	count	Quantos estabelecimentos ativos na cidade de Duque de Caxias/RJ têm CNAE principal na classe 49302?
+commercial-r02-0693	activity	execute	count	Quantos estabelecimentos ativos na cidade de Cruzeiro do Sul/AC têm CNAE principal na classe 86101?
+commercial-r02-0694	activity	execute	count	Quantos estabelecimentos ativos na cidade de Salvador/BA têm CNAE principal na classe 62015?
+commercial-r02-0695	activity	execute	count	Quantos estabelecimentos ativos na cidade de Goiânia/GO têm CNAE principal na classe 43991?
+commercial-r02-0696	activity	execute	count	Quantos estabelecimentos ativos na cidade de Dourados/MS têm CNAE principal na classe 96092?
+commercial-r02-0697	activity	execute	count	Quantos estabelecimentos ativos na cidade de Recife/PE têm CNAE principal na classe 47717?
+commercial-r02-0698	activity	execute	count	Quantos estabelecimentos ativos na cidade de São Gonçalo/RJ têm CNAE principal na classe 47831?
+commercial-r02-0699	activity	execute	count	Quantos estabelecimentos ativos na cidade de Porto Alegre/RS têm CNAE principal na classe 56112?
+commercial-r02-0700	activity	execute	count	Quantos estabelecimentos ativos na cidade de Guarulhos/SP têm CNAE principal na classe 43304?
+commercial-r02-0701	exclusion	execute	count	Quantos estabelecimentos ativos de fazenda de seringueira existem em CE, exceto os da cidade de Brasília/DF?
+commercial-r02-0702	exclusion	execute	count	Quantos estabelecimentos ativos de loja de materiais de construção existem em MS e RJ, exceto os de RJ?
+commercial-r02-0703	exclusion	execute	count	Quantos estabelecimentos ativos de hipermercado existem na cidade de Curitiba/PR, exceto os de joalheria?
+commercial-r02-0704	exclusion	execute	count	Quantos estabelecimentos ativos de fazenda de seringueira na cidade de Caxias do Sul/RS não são MEI?
+commercial-r02-0705	exclusion	execute	count	Quantos estabelecimentos ativos de loja de materiais de construção na cidade de Nova Iguaçu/RJ não são optantes pelo Simples?
+commercial-r02-0706	exclusion	execute	count	Quantos estabelecimentos ativos de hipermercado existem em AP, exceto os da cidade de Santana/AP?
+commercial-r02-0707	exclusion	execute	count	Quantos estabelecimentos ativos de fazenda de seringueira existem em MA e PI, exceto os de PI?
+commercial-r02-0708	exclusion	execute	count	Quantos estabelecimentos ativos de loja de materiais de construção existem na cidade de Campina Grande/PB, exceto os de loja de produtos de limpeza?
+commercial-r02-0709	exclusion	execute	count	Quantos estabelecimentos ativos de hipermercado na cidade de Porto Velho/RO não são MEI?
+commercial-r02-0710	exclusion	execute	count	Quantos estabelecimentos ativos de fazenda de seringueira na cidade de Guarulhos/SP não são optantes pelo Simples?
+commercial-r02-0711	exclusion	execute	count	Quantos estabelecimentos ativos de loja de materiais de construção existem em AC, exceto os da cidade de Maceió/AL?
+commercial-r02-0712	exclusion	execute	count	Quantos estabelecimentos ativos de hipermercado existem em DF e PA, exceto os de PA?
+commercial-r02-0713	exclusion	execute	count	Quantos estabelecimentos ativos de fazenda de seringueira existem na cidade de Cuiabá/MT, exceto os de loja de artigos esportivos?
+commercial-r02-0714	exclusion	execute	count	Quantos estabelecimentos ativos de loja de materiais de construção na cidade de Londrina/PR não são MEI?
+commercial-r02-0715	exclusion	execute	count	Quantos estabelecimentos ativos de hipermercado na cidade de Joinville/SC não são optantes pelo Simples?
+commercial-r02-0716	exclusion	execute	count	Quantos estabelecimentos ativos de fazenda de seringueira existem em SP, exceto os da cidade de Santo André/SP?
+commercial-r02-0717	exclusion	execute	count	Quantos estabelecimentos ativos de loja de materiais de construção existem em AP e MG, exceto os de MG?
+commercial-r02-0718	exclusion	execute	count	Quantos estabelecimentos ativos de hipermercado existem na cidade de Imperatriz/MA, exceto os de joalheria?
+commercial-r02-0719	exclusion	execute	count	Quantos estabelecimentos ativos de fazenda de seringueira na cidade de Recife/PE não são MEI?
+commercial-r02-0720	exclusion	execute	count	Quantos estabelecimentos ativos de loja de materiais de construção na cidade de Ji-Paraná/RO não são optantes pelo Simples?
+commercial-r02-0721	exclusion	execute	count	Quantos estabelecimentos ativos de hipermercado existem em TO, exceto os da cidade de Araguaína/TO?
+commercial-r02-0722	exclusion	execute	count	Quantos estabelecimentos ativos de fazenda de seringueira existem em AL e GO, exceto os de GO?
+commercial-r02-0723	exclusion	execute	count	Quantos estabelecimentos ativos de loja de materiais de construção existem na cidade de Serra/ES, exceto os de loja de produtos de limpeza?
+commercial-r02-0724	exclusion	execute	count	Quantos estabelecimentos ativos de hipermercado na cidade de Várzea Grande/MT não são MEI?
+commercial-r02-0725	exclusion	execute	count	Quantos estabelecimentos ativos de fazenda de seringueira na cidade de Rio de Janeiro/RJ não são optantes pelo Simples?
+commercial-r02-0726	exclusion	execute	count	Quantos estabelecimentos ativos de loja de materiais de construção existem em SC, exceto os da cidade de Aracaju/SE?
+commercial-r02-0727	exclusion	execute	count	Quantos estabelecimentos ativos de hipermercado existem em SP e CE, exceto os de CE?
+commercial-r02-0728	exclusion	execute	count	Quantos estabelecimentos ativos de fazenda de seringueira existem na cidade de Salvador/BA, exceto os de loja de artigos esportivos?
+commercial-r02-0729	exclusion	execute	count	Quantos estabelecimentos ativos de loja de materiais de construção na cidade de Belo Horizonte/MG não são MEI?
+commercial-r02-0730	exclusion	execute	count	Quantos estabelecimentos ativos de hipermercado na cidade de Jaboatão dos Guararapes/PE não são optantes pelo Simples?
+commercial-r02-0731	exclusion	execute	count	Quantos estabelecimentos ativos de fazenda de seringueira existem em RR, exceto os da cidade de Rorainópolis/RR?
+commercial-r02-0732	exclusion	execute	count	Quantos estabelecimentos ativos de loja de materiais de construção existem em TO e DF, exceto os de DF?
+commercial-r02-0733	exclusion	execute	count	Quantos estabelecimentos ativos de hipermercado existem na cidade de Arapiraca/AL, exceto os de joalheria?
+commercial-r02-0734	exclusion	execute	count	Quantos estabelecimentos ativos de fazenda de seringueira na cidade de Vila Velha/ES não são MEI?
+commercial-r02-0735	exclusion	execute	count	Quantos estabelecimentos ativos de loja de materiais de construção na cidade de Belém/PA não são optantes pelo Simples?
+commercial-r02-0736	exclusion	execute	count	Quantos estabelecimentos ativos de hipermercado existem em RJ, exceto os da cidade de Natal/RN?
+commercial-r02-0737	exclusion	execute	count	Quantos estabelecimentos ativos de fazenda de seringueira existem em SE e BA, exceto os de BA?
+commercial-r02-0738	exclusion	execute	count	Quantos estabelecimentos ativos de loja de materiais de construção existem na cidade de Sorocaba/SP, exceto os de loja de produtos de limpeza?
+commercial-r02-0739	exclusion	execute	count	Quantos estabelecimentos ativos de hipermercado na cidade de Feira de Santana/BA não são MEI?
+commercial-r02-0740	exclusion	execute	count	Quantos estabelecimentos ativos de fazenda de seringueira na cidade de Uberlândia/MG não são optantes pelo Simples?
+commercial-r02-0741	exclusion	execute	count	Quantos estabelecimentos ativos de loja de materiais de construção existem em PI, exceto os da cidade de Parnaíba/PI?
+commercial-r02-0742	exclusion	execute	count	Quantos estabelecimentos ativos de hipermercado existem em RR e AL, exceto os de AL?
+commercial-r02-0743	exclusion	execute	count	Quantos estabelecimentos ativos de fazenda de seringueira existem na cidade de Campinas/SP, exceto os de loja de artigos esportivos?
+commercial-r02-0744	exclusion	execute	count	Quantos estabelecimentos ativos de loja de materiais de construção na cidade de Manaus/AM não são MEI?
+commercial-r02-0745	exclusion	execute	count	Quantos estabelecimentos ativos de hipermercado na cidade de Goiânia/GO não são optantes pelo Simples?
+commercial-r02-0746	exclusion	execute	count	Quantos estabelecimentos ativos de fazenda de seringueira existem em PA, exceto os da cidade de João Pessoa/PB?
+commercial-r02-0747	exclusion	execute	count	Quantos estabelecimentos ativos de loja de materiais de construção existem em RN e TO, exceto os de TO?
+commercial-r02-0748	exclusion	execute	count	Quantos estabelecimentos ativos de hipermercado existem na cidade de Nossa Senhora do Socorro/SE, exceto os de joalheria?
+commercial-r02-0749	exclusion	execute	count	Quantos estabelecimentos ativos de fazenda de seringueira na cidade de Osasco/SP não são MEI?
+commercial-r02-0750	exclusion	execute	count	Quantos estabelecimentos ativos de loja de materiais de construção na cidade de Fortaleza/CE não são optantes pelo Simples?
+commercial-r02-0751	lookup	execute	lookup	Antes de fechar negócio, consulte o CNPJ 10.000.000/0001-45 na base.
+commercial-r02-0752	lookup	execute	lookup	Quero conferir o registro cadastral do CNPJ 10.007.919/0001-60.
+commercial-r02-0753	lookup	execute	lookup	O que consta na base sobre o CNPJ 10.015.838/0001-02?
+commercial-r02-0754	lookup	execute	lookup	Localize o CNPJ 10.023.757/0001-54 para uma conferência comercial.
+commercial-r02-0755	lookup	execute	lookup	Busque o registro 10.031.676/0001-04 e informe se ele aparece nesta base.
+commercial-r02-0756	lookup	execute	lookup	Antes de fechar negócio, consulte o CNPJ 10.039.595/0001-42 na base.
+commercial-r02-0757	lookup	execute	lookup	Quero conferir o registro cadastral do CNPJ 10.047.514/0001-56.
+commercial-r02-0758	lookup	execute	lookup	O que consta na base sobre o CNPJ 10.055.433/0001-06?
+commercial-r02-0759	lookup	execute	lookup	Localize o CNPJ 10.063.352/0001-40 para uma conferência comercial.
+commercial-r02-0760	lookup	execute	lookup	Busque o registro 10.071.271/0001-91 e informe se ele aparece nesta base.
+commercial-r02-0761	lookup	execute	lookup	Antes de fechar negócio, consulte o CNPJ 10.079.190/0001-38 na base.
+commercial-r02-0762	lookup	execute	lookup	Quero conferir o registro cadastral do CNPJ 10.087.109/0001-61.
+commercial-r02-0763	lookup	execute	lookup	O que consta na base sobre o CNPJ 10.095.028/0001-03?
+commercial-r02-0764	lookup	execute	lookup	Localize o CNPJ 10.102.947/0001-67 para uma conferência comercial.
+commercial-r02-0765	lookup	execute	lookup	Busque o registro 10.110.866/0001-09 e informe se ele aparece nesta base.
+commercial-r02-0766	lookup	execute	lookup	Antes de fechar negócio, consulte o CNPJ 10.118.785/0001-55 na base.
+commercial-r02-0767	lookup	execute	lookup	Quero conferir o registro cadastral do CNPJ 10.126.704/0001-69.
+commercial-r02-0768	lookup	execute	lookup	O que consta na base sobre o CNPJ 10.134.623/0001-00?
+commercial-r02-0769	lookup	execute	lookup	Localize o CNPJ 10.142.542/0001-52 para uma conferência comercial.
+commercial-r02-0770	lookup	execute	lookup	Busque o registro 10.150.461/0001-02 e informe se ele aparece nesta base.
+commercial-r02-0771	lookup	execute	lookup	Antes de fechar negócio, consulte o CNPJ 10.158.380/0001-40 na base.
+commercial-r02-0772	lookup	execute	lookup	Quero conferir o registro cadastral do CNPJ 10.166.299/0001-02.
+commercial-r02-0773	lookup	execute	lookup	O que consta na base sobre o CNPJ 10.174.218/0001-16?
+commercial-r02-0774	lookup	execute	lookup	Localize o CNPJ 10.182.137/0001-68 para uma conferência comercial.
+commercial-r02-0775	lookup	execute	lookup	Busque o registro 10.190.056/0001-00 e informe se ele aparece nesta base.
+commercial-r02-0776	lookup	execute	lookup	Antes de fechar negócio, consulte o CNPJ 10.197.975/0001-05 na base.
+commercial-r02-0777	lookup	execute	lookup	Quero conferir o registro cadastral do CNPJ 10.205.894/0001-00.
+commercial-r02-0778	lookup	execute	lookup	O que consta na base sobre o CNPJ 10.213.813/0001-13?
+commercial-r02-0779	lookup	execute	lookup	Localize o CNPJ 10.221.732/0001-65 para uma conferência comercial.
+commercial-r02-0780	lookup	execute	lookup	Busque o registro 10.229.651/0001-01 e informe se ele aparece nesta base.
+commercial-r02-0781	lookup	execute	lookup	Antes de fechar negócio, consulte o CNPJ 10.237.570/0001-53 na base.
+commercial-r02-0782	lookup	execute	lookup	Quero conferir o registro cadastral do CNPJ 10.245.489/0001-15.
+commercial-r02-0783	lookup	execute	lookup	O que consta na base sobre o CNPJ 10.253.408/0001-29?
+commercial-r02-0784	lookup	execute	lookup	Localize o CNPJ 10.261.327/0001-70 para uma conferência comercial.
+commercial-r02-0785	lookup	execute	lookup	Busque o registro 10.269.246/0001-17 e informe se ele aparece nesta base.
+commercial-r02-0786	lookup	execute	lookup	Antes de fechar negócio, consulte o CNPJ 10.277.165/0001-69 na base.
+commercial-r02-0787	lookup	execute	lookup	Quero conferir o registro cadastral do CNPJ 10.285.084/0001-00.
+commercial-r02-0788	lookup	execute	lookup	O que consta na base sobre o CNPJ 10.293.003/0001-14?
+commercial-r02-0789	lookup	execute	lookup	Localize o CNPJ 10.300.922/0001-78 para uma conferência comercial.
+commercial-r02-0790	lookup	execute	lookup	Busque o registro 10.308.841/0001-14 e informe se ele aparece nesta base.
+commercial-r02-0791	lookup	execute	lookup	Antes de fechar negócio, consulte o CNPJ 10.316.760/0001-66 na base.
+commercial-r02-0792	lookup	execute	lookup	Quero conferir o registro cadastral do CNPJ 10.324.679/0001-28.
+commercial-r02-0793	lookup	execute	lookup	O que consta na base sobre o CNPJ 10.332.598/0001-70?
+commercial-r02-0794	lookup	execute	lookup	Localize o CNPJ 10.340.517/0001-83 para uma conferência comercial.
+commercial-r02-0795	lookup	execute	lookup	Busque o registro 10.348.436/0001-20 e informe se ele aparece nesta base.
+commercial-r02-0796	lookup	clarify		Antes de fechar negócio, consulte o CNPJ 49.217.430/0001-70 na base.
+commercial-r02-0797	lookup	clarify		Quero conferir o registro cadastral do CNPJ 49.217.430/0001-70.
+commercial-r02-0798	lookup	clarify		O que consta na base sobre o CNPJ 49.217.430/0001-70?
+commercial-r02-0799	lookup	clarify		Localize o CNPJ 49.217.430/0001-70 para uma conferência comercial.
+commercial-r02-0800	lookup	clarify		Busque o registro 49.217.430/0001-70 e informe se ele aparece nesta base.
+commercial-r02-0801	methodology	execute	meta	De que data são os dados usados para pesquisar marmoraria na cidade de Serra/ES?
+commercial-r02-0802	methodology	execute	meta	Quais são as fontes dos dados usados para pesquisar assistência técnica de computadores na cidade de Ananindeua/PA?
+commercial-r02-0803	methodology	execute	meta	Qual é a metodologia usada para pesquisar chaveiro na cidade de Porto Velho/RO?
+commercial-r02-0804	methodology	execute	meta	Que pesquisas comerciais posso fazer sobre serviço de táxi na cidade de Araguaína/TO?
+commercial-r02-0805	methodology	execute	meta	Quais CNAEs entram para pesquisar revenda de gás de cozinha na cidade de Itacoatiara/AM?
+commercial-r02-0806	methodology	execute	meta	De que data são os dados usados para pesquisar loja de colchões na cidade de Imperatriz/MA?
+commercial-r02-0807	methodology	execute	meta	Quais são as fontes dos dados usados para pesquisar serviço de tradução na cidade de Teresina/PI?
+commercial-r02-0808	methodology	execute	meta	Qual é a metodologia usada para pesquisar empresa de software customizável na cidade de Caxias do Sul/RS?
+commercial-r02-0809	methodology	execute	meta	Que pesquisas comerciais posso fazer sobre serralheria na cidade de Santo André/SP?
+commercial-r02-0810	methodology	execute	meta	Quais CNAEs entram para pesquisar loja de autopeças usadas na cidade de Fortaleza/CE?
+commercial-r02-0811	methodology	execute	meta	De que data são os dados usados para pesquisar loja de departamentos na cidade de Cuiabá/MT?
+commercial-r02-0812	methodology	execute	meta	Quais são as fontes dos dados usados para pesquisar produtora musical na cidade de São Gonçalo/RJ?
+commercial-r02-0813	methodology	execute	meta	Qual é a metodologia usada para pesquisar estúdio de pós-produção de vídeo na cidade de São Paulo/SP?
+commercial-r02-0814	methodology	execute	meta	Que pesquisas comerciais posso fazer sobre escritório de engenharia na cidade de Maceió/AL?
+commercial-r02-0815	methodology	execute	meta	Quais CNAEs entram para pesquisar ótica na cidade de Goiânia/GO?
+commercial-r02-0816	methodology	execute	meta	De que data são os dados usados para pesquisar fábrica de uniformes profissionais na cidade de Campina Grande/PB?
+commercial-r02-0817	methodology	execute	meta	Quais são as fontes dos dados usados para pesquisar serviço de entrega rápida na cidade de Boa Vista/RR?
+commercial-r02-0818	methodology	execute	meta	Qual é a metodologia usada para pesquisar serviço de banho e tosa na cidade de Duque de Caxias/RJ?
+commercial-r02-0819	methodology	execute	meta	Que pesquisas comerciais posso fazer sobre gráfica publicitária na cidade de Santana/AP?
+commercial-r02-0820	methodology	execute	meta	Quais CNAEs entram para pesquisar floricultura na cidade de Uberlândia/MG?
+commercial-r02-0821	methodology	execute	meta	De que data são os dados usados para pesquisar serviço de gesso na cidade de Curitiba/PR?
+commercial-r02-0822	methodology	execute	meta	Quais são as fontes dos dados usados para pesquisar escritório de arquitetura na cidade de Florianópolis/SC?
+commercial-r02-0823	methodology	execute	meta	Qual é a metodologia usada para pesquisar facção de vestuário na cidade de Osasco/SP?
+commercial-r02-0824	methodology	execute	meta	Que pesquisas comerciais posso fazer sobre atacado de frutas e verduras na cidade de Brasília/DF?
+commercial-r02-0825	methodology	execute	meta	Quais CNAEs entram para pesquisar bar na cidade de Belém/PA?
+commercial-r02-0826	methodology	execute	meta	De que data são os dados usados para pesquisar academia de ginástica na cidade de Mossoró/RN?
+commercial-r02-0827	methodology	execute	meta	Quais são as fontes dos dados usados para pesquisar corretor de imóveis na cidade de Palmas/TO?
+commercial-r02-0828	methodology	execute	meta	Qual é a metodologia usada para pesquisar bicicletaria na cidade de Manaus/AM?
+commercial-r02-0829	methodology	execute	meta	Que pesquisas comerciais posso fazer sobre produtor de hortaliças na cidade de São Luís/MA?
+commercial-r02-0830	methodology	execute	meta	Quais CNAEs entram para pesquisar serviço de carro com motorista na cidade de Jaboatão dos Guararapes/PE?
+commercial-r02-0831	methodology	execute	meta	De que data são os dados usados para pesquisar serviço de pintura predial na cidade de Porto Alegre/RS?
+commercial-r02-0832	methodology	execute	meta	Quais são as fontes dos dados usados para pesquisar serviço de manutenção de refrigeração industrial na cidade de São Bernardo do Campo/SP?
+commercial-r02-0833	methodology	execute	meta	Qual é a metodologia usada para pesquisar lanchonete na cidade de Feira de Santana/BA?
+commercial-r02-0834	methodology	execute	meta	Que pesquisas comerciais posso fazer sobre serviço de carga e descarga na cidade de Dourados/MS?
+commercial-r02-0835	methodology	execute	meta	Quais CNAEs entram para pesquisar joalheria na cidade de Rio de Janeiro/RJ?
+commercial-r02-0836	methodology	execute	meta	De que data são os dados usados para pesquisar serviço de revestimento de metais na cidade de Nossa Senhora do Socorro/SE?
+commercial-r02-0837	methodology	execute	meta	Quais são as fontes dos dados usados para pesquisar farmácia de manipulação na cidade de Cruzeiro do Sul/AC?
+commercial-r02-0838	methodology	execute	meta	Qual é a metodologia usada para pesquisar frete rodoviário municipal na cidade de Vila Velha/ES?
+commercial-r02-0839	methodology	execute	meta	Que pesquisas comerciais posso fazer sobre estúdio de tatuagem na cidade de João Pessoa/PB?
+commercial-r02-0840	methodology	execute	meta	Quais CNAEs entram para pesquisar locadora de equipamentos de construção na cidade de Ji-Paraná/RO?
+commercial-r02-0841	methodology	execute	meta	De que data são os dados usados para pesquisar serviço de alvenaria na cidade de Campinas/SP?
+commercial-r02-0842	methodology	execute	meta	Quais são as fontes dos dados usados para pesquisar loja de brinquedos na cidade de Macapá/AP?
+commercial-r02-0843	methodology	execute	meta	Qual é a metodologia usada para pesquisar empresa de software sob encomenda na cidade de Belo Horizonte/MG?
+commercial-r02-0844	methodology	execute	meta	Que pesquisas comerciais posso fazer sobre fábrica de esquadrias metálicas na cidade de Parnaíba/PI?
+commercial-r02-0845	methodology	execute	meta	Quais CNAEs entram para pesquisar pronto-socorro na cidade de Joinville/SC?
+commercial-r02-0846	methodology	execute	meta	De que data são os dados usados para pesquisar clínica odontológica na cidade de Sorocaba/SP?
+commercial-r02-0847	methodology	execute	meta	Quais são as fontes dos dados usados para pesquisar empresa de mudanças na cidade de Caucaia/CE?
+commercial-r02-0848	methodology	execute	meta	Qual é a metodologia usada para pesquisar clínica veterinária na cidade de Várzea Grande/MT?
+commercial-r02-0849	methodology	execute	meta	Que pesquisas comerciais posso fazer sobre escola de ensino fundamental na cidade de Natal/RN?
+commercial-r02-0850	methodology	execute	meta	Quais CNAEs entram para pesquisar laboratório óptico na cidade de Guarulhos/SP?
+commercial-r02-0851	dialogue	execute	count	Quantos estabelecimentos ativos de serviço de tradução existem na cidade de Belo Horizonte/MG para eu planejar minha carteira?
+commercial-r02-0852	dialogue	execute	count	E na cidade de Uberlândia/MG?
+commercial-r02-0853	dialogue	execute	count	Só os que são matrizes.
+commercial-r02-0854	dialogue	execute	count	Conte matrizes e filiais.
+commercial-r02-0855	dialogue	execute	count	Nova pesquisa: quantos estabelecimentos ativos de serviço de transporte existem na cidade de Uberlândia/MG?
+commercial-r02-0856	dialogue	execute	count	Quantos estabelecimentos ativos de loja de departamentos existem na cidade de Dourados/MS para eu planejar minha carteira?
+commercial-r02-0857	dialogue	execute	count	E na cidade de Cuiabá/MT?
+commercial-r02-0858	dialogue	execute	count	Só matrizes.
+commercial-r02-0859	dialogue	execute	count	Inclua filiais também.
+commercial-r02-0860	dialogue	execute	count	Nova pesquisa: quantos estabelecimentos ativos de empresa de marketing direto existem na cidade de Cuiabá/MT?
+commercial-r02-0861	dialogue	execute	count	Quantos estabelecimentos ativos de ótica existem na cidade de Belém/PA para eu planejar minha carteira?
+commercial-r02-0862	dialogue	execute	count	E na cidade de Ananindeua/PA?
+commercial-r02-0863	dialogue	execute	count	Apenas matrizes.
+commercial-r02-0864	dialogue	execute	count	Volte a incluir as filiais.
+commercial-r02-0865	dialogue	execute	count	Nova pesquisa: quantos estabelecimentos ativos de loja de tintas existem na cidade de Ananindeua/PA?
+commercial-r02-0866	dialogue	execute	count	Quantos estabelecimentos ativos de gráfica publicitária existem na cidade de Campina Grande/PB para eu planejar minha carteira?
+commercial-r02-0867	dialogue	execute	count	E na cidade de Recife/PE?
+commercial-r02-0868	dialogue	execute	count	Somente matrizes.
+commercial-r02-0869	dialogue	execute	count	Tire o filtro de matriz, por favor.
+commercial-r02-0870	dialogue	execute	count	Nova pesquisa: quantos estabelecimentos ativos de companhia aérea regular existem na cidade de Recife/PE?
+commercial-r02-0871	dialogue	execute	count	Quantos estabelecimentos ativos de facção de vestuário existem na cidade de Teresina/PI para eu planejar minha carteira?
+commercial-r02-0872	dialogue	execute	count	E na cidade de Parnaíba/PI?
+commercial-r02-0873	dialogue	execute	count	Quero só matrizes.
+commercial-r02-0874	dialogue	execute	count	Tanto matriz quanto filial.
+commercial-r02-0875	dialogue	execute	count	Nova pesquisa: quantos estabelecimentos ativos de distribuidora de gás liquefeito existem na cidade de Parnaíba/PI?
+commercial-r02-0876	dialogue	execute	count	Quantos estabelecimentos ativos de corretor de imóveis existem na cidade de Londrina/PR para eu planejar minha carteira?
+commercial-r02-0877	dialogue	execute	count	E na cidade de Rio de Janeiro/RJ?
+commercial-r02-0878	dialogue	execute	count	Só os que são matrizes, por favor.
+commercial-r02-0879	dialogue	execute	count	Quero tanto matriz quanto filial.
+commercial-r02-0880	dialogue	execute	count	Nova pesquisa: quantos estabelecimentos ativos de incorporadora imobiliária existem na cidade de Rio de Janeiro/RJ?
+commercial-r02-0881	dialogue	execute	count	Quantos estabelecimentos ativos de serviço de pintura predial existem na cidade de Natal/RN para eu planejar minha carteira?
+commercial-r02-0882	dialogue	execute	count	E na cidade de Mossoró/RN?
+commercial-r02-0883	dialogue	execute	count	Só matrizes, por favor.
+commercial-r02-0884	dialogue	execute	count	Por favor, inclua filiais.
+commercial-r02-0885	dialogue	execute	count	Nova pesquisa: quantos estabelecimentos ativos de serviço de fretamento de ônibus existem na cidade de Mossoró/RN?
+commercial-r02-0886	dialogue	execute	count	Quantos estabelecimentos ativos de joalheria existem na cidade de Ji-Paraná/RO para eu planejar minha carteira?
+commercial-r02-0887	dialogue	execute	count	E na cidade de Boa Vista/RR?
+commercial-r02-0888	dialogue	execute	count	Apenas matrizes, por favor.
+commercial-r02-0889	dialogue	execute	count	Conte matriz e filial.
+commercial-r02-0890	dialogue	execute	count	Nova pesquisa: quantos estabelecimentos ativos de serviço de paisagismo existem na cidade de Boa Vista/RR?
+commercial-r02-0891	dialogue	execute	count	Quantos estabelecimentos ativos de estúdio de tatuagem existem na cidade de Porto Alegre/RS para eu planejar minha carteira?
+commercial-r02-0892	dialogue	execute	count	E na cidade de Caxias do Sul/RS?
+commercial-r02-0893	dialogue	execute	count	Apenas as matrizes.
+commercial-r02-0894	dialogue	execute	count	Remova o filtro de matriz, por favor.
+commercial-r02-0895	dialogue	execute	count	Nova pesquisa: quantos estabelecimentos ativos de serviço de táxi existem na cidade de Caxias do Sul/RS?
+commercial-r02-0896	dialogue	execute	count	Quantos estabelecimentos ativos de empresa de software sob encomenda existem na cidade de Florianópolis/SC para eu planejar minha carteira?
+commercial-r02-0897	dialogue	execute	count	E na cidade de Aracaju/SE?
+commercial-r02-0898	dialogue	execute	count	Somente as matrizes.
+commercial-r02-0899	dialogue	execute	count	Limpe o filtro de matriz.
+commercial-r02-0900	dialogue	execute	count	Nova pesquisa: quantos estabelecimentos ativos de empresa de software customizável existem na cidade de Aracaju/SE?
+commercial-r02-0901	clarification	clarify		Quero os serviços de fretamento de ônibus grandes na cidade de Cuiabá/MT.
+commercial-r02-0902	clarification	clarify		Quantas empresas de tecnologia tem na cidade de Ji-Paraná/RO?
+commercial-r02-0903	clarification	clarify		Quantos mercados ativos existem na cidade de Santo André/SP?
+commercial-r02-0904	clarification	clarify		Quantas empresas ativas há em Bom Jesus? Quero comparar com Vila Velha/ES.
+commercial-r02-0905	clarification	clarify		Quero os melhores lava-jatos da cidade de Teresina/PI para prospectar.
+commercial-r02-0906	clarification	clarify		Quantos serviços de carga e descarga tiveram alta recente na cidade de Nossa Senhora do Socorro/SE?
+commercial-r02-0907	clarification	clarify		Liste serviços de climatização central perto de mim para uma rota de vendas em AM.
+commercial-r02-0908	clarification	clarify		Preciso pesquisar lojas de produtos de limpeza de São Paulo e comparar com a cidade de Dourados/MS.
+commercial-r02-0909	clarification	clarify		Conte os laboratórios de análises clínicas da cidade de Porto Velho/RO que não sejam desse tipo.
+commercial-r02-0910	clarification	clarify		Na pesquisa de loja de autopeças usadas para minha carteira 2, preciso esclarecer: Quero os serviços de fretamento de ônibus grandes na cidade de Cuiabá/MT.
+commercial-r02-0911	clarification	clarify		Na pesquisa de casa de festas para minha carteira 2, preciso esclarecer: Quantas empresas de tecnologia tem na cidade de Ji-Paraná/RO?
+commercial-r02-0912	clarification	clarify		Na pesquisa de serviço de pré-impressão para minha carteira 2, preciso esclarecer: Quantos mercados ativos existem na cidade de Santo André/SP?
+commercial-r02-0913	clarification	clarify		Na pesquisa de bicicletaria para minha carteira 2, preciso esclarecer: Quantas empresas ativas há em Bom Jesus? Quero comparar com Vila Velha/ES.
+commercial-r02-0914	clarification	clarify		Na pesquisa de serviço de tecnologia da informação para minha carteira 2, preciso esclarecer: Quero os melhores lava-jatos da cidade de Teresina/PI para prospectar.
+commercial-r02-0915	clarification	clarify		Na pesquisa de borracharia para minha carteira 2, preciso esclarecer: Quantos serviços de carga e descarga tiveram alta recente na cidade de Nossa Senhora do Socorro/SE?
+commercial-r02-0916	clarification	clarify		Na pesquisa de clínica odontológica para minha carteira 2, preciso esclarecer: Liste serviços de climatização central perto de mim para uma rota de vendas em AM.
+commercial-r02-0917	clarification	clarify		Na pesquisa de locadora de utensílios para festas para minha carteira 2, preciso esclarecer: Preciso pesquisar lojas de produtos de limpeza de São Paulo e comparar com a cidade de Dourados/MS.
+commercial-r02-0918	clarification	clarify		Na pesquisa de oficina de elétrica automotiva para minha carteira 2, preciso esclarecer: Conte os laboratórios de análises clínicas da cidade de Porto Velho/RO que não sejam desse tipo.
+commercial-r02-0919	clarification	clarify		Na pesquisa de loja de autopeças usadas para minha carteira 3, preciso esclarecer: Quero os serviços de fretamento de ônibus grandes na cidade de Cuiabá/MT.
+commercial-r02-0920	clarification	clarify		Na pesquisa de casa de festas para minha carteira 3, preciso esclarecer: Quantas empresas de tecnologia tem na cidade de Ji-Paraná/RO?
+commercial-r02-0921	clarification	clarify		Na pesquisa de serviço de pré-impressão para minha carteira 3, preciso esclarecer: Quantos mercados ativos existem na cidade de Santo André/SP?
+commercial-r02-0922	clarification	clarify		Na pesquisa de bicicletaria para minha carteira 3, preciso esclarecer: Quantas empresas ativas há em Bom Jesus? Quero comparar com Vila Velha/ES.
+commercial-r02-0923	clarification	clarify		Na pesquisa de serviço de tecnologia da informação para minha carteira 3, preciso esclarecer: Quero os melhores lava-jatos da cidade de Teresina/PI para prospectar.
+commercial-r02-0924	clarification	clarify		Na pesquisa de borracharia para minha carteira 3, preciso esclarecer: Quantos serviços de carga e descarga tiveram alta recente na cidade de Nossa Senhora do Socorro/SE?
+commercial-r02-0925	clarification	clarify		Na pesquisa de clínica odontológica para minha carteira 3, preciso esclarecer: Liste serviços de climatização central perto de mim para uma rota de vendas em AM.
+commercial-r02-0926	clarification	clarify		Na pesquisa de locadora de utensílios para festas para minha carteira 3, preciso esclarecer: Preciso pesquisar lojas de produtos de limpeza de São Paulo e comparar com a cidade de Dourados/MS.
+commercial-r02-0927	clarification	clarify		Na pesquisa de oficina de elétrica automotiva para minha carteira 3, preciso esclarecer: Conte os laboratórios de análises clínicas da cidade de Porto Velho/RO que não sejam desse tipo.
+commercial-r02-0928	clarification	clarify		Na pesquisa de loja de autopeças usadas para minha carteira 4, preciso esclarecer: Quero os serviços de fretamento de ônibus grandes na cidade de Cuiabá/MT.
+commercial-r02-0929	clarification	clarify		Na pesquisa de casa de festas para minha carteira 4, preciso esclarecer: Quantas empresas de tecnologia tem na cidade de Ji-Paraná/RO?
+commercial-r02-0930	clarification	clarify		Na pesquisa de serviço de pré-impressão para minha carteira 4, preciso esclarecer: Quantos mercados ativos existem na cidade de Santo André/SP?
+commercial-r02-0931	clarification	clarify		Na pesquisa de bicicletaria para minha carteira 4, preciso esclarecer: Quantas empresas ativas há em Bom Jesus? Quero comparar com Vila Velha/ES.
+commercial-r02-0932	clarification	clarify		Na pesquisa de serviço de tecnologia da informação para minha carteira 4, preciso esclarecer: Quero os melhores lava-jatos da cidade de Teresina/PI para prospectar.
+commercial-r02-0933	clarification	clarify		Na pesquisa de borracharia para minha carteira 4, preciso esclarecer: Quantos serviços de carga e descarga tiveram alta recente na cidade de Nossa Senhora do Socorro/SE?
+commercial-r02-0934	clarification	clarify		Na pesquisa de clínica odontológica para minha carteira 4, preciso esclarecer: Liste serviços de climatização central perto de mim para uma rota de vendas em AM.
+commercial-r02-0935	clarification	clarify		Na pesquisa de locadora de utensílios para festas para minha carteira 4, preciso esclarecer: Preciso pesquisar lojas de produtos de limpeza de São Paulo e comparar com a cidade de Dourados/MS.
+commercial-r02-0936	clarification	clarify		Na pesquisa de oficina de elétrica automotiva para minha carteira 4, preciso esclarecer: Conte os laboratórios de análises clínicas da cidade de Porto Velho/RO que não sejam desse tipo.
+commercial-r02-0937	clarification	clarify		Na pesquisa de loja de autopeças usadas para minha carteira 5, preciso esclarecer: Quero os serviços de fretamento de ônibus grandes na cidade de Cuiabá/MT.
+commercial-r02-0938	clarification	clarify		Na pesquisa de casa de festas para minha carteira 5, preciso esclarecer: Quantas empresas de tecnologia tem na cidade de Ji-Paraná/RO?
+commercial-r02-0939	clarification	clarify		Na pesquisa de serviço de pré-impressão para minha carteira 5, preciso esclarecer: Quantos mercados ativos existem na cidade de Santo André/SP?
+commercial-r02-0940	clarification	clarify		Na pesquisa de bicicletaria para minha carteira 5, preciso esclarecer: Quantas empresas ativas há em Bom Jesus? Quero comparar com Vila Velha/ES.
+commercial-r02-0941	clarification	clarify		Na pesquisa de serviço de tecnologia da informação para minha carteira 5, preciso esclarecer: Quero os melhores lava-jatos da cidade de Teresina/PI para prospectar.
+commercial-r02-0942	clarification	clarify		Na pesquisa de borracharia para minha carteira 5, preciso esclarecer: Quantos serviços de carga e descarga tiveram alta recente na cidade de Nossa Senhora do Socorro/SE?
+commercial-r02-0943	clarification	clarify		Na pesquisa de clínica odontológica para minha carteira 5, preciso esclarecer: Liste serviços de climatização central perto de mim para uma rota de vendas em AM.
+commercial-r02-0944	clarification	clarify		Na pesquisa de locadora de utensílios para festas para minha carteira 5, preciso esclarecer: Preciso pesquisar lojas de produtos de limpeza de São Paulo e comparar com a cidade de Dourados/MS.
+commercial-r02-0945	clarification	clarify		Na pesquisa de oficina de elétrica automotiva para minha carteira 5, preciso esclarecer: Conte os laboratórios de análises clínicas da cidade de Porto Velho/RO que não sejam desse tipo.
+commercial-r02-0946	clarification	reject		Quantas empresas estavam ativas em RN em 2010?
+commercial-r02-0947	clarification	reject		Na pesquisa de bicicletaria para minha carteira 3, preciso esclarecer: Quantas empresas estavam ativas em MT em 2010?
+commercial-r02-0948	clarification	reject		Na pesquisa de serviço de tecnologia da informação para minha carteira 4, preciso esclarecer: Quantas empresas estavam ativas em MG em 2010?
+commercial-r02-0949	clarification	reject		Na pesquisa de borracharia para minha carteira 5, preciso esclarecer: Quantas empresas estavam ativas em RN em 2010?
+commercial-r02-0950	clarification	reject		Quantas empresas estavam ativas em MA em 2010?
+commercial-r02-0951	unsupported	reject		Qual é o faturamento mensal dos bufês na cidade de Recife/PE?
+commercial-r02-0952	unsupported	reject		Quantos funcionários trabalham em cada serviço de filmagem de eventos na cidade de Nossa Senhora do Socorro/SE?
+commercial-r02-0953	unsupported	reject		Quais organizadoras de eventos na cidade de Santana/AP dão mais lucro?
+commercial-r02-0954	unsupported	reject		Quais são os sócios das empresas na cidade de Ananindeua/PA?
+commercial-r02-0955	unsupported	reject		Qual o CPF do dono das padarias na cidade de Joinville/SC?
+commercial-r02-0956	unsupported	reject		Vai chover amanhã na cidade de Manaus/AM e isso afeta as vendas?
+commercial-r02-0957	unsupported	reject		Quem ganhou o jogo do time na cidade de Cuiabá/MT?
+commercial-r02-0958	unsupported	reject		Quem é o prefeito na cidade de Rorainópolis/RR?
+commercial-r02-0959	unsupported	reject		Onde devo abrir uma padaria na cidade de Cruzeiro do Sul/AC para ter mais lucro?
+commercial-r02-0960	unsupported	reject		Me ensine uma receita de bolo para vender na cidade de Uberlândia/MG?
+commercial-r02-0961	unsupported	reject		Qual é o faturamento mensal dos bufês na cidade de Porto Velho/RO?
+commercial-r02-0962	unsupported	reject		Quantos funcionários trabalham em cada serviço de filmagem de eventos na cidade de Sorocaba/SP?
+commercial-r02-0963	unsupported	reject		Quais organizadoras de eventos na cidade de São Luís/MA dão mais lucro?
+commercial-r02-0964	unsupported	reject		Quais são os sócios das empresas na cidade de São Gonçalo/RJ?
+commercial-r02-0965	unsupported	reject		Qual o CPF do dono das padarias na cidade de Nova Iguaçu/RJ?
+commercial-r02-0966	unsupported	reject		Vai chover amanhã na cidade de Vila Velha/ES e isso afeta as vendas?
+commercial-r02-0967	unsupported	reject		Quem ganhou o jogo do time na cidade de Curitiba/PR?
+commercial-r02-0968	unsupported	reject		Quem é o prefeito na cidade de Araguaína/TO?
+commercial-r02-0969	unsupported	reject		Onde devo abrir uma padaria na cidade de Caucaia/CE para ter mais lucro?
+commercial-r02-0970	unsupported	reject		Me ensine uma receita de bolo para vender na cidade de Jaboatão dos Guararapes/PE?
+commercial-r02-0971	unsupported	reject		Qual é o faturamento mensal dos bufês na cidade de São Paulo/SP?
+commercial-r02-0972	unsupported	reject		Quantos funcionários trabalham em cada serviço de filmagem de eventos na cidade de Salvador/BA?
+commercial-r02-0973	unsupported	reject		Quais organizadoras de eventos na cidade de João Pessoa/PB dão mais lucro?
+commercial-r02-0974	unsupported	reject		Quais são os sócios das empresas na cidade de Florianópolis/SC?
+commercial-r02-0975	unsupported	reject		Qual o CPF do dono das padarias na cidade de Itacoatiara/AM?
+commercial-r02-0976	unsupported	reject		Vai chover amanhã na cidade de Várzea Grande/MT e isso afeta as vendas?
+commercial-r02-0977	unsupported	reject		Quem ganhou o jogo do time na cidade de Porto Alegre/RS?
+commercial-r02-0978	unsupported	reject		Quem é o prefeito na cidade de Maceió/AL?
+commercial-r02-0979	unsupported	reject		Onde devo abrir uma padaria na cidade de Campo Grande/MS para ter mais lucro?
+commercial-r02-0980	unsupported	reject		Me ensine uma receita de bolo para vender na cidade de Ji-Paraná/RO?
+commercial-r02-0981	unsupported	reject		Qual é o faturamento mensal dos bufês na cidade de Osasco/SP?
+commercial-r02-0982	unsupported	reject		Quantos funcionários trabalham em cada serviço de filmagem de eventos na cidade de Imperatriz/MA?
+commercial-r02-0983	unsupported	reject		Quais organizadoras de eventos na cidade de Natal/RN dão mais lucro?
+commercial-r02-0984	unsupported	reject		Quais são os sócios das empresas na cidade de São Bernardo do Campo/SP?
+commercial-r02-0985	unsupported	reject		Qual o CPF do dono das padarias na cidade de Goiânia/GO?
+commercial-r02-0986	unsupported	reject		Vai chover amanhã na cidade de Londrina/PR e isso afeta as vendas?
+commercial-r02-0987	unsupported	reject		Quem ganhou o jogo do time na cidade de Campinas/SP?
+commercial-r02-0988	unsupported	reject		Quem é o prefeito na cidade de Brasília/DF?
+commercial-r02-0989	unsupported	reject		Onde devo abrir uma padaria na cidade de Teresina/PI para ter mais lucro?
+commercial-r02-0990	unsupported	reject		Me ensine uma receita de bolo para vender na cidade de Guarulhos/SP?
+commercial-r02-0991	unsupported	reject		Qual é o faturamento mensal dos bufês na cidade de Feira de Santana/BA?
+commercial-r02-0992	unsupported	reject		Quantos funcionários trabalham em cada serviço de filmagem de eventos na cidade de Campina Grande/PB?
+commercial-r02-0993	unsupported	reject		Quais organizadoras de eventos na cidade de Aracaju/SE dão mais lucro?
+commercial-r02-0994	unsupported	reject		Quais são os sócios das empresas na cidade de Macapá/AP?
+commercial-r02-0995	unsupported	reject		Qual o CPF do dono das padarias na cidade de Belém/PA?
+commercial-r02-0996	unsupported	reject		Vai chover amanhã na cidade de Caxias do Sul/RS e isso afeta as vendas?
+commercial-r02-0997	unsupported	reject		Quem ganhou o jogo do time na cidade de Arapiraca/AL?
+commercial-r02-0998	unsupported	reject		Quem é o prefeito na cidade de Dourados/MS?
+commercial-r02-0999	unsupported	reject		Onde devo abrir uma padaria na cidade de Boa Vista/RR para ter mais lucro?
+commercial-r02-1000	unsupported	reject		Me ensine uma receita de bolo para vender na cidade de Rio Branco/AC?

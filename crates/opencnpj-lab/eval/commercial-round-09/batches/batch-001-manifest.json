@@ -1,0 +1,45 @@
+{
+  "batch_id": "batch-001",
+  "items": 1000,
+  "first_id": "commercial-r09-00001",
+  "last_id": "commercial-r09-01000",
+  "sha256": "477006e6a44918f48bc5dc8b219cf74562c034f12785640cb026ef4af5f5e9fa",
+  "by_family": {
+    "market_size_density_competition": 100,
+    "prospecting_qualification_territory": 140,
+    "historical_stock_flows_seasonality": 100,
+    "geography_catchments_comparisons": 100,
+    "corporate_structure_hq_branches_identity": 80,
+    "supply_chain_complementary": 100,
+    "cross_variable_correlation": 100,
+    "dialogue_corrections_references_planning": 120,
+    "source_quality_provenance_uncertainty": 60,
+    "unsupported_missing_contradictions": 60,
+    "tax_size_legal_capital_numeric": 40
+  },
+  "by_geographic_stratum": {
+    "mt_metropolitan": 100,
+    "mt_north_agro_industrial": 120,
+    "mt_south_logistics_industrial": 100,
+    "mt_east_araguaia_xingu": 90,
+    "mt_west_parecis_guapore": 90,
+    "mt_pantanal": 100,
+    "other_26_ufs": 240,
+    "national_cross_uf_comparative": 160
+  },
+  "by_register": {
+    "conversational_professional": 700,
+    "formal_technical": 200,
+    "noisy_short": 100
+  },
+  "by_split": {
+    "synthetic_dev": 700,
+    "synthetic_eval": 200,
+    "synthetic_challenge": 100
+  },
+  "by_decision": {
+    "execute": 830,
+    "clarify": 94,
+    "reject": 76
+  }
+}

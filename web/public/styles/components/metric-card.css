@@ -1,0 +1,57 @@
+.metric {
+  display: flex;
+  flex-direction: column;
+  height: 170px;
+  padding: 16px 24px 0;
+}
+
+.metric__icon {
+  flex: none;
+  color: #3b4757;
+}
+
+.metric__label {
+  margin-top: 7px;
+  color: var(--ink-700);
+  font-size: 12.5px;
+  line-height: 17px;
+}
+
+.metric__value {
+  height: 40px;
+  margin-top: 7px;
+  color: var(--ink-900);
+  font-family: var(--font-serif);
+  font-size: 36px;
+  font-weight: 680;
+  letter-spacing: -0.025em;
+  line-height: 40px;
+  white-space: nowrap;
+}
+
+.metric__value--compact {
+  font-size: 20px;
+  letter-spacing: -0.02em;
+}
+
+.metric__delta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 1px;
+  color: var(--green-500);
+  font-size: 13.5px;
+  font-weight: 650;
+  line-height: 18px;
+}
+
+.metric__caption {
+  margin-top: 5px;
+  color: var(--ink-600);
+  font-size: 12px;
+  line-height: 17px;
+}
+
+.metric__value + .metric__caption {
+  margin-top: 1px;
+}

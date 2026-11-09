@@ -1,0 +1,1362 @@
+{
+  "by_category": {
+    "agriculture": 2,
+    "census": 1,
+    "compliance": 1,
+    "economy": 2,
+    "education": 1,
+    "energy": 2,
+    "fiscal": 2,
+    "fuel": 1,
+    "health": 1,
+    "labour": 2,
+    "local_government": 1,
+    "macroeconomy": 1,
+    "population": 1,
+    "procurement": 2,
+    "trade": 1,
+    "transport": 3
+  },
+  "by_format": {
+    "csv_semicolon": 1,
+    "html": 11,
+    "json": 8,
+    "json_partial_or_invalid": 1,
+    "xlsx": 3
+  },
+  "by_source": {
+    "aneel": 2,
+    "anp": 1,
+    "antt": 2,
+    "bcb": 1,
+    "cgu": 1,
+    "cnes": 1,
+    "comexstat": 1,
+    "compras": 1,
+    "ibge": 6,
+    "inep": 1,
+    "mt": 1,
+    "mte": 2,
+    "pgfn": 2,
+    "pncp": 1,
+    "senatran": 1
+  },
+  "dataset_count": 10,
+  "datasets": [
+    {
+      "cadence": "annual",
+      "category": "agriculture",
+      "coverage": "Mato Grosso municipalities",
+      "dataset_id": "ibge-1612",
+      "source_id": "ibge",
+      "state": "verified",
+      "title": "IBGE - PAM lavouras temporárias"
+    },
+    {
+      "cadence": "annual",
+      "category": "agriculture",
+      "coverage": "Mato Grosso municipalities",
+      "dataset_id": "ibge-1613",
+      "source_id": "ibge",
+      "state": "verified",
+      "title": "IBGE - PAM lavouras permanentes"
+    },
+    {
+      "cadence": "annual",
+      "category": "agriculture",
+      "coverage": "Mato Grosso municipalities",
+      "dataset_id": "ibge-3939",
+      "source_id": "ibge",
+      "state": "verified",
+      "title": "IBGE - PPM efetivo dos rebanhos"
+    },
+    {
+      "cadence": "annual, with publication lag",
+      "category": "economy",
+      "coverage": "Mato Grosso and its municipalities",
+      "dataset_id": "ibge-5938",
+      "source_id": "ibge",
+      "state": "verified",
+      "title": "IBGE - PIB dos municípios"
+    },
+    {
+      "cadence": "annual",
+      "category": "population",
+      "coverage": "Mato Grosso and its municipalities",
+      "dataset_id": "ibge-6579",
+      "source_id": "ibge",
+      "state": "verified",
+      "title": "IBGE - População residente estimada"
+    },
+    {
+      "cadence": "monthly",
+      "category": "agriculture",
+      "coverage": "Mato Grosso state; municipal detail is not released by this resource",
+      "dataset_id": "ibge-6588",
+      "source_id": "ibge",
+      "state": "verified",
+      "title": "IBGE - LSPA série histórica"
+    },
+    {
+      "cadence": "annual",
+      "category": "economy",
+      "coverage": "Mato Grosso municipalities",
+      "dataset_id": "ibge-9509",
+      "source_id": "ibge",
+      "state": "verified",
+      "title": "IBGE - CEMPRE"
+    },
+    {
+      "cadence": "2022 Census observation",
+      "category": "census",
+      "coverage": "Mato Grosso municipalities",
+      "dataset_id": "ibge-9922",
+      "source_id": "ibge",
+      "state": "verified",
+      "title": "IBGE - Censo 2022: domicílios e moradores"
+    },
+    {
+      "cadence": "annual",
+      "category": "labour",
+      "coverage": "Brazil, states and municipalities; this import keeps the MT slice",
+      "dataset_id": "mte-rais-2024",
+      "source_id": "mte",
+      "state": "verified",
+      "title": "RAIS 2024 - empregos formais por município e atividade"
+    },
+    {
+      "cadence": "monthly",
+      "category": "transport",
+      "coverage": "Brazilian municipalities; this import keeps the MT slice",
+      "dataset_id": "senatran-frota-2026-09",
+      "source_id": "senatran",
+      "state": "verified",
+      "title": "Senatran - frota por município e tipo (setembro/2026)"
+    }
+  ],
+  "error_count": 0,
+  "generated_at": "unix:1794154551",
+  "probe_count": 24,
+  "probes": [
+    {
+      "bytes": 444,
+      "category": "population",
+      "content_length": null,
+      "content_type": "application/json; charset=utf-8",
+      "file": "/data/opencnpj-data/intelligence/official/audit/raw/ibge/ibge-6579-metadata.json",
+      "format": "json",
+      "http_status": 200,
+      "kind": "metadata",
+      "label": "ibge-6579-metadata",
+      "note": "",
+      "schema": {
+        "json_type": "object",
+        "keys": [
+          "URL",
+          "assunto",
+          "classificacoes",
+          "id",
+          "nivelTerritorial",
+          "nome",
+          "periodicidade",
+          "pesquisa",
+          "variaveis"
+        ]
+      },
+      "sha256": "6172ae800a704ad21cfd4f8ae55c2864ef688d172aa305341e84b3964cf45962",
+      "source_id": "ibge",
+      "truncated": false,
+      "url": "https://servicodados.ibge.gov.br/api/v3/agregados/6579/metadados"
+    },
+    {
+      "bytes": 12058,
+      "category": "economy",
+      "content_length": null,
+      "content_type": "application/json; charset=utf-8",
+      "file": "/data/opencnpj-data/intelligence/official/audit/raw/ibge/ibge-5938-metadata.json",
+      "format": "json",
+      "http_status": 200,
+      "kind": "metadata",
+      "label": "ibge-5938-metadata",
+      "note": "",
+      "schema": {
+        "json_type": "object",
+        "keys": [
+          "URL",
+          "assunto",
+          "classificacoes",
+          "id",
+          "nivelTerritorial",
+          "nome",
+          "periodicidade",
+          "pesquisa",
+          "variaveis"
+        ]
+      },
+      "sha256": "095d618c940e99bf0bae617cb1e5b081da2394fa1dbd16c00cd44f805cdb35a4",
+      "source_id": "ibge",
+      "truncated": false,
+      "url": "https://servicodados.ibge.gov.br/api/v3/agregados/5938/metadados"
+    },
+    {
+      "bytes": 1344,
+      "category": "economy",
+      "content_length": null,
+      "content_type": "application/json; charset=utf-8",
+      "file": "/data/opencnpj-data/intelligence/official/audit/raw/ibge/ibge-9509-metadata.json",
+      "format": "json",
+      "http_status": 200,
+      "kind": "metadata",
+      "label": "ibge-9509-metadata",
+      "note": "",
+      "schema": {
+        "json_type": "object",
+        "keys": [
+          "URL",
+          "assunto",
+          "classificacoes",
+          "id",
+          "nivelTerritorial",
+          "nome",
+          "periodicidade",
+          "pesquisa",
+          "variaveis"
+        ]
+      },
+      "sha256": "1a7d18b3eb6dc5f683ded3d9615e04aff843c185b710f0159e5eb412dc04498c",
+      "source_id": "ibge",
+      "truncated": false,
+      "url": "https://servicodados.ibge.gov.br/api/v3/agregados/9509/metadados"
+    },
+    {
+      "bytes": 4213,
+      "category": "agriculture",
+      "content_length": null,
+      "content_type": "application/json; charset=utf-8",
+      "file": "/data/opencnpj-data/intelligence/official/audit/raw/ibge/ibge-1612-metadata.json",
+      "format": "json",
+      "http_status": 200,
+      "kind": "metadata",
+      "label": "ibge-1612-metadata",
+      "note": "",
+      "schema": {
+        "json_type": "object",
+        "keys": [
+          "URL",
+          "assunto",
+          "classificacoes",
+          "id",
+          "nivelTerritorial",
+          "nome",
+          "periodicidade",
+          "pesquisa",
+          "variaveis"
+        ]
+      },
+      "sha256": "19755ad7514b697fce888bc0331ba222181c5d421c0918635a86545abcc8b73c",
+      "source_id": "ibge",
+      "truncated": false,
+      "url": "https://servicodados.ibge.gov.br/api/v3/agregados/1612/metadados"
+    },
+    {
+      "bytes": 3885,
+      "category": "agriculture",
+      "content_length": null,
+      "content_type": "application/json; charset=utf-8",
+      "file": "/data/opencnpj-data/intelligence/official/audit/raw/ibge/ibge-6588-metadata.json",
+      "format": "json",
+      "http_status": 200,
+      "kind": "metadata",
+      "label": "ibge-6588-metadata",
+      "note": "",
+      "schema": {
+        "json_type": "object",
+        "keys": [
+          "URL",
+          "assunto",
+          "classificacoes",
+          "id",
+          "nivelTerritorial",
+          "nome",
+          "periodicidade",
+          "pesquisa",
+          "variaveis"
+        ]
+      },
+      "sha256": "e88dc8978998b86706d3d5bef04974f7b4a0de9b2aa0a4fdd0e909896075c8f4",
+      "source_id": "ibge",
+      "truncated": false,
+      "url": "https://servicodados.ibge.gov.br/api/v3/agregados/6588/metadados"
+    },
+    {
+      "bytes": 1186,
+      "category": "census",
+      "content_length": null,
+      "content_type": "application/json; charset=utf-8",
+      "file": "/data/opencnpj-data/intelligence/official/audit/raw/ibge/ibge-9922-metadata.json",
+      "format": "json",
+      "http_status": 200,
+      "kind": "metadata",
+      "label": "ibge-9922-metadata",
+      "note": "",
+      "schema": {
+        "json_type": "object",
+        "keys": [
+          "URL",
+          "assunto",
+          "classificacoes",
+          "id",
+          "nivelTerritorial",
+          "nome",
+          "periodicidade",
+          "pesquisa",
+          "variaveis"
+        ]
+      },
+      "sha256": "d9f92ee4850ffa5075934ecfe4ed81e84b5a175d8154051a8f5b2554b9405ba5",
+      "source_id": "ibge",
+      "truncated": false,
+      "url": "https://servicodados.ibge.gov.br/api/v3/agregados/9922/metadados"
+    },
+    {
+      "bytes": 2544043,
+      "category": "labour",
+      "content_length": 2544043,
+      "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "file": "/data/opencnpj-data/intelligence/official/audit/raw/mte/mte-rais-2024-xlsx.xlsx",
+      "format": "xlsx",
+      "http_status": 200,
+      "kind": "data",
+      "label": "mte-rais-2024-xlsx",
+      "note": "",
+      "schema": {
+        "first_entries": [
+          "[Content_Types].xml",
+          "_rels/.rels",
+          "xl/workbook.xml",
+          "xl/_rels/workbook.xml.rels",
+          "xl/worksheets/sheet1.xml",
+          "xl/worksheets/sheet2.xml",
+          "xl/worksheets/sheet3.xml",
+          "xl/worksheets/sheet4.xml",
+          "xl/worksheets/sheet5.xml",
+          "xl/worksheets/sheet6.xml",
+          "xl/worksheets/sheet7.xml",
+          "xl/worksheets/sheet8.xml"
+        ],
+        "has_workbook": true,
+        "zip_entries": 70
+      },
+      "sha256": "175c696341bb2821dc6a210367ccd20ba8e9e5f9d790daef195b76b3ee90ab38",
+      "source_id": "mte",
+      "truncated": false,
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/acoes-e-programas/programas-projetos-acoes-obras-e-atividades/estatisticas-trabalho/rais/rais-2024/rais-2024-1/rais-complementar-tabelas-2023x2024.xlsx/@@download/file"
+    },
+    {
+      "bytes": 207752,
+      "category": "labour",
+      "content_length": 207752,
+      "content_type": "text/html;charset=utf-8",
+      "file": "/data/opencnpj-data/intelligence/official/audit/raw/mte/mte-novo-caged-page.html",
+      "format": "html",
+      "http_status": 200,
+      "kind": "discovery_page",
+      "label": "mte-novo-caged-page",
+      "note": "",
+      "schema": {
+        "candidate_resources": [
+          {
+            "extension": "pdf",
+            "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/acoes-e-programas/programas-projetos-acoes-obras-e-atividades/estatisticas-trabalho/novo-caged/2026/agosto/comunicado-microdados-novo-caged.pdf"
+          },
+          {
+            "extension": "pdf",
+            "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/acoes-e-programas/programas-projetos-acoes-obras-e-atividades/estatisticas-trabalho/novo-caged/2026/setembro/apresentacao-setembro-de-2026.pdf"
+          },
+          {
+            "extension": "pdf",
+            "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/acoes-e-programas/programas-projetos-acoes-obras-e-atividades/estatisticas-trabalho/novo-caged/2026/setembro/sumario-executivo_setembro-de-2026.pdf"
+          },
+          {
+            "extension": "pdf",
+            "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/acoes-e-programas/programas-projetos-acoes-obras-e-atividades/estatisticas-trabalho/novo-caged/novo-caged-2023/outubro/nota_tecnica_novo_caged_11-2021.pdf"
+          }
+        ],
+        "content_type": "text/html;charset=utf-8",
+        "title": "Página Inicial — Ministério do Trabalho e Emprego"
+      },
+      "sha256": "f225bcfc3b76d531ba09ceff2bc9da2cf182c6c06255e67921a24d2f1b4f0727",
+      "source_id": "mte",
+      "truncated": false,
+      "url": "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/acoes-e-programas/programas-projetos-acoes-obras-e-atividades/estatisticas-trabalho/novo-caged"
+    },
+    {
+      "bytes": 737420,
+      "category": "transport",
+      "content_length": 737420,
+      "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "file": "/data/opencnpj-data/intelligence/official/audit/raw/senatran/senatran-fleet-202609-xlsx.xlsx",
+      "format": "xlsx",
+      "http_status": 200,
+      "kind": "data",
+      "label": "senatran-fleet-202609-xlsx",
+      "note": "",
+      "schema": {
+        "first_entries": [
+          "[Content_Types].xml",
+          "_rels/.rels",
+          "xl/workbook.xml",
+          "xl/_rels/workbook.xml.rels",
+          "xl/worksheets/sheet1.xml",
+          "xl/theme/theme1.xml",
+          "xl/styles.xml",
+          "xl/sharedStrings.xml",
+          "docProps/thumbnail.emf",
+          "xl/worksheets/_rels/sheet1.xml.rels",
+          "xl/connections.xml",
+          "xl/printerSettings/printerSettings1.bin"
+        ],
+        "has_workbook": true,
+        "zip_entries": 22
+      },
+      "sha256": "889d133da1ee2c301ad9a3e6b41b24fbb94286b4ba483c15cb706775bef5e16a",
+      "source_id": "senatran",
+      "truncated": false,
+      "url": "https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2026-2/Frota_por_municipio_e_tipo_Setembro_2026.xlsx/@@download/file"
+    },
+    {
+      "bytes": 22202,
+      "category": "transport",
+      "content_length": 22202,
+      "content_type": "text/html; charset=utf-8",
+      "file": "/data/opencnpj-data/intelligence/official/audit/raw/antt/antt-rntrc-page.html",
+      "format": "html",
+      "http_status": 200,
+      "kind": "discovery_page",
+      "label": "antt-rntrc-page",
+      "note": "",
+      "schema": {
+        "candidate_resources": [
+          {
+            "extension": "csv",
+            "url": "https://dados.antt.gov.br/dataset/2b564396-5593-4b5c-ba2c-3de3fa0a92c0/resource/73efb515-d639-46b7-8c7d-1013320763eb/download/rntrc-veiculos.csv"
+          },
+          {
+            "extension": "pdf",
+            "url": "https://dados.antt.gov.br/dataset/2b564396-5593-4b5c-ba2c-3de3fa0a92c0/resource/7a3d02e7-55e7-46c3-9c28-d10b596a9b6a/download/dicionario-de-dados-veiculos.pdf"
+          },
+          {
+            "extension": "json",
+            "url": "https://dados.antt.gov.br/dataset/2b564396-5593-4b5c-ba2c-3de3fa0a92c0/resource/c1367dd9-2874-4d97-bca3-3940e70bf224/download/rntrc-veiculos.json"
+          },
+          {
+            "extension": "json",
+            "url": "https://dados.antt.gov.br/favicon/manifest.json"
+          }
+        ],
+        "content_type": "text/html; charset=utf-8",
+        "title": "RNTRC-Dados de Veículos - Conjuntos de dados - Portal de Dados Abertos ANTT"
+      },
+      "sha256": "1030eb335e377d3cf90751373c1872b6be57e1b67175aa28b4846b0b3025ffbb",
+      "source_id": "antt",
+      "truncated": false,
+      "url": "https://dados.antt.gov.br/pt_BR/dataset/rntrc-veiculos"
+    },
+    {
+      "bytes": 849499,
+      "category": "procurement",
+      "content_length": null,
+      "content_type": "application/json",
+      "file": "/data/opencnpj-data/intelligence/official/audit/raw/pncp/pncp-contracts-202609.json",
+      "format": "json",
+      "http_status": 200,
+      "kind": "data",
+      "label": "pncp-contracts-202609",
+      "note": "",
+      "schema": {
+        "json_type": "object",
+        "keys": [
+          "data",
+          "empty",
+          "numeroPagina",
+          "paginasRestantes",
+          "totalPaginas",
+          "totalRegistros"
+        ]
+      },
+      "sha256": "377a9a93812d33a87f9243f861d347afbed79317e72791f8a404ffcf89e72df2",
+      "source_id": "pncp",
+      "truncated": false,
+      "url": "https://pncp.gov.br/api/consulta/v1/contratos?dataInicial=20260901&dataFinal=20260930&codigoModalidadeContratacao=6&pagina=1"
+    },
+    {
+      "bytes": 734,
+      "category": "procurement",
+      "content_length": 734,
+      "content_type": "text/html",
+      "file": "/data/opencnpj-data/intelligence/official/audit/raw/compras/compras-swagger.html",
+      "format": "html",
+      "http_status": 200,
+      "kind": "discovery_page",
+      "label": "compras-swagger",
+      "note": "",
+      "schema": {
+        "candidate_resources": [],
+        "content_type": "text/html",
+        "title": "Swagger UI"
+      },
+      "sha256": "bb9928afd0ea8c12e124c42fef58fb080f36770389684badb2a4dcf548624eeb",
+      "source_id": "compras",
+      "truncated": false,
+      "url": "https://dadosabertos.compras.gov.br/swagger-ui/index.html"
+    },
+    {
+      "bytes": 86148,
+      "category": "compliance",
+      "content_length": null,
+      "content_type": "text/html;charset=UTF-8",
+      "file": "/data/opencnpj-data/intelligence/official/audit/raw/cgu/cgu-ceis-page.html",
+      "format": "html",
+      "http_status": 200,
+      "kind": "discovery_page",
+      "label": "cgu-ceis-page",
+      "note": "",
+      "schema": {
+        "candidate_resources": [],
+        "content_type": "text/html;charset=UTF-8",
+        "title": "Ceis | Portal da Transparência"
+      },
+      "sha256": "a5d2eb57ebd670f5179580059fcd206462be1e934f9dfdc6faa4042bb261572a",
+      "source_id": "cgu",
+      "truncated": false,
+      "url": "https://portaldatransparencia.gov.br/download-de-dados/ceis"
+    },
+    {
+      "bytes": 24592,
+      "category": "health",
+      "content_length": 24592,
+      "content_type": "text/html; charset=utf-8",
+      "file": "/data/opencnpj-data/intelligence/official/audit/raw/cnes/cnes-dataset-page.html",
+      "format": "html",
+      "http_status": 200,
+      "kind": "discovery_page",
+      "label": "cnes-dataset-page",
+      "note": "",
+      "schema": {
+        "candidate_resources": [
+          {
+            "extension": "pdf",
+            "url": "https://www.gov.br/saude/pt-br/acesso-a-informacao/dados-abertos/pda/plano-de-dados-abertos-2026-2028.pdf/@@download/file"
+          },
+          {
+            "extension": "pdf",
+            "url": "https://www.gov.br/saude/pt-br/acesso-a-informacao/dados-abertos/pda/plano-de-dados-abertos_ms_2022-2023.pdf/@@download/file"
+          },
+          {
+            "extension": "pdf",
+            "url": "https://www.gov.br/saude/pt-br/acesso-a-informacao/dados-abertos/pda/plano-de-dados-abertos_ms_2024-2026.pdf/@@download/file"
+          },
+          {
+            "extension": "pdf",
+            "url": "https://www.gov.br/saude/pt-br/acesso-a-informacao/dados-abertos/pda/plano_de_dados_abertos_do_ms.pdf/@@download/file"
+          }
+        ],
+        "content_type": "text/html; charset=utf-8",
+        "title": null
+      },
+      "sha256": "fc253bf7da29abaf73b85587c927b40d097ad13014d90ce765e3418ec5663229",
+      "source_id": "cnes",
+      "truncated": false,
+      "url": "https://dadosabertos.saude.gov.br/dataset/cnes-cadastro-nacional-de-estabelecimentos-de-saude"
+    },
+    {
+      "bytes": 229691,
+      "category": "education",
+      "content_length": 229691,
+      "content_type": "text/html;charset=utf-8",
+      "file": "/data/opencnpj-data/intelligence/official/audit/raw/inep/inep-censo-escolar-page.html",
+      "format": "html",
+      "http_status": 200,
+      "kind": "discovery_page",
+      "label": "inep-censo-escolar-page",
+      "note": "",
+      "schema": {
+        "candidate_resources": [
+          {
+            "extension": "zip",
+            "url": "https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_1995.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_1996.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_1997.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_1998.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_1999.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_2000.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_2001.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_2002.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_2003.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_2004.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_2005.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_2006.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_2007.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_2008.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_2009.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_2010.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_2011.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_2012.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_2013.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_2014.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_2015.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_2016.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_2017.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_2018.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_2019.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_2020.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_2021.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_2022.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_2023.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_2024.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_2025_.zip"
+          }
+        ],
+        "content_type": "text/html;charset=utf-8",
+        "title": "Censo Escolar — Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira | Inep"
+      },
+      "sha256": "de91aa9c7b7460870ac7139cd5adbdcf13b35ff6bba43f246841ae81baf20fd3",
+      "source_id": "inep",
+      "truncated": false,
+      "url": "https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/microdados/censo-escolar"
+    },
+    {
+      "bytes": 309271,
+      "category": "fuel",
+      "content_length": 309271,
+      "content_type": "text/html;charset=utf-8",
+      "file": "/data/opencnpj-data/intelligence/official/audit/raw/anp/anp-prices-page.html",
+      "format": "html",
+      "http_status": 200,
+      "kind": "discovery_page",
+      "label": "anp-prices-page",
+      "note": "",
+      "schema": {
+        "candidate_resources": [
+          {
+            "extension": "pdf",
+            "url": "https://www.gov.br/anp/pt-br/acesso-a-informacao/acoes-e-programas/governanca-privacidade.pdf"
+          },
+          {
+            "extension": "pdf",
+            "url": "https://www.gov.br/anp/pt-br/acesso-a-informacao/arquivos-lgpd/relatorio-tcu-lgpd.pdf"
+          },
+          {
+            "extension": "xlsx",
+            "url": "https://www.gov.br/anp/pt-br/acesso-a-informacao/institucional/agenda-dirigentes/agendadirigentesate2020.xlsx"
+          },
+          {
+            "extension": "pdf",
+            "url": "https://www.gov.br/anp/pt-br/acesso-a-informacao/termo-uso-politica-privacidade-lgpd.pdf"
+          },
+          {
+            "extension": "pdf",
+            "url": "https://www.gov.br/anp/pt-br/assuntos/precos-e-defesa-da-concorrencia/precos/precos-revenda-e-de-distribuicao-combustiveis/54_municipios_excluidos.pdf"
+          },
+          {
+            "extension": "pdf",
+            "url": "https://www.gov.br/anp/pt-br/assuntos/precos-e-defesa-da-concorrencia/precos/precos-revenda-e-de-distribuicao-combustiveis/arquivos-levantamento-de-precos-de-combustiveis/cronograma-implantacao-pesquisa-precos-revenda.pdf"
+          },
+          {
+            "extension": "pdf",
+            "url": "https://www.gov.br/anp/pt-br/assuntos/precos-e-defesa-da-concorrencia/precos/precos-revenda-e-de-distribuicao-combustiveis/arquivos-metodologia/edital_e_tr_do_pe-27-22.pdf"
+          },
+          {
+            "extension": "pdf",
+            "url": "https://www.gov.br/anp/pt-br/assuntos/precos-e-defesa-da-concorrencia/precos/precos-revenda-e-de-distribuicao-combustiveis/arquivos-metodologia/metodologia-coleta.pdf"
+          },
+          {
+            "extension": "pdf",
+            "url": "https://www.gov.br/anp/pt-br/assuntos/precos-e-defesa-da-concorrencia/precos/precos-revenda-e-de-distribuicao-combustiveis/arquivos-metodologia/oficio-circular-1-2022.pdf"
+          },
+          {
+            "extension": "xlsx",
+            "url": "https://www.gov.br/anp/pt-br/assuntos/precos-e-defesa-da-concorrencia/precos/precos-revenda-e-de-distribuicao-combustiveis/lpmcc-30-07-2017.xlsx"
+          },
+          {
+            "extension": "pdf",
+            "url": "https://www.gov.br/anp/pt-br/assuntos/tecnologia-meio-ambiente/arquivos/relatorio-resolucao-cnpe05-2022.pdf"
+          }
+        ],
+        "content_type": "text/html;charset=utf-8",
+        "title": "Informações sobre o levantamento de preços de combustíveis — Agência Nacional do Petróleo, Gás Natural e Biocombustíveis"
+      },
+      "sha256": "3bee83f879249b6449b5f91d8abcce179a4eef6fc51e85360d6045e22017cbe5",
+      "source_id": "anp",
+      "truncated": false,
+      "url": "https://www.gov.br/anp/pt-br/assuntos/precos-e-defesa-da-concorrencia/precos/precos-revenda-e-de-distribuicao-combustiveis/informacoes-levantamento-de-precos-de-combustiveis"
+    },
+    {
+      "bytes": 524288,
+      "category": "trade",
+      "content_length": null,
+      "content_type": "text/html",
+      "file": "/data/opencnpj-data/intelligence/official/audit/raw/comexstat/comexstat-page.html",
+      "format": "html",
+      "http_status": 200,
+      "kind": "discovery_page",
+      "label": "comexstat-page",
+      "note": "",
+      "schema": {
+        "candidate_resources": [],
+        "content_type": "text/html",
+        "title": null
+      },
+      "sha256": "dfed1c26633d19b1bbecbdb3351604a4a7d77176c06fc33584de67f0eaababa7",
+      "source_id": "comexstat",
+      "truncated": true,
+      "url": "https://comexstat.mdic.gov.br/pt/home"
+    },
+    {
+      "bytes": 196,
+      "category": "macroeconomy",
+      "content_length": 196,
+      "content_type": "application/json; charset=utf-8",
+      "file": "/data/opencnpj-data/intelligence/official/audit/raw/bcb/bcb-sgs-series-1.json",
+      "format": "json",
+      "http_status": 200,
+      "kind": "data",
+      "label": "bcb-sgs-series-1",
+      "note": "",
+      "schema": {
+        "first_keys": [
+          "data",
+          "valor"
+        ],
+        "items": 5,
+        "json_type": "array"
+      },
+      "sha256": "bb9e5afd52769c2fd64ae8c13ea50b9769a64bc8369322e18880f6af4ea827e3",
+      "source_id": "bcb",
+      "truncated": false,
+      "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.1/dados/ultimos/5?formato=json"
+    },
+    {
+      "bytes": 42656,
+      "category": "energy",
+      "content_length": 42656,
+      "content_type": "text/html; charset=utf-8",
+      "file": "/data/opencnpj-data/intelligence/official/audit/raw/aneel/aneel-distributed-generation-page.html",
+      "format": "html",
+      "http_status": 200,
+      "kind": "discovery_page",
+      "label": "aneel-distributed-generation-page",
+      "note": "",
+      "schema": {
+        "candidate_resources": [
+          {
+            "extension": "pdf",
+            "url": "https://dadosabertos.aneel.gov.br/dataset/5e0fafd2-21b9-4d5b-b622-40438d40aba2/resource/27b24236-3974-462d-ae35-64ab16661ef7/download/dm-empreendimentos-geracao-distribuida-eolica-informacoes-tecnicas.pdf"
+          },
+          {
+            "extension": "pdf",
+            "url": "https://dadosabertos.aneel.gov.br/dataset/5e0fafd2-21b9-4d5b-b622-40438d40aba2/resource/3ade445c-8d99-4594-b331-5008df43dec2/download/dm-empreendimentos-geracao-distribuida-termeletrica-informacoes-tecnicas.pdf"
+          },
+          {
+            "extension": "pdf",
+            "url": "https://dadosabertos.aneel.gov.br/dataset/5e0fafd2-21b9-4d5b-b622-40438d40aba2/resource/3fabb9e8-668a-4f94-8f0e-ed9cd2682979/download/dm-geracao-distribuida-relacao-de-empreendimentos.pdf"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.aneel.gov.br/dataset/5e0fafd2-21b9-4d5b-b622-40438d40aba2/resource/49fa9ca0-f609-4ae3-a6f7-b97bd0945a3a/download/empreendimento-gd-informacoes-tecnicas-fotovoltaica.zip"
+          },
+          {
+            "extension": "csv",
+            "url": "https://dadosabertos.aneel.gov.br/dataset/5e0fafd2-21b9-4d5b-b622-40438d40aba2/resource/5f903d78-25ae-4a3f-a2bd-9a93351c59fb/download/empreendimento-gd-informacoes-tecnicas-eolica.csv"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.aneel.gov.br/dataset/5e0fafd2-21b9-4d5b-b622-40438d40aba2/resource/b1bd71e7-d0ad-4214-9053-cbd58e9564a7/download/empreendimento-geracao-distribuida.zip"
+          },
+          {
+            "extension": "csv",
+            "url": "https://dadosabertos.aneel.gov.br/dataset/5e0fafd2-21b9-4d5b-b622-40438d40aba2/resource/bd1d3783-b389-49d8-a828-a56e193d0671/download/empreendimento-gd-informacoes-tecnicas-termeletrica.csv"
+          },
+          {
+            "extension": "csv",
+            "url": "https://dadosabertos.aneel.gov.br/dataset/5e0fafd2-21b9-4d5b-b622-40438d40aba2/resource/c189442a-18f0-44eb-9c89-3b48147a4d65/download/empreendimento-gd-informacoes-tecnicas-hidreletrica.csv"
+          },
+          {
+            "extension": "pdf",
+            "url": "https://dadosabertos.aneel.gov.br/dataset/5e0fafd2-21b9-4d5b-b622-40438d40aba2/resource/ca5dd097-aa05-47f7-b0fd-cf2c21cae6b8/download/dm-empreendimentos-geracao-distribuida-hidreletcrica-informacoes-tecnicas.pdf"
+          },
+          {
+            "extension": "pdf",
+            "url": "https://dadosabertos.aneel.gov.br/dataset/5e0fafd2-21b9-4d5b-b622-40438d40aba2/resource/e8f71a89-85b1-4a49-920a-56224e49dba2/download/dm-empreendimentos-geracao-distribuida-fotovoltaica-informacoes-tecnicas.pdf"
+          }
+        ],
+        "content_type": "text/html; charset=utf-8",
+        "title": "Relação de empreendimentos de Mini e Micro Geração Distribuída - Conjunto de dados - Portal de Dados Abertos - Agência Nacional de Energia Elétrica"
+      },
+      "sha256": "80555e0be8059bcf0d68a8991c6ab8dde42b9317fd3bc6fb79461411aa64d678",
+      "source_id": "aneel",
+      "truncated": false,
+      "url": "https://dadosabertos.aneel.gov.br/dataset/relacao-de-empreendimentos-de-geracao-distribuida"
+    },
+    {
+      "bytes": 187400,
+      "category": "fiscal",
+      "content_length": 187400,
+      "content_type": "text/html;charset=utf-8",
+      "file": "/data/opencnpj-data/intelligence/official/audit/raw/pgfn/pgfn-active-debt-page.html",
+      "format": "html",
+      "http_status": 200,
+      "kind": "discovery_page",
+      "label": "pgfn-active-debt-page",
+      "note": "",
+      "schema": {
+        "candidate_resources": [
+          {
+            "extension": "zip",
+            "url": "http://Dados_abertos_Previdenciario.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "http://http://dadosabertos.pgfn.gov.br/2023_trimestre_01/Dados_abertos_Previdenciario.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2022_trimestre_01/Dados_abertos_Nao_Previdenciario.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2023_trimestre_01/Dados_abertos_FGTS.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2023_trimestre_01/Dados_abertos_Nao_Previdenciario.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2023_trimestre_01/Dados_abertos_Previdenciario.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2023_trimestre_02/Dados_abertos_FGTS.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2023_trimestre_02/Dados_abertos_Nao_Previdenciario.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2023_trimestre_02/Dados_abertos_Previdenciario.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2023_trimestre_03/Dados_abertos_FGTS.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2023_trimestre_03/Dados_abertos_Nao_Previdenciario.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2023_trimestre_03/Dados_abertos_Previdenciario.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2023_trimestre_04/Dados_abertos_FGTS.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2023_trimestre_04/Dados_abertos_Nao_Previdenciario.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2023_trimestre_04/Dados_abertos_Previdenciario.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2024_trimestre_01/Dados_abertos_FGTS.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2024_trimestre_01/Dados_abertos_Nao_Previdenciario.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2024_trimestre_01/Dados_abertos_Previdenciario.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2024_trimestre_02/Dados_abertos_FGTS.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2024_trimestre_02/Dados_abertos_Nao_Previdenciario.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2024_trimestre_02/Dados_abertos_Previdenciario.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2024_trimestre_03/Dados_abertos_FGTS.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2024_trimestre_03/Dados_abertos_Nao_Previdenciario.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2024_trimestre_03/Dados_abertos_Previdenciario.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2024_trimestre_04/Dados_abertos_FGTS.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2024_trimestre_04/Dados_abertos_Nao_Previdenciario.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2024_trimestre_04/Dados_abertos_Previdenciario.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2025_trimestre_01/Dados_abertos_FGTS.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2025_trimestre_01/Dados_abertos_Nao_Previdenciario.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2025_trimestre_01/Dados_abertos_Previdenciario.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2025_trimestre_02/Dados_abertos_FGTS.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2025_trimestre_02/Dados_abertos_Nao_Previdenciario.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2025_trimestre_02/Dados_abertos_Previdenciario.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2025_trimestre_03/Dados_abertos_FGTS.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2025_trimestre_03/Dados_abertos_Nao_Previdenciario.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2025_trimestre_03/Dados_abertos_Previdenciario.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2025_trimestre_04/Dados_abertos_FGTS.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2025_trimestre_04/Dados_abertos_Nao_Previdenciario.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2025_trimestre_04/Dados_abertos_Previdenciario.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2026_trimestre_01/Dados_abertos_FGTS.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2026_trimestre_01/Dados_abertos_Nao_Previdenciario.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2026_trimestre_01/Dados_abertos_Previdenciario.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2026_trimestre_02/Dados_abertos_FGTS.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2026_trimestre_02/Dados_abertos_Nao_Previdenciario.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2026_trimestre_02/Dados_abertos_Previdenciario.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2026_trimestre_03/Dados_abertos_FGTS.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2026_trimestre_03/Dados_abertos_Previdenciario.zip"
+          },
+          {
+            "extension": "zip",
+            "url": "https://dadosabertos.pgfn.gov.br/2026_trimestre_03/Dados_abertos_Sistema_SIDA.zip"
+          },
+          {
+            "extension": "xlsx",
+            "url": "https://www.gov.br/pgfn/pt-br/assuntos/divida-ativa-da-uniao/transparencia-fiscal-1/arquivos-dados-abertos/dicionario_de_campos.xlsx"
+          },
+          {
+            "extension": "pdf",
+            "url": "https://www.tcu.gov.br/atas/2018/PLENARIO/TCU_ATA_0_N_2018_43.PDF"
+          }
+        ],
+        "content_type": "text/html;charset=utf-8",
+        "title": "Dados Abertos — Procuradoria-Geral da Fazenda Nacional"
+      },
+      "sha256": "d3b8aa61f654389a52e7e0a2b88b92270dff2e692d35c8b25d46ea063b4d4051",
+      "source_id": "pgfn",
+      "truncated": false,
+      "url": "https://www.gov.br/pgfn/pt-br/assuntos/divida-ativa-da-uniao/transparencia-fiscal-1/dados-abertos"
+    },
+    {
+      "bytes": 36481,
+      "category": "local_government",
+      "content_length": 36481,
+      "content_type": "text/html; charset=utf-8",
+      "file": "/data/opencnpj-data/intelligence/official/audit/raw/mt/mt-open-data-page.html",
+      "format": "html",
+      "http_status": 200,
+      "kind": "discovery_page",
+      "label": "mt-open-data-page",
+      "note": "",
+      "schema": {
+        "candidate_resources": [],
+        "content_type": "text/html; charset=utf-8",
+        "title": "Portal de Dados Abertos - Mato Grosso"
+      },
+      "sha256": "62cc37fd4a96218f0598d906788beeab0c9b8e55c0f1d72fc406264eb5739690",
+      "source_id": "mt",
+      "truncated": false,
+      "url": "https://dadosabertos.mt.gov.br/"
+    },
+    {
+      "bytes": 1048576,
+      "category": "transport",
+      "content_length": null,
+      "content_type": "application/json",
+      "file": "/data/opencnpj-data/intelligence/official/audit/raw/antt/antt-rntrc-veiculos-json.json",
+      "format": "json_partial_or_invalid",
+      "http_status": 200,
+      "kind": "data",
+      "label": "antt-rntrc-veiculos-json",
+      "note": "",
+      "schema": {
+        "error": "EOF while parsing a string at line 1 column 1048576",
+        "truncated": true
+      },
+      "sha256": "23998fbbe7d3f3496c7216d35cbf732067d457d9c014fd8b6ab23381b3784e26",
+      "source_id": "antt",
+      "truncated": true,
+      "url": "https://dados.antt.gov.br/dataset/2b564396-5593-4b5c-ba2c-3de3fa0a92c0/resource/c1367dd9-2874-4d97-bca3-3940e70bf224/download/rntrc-veiculos.json"
+    },
+    {
+      "bytes": 8486,
+      "category": "energy",
+      "content_length": 8486,
+      "content_type": "text/csv",
+      "file": "/data/opencnpj-data/intelligence/official/audit/raw/aneel/aneel-gd-eolica-csv.csv",
+      "format": "csv_semicolon",
+      "http_status": 200,
+      "kind": "data",
+      "label": "aneel-gd-eolica-csv",
+      "note": "",
+      "schema": {
+        "columns_guess": 8,
+        "content_type": "text/csv",
+        "first_line": "\"DatGeracaoConjuntoDados\";\"CodGeracaoDistribuida\";\"NomFabricanteAerogerador\";\"DscModeloAerogerador\";\"MdaPotenciaInstalada\";\"MdaAlturaPa\";\"DatConexao\";\"IdcEixoRotor\"",
+        "truncated": false
+      },
+      "sha256": "e8a0c51d3f399b2e295c0d50390fc100bced70dce0dadbfc8adf2f9acc0871ba",
+      "source_id": "aneel",
+      "truncated": false,
+      "url": "https://dadosabertos.aneel.gov.br/dataset/5e0fafd2-21b9-4d5b-b622-40438d40aba2/resource/5f903d78-25ae-4a3f-a2bd-9a93351c59fb/download/empreendimento-gd-informacoes-tecnicas-eolica.csv"
+    },
+    {
+      "bytes": 9458,
+      "category": "fiscal",
+      "content_length": 9458,
+      "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "file": "/data/opencnpj-data/intelligence/official/audit/raw/pgfn/pgfn-dictionary-xlsx.xlsx",
+      "format": "xlsx",
+      "http_status": 200,
+      "kind": "metadata",
+      "label": "pgfn-dictionary-xlsx",
+      "note": "",
+      "schema": {
+        "first_entries": [
+          "[Content_Types].xml",
+          "_rels/.rels",
+          "xl/_rels/workbook.xml.rels",
+          "xl/workbook.xml",
+          "xl/sharedStrings.xml",
+          "xl/theme/theme1.xml",
+          "xl/styles.xml",
+          "xl/worksheets/sheet1.xml",
+          "docProps/core.xml",
+          "docProps/app.xml"
+        ],
+        "has_workbook": true,
+        "zip_entries": 10
+      },
+      "sha256": "4391117893f0a62bd1a3f401378882bea6a797056a702dd2bb23833730b4f0a8",
+      "source_id": "pgfn",
+      "truncated": false,
+      "url": "https://www.gov.br/pgfn/pt-br/assuntos/divida-ativa-da-uniao/transparencia-fiscal-1/arquivos-dados-abertos/dicionario_de_campos.xlsx/@@download/file"
+    }
+  ],
+  "source_count": 15,
+  "sources": [
+    {
+      "category": "energy",
+      "licence": "Open Database License (ODbL)",
+      "licence_status": "verified",
+      "licence_url": "https://opendatacommons.org/licenses/odbl/summary/",
+      "publisher": "ANEEL",
+      "source_id": "aneel",
+      "state": "discovered",
+      "title": "ANEEL - geração distribuída"
+    },
+    {
+      "category": "fuel",
+      "licence": "Public sampled prices; reuse terms require review",
+      "licence_status": "review_required",
+      "licence_url": "https://www.gov.br/anp/pt-br/assuntos/precos-e-defesa-da-concorrencia/precos/precos-revenda-e-de-distribuicao-combustiveis/informacoes-levantamento-de-precos-de-combustiveis",
+      "publisher": "Agência Nacional do Petróleo, Gás Natural e Biocombustíveis",
+      "source_id": "anp",
+      "state": "discovered",
+      "title": "ANP - levantamento de preços de combustíveis"
+    },
+    {
+      "category": "transport",
+      "licence": "Creative Commons Attribution (declared for the checked vehicle resource)",
+      "licence_status": "verified",
+      "licence_url": "https://dados.antt.gov.br/pt_BR/dataset/rntrc-veiculos",
+      "publisher": "Agência Nacional de Transportes Terrestres",
+      "source_id": "antt",
+      "state": "discovered",
+      "title": "ANTT - RNTRC"
+    },
+    {
+      "category": "macroeconomy",
+      "licence": "Public economic series; reuse terms require review",
+      "licence_status": "review_required",
+      "licence_url": "https://www.bcb.gov.br/acessoinformacao/dadosabertos",
+      "publisher": "BCB",
+      "source_id": "bcb",
+      "state": "verified",
+      "title": "Banco Central do Brasil - dados abertos"
+    },
+    {
+      "category": "compliance",
+      "licence": "Public sanction records; reuse terms require review",
+      "licence_status": "review_required",
+      "licence_url": "https://portaldatransparencia.gov.br/download-de-dados/ceis",
+      "publisher": "Controladoria-Geral da União",
+      "source_id": "cgu",
+      "state": "verified",
+      "title": "CGU - CEIS e CNEP"
+    },
+    {
+      "category": "health",
+      "licence": "Public health-establishment data; reuse terms require review",
+      "licence_status": "review_required",
+      "licence_url": "https://dadosabertos.saude.gov.br/dataset/cnes-cadastro-nacional-de-estabelecimentos-de-saude",
+      "publisher": "Ministério da Saúde",
+      "source_id": "cnes",
+      "state": "discovered",
+      "title": "CNES - Cadastro Nacional de Estabelecimentos de Saúde"
+    },
+    {
+      "category": "trade",
+      "licence": "Public trade statistics; reuse terms require review",
+      "licence_status": "review_required",
+      "licence_url": "https://www.gov.br/mdic/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta",
+      "publisher": "MDIC",
+      "source_id": "comexstat",
+      "state": "verified",
+      "title": "Comex Stat"
+    },
+    {
+      "category": "procurement",
+      "licence": "Public procurement data; reuse terms require review",
+      "licence_status": "review_required",
+      "licence_url": "https://dadosabertos.compras.gov.br/swagger-ui/index.html",
+      "publisher": "Ministério da Gestão e da Inovação em Serviços Públicos",
+      "source_id": "compras",
+      "state": "verified",
+      "title": "Compras.gov.br - dados abertos"
+    },
+    {
+      "category": "statistics",
+      "licence": "IBGE public statistics; resource-level terms require review",
+      "licence_status": "review_required",
+      "licence_url": "https://www.ibge.gov.br/acesso-informacao/termos-de-uso.html",
+      "publisher": "IBGE",
+      "source_id": "ibge",
+      "state": "verified",
+      "title": "Instituto Brasileiro de Geografia e Estatística"
+    },
+    {
+      "category": "education",
+      "licence": "Public education microdata; reuse terms require review",
+      "licence_status": "review_required",
+      "licence_url": "https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/microdados/censo-escolar",
+      "publisher": "INEP",
+      "source_id": "inep",
+      "state": "discovered",
+      "title": "INEP - Censo Escolar"
+    },
+    {
+      "category": "local_government",
+      "licence": "Dataset-specific; not yet verified",
+      "licence_status": "review_required",
+      "licence_url": "https://dadosabertos.mt.gov.br/",
+      "publisher": "Governo do Estado de Mato Grosso",
+      "source_id": "mt",
+      "state": "discovered",
+      "title": "Dados Abertos MT"
+    },
+    {
+      "category": "labour",
+      "licence": "Public employment statistics; resource-level terms not yet verified",
+      "licence_status": "review_required",
+      "licence_url": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/estatisticas-trabalho",
+      "publisher": "MTE",
+      "source_id": "mte",
+      "state": "discovered",
+      "title": "Ministério do Trabalho e Emprego - estatísticas"
+    },
+    {
+      "category": "fiscal",
+      "licence": "Public fiscal records; reuse terms require review",
+      "licence_status": "review_required",
+      "licence_url": "https://www.gov.br/pgfn/pt-br/assuntos/divida-ativa-da-uniao/transparencia-fiscal-1/dados-abertos",
+      "publisher": "Procuradoria-Geral da Fazenda Nacional",
+      "source_id": "pgfn",
+      "state": "discovered",
+      "title": "PGFN - dívida ativa da União"
+    },
+    {
+      "category": "procurement",
+      "licence": "Public procurement data; reuse terms require review",
+      "licence_status": "review_required",
+      "licence_url": "https://www.gov.br/pncp/pt-br/acesso-a-informacao/dados-abertos",
+      "publisher": "PNCP",
+      "source_id": "pncp",
+      "state": "discovered",
+      "title": "Portal Nacional de Contratações Públicas"
+    },
+    {
+      "category": "transport",
+      "licence": "Public fleet statistics; resource-level terms not yet verified",
+      "licence_status": "review_required",
+      "licence_url": "https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2026",
+      "publisher": "Ministério dos Transportes / Senatran",
+      "source_id": "senatran",
+      "state": "verified",
+      "title": "Senatran - frota de veículos"
+    }
+  ]
+}

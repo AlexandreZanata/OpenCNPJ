@@ -1,0 +1,16 @@
+processed 50/400 correct 50
+processed 100/400 correct 100
+processed 150/400 correct 150
+processed 200/400 correct 190
+processed 250/400 correct 237
+processed 300/400 correct 282
+processed 350/400 correct 327
+processed 400/400 correct 377
+{
+  "act_correct": 400,
+  "act_items": 400,
+  "decision_correct": 377,
+  "interpretation_correct": 377,
+  "interpretation_wrong": 23,
+  "items": 400
+}

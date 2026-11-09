@@ -1,0 +1,176 @@
+{
+  "round": "commercial-round-01",
+  "national": {
+    "categories": {
+      "activity": {
+        "gold_backend_ok": 50,
+        "interpretation_correct": 50,
+        "items": 50
+      },
+      "capital_legal": {
+        "gold_backend_ok": 50,
+        "interpretation_correct": 50,
+        "items": 50
+      },
+      "clarification": {
+        "interpretation_correct": 50,
+        "items": 50
+      },
+      "closures": {
+        "gold_backend_ok": 50,
+        "interpretation_correct": 50,
+        "items": 50
+      },
+      "comparison": {
+        "gold_backend_ok": 50,
+        "interpretation_correct": 50,
+        "items": 50
+      },
+      "density": {
+        "gold_backend_ok": 50,
+        "interpretation_correct": 50,
+        "items": 50
+      },
+      "dialogue": {
+        "gold_backend_ok": 50,
+        "interpretation_correct": 50,
+        "items": 50
+      },
+      "distribution": {
+        "gold_backend_ok": 50,
+        "interpretation_correct": 50,
+        "items": 50
+      },
+      "exclusion": {
+        "gold_backend_ok": 50,
+        "interpretation_correct": 50,
+        "items": 50
+      },
+      "geography": {
+        "gold_backend_ok": 50,
+        "interpretation_correct": 50,
+        "items": 50
+      },
+      "historical": {
+        "gold_backend_ok": 50,
+        "interpretation_correct": 50,
+        "items": 50
+      },
+      "lookup": {
+        "gold_backend_ok": 45,
+        "interpretation_correct": 50,
+        "items": 50
+      },
+      "market_size": {
+        "gold_backend_ok": 50,
+        "interpretation_correct": 50,
+        "items": 50
+      },
+      "methodology": {
+        "gold_backend_ok": 50,
+        "interpretation_correct": 50,
+        "items": 50
+      },
+      "prospecting": {
+        "gold_backend_ok": 50,
+        "interpretation_correct": 50,
+        "items": 50
+      },
+      "registrations": {
+        "gold_backend_ok": 50,
+        "interpretation_correct": 50,
+        "items": 50
+      },
+      "structure_status": {
+        "gold_backend_ok": 50,
+        "interpretation_correct": 50,
+        "items": 50
+      },
+      "tax_size": {
+        "gold_backend_ok": 50,
+        "interpretation_correct": 50,
+        "items": 50
+      },
+      "trends": {
+        "gold_backend_ok": 50,
+        "interpretation_correct": 50,
+        "items": 50
+      },
+      "unsupported": {
+        "interpretation_correct": 50,
+        "items": 50
+      }
+    },
+    "counts": {
+      "act_correct": 50,
+      "act_items": 50,
+      "correct_executed_answer": 895,
+      "decision_correct": 1000,
+      "gold_backend_ok": 895,
+      "gold_empty_records": 8,
+      "gold_zero_scalar": 53,
+      "interpretation_correct": 1000,
+      "items": 1000,
+      "verification_engine_match": 505,
+      "verification_marginal_match": 50,
+      "verification_not_numeric": 50,
+      "verification_single_backend": 290
+    },
+    "data_anchor": "2026-10-11",
+    "evidence_score": "Rule evidence is not a calibrated probability.",
+    "human_validation": "Not performed; human validation is deferred to product refinement.",
+    "method": "Actual text-only deterministic interpretation; gold IR used only for canonical scoring and separate backend reference, never as a prediction or conversation seed.",
+    "set": "crates/opencnpj-lab/eval/commercial-round-01/questions.jsonl",
+    "set_sha256": "65d962712b8e9a659bebe58da0b56ce9cbbd0b25d0b428ebb89e0e4f55bf4867",
+    "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+  },
+  "frozen_suites": {
+    "frozen-adv": {
+      "act_correct": 303,
+      "act_items": 304,
+      "decision_correct": 269,
+      "interpretation_correct": 198,
+      "interpretation_wrong": 106,
+      "items": 304,
+      "out_of_policy_execution": 12
+    },
+    "frozen-informal": {
+      "act_correct": 201,
+      "act_items": 202,
+      "decision_correct": 165,
+      "interpretation_correct": 116,
+      "interpretation_wrong": 86,
+      "items": 202,
+      "out_of_policy_execution": 2
+    },
+    "frozen-dialogues": {
+      "act_correct": 88,
+      "act_items": 122,
+      "decision_correct": 103,
+      "interpretation_correct": 81,
+      "interpretation_wrong": 41,
+      "items": 122
+    },
+    "frozen-ood": {
+      "act_correct": 400,
+      "act_items": 400,
+      "decision_correct": 377,
+      "interpretation_correct": 377,
+      "interpretation_wrong": 23,
+      "items": 400
+    }
+  },
+  "delivery_gate": {
+    "fmt_exit": 0,
+    "clippy_exit": 0,
+    "test_exit": 0,
+    "passed": 289,
+    "failed": 0,
+    "ignored": 5
+  },
+  "source_revision": "ec5a3d26c8cb391bd3e2827c63cf84cae1d9d95c",
+  "uncommitted_changes": true,
+  "human_validation": "deferred to product refinement",
+  "blind_set_used": false,
+  "production_readiness": "not established by synthetic evaluation"
+}

@@ -1,0 +1,23 @@
+{
+  "categories": {
+    "existing_suite": {
+      "interpretation_correct": 81,
+      "items": 122
+    }
+  },
+  "counts": {
+    "act_correct": 88,
+    "act_items": 122,
+    "decision_correct": 103,
+    "interpretation_correct": 81,
+    "interpretation_wrong": 41,
+    "items": 122
+  },
+  "data_anchor": "2026-10-11",
+  "evidence_score": "Rule evidence is not a calibrated probability.",
+  "human_validation": "Not performed; human validation is deferred to product refinement.",
+  "method": "Actual text-only deterministic interpretation; gold IR used only for canonical scoring and separate backend reference, never as a prediction or conversation seed.",
+  "set": "crates/opencnpj-lab/eval/dialogues.jsonl",
+  "set_sha256": "58e3a50e851ba5b6d01e5a4e29f582f52cd69580294ca518be466bb62838f5cb",
+  "snapshot_sha256": null
+}

@@ -1,0 +1,119 @@
+{
+  "generated_at": "unix:1794174685",
+  "inconsistencies": [
+    {
+      "action": "Check the source year and CNPJ root/establishment; keep unmatched rows explicit.",
+      "dataset_id": "aneel-gd",
+      "kind": "record_cnpj_absent_from_snapshot",
+      "sample": [
+        "14955450001890"
+      ],
+      "severity": "medium"
+    }
+  ],
+  "sample_per_store": 5000,
+  "snapshot": "/data/opencnpj-data/snapshots/2026-10-balanced.ocnpj",
+  "stores": [
+    {
+      "absent_cnpj_sample": [
+        "14955450001890"
+      ],
+      "cnpj_checked_against_snapshot": 5000,
+      "dataset_id": "aneel-gd",
+      "invalid_cnpj_sample": [],
+      "records": 15651,
+      "source_sha256": "4d8d7c0871582542f35108bcd1f39282d6c944e20b46da61dee940ec047485ba",
+      "store_sha256": "3498eed2b3790b23feec2d9188d83d87236b257791ce60d09255aec092a2507b",
+      "unique_cnpjs": 12186,
+      "unmatched_geographies": 0
+    },
+    {
+      "absent_cnpj_sample": [],
+      "cnpj_checked_against_snapshot": 843,
+      "dataset_id": "anp-precos-revenda",
+      "invalid_cnpj_sample": [],
+      "records": 843,
+      "source_sha256": "a04fd8b6beb1d4e16493552700aef1370ef904eadd2ba461f1a7a35473ae44f0",
+      "store_sha256": "a7b392fe8aae94f15b0e9d71d3f7f77dfdb5ff126067230425ca183dfa938502",
+      "unique_cnpjs": 126,
+      "unmatched_geographies": 0
+    },
+    {
+      "absent_cnpj_sample": [],
+      "cnpj_checked_against_snapshot": 0,
+      "dataset_id": "antt-rntrc-veiculos",
+      "invalid_cnpj_sample": [],
+      "records": 4533,
+      "source_sha256": "9bd0f0acb5412482670c9e1c8ef370171013cb3c36840b085f4669b8bf7de159",
+      "store_sha256": "1364a79e4fc0ab7958ca788f96c341e1a65dc18209fab38f20d7522bc64520c4",
+      "unique_cnpjs": 0,
+      "unmatched_geographies": 0
+    },
+    {
+      "absent_cnpj_sample": [],
+      "cnpj_checked_against_snapshot": 5000,
+      "dataset_id": "cnes-estabelecimentos",
+      "invalid_cnpj_sample": [],
+      "records": 14101,
+      "source_sha256": "32fc3f981d0c3e93049ff2aeaf83d3ac2a6781d1972af894eb35e32f7a40f07a",
+      "store_sha256": "30f997e4044c29b9e53ed132120f941d69ef0e3c3affdbe6af2e913b8ad97ac5",
+      "unique_cnpjs": 8140,
+      "unmatched_geographies": 0
+    },
+    {
+      "absent_cnpj_sample": [],
+      "cnpj_checked_against_snapshot": 0,
+      "dataset_id": "comex-exp-2025-mun",
+      "invalid_cnpj_sample": [],
+      "records": 13271,
+      "source_sha256": "a8ab76c8c93676b6a6fc3979ebbe6baacf6c675651c2710bbb9d11529de73f0f",
+      "store_sha256": "25fa3903acb29e7327325e3f4951f0304caf73ccb90fedb2ae0985e533d43620",
+      "unique_cnpjs": 0,
+      "unmatched_geographies": 0
+    },
+    {
+      "absent_cnpj_sample": [],
+      "cnpj_checked_against_snapshot": 468,
+      "dataset_id": "inep-censo-escolar-2024",
+      "invalid_cnpj_sample": [],
+      "records": 3191,
+      "source_sha256": "ae29d81d45ddecef59e11eda39788cbfd30dfa1cc71be9d29f23051fc2d640db",
+      "store_sha256": "9bbc05425c87d85afd5a386ffe78a5388976c154522fa9606c86526bc5b814e0",
+      "unique_cnpjs": 465,
+      "unmatched_geographies": 0
+    },
+    {
+      "absent_cnpj_sample": [],
+      "cnpj_checked_against_snapshot": 79,
+      "dataset_id": "mt-convenios-2024",
+      "invalid_cnpj_sample": [],
+      "records": 79,
+      "source_sha256": "ed77dad0c37525940647632430f36632b88ab326c05bbcd406729ec31dd56d06",
+      "store_sha256": "f075bb13b29ea8e062064d4616976da495c29705c0de9fcde3e8a21ef908370b",
+      "unique_cnpjs": 68,
+      "unmatched_geographies": 0
+    },
+    {
+      "absent_cnpj_sample": [],
+      "cnpj_checked_against_snapshot": 5000,
+      "dataset_id": "pgfn-fgts-2026Q3",
+      "invalid_cnpj_sample": [],
+      "records": 7598,
+      "source_sha256": "a011daf66131376f5d68271181e3179a25189633a1a4d79f31850740811b7356",
+      "store_sha256": "ba8571e80f450a15613fb63926e8eba1c0d94a640038410fa4a1e1fac7700d54",
+      "unique_cnpjs": 4161,
+      "unmatched_geographies": 0
+    },
+    {
+      "absent_cnpj_sample": [],
+      "cnpj_checked_against_snapshot": 5000,
+      "dataset_id": "pgfn-previdenciario-2026Q3",
+      "invalid_cnpj_sample": [],
+      "records": 81870,
+      "source_sha256": "149d857cfa4aa748017838ed24f29dcf1dc878309c6b2221a6d4cb6e0cb54c26",
+      "store_sha256": "26c1fe34645c697b3255610a406702231df995c63d956f553fa46493f2c198c4",
+      "unique_cnpjs": 20497,
+      "unmatched_geographies": 0
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+processed 50/1000 correct 50
+processed 100/1000 correct 100
+processed 150/1000 correct 150
+processed 200/1000 correct 200
+processed 250/1000 correct 250
+processed 300/1000 correct 300
+processed 350/1000 correct 350
+processed 400/1000 correct 400
+processed 450/1000 correct 450
+processed 500/1000 correct 500
+processed 550/1000 correct 550
+processed 600/1000 correct 600
+processed 650/1000 correct 650
+processed 700/1000 correct 700
+processed 750/1000 correct 750
+processed 800/1000 correct 800
+processed 850/1000 correct 850
+processed 900/1000 correct 900
+processed 950/1000 correct 950
+processed 1000/1000 correct 1000
+{
+  "act_correct": 50,
+  "act_items": 50,
+  "correct_executed_answer": 895,
+  "decision_correct": 1000,
+  "gold_backend_ok": 895,
+  "gold_empty_records": 8,
+  "gold_zero_scalar": 53,
+  "interpretation_correct": 1000,
+  "items": 1000,
+  "verification_engine_match": 505,
+  "verification_marginal_match": 50,
+  "verification_not_numeric": 50,
+  "verification_single_backend": 290
+}

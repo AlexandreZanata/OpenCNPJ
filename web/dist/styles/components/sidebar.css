@@ -1,0 +1,126 @@
+.sidebar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 38px 9px 25px;
+  overflow-y: auto;
+  background: linear-gradient(180deg, var(--navy-900) 0%, var(--navy-800) 100%);
+  color: var(--sidebar-ink);
+}
+
+.sidebar__brand {
+  display: block;
+  padding: 0 0 0 10px;
+  border-radius: var(--radius-md);
+}
+
+.sidebar__nav {
+  margin-top: 43px;
+}
+
+.sidebar__list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sidebar__divider {
+  margin: 25px 8px 14px;
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.13);
+}
+
+.source-card {
+  margin: auto 3px 0;
+  padding: 18px 30px 13px 18px;
+  border: 1px solid rgba(94, 214, 166, 0.28);
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(140deg, rgba(38, 160, 112, 0.2) 0%, rgba(38, 160, 112, 0.04) 60%),
+    #14263a;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.source-card__icon {
+  display: block;
+  color: #36d08b;
+}
+
+.source-card__title {
+  margin-top: 10px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 20px;
+  letter-spacing: -0.01em;
+}
+
+.source-card__text {
+  margin-top: 9px;
+  color: var(--sidebar-muted);
+  font-size: 11px;
+  line-height: 17px;
+}
+
+/* Icon rail */
+@media (max-width: 980px) {
+  .sidebar {
+    padding-inline: 8px;
+  }
+  .sidebar__brand {
+    padding-left: 8px;
+  }
+  .logo__text,
+  .nav-link__label,
+  .nav-link__trailing,
+  .source-card {
+    display: none;
+  }
+  .nav-link {
+    justify-content: center;
+    padding: 0;
+  }
+  .sidebar__divider {
+    margin-inline: 12px;
+  }
+}
+
+/* Horizontal strip on phones */
+@media (max-width: 640px) {
+  .sidebar {
+    position: static;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    height: auto;
+    padding: 10px 12px;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+  .sidebar__brand {
+    padding: 0;
+  }
+  .sidebar__nav {
+    margin: 0;
+  }
+  .sidebar__links {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .sidebar__list {
+    flex-direction: row;
+  }
+  .nav-link {
+    width: 42px;
+  }
+  .sidebar__divider {
+    width: 1px;
+    height: 24px;
+    margin: 0 4px;
+    border-top: 0;
+    border-left: 1px solid rgba(255, 255, 255, 0.18);
+  }
+}

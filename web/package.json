@@ -1,0 +1,13 @@
+{
+  "name": "opencnpj-web",
+  "private": true,
+  "version": "0.1.0",
+  "description": "OpenCNPJ platform front end: TypeScript 7 compiled to plain ES modules, zero runtime dependencies.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "typecheck": "sh scripts/tsc.sh --noEmit",
+    "build": "sh scripts/build.sh",
+    "serve": "sh scripts/serve.sh"
+  }
+}

@@ -1,0 +1,15 @@
+{
+ "docs/intelligence/results/commercial-round-05/ask-smoke-01.json": "b3906585a0ac479657d65f2e5481bdc18d291690d83ef0fbfebbf6ea003e9977",
+ "docs/intelligence/results/commercial-round-05/ask-smoke-02.json": "215e957aa9ffbc1dd0752c5dc62180f7767df3436380dfa00001d567178ccf5f",
+ "docs/intelligence/results/commercial-round-05/frozen-adv/predictions.jsonl": "0d365ef947e05abb8e7d1a4bf8115d89c1801a99bd0b5b504178a325bbede1c0",
+ "docs/intelligence/results/commercial-round-05/frozen-adv/results.jsonl": "2f05221b01b26155d0edf6cdfacb3f2d935503f8fe7d7ae1cd89d819d8a5a74b",
+ "docs/intelligence/results/commercial-round-05/frozen-dialogues/predictions.jsonl": "bcdfba6801d43f7751b3378a682f0f750ad46841bcb76f01473d9bc3d305ff6c",
+ "docs/intelligence/results/commercial-round-05/frozen-dialogues/results.jsonl": "d0d23351c8fd629720fcfbe0da2e488372fcac688237f2d02450c63bf0b1b5c5",
+ "docs/intelligence/results/commercial-round-05/frozen-informal/predictions.jsonl": "cc0018979630a463b8884f25f81752e2df25329632b635271ee225fef2e3b2e7",
+ "docs/intelligence/results/commercial-round-05/frozen-informal/results.jsonl": "cba627ee1c3b2a8702718a4e51fc39098260f940ca3ada995b6a0765155e4519",
+ "docs/intelligence/results/commercial-round-05/frozen-ood/predictions.jsonl": "f276538dfb4ddb5a7e47a8bd0295c61075f91b99ef65bc7c18fbe36a21db97b7",
+ "docs/intelligence/results/commercial-round-05/frozen-ood/results.jsonl": "15d63ab3f9c79710caf529beb0d78f08d5e027885f32bd79593b34ec11435dbe",
+ "docs/intelligence/results/commercial-round-05/national/predictions.jsonl": "5aad88a7fcd056080971d2310e2550f4c85ffcacd4c96d57abeb85efeedb46e4",
+ "docs/intelligence/results/commercial-round-05/national/results.jsonl": "bbae2ded60e58d3ad206cf71a6f342518505908d21dc2e49086d0e7202ff71bc",
+ "docs/intelligence/results/commercial-round-05/national/summary.json": "407a9d195b9c45180954616679d50ee0b8dd184e4d6b5e852cba71f0505156d7"
+}

@@ -1,0 +1,18 @@
+{
+  "crates/opencnpj-nlu/src/context.rs": "f09db22ecee96536cddda30f0720b52015c0480708d3bc7d05734e0884f1fae7",
+  "crates/opencnpj-nlu/src/grammar.rs": "1b819d3a1df00579cab168b1caa3ad0173dfe46cea6d52c66a1048519e8649e8",
+  "crates/opencnpj-nlu/src/lang.rs": "d5ae062e2b35518c195681f0fffebeb92faedac631b71f522bfed8e39d0babc4",
+  "crates/opencnpj-nlu/src/lib.rs": "b4e292ac17d9698a579161d660bf0b124fc5ce59b8c6fc7dec8b551c2666fc3b",
+  "crates/opencnpj-nlu/src/normalize.rs": "9d9e5de90974903409a9d309ed81f012800bb240e399cdf24972d0bd4b8f7b2b",
+  "crates/opencnpj-nlu/src/policy.rs": "e92a3fa04d6499e5c008052dff936517bd0c0a9b70890ef465ca04e3acc23517",
+  "crates/opencnpj-nlu/src/spotter.rs": "defa8e2815e4bfe75737e1efb4bd6f266528f0724cf30700567e463f992b26e3",
+  "crates/opencnpj-nlu/src/tests.rs": "638283c2fd05db898377a9fbf344b2129cf46d92ff2cb90219de69a3d6aca7fe",
+  "crates/opencnpj-nlu/src/time.rs": "f9e40ff52e3636a9c37192921153630b9153456c7611704bd5ad65468c5e196f",
+  "crates/opencnpj-nlu/lang/pt-BR/cues.toml": "dc9b8323dfb74cc751a7164f8926bc69f18135b1c38cf3edb2e32433862f5ca0",
+  "crates/opencnpj-nlu/lang/pt-BR/policy.toml": "cd2580e39deba32385d0cd4b7a7008c126cd3b85378a1d06aa12e4bd5220d7e6",
+  "Cargo.toml": "6c103294d6ec6817bb60dcad1cdbb06c3548be9b4a7810c2291d862b53386817",
+  "Cargo.lock": "47a2d7b11264a561ff7d31f9964a67d6fb35a5ae8bfd3d4fd738b97720697409",
+  "crates/opencnpj-nlu/Cargo.toml": "d90da20d10c229ca28658463a865544ad6dd33d23394bad91685f6d2ab22820e",
+  "crates/opencnpj-lab/src/questions.rs": "b461a71dfdc778e792a3a9ed025e29371d4f6b03ce58f09d9fdf733710199eff",
+  "crates/opencnpj-lab/src/query.rs": "c448e6edd87e638aaa0a4abd470ca6a01a76a2462eabee144a0510d64d47b644"
+}

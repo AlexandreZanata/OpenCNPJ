@@ -1,0 +1,44 @@
+{
+  "fmt": {
+    "command": [
+      "cargo",
+      "fmt",
+      "--all",
+      "--check"
+    ],
+    "exit_code": 0
+  },
+  "clippy": {
+    "command": [
+      "cargo",
+      "clippy",
+      "--offline",
+      "--workspace",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit_code": 0
+  },
+  "test": {
+    "command": [
+      "cargo",
+      "test",
+      "--offline",
+      "--workspace"
+    ],
+    "exit_code": 0
+  },
+  "build": {
+    "command": [
+      "cargo",
+      "build",
+      "--offline",
+      "--release",
+      "-p",
+      "opencnpj-lab"
+    ],
+    "exit_code": 0
+  }
+}

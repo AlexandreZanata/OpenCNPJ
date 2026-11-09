@@ -1,0 +1,16 @@
+# Frozen evaluation sets, catalogues, generator specs, templates and golden fixtures are
+# hashed byte for byte (dataset card, manifests, golden tests). Keep them LF on every
+# platform so a Windows checkout produces the same bytes and the same SHA-256.
+crates/opencnpj-lab/eval/** text eol=lf
+crates/opencnpj-lab/synth/** text eol=lf
+crates/opencnpj-insights/catalog/** text eol=lf
+crates/opencnpj-insights/templates/** text eol=lf
+crates/opencnpj-insights/tests/fixtures/** text eol=lf
+crates/opencnpj-query/tests/fixtures/** text eol=lf
+
+# Frozen evaluation sources and raw logs must retain their recorded byte hashes.
+crates/opencnpj-lab/eval/commercial-round-*/questions.tsv -text !eol -whitespace
+crates/opencnpj-lab/eval/commercial-round-*/*.jsonl -text !eol
+docs/intelligence/results/commercial-round-*/*.log -text -whitespace
+
+docs/intelligence/results/publish-2026-11-08/*.log -text -whitespace

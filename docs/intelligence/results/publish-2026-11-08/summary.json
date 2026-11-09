@@ -1,0 +1,35 @@
+{
+  "date": "2026-11-08",
+  "passed": 300,
+  "failed": 0,
+  "ignored": 5,
+  "fmt_exit": 0,
+  "clippy_exit": 0,
+  "test_exit": 0,
+  "cargo_target_dir": "/data/opencnpj-target",
+  "commands": [
+    [
+      "cargo",
+      "fmt",
+      "--all",
+      "--check"
+    ],
+    [
+      "cargo",
+      "clippy",
+      "--offline",
+      "--workspace",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    [
+      "cargo",
+      "test",
+      "--offline",
+      "--workspace"
+    ]
+  ],
+  "scope": "Previously completed interpreter/evaluation code; round 09 is planned, not executed."
+}

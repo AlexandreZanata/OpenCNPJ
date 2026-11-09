@@ -1,0 +1,1056 @@
+{
+  "round": "commercial-round-14",
+  "total_items": 50000,
+  "batch_plan": {
+    "total_batches": 99,
+    "pilot_batch": {
+      "batch_id": "batch-001",
+      "items": 1000,
+      "id_range": [
+        "commercial-r14-00001",
+        "commercial-r14-01000"
+      ]
+    },
+    "regular_batches": {
+      "batch_id_range": [
+        "batch-002",
+        "batch-099"
+      ],
+      "count": 98,
+      "items_per_batch": 500,
+      "total_items": 49000,
+      "id_range": [
+        "commercial-r14-01001",
+        "commercial-r14-50000"
+      ]
+    }
+  },
+  "primary_business_families": {
+    "market_size_density_competition": {
+      "total": 5000,
+      "pilot": 100,
+      "per_500_batch": 50
+    },
+    "prospecting_qualification_territory": {
+      "total": 7000,
+      "pilot": 140,
+      "per_500_batch": 70
+    },
+    "historical_stock_flows_seasonality": {
+      "total": 5000,
+      "pilot": 100,
+      "per_500_batch": 50
+    },
+    "geography_catchments_comparisons": {
+      "total": 5000,
+      "pilot": 100,
+      "per_500_batch": 50
+    },
+    "corporate_structure_hq_branches_identity": {
+      "total": 4000,
+      "pilot": 80,
+      "per_500_batch": 40
+    },
+    "supply_chain_complementary": {
+      "total": 5000,
+      "pilot": 100,
+      "per_500_batch": 50
+    },
+    "cross_variable_correlation": {
+      "total": 5000,
+      "pilot": 100,
+      "per_500_batch": 50
+    },
+    "dialogue_corrections_references_planning": {
+      "total": 6000,
+      "pilot": 120,
+      "per_500_batch": 60
+    },
+    "source_quality_provenance_uncertainty": {
+      "total": 3000,
+      "pilot": 60,
+      "per_500_batch": 30
+    },
+    "unsupported_missing_contradictions": {
+      "total": 3000,
+      "pilot": 60,
+      "per_500_batch": 30
+    },
+    "tax_size_legal_capital_numeric": {
+      "total": 2000,
+      "pilot": 40,
+      "per_500_batch": 20
+    }
+  },
+  "orthogonal_geography": {
+    "mato_grosso_total": 30000,
+    "mato_grosso_strata": {
+      "mt_metropolitan": {
+        "total": 5000,
+        "pilot": 100,
+        "per_500_batch": 50,
+        "municipalities": [
+          {
+            "id": 90,
+            "ibge": "5106455",
+            "name": "Planalto da Serra",
+            "reg_imediata": "510001"
+          },
+          {
+            "id": 5065,
+            "ibge": "5106208",
+            "name": "Nova Brasilândia",
+            "reg_imediata": "510001"
+          },
+          {
+            "id": 5075,
+            "ibge": "5100102",
+            "name": "Acorizal",
+            "reg_imediata": "510001"
+          },
+          {
+            "id": 5104,
+            "ibge": "5103007",
+            "name": "Chapada dos Guimarães",
+            "reg_imediata": "510001"
+          },
+          {
+            "id": 5108,
+            "ibge": "5103403",
+            "name": "Cuiabá",
+            "reg_imediata": "510001"
+          },
+          {
+            "id": 5133,
+            "ibge": "5105903",
+            "name": "Nobres",
+            "reg_imediata": "510001"
+          },
+          {
+            "id": 5151,
+            "ibge": "5107701",
+            "name": "Rosário Oeste",
+            "reg_imediata": "510001"
+          },
+          {
+            "id": 5158,
+            "ibge": "5108402",
+            "name": "Várzea Grande",
+            "reg_imediata": "510001"
+          },
+          {
+            "id": 5463,
+            "ibge": "5102678",
+            "name": "Campo Verde",
+            "reg_imediata": "510001"
+          },
+          {
+            "id": 5504,
+            "ibge": "5104906",
+            "name": "Jangada",
+            "reg_imediata": "510001"
+          }
+        ]
+      },
+      "mt_north_agro_industrial": {
+        "total": 6000,
+        "pilot": 120,
+        "per_500_batch": 60,
+        "municipalities": [
+          {
+            "id": 110,
+            "ibge": "5108907",
+            "name": "Nova Maringá",
+            "reg_imediata": "510003"
+          },
+          {
+            "id": 116,
+            "ibge": "5106158",
+            "name": "Nova Bandeirantes",
+            "reg_imediata": "510010"
+          },
+          {
+            "id": 118,
+            "ibge": "5108956",
+            "name": "Nova Monte Verde",
+            "reg_imediata": "510010"
+          },
+          {
+            "id": 120,
+            "ibge": "5108808",
+            "name": "Nova Guarita",
+            "reg_imediata": "510007"
+          },
+          {
+            "id": 122,
+            "ibge": "5107248",
+            "name": "Santa Carmem",
+            "reg_imediata": "510007"
+          },
+          {
+            "id": 124,
+            "ibge": "5107941",
+            "name": "Tabaporã",
+            "reg_imediata": "510012"
+          },
+          {
+            "id": 1032,
+            "ibge": "5102793",
+            "name": "Carlinda",
+            "reg_imediata": "510010"
+          },
+          {
+            "id": 1034,
+            "ibge": "5103700",
+            "name": "Feliz Natal",
+            "reg_imediata": "510007"
+          },
+          {
+            "id": 1040,
+            "ibge": "5106240",
+            "name": "Nova Ubiratã",
+            "reg_imediata": "510008"
+          },
+          {
+            "id": 1042,
+            "ibge": "5106265",
+            "name": "Novo Mundo",
+            "reg_imediata": "510011"
+          },
+          {
+            "id": 1046,
+            "ibge": "5108303",
+            "name": "União do Sul",
+            "reg_imediata": "510007"
+          },
+          {
+            "id": 1086,
+            "ibge": "5106190",
+            "name": "Nova Santa Helena",
+            "reg_imediata": "510007"
+          },
+          {
+            "id": 1094,
+            "ibge": "5107768",
+            "name": "Santa Rita do Trivelato",
+            "reg_imediata": "510008"
+          },
+          {
+            "id": 1179,
+            "ibge": "5101837",
+            "name": "Boa Esperança do Norte",
+            "reg_imediata": "510008"
+          },
+          {
+            "id": 1181,
+            "ibge": "5104526",
+            "name": "Ipiranga do Norte",
+            "reg_imediata": "510008"
+          },
+          {
+            "id": 1183,
+            "ibge": "5104542",
+            "name": "Itanhangá",
+            "reg_imediata": "510008"
+          },
+          {
+            "id": 5064,
+            "ibge": "5103205",
+            "name": "Colíder",
+            "reg_imediata": "510007"
+          },
+          {
+            "id": 5067,
+            "ibge": "5107909",
+            "name": "Sinop",
+            "reg_imediata": "510007"
+          },
+          {
+            "id": 5068,
+            "ibge": "5100250",
+            "name": "Alta Floresta",
+            "reg_imediata": "510010"
+          },
+          {
+            "id": 5109,
+            "ibge": "5103502",
+            "name": "Diamantino",
+            "reg_imediata": "510003"
+          },
+          {
+            "id": 5142,
+            "ibge": "5106802",
+            "name": "Porto dos Gaúchos",
+            "reg_imediata": "510012"
+          },
+          {
+            "id": 5174,
+            "ibge": "5107305",
+            "name": "São José do Rio Claro",
+            "reg_imediata": "510003"
+          },
+          {
+            "id": 5455,
+            "ibge": "5108006",
+            "name": "Tapurah",
+            "reg_imediata": "510008"
+          },
+          {
+            "id": 5460,
+            "ibge": "5100805",
+            "name": "Apiacás",
+            "reg_imediata": "510010"
+          },
+          {
+            "id": 5468,
+            "ibge": "5103056",
+            "name": "Cláudia",
+            "reg_imediata": "510007"
+          },
+          {
+            "id": 5483,
+            "ibge": "5105101",
+            "name": "Juara",
+            "reg_imediata": "510012"
+          },
+          {
+            "id": 5516,
+            "ibge": "5106299",
+            "name": "Paranaíta",
+            "reg_imediata": "510010"
+          },
+          {
+            "id": 5517,
+            "ibge": "5104104",
+            "name": "Guarantã do Norte",
+            "reg_imediata": "510011"
+          },
+          {
+            "id": 5518,
+            "ibge": "5106216",
+            "name": "Nova Canaã do Norte",
+            "reg_imediata": "510007"
+          },
+          {
+            "id": 5519,
+            "ibge": "5106422",
+            "name": "Peixoto de Azevedo",
+            "reg_imediata": "510011"
+          },
+          {
+            "id": 5523,
+            "ibge": "5105580",
+            "name": "Marcelândia",
+            "reg_imediata": "510007"
+          },
+          {
+            "id": 5524,
+            "ibge": "5104559",
+            "name": "Itaúba",
+            "reg_imediata": "510007"
+          },
+          {
+            "id": 5525,
+            "ibge": "5106273",
+            "name": "Novo Horizonte do Norte",
+            "reg_imediata": "510012"
+          },
+          {
+            "id": 5526,
+            "ibge": "5108501",
+            "name": "Vera",
+            "reg_imediata": "510008"
+          },
+          {
+            "id": 5527,
+            "ibge": "5107925",
+            "name": "Sorriso",
+            "reg_imediata": "510008"
+          },
+          {
+            "id": 5528,
+            "ibge": "5108055",
+            "name": "Terra Nova do Norte",
+            "reg_imediata": "510007"
+          },
+          {
+            "id": 5536,
+            "ibge": "5105259",
+            "name": "Lucas do Rio Verde",
+            "reg_imediata": "510008"
+          },
+          {
+            "id": 5538,
+            "ibge": "5105606",
+            "name": "Matupá",
+            "reg_imediata": "510011"
+          },
+          {
+            "id": 5542,
+            "ibge": "5106224",
+            "name": "Nova Mutum",
+            "reg_imediata": "510008"
+          }
+        ]
+      },
+      "mt_south_logistics_industrial": {
+        "total": 5000,
+        "pilot": 100,
+        "per_500_batch": 50,
+        "municipalities": [
+          {
+            "id": 92,
+            "ibge": "5107404",
+            "name": "São Pedro da Cipa",
+            "reg_imediata": "510018"
+          },
+          {
+            "id": 1096,
+            "ibge": "5107792",
+            "name": "Santo Antônio do Leste",
+            "reg_imediata": "510017"
+          },
+          {
+            "id": 3638,
+            "ibge": "5107297",
+            "name": "São José do Povo",
+            "reg_imediata": "510016"
+          },
+          {
+            "id": 5066,
+            "ibge": "5106307",
+            "name": "Paranatinga",
+            "reg_imediata": "510017"
+          },
+          {
+            "id": 5077,
+            "ibge": "5100300",
+            "name": "Alto Araguaia",
+            "reg_imediata": "510016"
+          },
+          {
+            "id": 5078,
+            "ibge": "5100409",
+            "name": "Alto Garças",
+            "reg_imediata": "510016"
+          },
+          {
+            "id": 5086,
+            "ibge": "5101209",
+            "name": "Araguainha",
+            "reg_imediata": "510016"
+          },
+          {
+            "id": 5110,
+            "ibge": "5103601",
+            "name": "Dom Aquino",
+            "reg_imediata": "510018"
+          },
+          {
+            "id": 5116,
+            "ibge": "5104203",
+            "name": "Guiratinga",
+            "reg_imediata": "510016"
+          },
+          {
+            "id": 5120,
+            "ibge": "5104609",
+            "name": "Itiquira",
+            "reg_imediata": "510016"
+          },
+          {
+            "id": 5122,
+            "ibge": "5104807",
+            "name": "Jaciara",
+            "reg_imediata": "510018"
+          },
+          {
+            "id": 5144,
+            "ibge": "5107008",
+            "name": "Poxoréu",
+            "reg_imediata": "510017"
+          },
+          {
+            "id": 5150,
+            "ibge": "5107602",
+            "name": "Rondonópolis",
+            "reg_imediata": "510016"
+          },
+          {
+            "id": 5155,
+            "ibge": "5108105",
+            "name": "Tesouro",
+            "reg_imediata": "510016"
+          },
+          {
+            "id": 5165,
+            "ibge": "5106372",
+            "name": "Pedra Preta",
+            "reg_imediata": "510016"
+          },
+          {
+            "id": 5169,
+            "ibge": "5105200",
+            "name": "Juscimeira",
+            "reg_imediata": "510018"
+          },
+          {
+            "id": 5509,
+            "ibge": "5107040",
+            "name": "Primavera do Leste",
+            "reg_imediata": "510017"
+          },
+          {
+            "id": 5529,
+            "ibge": "5100607",
+            "name": "Alto Taquari",
+            "reg_imediata": "510016"
+          }
+        ]
+      },
+      "mt_east_araguaia_xingu": {
+        "total": 4500,
+        "pilot": 90,
+        "per_500_batch": 45,
+        "municipalities": [
+          {
+            "id": 94,
+            "ibge": "5106653",
+            "name": "Pontal do Araguaia",
+            "reg_imediata": "510013"
+          },
+          {
+            "id": 96,
+            "ibge": "5107065",
+            "name": "Querência",
+            "reg_imediata": "510015"
+          },
+          {
+            "id": 98,
+            "ibge": "5107198",
+            "name": "Ribeirãozinho",
+            "reg_imediata": "510013"
+          },
+          {
+            "id": 126,
+            "ibge": "5100359",
+            "name": "Alto Boa Vista",
+            "reg_imediata": "510014"
+          },
+          {
+            "id": 128,
+            "ibge": "5102694",
+            "name": "Canabrava do Norte",
+            "reg_imediata": "510014"
+          },
+          {
+            "id": 130,
+            "ibge": "5103353",
+            "name": "Confresa",
+            "reg_imediata": "510014"
+          },
+          {
+            "id": 132,
+            "ibge": "5107354",
+            "name": "São José do Xingu",
+            "reg_imediata": "510014"
+          },
+          {
+            "id": 1036,
+            "ibge": "5103858",
+            "name": "Gaúcha do Norte",
+            "reg_imediata": "510015"
+          },
+          {
+            "id": 1076,
+            "ibge": "5101852",
+            "name": "Bom Jesus do Araguaia",
+            "reg_imediata": "510014"
+          },
+          {
+            "id": 1084,
+            "ibge": "5106174",
+            "name": "Nova Nazaré",
+            "reg_imediata": "510015"
+          },
+          {
+            "id": 1088,
+            "ibge": "5106315",
+            "name": "Novo Santo Antônio",
+            "reg_imediata": "510014"
+          },
+          {
+            "id": 1092,
+            "ibge": "5107743",
+            "name": "Santa Cruz do Xingu",
+            "reg_imediata": "510014"
+          },
+          {
+            "id": 1098,
+            "ibge": "5107883",
+            "name": "Serra Nova Dourada",
+            "reg_imediata": "510014"
+          },
+          {
+            "id": 5092,
+            "ibge": "5101803",
+            "name": "Barra do Garças",
+            "reg_imediata": "510013"
+          },
+          {
+            "id": 5113,
+            "ibge": "5103908",
+            "name": "General Carneiro",
+            "reg_imediata": "510013"
+          },
+          {
+            "id": 5127,
+            "ibge": "5105309",
+            "name": "Luciara",
+            "reg_imediata": "510014"
+          },
+          {
+            "id": 5141,
+            "ibge": "5106703",
+            "name": "Ponte Branca",
+            "reg_imediata": "510013"
+          },
+          {
+            "id": 5156,
+            "ibge": "5108204",
+            "name": "Torixoréu",
+            "reg_imediata": "510013"
+          },
+          {
+            "id": 5166,
+            "ibge": "5107859",
+            "name": "São Félix do Araguaia",
+            "reg_imediata": "510014"
+          },
+          {
+            "id": 5170,
+            "ibge": "5100201",
+            "name": "Água Boa",
+            "reg_imediata": "510015"
+          },
+          {
+            "id": 5171,
+            "ibge": "5102702",
+            "name": "Canarana",
+            "reg_imediata": "510015"
+          },
+          {
+            "id": 5172,
+            "ibge": "5106257",
+            "name": "Nova Xavantina",
+            "reg_imediata": "510013"
+          },
+          {
+            "id": 5173,
+            "ibge": "5107776",
+            "name": "Santa Terezinha",
+            "reg_imediata": "510014"
+          },
+          {
+            "id": 5444,
+            "ibge": "5107180",
+            "name": "Ribeirão Cascalheira",
+            "reg_imediata": "510015"
+          },
+          {
+            "id": 5505,
+            "ibge": "5102603",
+            "name": "Campinápolis",
+            "reg_imediata": "510015"
+          },
+          {
+            "id": 5506,
+            "ibge": "5103106",
+            "name": "Cocalinho",
+            "reg_imediata": "510015"
+          },
+          {
+            "id": 5507,
+            "ibge": "5106281",
+            "name": "Novo São Joaquim",
+            "reg_imediata": "510013"
+          },
+          {
+            "id": 5508,
+            "ibge": "5101001",
+            "name": "Araguaiana",
+            "reg_imediata": "510013"
+          },
+          {
+            "id": 5521,
+            "ibge": "5106778",
+            "name": "Porto Alegre do Norte",
+            "reg_imediata": "510014"
+          },
+          {
+            "id": 5522,
+            "ibge": "5108600",
+            "name": "Vila Rica",
+            "reg_imediata": "510014"
+          }
+        ]
+      },
+      "mt_west_parecis_guapore": {
+        "total": 4500,
+        "pilot": 90,
+        "per_500_batch": 45,
+        "municipalities": [
+          {
+            "id": 88,
+            "ibge": "5103379",
+            "name": "Cotriguaçu",
+            "reg_imediata": "510009"
+          },
+          {
+            "id": 102,
+            "ibge": "5108857",
+            "name": "Nova Marilândia",
+            "reg_imediata": "510003"
+          },
+          {
+            "id": 114,
+            "ibge": "5107263",
+            "name": "Santo Afonso",
+            "reg_imediata": "510003"
+          },
+          {
+            "id": 1030,
+            "ibge": "5102686",
+            "name": "Campos de Júlio",
+            "reg_imediata": "510005"
+          },
+          {
+            "id": 1038,
+            "ibge": "5106182",
+            "name": "Nova Lacerda",
+            "reg_imediata": "510005"
+          },
+          {
+            "id": 1044,
+            "ibge": "5107875",
+            "name": "Sapezal",
+            "reg_imediata": "510002"
+          },
+          {
+            "id": 1078,
+            "ibge": "5103254",
+            "name": "Colniza",
+            "reg_imediata": "510009"
+          },
+          {
+            "id": 1080,
+            "ibge": "5103361",
+            "name": "Conquista D'Oeste",
+            "reg_imediata": "510005"
+          },
+          {
+            "id": 1090,
+            "ibge": "5107578",
+            "name": "Rondolândia",
+            "reg_imediata": "510009"
+          },
+          {
+            "id": 1100,
+            "ibge": "5108352",
+            "name": "Vale de São Domingos",
+            "reg_imediata": "510005"
+          },
+          {
+            "id": 5069,
+            "ibge": "5101258",
+            "name": "Araputanga",
+            "reg_imediata": "510006"
+          },
+          {
+            "id": 5070,
+            "ibge": "5105002",
+            "name": "Jauru",
+            "reg_imediata": "510006"
+          },
+          {
+            "id": 5071,
+            "ibge": "5107107",
+            "name": "São José dos Quatro Marcos",
+            "reg_imediata": "510006"
+          },
+          {
+            "id": 5074,
+            "ibge": "5106752",
+            "name": "Pontes e Lacerda",
+            "reg_imediata": "510005"
+          },
+          {
+            "id": 5079,
+            "ibge": "5100508",
+            "name": "Alto Paraguai",
+            "reg_imediata": "510003"
+          },
+          {
+            "id": 5087,
+            "ibge": "5101308",
+            "name": "Arenápolis",
+            "reg_imediata": "510003"
+          },
+          {
+            "id": 5088,
+            "ibge": "5101407",
+            "name": "Aripuanã",
+            "reg_imediata": "510009"
+          },
+          {
+            "id": 5091,
+            "ibge": "5101704",
+            "name": "Barra do Bugres",
+            "reg_imediata": "510002"
+          },
+          {
+            "id": 5129,
+            "ibge": "5105507",
+            "name": "Vila Bela da Santíssima Trindade",
+            "reg_imediata": "510005"
+          },
+          {
+            "id": 5134,
+            "ibge": "5106000",
+            "name": "Nortelândia",
+            "reg_imediata": "510003"
+          },
+          {
+            "id": 5163,
+            "ibge": "5105622",
+            "name": "Mirassol d'Oeste",
+            "reg_imediata": "510006"
+          },
+          {
+            "id": 5167,
+            "ibge": "5107958",
+            "name": "Tangará da Serra",
+            "reg_imediata": "510002"
+          },
+          {
+            "id": 5462,
+            "ibge": "5102637",
+            "name": "Campo Novo do Parecis",
+            "reg_imediata": "510002"
+          },
+          {
+            "id": 5465,
+            "ibge": "5102850",
+            "name": "Castanheira",
+            "reg_imediata": "510009"
+          },
+          {
+            "id": 5489,
+            "ibge": "5105150",
+            "name": "Juína",
+            "reg_imediata": "510009"
+          },
+          {
+            "id": 5490,
+            "ibge": "5103452",
+            "name": "Denise",
+            "reg_imediata": "510002"
+          },
+          {
+            "id": 5510,
+            "ibge": "5101902",
+            "name": "Brasnorte",
+            "reg_imediata": "510002"
+          },
+          {
+            "id": 5512,
+            "ibge": "5104500",
+            "name": "Indiavaí",
+            "reg_imediata": "510006"
+          },
+          {
+            "id": 5513,
+            "ibge": "5107156",
+            "name": "Reserva do Cabaçal",
+            "reg_imediata": "510006"
+          },
+          {
+            "id": 5514,
+            "ibge": "5103809",
+            "name": "Figueirópolis D'Oeste",
+            "reg_imediata": "510006"
+          },
+          {
+            "id": 5515,
+            "ibge": "5103304",
+            "name": "Comodoro",
+            "reg_imediata": "510005"
+          },
+          {
+            "id": 5520,
+            "ibge": "5106232",
+            "name": "Nova Olímpia",
+            "reg_imediata": "510002"
+          },
+          {
+            "id": 5534,
+            "ibge": "5105176",
+            "name": "Juruena",
+            "reg_imediata": "510009"
+          }
+        ]
+      },
+      "mt_pantanal": {
+        "total": 5000,
+        "pilot": 100,
+        "per_500_batch": 50,
+        "municipalities": [
+          {
+            "id": 100,
+            "ibge": "5106851",
+            "name": "Porto Estrela",
+            "reg_imediata": "510002"
+          },
+          {
+            "id": 134,
+            "ibge": "5103957",
+            "name": "Glória D'Oeste",
+            "reg_imediata": "510006"
+          },
+          {
+            "id": 136,
+            "ibge": "5105234",
+            "name": "Lambari D'Oeste",
+            "reg_imediata": "510004"
+          },
+          {
+            "id": 1082,
+            "ibge": "5103437",
+            "name": "Curvelândia",
+            "reg_imediata": "510004"
+          },
+          {
+            "id": 5072,
+            "ibge": "5107206",
+            "name": "Rio Branco",
+            "reg_imediata": "510004"
+          },
+          {
+            "id": 5073,
+            "ibge": "5107750",
+            "name": "Salto do Céu",
+            "reg_imediata": "510004"
+          },
+          {
+            "id": 5090,
+            "ibge": "5101605",
+            "name": "Barão de Melgaço",
+            "reg_imediata": "510001"
+          },
+          {
+            "id": 5098,
+            "ibge": "5102504",
+            "name": "Cáceres",
+            "reg_imediata": "510004"
+          },
+          {
+            "id": 5135,
+            "ibge": "5106109",
+            "name": "Nossa Senhora do Livramento",
+            "reg_imediata": "510001"
+          },
+          {
+            "id": 5139,
+            "ibge": "5106505",
+            "name": "Poconé",
+            "reg_imediata": "510001"
+          },
+          {
+            "id": 5152,
+            "ibge": "5107800",
+            "name": "Santo Antônio de Leverger",
+            "reg_imediata": "510001"
+          },
+          {
+            "id": 5511,
+            "ibge": "5106828",
+            "name": "Porto Esperidião",
+            "reg_imediata": "510006"
+          }
+        ]
+      }
+    },
+    "other_26_ufs_total": 12000,
+    "other_26_ufs_floor_per_uf": 400,
+    "other_26_ufs_allocation": {
+      "AC": 405,
+      "AL": 420,
+      "AM": 460,
+      "AP": 405,
+      "BA": 500,
+      "CE": 480,
+      "DF": 415,
+      "ES": 415,
+      "GO": 520,
+      "MA": 440,
+      "MG": 520,
+      "MS": 520,
+      "PA": 500,
+      "PB": 430,
+      "PE": 500,
+      "PI": 430,
+      "PR": 500,
+      "RJ": 460,
+      "RN": 420,
+      "RO": 460,
+      "RR": 405,
+      "RS": 520,
+      "SC": 480,
+      "SE": 415,
+      "SP": 520,
+      "TO": 460
+    },
+    "national_cross_uf_comparative_unresolved_total": 8000
+  },
+  "exclusive_registers": {
+    "conversational_professional": {
+      "total": 35000,
+      "pilot": 700,
+      "per_500_batch": 350
+    },
+    "formal_technical": {
+      "total": 10000,
+      "pilot": 200,
+      "per_500_batch": 100
+    },
+    "noisy_short": {
+      "total": 5000,
+      "pilot": 100,
+      "per_500_batch": 50
+    }
+  },
+  "exclusive_splits": {
+    "synthetic_dev": {
+      "total": 35000,
+      "pilot": 700,
+      "per_500_batch": 350
+    },
+    "synthetic_eval": {
+      "total": 10000,
+      "pilot": 200,
+      "per_500_batch": 100
+    },
+    "synthetic_challenge": {
+      "total": 5000,
+      "pilot": 100,
+      "per_500_batch": 50
+    },
+    "partition_rule": "Split by disjoint scenario_family_id, surface skeleton, CNPJ roots, and complete dialogue session_id; zero cross-split template or session leakage."
+  },
+  "overlapping_floors": {
+    "mt_context_regional_economic_min": 8000,
+    "other_uf_regional_min": 4000,
+    "novel_semantic_constructions_min": 15000,
+    "clarify_or_reject_outcomes_min": 5000
+  }
+}

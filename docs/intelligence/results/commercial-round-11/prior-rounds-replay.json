@@ -1,0 +1,122 @@
+{
+  "replay-round-01": {
+    "set": "crates/opencnpj-lab/eval/commercial-round-01/questions.jsonl",
+    "set_sha256": "65d962712b8e9a659bebe58da0b56ce9cbbd0b25d0b428ebb89e0e4f55bf4867",
+    "counts": {
+      "act_correct": 50,
+      "act_items": 50,
+      "decision_correct": 1000,
+      "interpretation_correct": 1000,
+      "items": 1000
+    }
+  },
+  "replay-round-02": {
+    "set": "crates/opencnpj-lab/eval/commercial-round-02/questions.jsonl",
+    "set_sha256": "683ac7a7cc1f2cb0c6daa07d1023cfe8c26b86969e8b0f34e9cecddd0e641715",
+    "counts": {
+      "act_correct": 845,
+      "act_items": 845,
+      "decision_correct": 950,
+      "interpretation_correct": 950,
+      "interpretation_wrong": 50,
+      "items": 1000
+    }
+  },
+  "replay-round-03": {
+    "set": "crates/opencnpj-lab/eval/commercial-round-03/questions.jsonl",
+    "set_sha256": "331d33f48d655469f2a3b1926fc5140dbc0fdb9c65f88614b82138983aa76d98",
+    "counts": {
+      "act_correct": 2535,
+      "act_items": 2535,
+      "decision_correct": 2844,
+      "interpretation_correct": 2844,
+      "interpretation_wrong": 156,
+      "items": 3000
+    }
+  },
+  "replay-round-04": {
+    "set": "crates/opencnpj-lab/eval/commercial-round-04/questions.jsonl",
+    "set_sha256": "a92650ceda7328a4bd500f94497d00df4e79a82f5d2c37b2827f1e3f899141dd",
+    "counts": {
+      "act_correct": 4225,
+      "act_items": 4225,
+      "decision_correct": 4826,
+      "interpretation_correct": 4826,
+      "interpretation_wrong": 174,
+      "items": 5000
+    }
+  },
+  "replay-round-05": {
+    "set": "crates/opencnpj-lab/eval/commercial-round-05/questions.jsonl",
+    "set_sha256": "113ad5d2b44bfcf4a90e33bda83612a000fde7b0816c4403fc005a7af1c3a09b",
+    "counts": {
+      "act_correct": 8450,
+      "act_items": 8450,
+      "decision_correct": 9654,
+      "interpretation_correct": 9654,
+      "interpretation_wrong": 346,
+      "items": 10000
+    }
+  },
+  "replay-round-06": {
+    "set": "crates/opencnpj-lab/eval/commercial-round-06/questions.jsonl",
+    "set_sha256": "bf6770362c83b7095e345a6af913291e379eed0daa5f382521c15b8c80df40ff",
+    "counts": {
+      "act_correct": 16900,
+      "act_items": 16900,
+      "decision_correct": 19312,
+      "interpretation_correct": 19312,
+      "interpretation_wrong": 688,
+      "items": 20000
+    }
+  },
+  "replay-round-07": {
+    "set": "crates/opencnpj-lab/eval/commercial-round-07/questions.jsonl",
+    "set_sha256": "a428268809cea38917247fa929c109d84da9339139f561b478bc18efaa6217af",
+    "counts": {
+      "act_correct": 16900,
+      "act_items": 16900,
+      "decision_correct": 19312,
+      "interpretation_correct": 19312,
+      "interpretation_wrong": 688,
+      "items": 20000
+    }
+  },
+  "replay-round-08": {
+    "set": "crates/opencnpj-lab/eval/commercial-round-08/questions.jsonl",
+    "set_sha256": "87c03bab5eb9a3a7a2682a8dd2dac379ad29218a554be2e8898af72d8eca77da",
+    "counts": {
+      "act_correct": 42250,
+      "act_items": 42250,
+      "decision_correct": 48259,
+      "interpretation_correct": 48259,
+      "interpretation_wrong": 1741,
+      "items": 50000
+    },
+    "adjudicated_agreement_with_r08_patch": 49859
+  },
+  "replay-round-09": {
+    "set": "crates/opencnpj-lab/eval/commercial-round-09/questions.jsonl",
+    "set_sha256": "a3bc6c78b3066f4f8721b2de30948a04278adc80ca4cbd292acfb978eb763c29",
+    "counts": {
+      "act_correct": 40402,
+      "act_items": 40500,
+      "decision_correct": 49975,
+      "interpretation_correct": 49975,
+      "interpretation_wrong": 25,
+      "items": 50000,
+      "out_of_policy_execution": 25
+    }
+  },
+  "replay-round-10": {
+    "set": "crates/opencnpj-lab/eval/commercial-round-10/questions.jsonl",
+    "set_sha256": "666c6ed11915b128fd02749f228061a8036e4d4d7d66a2e1a21a9ab06d703460",
+    "counts": {
+      "act_correct": 39400,
+      "act_items": 41000,
+      "decision_correct": 50000,
+      "interpretation_correct": 50000,
+      "items": 50000
+    }
+  }
+}

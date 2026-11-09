@@ -1,0 +1,10 @@
+{
+  "items": 20,
+  "authorship": "ai_synthetic_independent_review",
+  "human_validated": false,
+  "source_questions_unchanged": true,
+  "sha256": {
+    "crates/opencnpj-lab/eval/commercial-round-08/review-regressions.jsonl": "51120df60e1e4d775d7394afcb8baaa545526e993fdcca5d9bcd947aeda59a7e"
+  },
+  "rules": "Calendar values and source catalogue identifiers; no prediction-derived labels."
+}

@@ -1,0 +1,22 @@
+//! Data assets, query execution and answer rendering.
+
+/// Reference catalogue loading.
+pub mod catalog;
+
+/// Aggregate artifact reading and writing.
+pub mod agg;
+
+/// Backend selection for validated requests.
+pub mod plan;
+
+/// Aggregate execution, engine lowering and engine adapters.
+pub mod execute;
+
+/// Answer blocks, provenance and templates.
+pub mod render;
+
+/// Excel, CSV and plain-text files delivered with an answer.
+pub mod export;
+
+/// Official source-backed indicators and immutable `.ocind` assets.
+pub mod official;

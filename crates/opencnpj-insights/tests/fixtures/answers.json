@@ -1,0 +1,4880 @@
+{
+  "annual_net_registrations": {
+    "blocks": [
+      {
+        "text": "De janeiro de 2025 a outubro de 2026, na região Nordeste, o saldo entre registros e baixas de estabelecimentos passou de 187 para 107 (-42,8%).",
+        "type": "text"
+      },
+      {
+        "kind": "line",
+        "series": [
+          {
+            "label": "2025",
+            "value": 187.0
+          },
+          {
+            "label": "2026",
+            "value": 147.0
+          },
+          {
+            "label": "2027",
+            "value": 107.0
+          }
+        ],
+        "type": "chart"
+      },
+      {
+        "columns": [
+          "Grupo",
+          "Valor"
+        ],
+        "rows": [
+          [
+            "2025",
+            "187"
+          ],
+          [
+            "2026",
+            "147"
+          ],
+          [
+            "2027",
+            "107"
+          ]
+        ],
+        "total": null,
+        "type": "table"
+      },
+      {
+        "items": [
+          "Atividade: todas",
+          "Situação cadastral: nula, ativa, suspensa, inapta e baixada",
+          "Unidade: estabelecimento (CNPJ completo)",
+          "Período: de 01/01/2025 a 11/10/2026"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      },
+      {
+        "items": [
+          {
+            "id": "C-REG",
+            "text": "Data de início de atividade é a data cadastral; não comprova a abertura física do estabelecimento."
+          },
+          {
+            "id": "C-CLOSE",
+            "text": "Baixas são contadas pela data da situação cadastral atual (a última alteração)."
+          },
+          {
+            "id": "C-PARTIAL",
+            "text": "O período vai até 11/10/2026, data mais recente da base."
+          }
+        ],
+        "type": "caveats"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "grain": "year",
+        "kind": "trend",
+        "metric": "net_registrations"
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": "any",
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": {
+          "region": 4
+        },
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "null",
+          "active",
+          "suspended",
+          "unfit",
+          "closed"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": {
+          "days": {
+            "from": 45657,
+            "to": 46305
+          }
+        }
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Ver a tabela completa",
+      "Comparar períodos"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · todas as atividades · a região Nordeste · RFB 2026-10"
+  },
+  "breakdown_cnae_section_brazil": {
+    "blocks": [
+      {
+        "text": "A distribuição de estabelecimentos ativos no Brasil tem 3 grupos; os maiores são G (187), H (147) e I (107).",
+        "type": "text"
+      },
+      {
+        "kind": "bar",
+        "series": [
+          {
+            "label": "G",
+            "value": 187.0
+          },
+          {
+            "label": "H",
+            "value": 147.0
+          },
+          {
+            "label": "I",
+            "value": 107.0
+          }
+        ],
+        "type": "chart"
+      },
+      {
+        "columns": [
+          "CNAE",
+          "Valor"
+        ],
+        "rows": [
+          [
+            "G",
+            "187"
+          ],
+          [
+            "H",
+            "147"
+          ],
+          [
+            "I",
+            "107"
+          ]
+        ],
+        "total": null,
+        "type": "table"
+      },
+      {
+        "items": [
+          "Atividade: todas",
+          "Situação cadastral: ativa",
+          "Unidade: estabelecimento (CNPJ completo)"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "dim": {
+          "cnae": "section"
+        },
+        "kind": "breakdown",
+        "metric": "stock"
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": "any",
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": "any",
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "active"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": null
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Ver por município",
+      "Comparar dois grupos"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · todas as atividades · o Brasil · RFB 2026-10"
+  },
+  "breakdown_porte": {
+    "blocks": [
+      {
+        "text": "A distribuição de participação em São Paulo tem 3 grupos; os maiores são Não informado (18,7%), Microempresa (14,7%) e Pequena empresa (10,7%).",
+        "type": "text"
+      },
+      {
+        "kind": "bar",
+        "series": [
+          {
+            "label": "Não informado",
+            "value": 18.7
+          },
+          {
+            "label": "Microempresa",
+            "value": 14.7
+          },
+          {
+            "label": "Pequena empresa",
+            "value": 10.7
+          }
+        ],
+        "type": "chart"
+      },
+      {
+        "columns": [
+          "Porte",
+          "Valor"
+        ],
+        "rows": [
+          [
+            "Não informado",
+            "18,7%"
+          ],
+          [
+            "Microempresa",
+            "14,7%"
+          ],
+          [
+            "Pequena empresa",
+            "10,7%"
+          ]
+        ],
+        "total": null,
+        "type": "table"
+      },
+      {
+        "items": [
+          "Atividade: todas",
+          "Situação cadastral: ativa",
+          "Unidade: estabelecimento (CNPJ completo)"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "dim": "porte",
+        "kind": "breakdown",
+        "metric": "share"
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": "any",
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": {
+          "ufs": [
+            25
+          ]
+        },
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "active"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": null
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Ver por município",
+      "Comparar dois grupos"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · todas as atividades · São Paulo · RFB 2026-10"
+  },
+  "closed_stock_filter": {
+    "blocks": [
+      {
+        "text": "Mato Grosso tem 187 estabelecimentos baixados, segundo a Receita Federal de outubro de 2026.",
+        "type": "text"
+      },
+      {
+        "label": "Estabelecimentos baixados",
+        "type": "kpi",
+        "value": "187"
+      },
+      {
+        "items": [
+          "Atividade: todas",
+          "Situação cadastral: baixada",
+          "Unidade: estabelecimento (CNPJ completo)",
+          "Data da situação cadastral: de 01/01/2025 a 31/12/2025"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "kind": "count",
+        "metric": "stock"
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": "any",
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": {
+          "ufs": [
+            12
+          ]
+        },
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "closed"
+        ],
+        "status_date": {
+          "from": 45657,
+          "to": 46021
+        },
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": null
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Ver por porte",
+      "Listar os estabelecimentos",
+      "Só matrizes"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · todas as atividades · Mato Grosso · RFB 2026-10"
+  },
+  "cnae_main_or_secondary": {
+    "blocks": [
+      {
+        "text": "Segundo a base da Receita Federal de outubro de 2026, o Brasil tem 187 estabelecimentos ativos de CNAE 4721-1/02.",
+        "type": "text"
+      },
+      {
+        "label": "Estabelecimentos ativos",
+        "type": "kpi",
+        "value": "187"
+      },
+      {
+        "items": [
+          "Atividade: CNAE 4721-1/02 (CNAE principal ou secundária)",
+          "Situação cadastral: ativa",
+          "Unidade: estabelecimento (CNPJ completo)",
+          "Data de início de atividade: de 01/01/2026 a 11/10/2026"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      },
+      {
+        "items": [
+          {
+            "id": "C-SECT",
+            "text": "Atividade principal ou secundária: CNAE 4721-1/02."
+          }
+        ],
+        "type": "caveats"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "kind": "count",
+        "metric": "stock"
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": {
+          "cnae": {
+            "codes": [
+              {
+                "subclass": 4721102
+              }
+            ],
+            "scope": "any"
+          }
+        },
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": {
+          "from": 46022,
+          "to": 46305
+        },
+        "place": "any",
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "active"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": null
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Ver por porte",
+      "Listar os estabelecimentos",
+      "Só matrizes"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · CNAE 4721-1/02 · o Brasil · RFB 2026-10"
+  },
+  "cnpjs_registrados_2025_mato_grosso": {
+    "blocks": [
+      {
+        "text": "Entre janeiro de 2025 e dezembro de 2025, Mato Grosso teve 42 estabelecimentos registrados com início de atividade no período.",
+        "type": "text"
+      },
+      {
+        "label": "Registros com início de atividade",
+        "type": "kpi",
+        "value": "42"
+      },
+      {
+        "items": [
+          "Atividade: todas",
+          "Situação cadastral: nula, ativa, suspensa, inapta e baixada",
+          "Unidade: estabelecimento (CNPJ completo)",
+          "Período: de 01/01/2025 a 31/12/2025"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      },
+      {
+        "items": [
+          {
+            "id": "C-REG",
+            "text": "Data de início de atividade é a data cadastral; não comprova a abertura física do estabelecimento."
+          }
+        ],
+        "type": "caveats"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "kind": "count",
+        "metric": {
+          "flow": "registrations"
+        }
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": "any",
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": {
+          "ufs": [
+            12
+          ]
+        },
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "null",
+          "active",
+          "suspended",
+          "unfit",
+          "closed"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": {
+          "days": {
+            "from": 45657,
+            "to": 46021
+          }
+        }
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Ver por porte",
+      "Listar os estabelecimentos",
+      "Só matrizes"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · todas as atividades · Mato Grosso · RFB 2026-10"
+  },
+  "compare_bakeries_pharmacies": {
+    "blocks": [
+      {
+        "text": "Padarias: 187 estabelecimentos ativos; farmácias: 147 (27,2% a mais).",
+        "type": "text"
+      },
+      {
+        "difference_abs": "40,0",
+        "difference_pct": "27,2%",
+        "members": [
+          {
+            "base": null,
+            "label": "padarias",
+            "value": "187"
+          },
+          {
+            "base": null,
+            "label": "farmácias",
+            "value": "147"
+          }
+        ],
+        "type": "comparison"
+      },
+      {
+        "kind": "bar",
+        "series": [
+          {
+            "label": "padarias",
+            "value": 187.0
+          },
+          {
+            "label": "farmácias",
+            "value": 147.0
+          }
+        ],
+        "type": "chart"
+      },
+      {
+        "columns": [
+          "Setor",
+          "Valor"
+        ],
+        "rows": [
+          [
+            "padarias",
+            "187"
+          ],
+          [
+            "farmácias",
+            "147"
+          ]
+        ],
+        "total": null,
+        "type": "table"
+      },
+      {
+        "items": [
+          "Atividade: todas",
+          "Situação cadastral: ativa",
+          "Unidade: estabelecimento (CNPJ completo)"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "dim": "sector",
+        "kind": "compare",
+        "members": [
+          {
+            "sector": 1
+          },
+          {
+            "sector": 2
+          }
+        ],
+        "metric": "stock"
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": "any",
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": {
+          "municipalities": [
+            5527
+          ]
+        },
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "active"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": null
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Incluir outro local",
+      "Ver a tabela completa"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · todas as atividades · Sorriso (MT) · RFB 2026-10"
+  },
+  "compare_density_sorriso_sinop": {
+    "blocks": [
+      {
+        "text": "Estabelecimentos ativos de padaria por dez mil habitantes em outubro de 2026 — Sinop (MT): 18,7; Sorriso (MT): 14,7 (27,2% a mais; população: IBGE estimativa 2026).",
+        "type": "text"
+      },
+      {
+        "difference_abs": "4,0",
+        "difference_pct": "27,2%",
+        "members": [
+          {
+            "base": "100.000",
+            "label": "Sinop (MT)",
+            "value": "18,7"
+          },
+          {
+            "base": "100.000",
+            "label": "Sorriso (MT)",
+            "value": "14,7"
+          }
+        ],
+        "type": "comparison"
+      },
+      {
+        "kind": "bar",
+        "series": [
+          {
+            "label": "Sinop (MT)",
+            "value": 18.7
+          },
+          {
+            "label": "Sorriso (MT)",
+            "value": 14.7
+          }
+        ],
+        "type": "chart"
+      },
+      {
+        "columns": [
+          "Município",
+          "Valor"
+        ],
+        "rows": [
+          [
+            "Sinop (MT)",
+            "18,7"
+          ],
+          [
+            "Sorriso (MT)",
+            "14,7"
+          ]
+        ],
+        "total": null,
+        "type": "table"
+      },
+      {
+        "items": [
+          "Atividade: padarias (CNAE principal)",
+          "Situação cadastral: ativa",
+          "Unidade: estabelecimento (CNPJ completo)",
+          "População: IBGE estimativa 2026"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      },
+      {
+        "items": [
+          {
+            "id": "C-DENS",
+            "text": "Densidade por habitante não indica, sozinha, oportunidade de mercado. População: IBGE estimativa 2026."
+          },
+          {
+            "id": "C-SECT",
+            "text": "Atividade principal: CNAE 1091-1/02, 4721-1/01 e 4721-1/02."
+          }
+        ],
+        "type": "caveats"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "dim": "municipality",
+        "kind": "compare",
+        "members": [
+          {
+            "municipality": 5067
+          },
+          {
+            "municipality": 5527
+          }
+        ],
+        "metric": {
+          "per10k": {
+            "ibge_estimate": 2026
+          }
+        }
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": {
+          "sectors": {
+            "cnaes": [
+              {
+                "subclass": 1091102
+              },
+              {
+                "subclass": 4721101
+              },
+              {
+                "subclass": 4721102
+              }
+            ],
+            "ids": [
+              1
+            ],
+            "scope": "main"
+          }
+        },
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": "any",
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "active"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": null
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Incluir outro local",
+      "Ver a tabela completa"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · padaria · o Brasil · RFB 2026-10"
+  },
+  "compare_sorriso_com_sinop": {
+    "blocks": [
+      {
+        "text": "Sinop (MT): 187 estabelecimentos ativos de padaria; Sorriso (MT): 147 (27,2% a mais).",
+        "type": "text"
+      },
+      {
+        "difference_abs": "40,0",
+        "difference_pct": "27,2%",
+        "members": [
+          {
+            "base": null,
+            "label": "Sinop (MT)",
+            "value": "187"
+          },
+          {
+            "base": null,
+            "label": "Sorriso (MT)",
+            "value": "147"
+          }
+        ],
+        "type": "comparison"
+      },
+      {
+        "kind": "bar",
+        "series": [
+          {
+            "label": "Sinop (MT)",
+            "value": 187.0
+          },
+          {
+            "label": "Sorriso (MT)",
+            "value": 147.0
+          }
+        ],
+        "type": "chart"
+      },
+      {
+        "columns": [
+          "Município",
+          "Valor"
+        ],
+        "rows": [
+          [
+            "Sinop (MT)",
+            "187"
+          ],
+          [
+            "Sorriso (MT)",
+            "147"
+          ]
+        ],
+        "total": null,
+        "type": "table"
+      },
+      {
+        "items": [
+          "Atividade: padarias (CNAE principal)",
+          "Situação cadastral: ativa",
+          "Unidade: estabelecimento (CNPJ completo)"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      },
+      {
+        "items": [
+          {
+            "id": "C-SECT",
+            "text": "Atividade principal: CNAE 1091-1/02, 4721-1/01 e 4721-1/02."
+          }
+        ],
+        "type": "caveats"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "dim": "municipality",
+        "kind": "compare",
+        "members": [
+          {
+            "municipality": 5067
+          },
+          {
+            "municipality": 5527
+          }
+        ],
+        "metric": "stock"
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": {
+          "sectors": {
+            "cnaes": [
+              {
+                "subclass": 1091102
+              },
+              {
+                "subclass": 4721101
+              },
+              {
+                "subclass": 4721102
+              }
+            ],
+            "ids": [
+              1
+            ],
+            "scope": "main"
+          }
+        },
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": "any",
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "active"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": null
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Incluir outro local",
+      "Ver a tabela completa"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · padaria · o Brasil · RFB 2026-10"
+  },
+  "count_section_i_mt": {
+    "blocks": [
+      {
+        "text": "Segundo a base da Receita Federal de outubro de 2026, Mato Grosso tem 187 estabelecimentos ativos de CNAE I.",
+        "type": "text"
+      },
+      {
+        "label": "Estabelecimentos ativos",
+        "type": "kpi",
+        "value": "187"
+      },
+      {
+        "items": [
+          "Atividade: CNAE I (CNAE principal)",
+          "Situação cadastral: ativa",
+          "Unidade: estabelecimento (CNPJ completo)"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      },
+      {
+        "items": [
+          {
+            "id": "C-SECT",
+            "text": "Atividade principal: CNAE I."
+          }
+        ],
+        "type": "caveats"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "kind": "count",
+        "metric": "stock"
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": {
+          "cnae": {
+            "codes": [
+              {
+                "section": 73
+              }
+            ],
+            "scope": "main"
+          }
+        },
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": {
+          "ufs": [
+            12
+          ]
+        },
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "active"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": null
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Ver por porte",
+      "Listar os estabelecimentos",
+      "Só matrizes"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · CNAE I · Mato Grosso · RFB 2026-10"
+  },
+  "density_census_mt": {
+    "blocks": [
+      {
+        "text": "Em outubro de 2026, Mato Grosso tem 18,7 estabelecimentos ativos de farmácia por dez mil habitantes (população de 100.000, IBGE Censo 2022).",
+        "type": "text"
+      },
+      {
+        "label": "Estabelecimentos ativos por dez mil habitantes",
+        "type": "kpi",
+        "value": "18,7"
+      },
+      {
+        "items": [
+          "Atividade: farmácias (CNAE principal)",
+          "Situação cadastral: ativa",
+          "Unidade: estabelecimento (CNPJ completo)",
+          "População: IBGE Censo 2022"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      },
+      {
+        "items": [
+          {
+            "id": "C-DENS",
+            "text": "Densidade por habitante não indica, sozinha, oportunidade de mercado. População: IBGE Censo 2022."
+          },
+          {
+            "id": "C-SECT",
+            "text": "Atividade principal: CNAE 4771-7/01, 4771-7/02 e 4771-7/03."
+          }
+        ],
+        "type": "caveats"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "kind": "count",
+        "metric": {
+          "per10k": {
+            "ibge_census": 2022
+          }
+        }
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": {
+          "sectors": {
+            "cnaes": [
+              {
+                "subclass": 4771701
+              },
+              {
+                "subclass": 4771702
+              },
+              {
+                "subclass": 4771703
+              }
+            ],
+            "ids": [
+              2
+            ],
+            "scope": "main"
+          }
+        },
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": {
+          "ufs": [
+            12
+          ]
+        },
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "active"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": null
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Ver por porte",
+      "Listar os estabelecimentos",
+      "Só matrizes"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · farmácia · Mato Grosso · RFB 2026-10"
+  },
+  "density_small_towns_mt": {
+    "blocks": [
+      {
+        "text": "Em outubro de 2026, Mato Grosso tem 18,7 estabelecimentos ativos de farmácia por dez mil habitantes (população de 100.000, IBGE estimativa 2026).",
+        "type": "text"
+      },
+      {
+        "label": "Estabelecimentos ativos por dez mil habitantes",
+        "type": "kpi",
+        "value": "18,7"
+      },
+      {
+        "items": [
+          "Atividade: farmácias (CNAE principal)",
+          "Situação cadastral: ativa",
+          "Unidade: estabelecimento (CNPJ completo)",
+          "Municípios com população até 50.000 habitantes",
+          "População: IBGE estimativa 2026"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      },
+      {
+        "items": [
+          {
+            "id": "C-DENS",
+            "text": "Densidade por habitante não indica, sozinha, oportunidade de mercado. População: IBGE estimativa 2026."
+          },
+          {
+            "id": "C-SECT",
+            "text": "Atividade principal: CNAE 4771-7/01, 4771-7/02 e 4771-7/03."
+          }
+        ],
+        "type": "caveats"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "kind": "count",
+        "metric": {
+          "per10k": {
+            "ibge_estimate": 2026
+          }
+        }
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": {
+          "sectors": {
+            "cnaes": [
+              {
+                "subclass": 4771701
+              },
+              {
+                "subclass": 4771702
+              },
+              {
+                "subclass": 4771703
+              }
+            ],
+            "ids": [
+              2
+            ],
+            "scope": "main"
+          }
+        },
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": {
+          "ufs": [
+            12
+          ]
+        },
+        "place_population": {
+          "from": null,
+          "to": 50000
+        },
+        "population_ref": {
+          "ibge_estimate": 2026
+        },
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "active"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": null
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Ver por porte",
+      "Listar os estabelecimentos",
+      "Só matrizes"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · farmácia · Mato Grosso · RFB 2026-10"
+  },
+  "drogarias_em_funcionamento_cuiaba_mt": {
+    "blocks": [
+      {
+        "text": "Cuiabá (MT) tem 187 estabelecimentos ativos de farmácia, segundo a Receita Federal de outubro de 2026.",
+        "type": "text"
+      },
+      {
+        "label": "Estabelecimentos ativos",
+        "type": "kpi",
+        "value": "187"
+      },
+      {
+        "items": [
+          "Atividade: farmácias (CNAE principal)",
+          "Situação cadastral: ativa",
+          "Unidade: estabelecimento (CNPJ completo)"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      },
+      {
+        "items": [
+          {
+            "id": "C-SECT",
+            "text": "Atividade principal: CNAE 4771-7/01, 4771-7/02 e 4771-7/03."
+          }
+        ],
+        "type": "caveats"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "kind": "count",
+        "metric": "stock"
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": {
+          "sectors": {
+            "cnaes": [
+              {
+                "subclass": 4771701
+              },
+              {
+                "subclass": 4771702
+              },
+              {
+                "subclass": 4771703
+              }
+            ],
+            "ids": [
+              2
+            ],
+            "scope": "main"
+          }
+        },
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": {
+          "municipalities": [
+            5108
+          ]
+        },
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "active"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": null
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Ver por porte",
+      "Listar os estabelecimentos",
+      "Só matrizes"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · farmácia · Cuiabá (MT) · RFB 2026-10"
+  },
+  "empresas_abertas_2025_mt": {
+    "blocks": [
+      {
+        "text": "Entre janeiro de 2025 e dezembro de 2025, Mato Grosso teve 42 estabelecimentos registrados com início de atividade no período.",
+        "type": "text"
+      },
+      {
+        "label": "Registros com início de atividade",
+        "type": "kpi",
+        "value": "42"
+      },
+      {
+        "items": [
+          "Atividade: todas",
+          "Situação cadastral: nula, ativa, suspensa, inapta e baixada",
+          "Unidade: estabelecimento (CNPJ completo)",
+          "Período: de 01/01/2025 a 31/12/2025"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      },
+      {
+        "items": [
+          {
+            "id": "C-REG",
+            "text": "Data de início de atividade é a data cadastral; não comprova a abertura física do estabelecimento."
+          }
+        ],
+        "type": "caveats"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "kind": "count",
+        "metric": {
+          "flow": "registrations"
+        }
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": "any",
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": {
+          "ufs": [
+            12
+          ]
+        },
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "null",
+          "active",
+          "suspended",
+          "unfit",
+          "closed"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": {
+          "days": {
+            "from": 45657,
+            "to": 46021
+          }
+        }
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Ver por porte",
+      "Listar os estabelecimentos",
+      "Só matrizes"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · todas as atividades · Mato Grosso · RFB 2026-10"
+  },
+  "estavam_ativas_2025_mt": {
+    "blocks": [
+      {
+        "text": "Mato Grosso tem 187 estabelecimentos ativos, segundo a Receita Federal de dezembro de 2025.",
+        "type": "text"
+      },
+      {
+        "label": "Estabelecimentos ativos",
+        "type": "kpi",
+        "value": "187"
+      },
+      {
+        "items": [
+          "Atividade: todas",
+          "Situação cadastral: ativa",
+          "Unidade: estabelecimento (CNPJ completo)"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2025-12",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "kind": "count",
+        "metric": "stock"
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": "any",
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": {
+          "ufs": [
+            12
+          ]
+        },
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "active"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46021,
+        "competence": 311,
+        "period": null
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Ver por porte",
+      "Listar os estabelecimentos",
+      "Só matrizes"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · todas as atividades · Mato Grosso · RFB 2026-10"
+  },
+  "exclusions": {
+    "blocks": [
+      {
+        "text": "Segundo a base da Receita Federal de outubro de 2026, Mato Grosso, exceto Cuiabá (MT) e farmácias tem 187 estabelecimentos ativos.",
+        "type": "text"
+      },
+      {
+        "label": "Estabelecimentos ativos",
+        "type": "kpi",
+        "value": "187"
+      },
+      {
+        "items": [
+          "Atividade: todas",
+          "Situação cadastral: ativa",
+          "Unidade: estabelecimento (CNPJ completo)",
+          "Excluídos: Cuiabá (MT) e farmácias"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "kind": "count",
+        "metric": "stock"
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": "any",
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [
+            5108
+          ],
+          "sector_cnaes": [
+            {
+              "subclass": 4771701
+            },
+            {
+              "subclass": 4771702
+            },
+            {
+              "subclass": 4771703
+            }
+          ],
+          "sectors": [
+            2
+          ],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": {
+          "ufs": [
+            12
+          ]
+        },
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "active"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": null
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Ver por porte",
+      "Listar os estabelecimentos",
+      "Só matrizes"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · todas as atividades · Mato Grosso, exceto Cuiabá (MT) e farmácias · RFB 2026-10"
+  },
+  "fabricacao_de_paes_sorriso": {
+    "blocks": [
+      {
+        "text": "Sorriso (MT) tem 187 estabelecimentos ativos de CNAE 1091-1/01, segundo a Receita Federal de outubro de 2026.",
+        "type": "text"
+      },
+      {
+        "label": "Estabelecimentos ativos",
+        "type": "kpi",
+        "value": "187"
+      },
+      {
+        "items": [
+          "Atividade: CNAE 1091-1/01 (CNAE principal)",
+          "Situação cadastral: ativa",
+          "Unidade: estabelecimento (CNPJ completo)"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      },
+      {
+        "items": [
+          {
+            "id": "C-SECT",
+            "text": "Atividade principal: CNAE 1091-1/01."
+          }
+        ],
+        "type": "caveats"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "kind": "count",
+        "metric": "stock"
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": {
+          "cnae": {
+            "codes": [
+              {
+                "subclass": 1091101
+              }
+            ],
+            "scope": "main"
+          }
+        },
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": {
+          "municipalities": [
+            5527
+          ]
+        },
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "active"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": null
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Ver por porte",
+      "Listar os estabelecimentos",
+      "Só matrizes"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · CNAE 1091-1/01 · Sorriso (MT) · RFB 2026-10"
+  },
+  "farmacias_ativas_cuiaba": {
+    "blocks": [
+      {
+        "text": "Cuiabá (MT) tem 187 estabelecimentos ativos de farmácia, segundo a Receita Federal de outubro de 2026.",
+        "type": "text"
+      },
+      {
+        "label": "Estabelecimentos ativos",
+        "type": "kpi",
+        "value": "187"
+      },
+      {
+        "items": [
+          "Atividade: farmácias (CNAE principal)",
+          "Situação cadastral: ativa",
+          "Unidade: estabelecimento (CNPJ completo)"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      },
+      {
+        "items": [
+          {
+            "id": "C-SECT",
+            "text": "Atividade principal: CNAE 4771-7/01, 4771-7/02 e 4771-7/03."
+          }
+        ],
+        "type": "caveats"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "kind": "count",
+        "metric": "stock"
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": {
+          "sectors": {
+            "cnaes": [
+              {
+                "subclass": 4771701
+              },
+              {
+                "subclass": 4771702
+              },
+              {
+                "subclass": 4771703
+              }
+            ],
+            "ids": [
+              2
+            ],
+            "scope": "main"
+          }
+        },
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": {
+          "municipalities": [
+            5108
+          ]
+        },
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "active"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": null
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Ver por porte",
+      "Listar os estabelecimentos",
+      "Só matrizes"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · farmácia · Cuiabá (MT) · RFB 2026-10"
+  },
+  "head_offices_legal_nature": {
+    "blocks": [
+      {
+        "text": "Segundo a base da Receita Federal de outubro de 2026, Mato Grosso tem 187 matrizes ativas.",
+        "type": "text"
+      },
+      {
+        "label": "Matrizes ativas",
+        "type": "kpi",
+        "value": "187"
+      },
+      {
+        "items": [
+          "Atividade: todas",
+          "Situação cadastral: ativa",
+          "Unidade: matriz",
+          "Excluindo MEI",
+          "Somente optantes pelo Simples",
+          "Porte: microempresa",
+          "Natureza jurídica: grupo 2 e 2062"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      },
+      {
+        "items": [
+          {
+            "id": "C-MEI",
+            "text": "MEI é uma opção tributária registrada na tabela do Simples; o porte cadastral costuma ser ‘micro’."
+          }
+        ],
+        "type": "caveats"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "kind": "count",
+        "metric": "stock"
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": "any",
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "no",
+        "natureza": [
+          {
+            "group": 2
+          },
+          {
+            "code": 2062
+          }
+        ],
+        "opened": null,
+        "place": {
+          "ufs": [
+            12
+          ]
+        },
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "micro"
+        ],
+        "simples": "yes",
+        "status": [
+          "active"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": null
+      },
+      "unit": "head_offices",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Ver por porte",
+      "Listar os estabelecimentos",
+      "Só matrizes"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "matrizes · todas as atividades · Mato Grosso · RFB 2026-10"
+  },
+  "largest_capital_with_contact": {
+    "blocks": [
+      {
+        "text": "Encontrei 20 estabelecimentos ativos em Mato Grosso. Mostrando 1.",
+        "type": "text"
+      },
+      {
+        "columns": [
+          "CNPJ",
+          "Nome"
+        ],
+        "page": 1,
+        "rows": [
+          [
+            "11111111000101",
+            "Padaria"
+          ]
+        ],
+        "total": 20,
+        "type": "records"
+      },
+      {
+        "items": [
+          "Atividade: todas",
+          "Situação cadastral: ativa",
+          "Unidade: estabelecimento (CNPJ completo)",
+          "Capital social: a partir de R$ 50.000.000",
+          "Com telefone e e-mail publicados"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      },
+      {
+        "items": [
+          {
+            "id": "C-CAP",
+            "text": "Capital social declarado não equivale a faturamento."
+          }
+        ],
+        "type": "caveats"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "kind": "list",
+        "limit": 12,
+        "order": "capital_desc"
+      },
+      "output": {
+        "display_order": [],
+        "page": 2,
+        "with_methodology": true
+      },
+      "scope": {
+        "activity": "any",
+        "capital": {
+          "from": 5000000000,
+          "to": null
+        },
+        "contact": "both",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": {
+          "ufs": [
+            12
+          ]
+        },
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "active"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": null
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Só matrizes",
+      "Com telefone",
+      "Mais recentes"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · todas as atividades · Mato Grosso · RFB 2026-10"
+  },
+  "lookup_alphanumeric_full": {
+    "blocks": [
+      {
+        "text": "Padaria Ltda (11111111000101) — situação Ativa.",
+        "type": "text"
+      },
+      {
+        "fields": [
+          [
+            "cnpj",
+            "11111111000101"
+          ],
+          [
+            "name",
+            "Padaria Ltda"
+          ],
+          [
+            "status",
+            "Ativa"
+          ]
+        ],
+        "type": "company"
+      },
+      {
+        "items": [
+          "Atividade: todas",
+          "Situação cadastral: nula, ativa, suspensa, inapta e baixada",
+          "Unidade: estabelecimento (CNPJ completo)"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "id": "12ABC34501DE35",
+        "kind": "lookup"
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": "any",
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": "any",
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "null",
+          "active",
+          "suspended",
+          "unfit",
+          "closed"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": null
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Ver os estabelecimentos",
+      "Ver a metodologia"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · todas as atividades · o Brasil · RFB 2026-10"
+  },
+  "lookup_alphanumeric_root": {
+    "blocks": [
+      {
+        "text": "Padaria Ltda (11111111000101) — situação Ativa.",
+        "type": "text"
+      },
+      {
+        "fields": [
+          [
+            "cnpj",
+            "11111111000101"
+          ],
+          [
+            "name",
+            "Padaria Ltda"
+          ],
+          [
+            "status",
+            "Ativa"
+          ]
+        ],
+        "type": "company"
+      },
+      {
+        "items": [
+          "Atividade: todas",
+          "Situação cadastral: nula, ativa, suspensa, inapta e baixada",
+          "Unidade: estabelecimento (CNPJ completo)"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "id": "12ABC345",
+        "kind": "lookup"
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": "any",
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": "any",
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "null",
+          "active",
+          "suspended",
+          "unfit",
+          "closed"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": null
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Ver os estabelecimentos",
+      "Ver a metodologia"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · todas as atividades · o Brasil · RFB 2026-10"
+  },
+  "lookup_numeric": {
+    "blocks": [
+      {
+        "text": "Padaria Ltda (11111111000101) — situação Ativa.",
+        "type": "text"
+      },
+      {
+        "fields": [
+          [
+            "cnpj",
+            "11111111000101"
+          ],
+          [
+            "name",
+            "Padaria Ltda"
+          ],
+          [
+            "status",
+            "Ativa"
+          ]
+        ],
+        "type": "company"
+      },
+      {
+        "items": [
+          "Atividade: todas",
+          "Situação cadastral: nula, ativa, suspensa, inapta e baixada",
+          "Unidade: estabelecimento (CNPJ completo)"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "id": "33000167000101",
+        "kind": "lookup"
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": "any",
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": "any",
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "null",
+          "active",
+          "suspended",
+          "unfit",
+          "closed"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": null
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Ver os estabelecimentos",
+      "Ver a metodologia"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · todas as atividades · o Brasil · RFB 2026-10"
+  },
+  "mei_opt_ins": {
+    "blocks": [
+      {
+        "text": "Entre janeiro de 2025 e dezembro de 2025, Mato Grosso teve 42 adesões ao MEI.",
+        "type": "text"
+      },
+      {
+        "label": "Adesões ao MEI",
+        "type": "kpi",
+        "value": "42"
+      },
+      {
+        "items": [
+          "Atividade: todas",
+          "Situação cadastral: nula, ativa, suspensa, inapta e baixada",
+          "Unidade: estabelecimento (CNPJ completo)",
+          "Período: de 01/01/2025 a 31/12/2025"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "kind": "count",
+        "metric": {
+          "flow": "mei_opt_ins"
+        }
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": "any",
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": {
+          "ufs": [
+            12
+          ]
+        },
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "null",
+          "active",
+          "suspended",
+          "unfit",
+          "closed"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": {
+          "days": {
+            "from": 45657,
+            "to": 46021
+          }
+        }
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Ver por porte",
+      "Listar os estabelecimentos",
+      "Só matrizes"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · todas as atividades · Mato Grosso · RFB 2026-10"
+  },
+  "methodology_meta": {
+    "blocks": [
+      {
+        "text": "Dados da Receita Federal de outubro de 2026; snapshot 76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b; catálogos municípios 202610 e setores 1.",
+        "type": "text"
+      },
+      {
+        "items": [
+          "Atividade: todas",
+          "Situação cadastral: nula, ativa, suspensa, inapta e baixada",
+          "Unidade: estabelecimento (CNPJ completo)"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "kind": "meta",
+        "topic": "methodology"
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": "any",
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": "any",
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "null",
+          "active",
+          "suspended",
+          "unfit",
+          "closed"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": null
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Ver fontes",
+      "Ver a metodologia"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · todas as atividades · o Brasil · RFB 2026-10"
+  },
+  "monthly_closures": {
+    "blocks": [
+      {
+        "text": "De abril de 2026 a outubro de 2026, em Mato Grosso, o número de baixas de estabelecimentos passou de 187 para 107 (-42,8%).",
+        "type": "text"
+      },
+      {
+        "kind": "line",
+        "series": [
+          {
+            "label": "janeiro de 2025",
+            "value": 187.0
+          },
+          {
+            "label": "fevereiro de 2025",
+            "value": 147.0
+          },
+          {
+            "label": "março de 2025",
+            "value": 107.0
+          }
+        ],
+        "type": "chart"
+      },
+      {
+        "columns": [
+          "Grupo",
+          "Valor"
+        ],
+        "rows": [
+          [
+            "janeiro de 2025",
+            "187"
+          ],
+          [
+            "fevereiro de 2025",
+            "147"
+          ],
+          [
+            "março de 2025",
+            "107"
+          ]
+        ],
+        "total": null,
+        "type": "table"
+      },
+      {
+        "items": [
+          "Atividade: todas",
+          "Situação cadastral: baixada",
+          "Unidade: estabelecimento (CNPJ completo)",
+          "Período: de 12/04/2026 a 11/10/2026"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      },
+      {
+        "items": [
+          {
+            "id": "C-CLOSE",
+            "text": "Baixas são contadas pela data da situação cadastral atual (a última alteração)."
+          },
+          {
+            "id": "C-PARTIAL",
+            "text": "O período vai até 11/10/2026, data mais recente da base."
+          }
+        ],
+        "type": "caveats"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "grain": "month",
+        "kind": "trend",
+        "metric": "closures"
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": "any",
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": {
+          "ufs": [
+            12
+          ]
+        },
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "closed"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": {
+          "days": {
+            "from": 46123,
+            "to": 46305
+          }
+        }
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Ver a tabela completa",
+      "Comparar períodos"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · todas as atividades · Mato Grosso · RFB 2026-10"
+  },
+  "near_sinop_km": {
+    "blocks": [
+      {
+        "text": "Segundo a base da Receita Federal de outubro de 2026, a região de Sinop (MT) tem 187 estabelecimentos ativos.",
+        "type": "text"
+      },
+      {
+        "label": "Estabelecimentos ativos",
+        "type": "kpi",
+        "value": "187"
+      },
+      {
+        "items": [
+          "Atividade: todas",
+          "Situação cadastral: ativa",
+          "Unidade: estabelecimento (CNPJ completo)",
+          "Região: municípios com sede a até 100 km de Sinop (MT)"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "kind": "count",
+        "metric": "stock"
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": "any",
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": {
+          "near": {
+            "center": 5067,
+            "rule": {
+              "within_km": 100
+            }
+          }
+        },
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "active"
+        ],
+        "status_date": null,
+        "within_ufs": [
+          12
+        ]
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": null
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Ver por porte",
+      "Listar os estabelecimentos",
+      "Só matrizes"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · todas as atividades · a região de Sinop (MT) · RFB 2026-10"
+  },
+  "padarias_sorriso": {
+    "blocks": [
+      {
+        "text": "Sorriso (MT) tem 187 estabelecimentos ativos de padaria, segundo a Receita Federal de outubro de 2026.",
+        "type": "text"
+      },
+      {
+        "label": "Estabelecimentos ativos",
+        "type": "kpi",
+        "value": "187"
+      },
+      {
+        "items": [
+          "Atividade: padarias (CNAE principal)",
+          "Situação cadastral: ativa",
+          "Unidade: estabelecimento (CNPJ completo)"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      },
+      {
+        "items": [
+          {
+            "id": "C-SECT",
+            "text": "Atividade principal: CNAE 1091-1/02, 4721-1/01 e 4721-1/02."
+          }
+        ],
+        "type": "caveats"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "kind": "count",
+        "metric": "stock"
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": {
+          "sectors": {
+            "cnaes": [
+              {
+                "subclass": 1091102
+              },
+              {
+                "subclass": 4721101
+              },
+              {
+                "subclass": 4721102
+              }
+            ],
+            "ids": [
+              1
+            ],
+            "scope": "main"
+          }
+        },
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": {
+          "municipalities": [
+            5527
+          ]
+        },
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "active"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": null
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Ver por porte",
+      "Listar os estabelecimentos",
+      "Só matrizes"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · padaria · Sorriso (MT) · RFB 2026-10"
+  },
+  "qtas_padarias_sorrisso_mt": {
+    "blocks": [
+      {
+        "text": "Sorriso (MT) tem 187 estabelecimentos ativos de padaria, segundo a Receita Federal de outubro de 2026.",
+        "type": "text"
+      },
+      {
+        "label": "Estabelecimentos ativos",
+        "type": "kpi",
+        "value": "187"
+      },
+      {
+        "items": [
+          "Atividade: padarias (CNAE principal)",
+          "Situação cadastral: ativa",
+          "Unidade: estabelecimento (CNPJ completo)"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      },
+      {
+        "items": [
+          {
+            "id": "C-SECT",
+            "text": "Atividade principal: CNAE 1091-1/02, 4721-1/01 e 4721-1/02."
+          }
+        ],
+        "type": "caveats"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "kind": "count",
+        "metric": "stock"
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": {
+          "sectors": {
+            "cnaes": [
+              {
+                "subclass": 1091102
+              },
+              {
+                "subclass": 4721101
+              },
+              {
+                "subclass": 4721102
+              }
+            ],
+            "ids": [
+              1
+            ],
+            "scope": "main"
+          }
+        },
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": {
+          "municipalities": [
+            5527
+          ]
+        },
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "active"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": null
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Ver por porte",
+      "Listar os estabelecimentos",
+      "Só matrizes"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · padaria · Sorriso (MT) · RFB 2026-10"
+  },
+  "rank_change_percent": {
+    "blocks": [
+      {
+        "text": "Entre julho de 2026 e outubro de 2026, as menores variações de estabelecimentos ativos no Brasil foram: Mato Grosso (187,0%), Paraná (147,0%) e São Paulo (107,0%).",
+        "type": "text"
+      },
+      {
+        "kind": "bar",
+        "series": [
+          {
+            "label": "Mato Grosso",
+            "value": 187.0
+          },
+          {
+            "label": "Paraná",
+            "value": 147.0
+          },
+          {
+            "label": "São Paulo",
+            "value": 107.0
+          }
+        ],
+        "type": "chart"
+      },
+      {
+        "columns": [
+          "UF",
+          "Valor"
+        ],
+        "rows": [
+          [
+            "Mato Grosso",
+            "187,0%"
+          ],
+          [
+            "Paraná",
+            "147,0%"
+          ],
+          [
+            "São Paulo",
+            "107,0%"
+          ]
+        ],
+        "total": null,
+        "type": "table"
+      },
+      {
+        "items": [
+          "Atividade: todas",
+          "Situação cadastral: ativa",
+          "Unidade: estabelecimento (CNPJ completo)",
+          "Base mínima: 30"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      },
+      {
+        "items": [
+          {
+            "id": "C-MINBASE",
+            "text": "Locais com menos de 30 estabelecimentos não entram na variação percentual."
+          }
+        ],
+        "type": "caveats"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "dim": "uf",
+        "dir": "asc",
+        "k": 5,
+        "kind": "rank",
+        "metric": {
+          "active_change": {
+            "pct": true
+          }
+        },
+        "min_base": 30
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": "any",
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": "any",
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "active"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": {
+          "competences": {
+            "from": 318,
+            "to": 321
+          }
+        }
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Ver a lista completa",
+      "Filtrar por setor"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · todas as atividades · o Brasil · RFB 2026-10"
+  },
+  "rank_cnae_section": {
+    "blocks": [
+      {
+        "text": "Os maiores números de estabelecimentos ativos no Brasil são: G (187), H (147) e I (107).",
+        "type": "text"
+      },
+      {
+        "kind": "bar",
+        "series": [
+          {
+            "label": "G",
+            "value": 187.0
+          },
+          {
+            "label": "H",
+            "value": 147.0
+          },
+          {
+            "label": "I",
+            "value": 107.0
+          }
+        ],
+        "type": "chart"
+      },
+      {
+        "columns": [
+          "CNAE",
+          "Valor"
+        ],
+        "rows": [
+          [
+            "G",
+            "187"
+          ],
+          [
+            "H",
+            "147"
+          ],
+          [
+            "I",
+            "107"
+          ]
+        ],
+        "total": null,
+        "type": "table"
+      },
+      {
+        "items": [
+          "Atividade: CNAEs H, 49, 492 e 99008 (CNAE principal)",
+          "Situação cadastral: ativa",
+          "Unidade: estabelecimento (CNPJ completo)"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      },
+      {
+        "items": [
+          {
+            "id": "C-SECT",
+            "text": "Atividade principal: CNAE H, 49, 492 e 99008."
+          }
+        ],
+        "type": "caveats"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "dim": {
+          "cnae": "section"
+        },
+        "dir": "desc",
+        "k": 3,
+        "kind": "rank",
+        "metric": "stock",
+        "min_base": 0
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": {
+          "cnae": {
+            "codes": [
+              {
+                "section": 72
+              },
+              {
+                "division": 49
+              },
+              {
+                "group": 492
+              },
+              {
+                "class": 99008
+              }
+            ],
+            "scope": "main"
+          }
+        },
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": "any",
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "active"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": null
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Ver a lista completa",
+      "Filtrar por setor"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · CNAEs H, 49, 492 e 99008 · o Brasil · RFB 2026-10"
+  },
+  "rank_inhabitants_minimum": {
+    "blocks": [
+      {
+        "text": "Os locais com mais habitantes por estabelecimento ativo de farmácia em Mato Grosso são: Sinop (MT) (534,8), Cuiabá (MT) (680,3) e Sorriso (MT) (934,6) (população: IBGE estimativa 2026).",
+        "type": "text"
+      },
+      {
+        "kind": "bar",
+        "series": [
+          {
+            "label": "Sinop (MT)",
+            "value": 534.75935828877
+          },
+          {
+            "label": "Cuiabá (MT)",
+            "value": 680.2721088435375
+          },
+          {
+            "label": "Sorriso (MT)",
+            "value": 934.5794392523364
+          }
+        ],
+        "type": "chart"
+      },
+      {
+        "columns": [
+          "Município",
+          "Valor"
+        ],
+        "rows": [
+          [
+            "Sinop (MT)",
+            "534,8"
+          ],
+          [
+            "Cuiabá (MT)",
+            "680,3"
+          ],
+          [
+            "Sorriso (MT)",
+            "934,6"
+          ]
+        ],
+        "total": null,
+        "type": "table"
+      },
+      {
+        "items": [
+          "Atividade: farmácias (CNAE principal)",
+          "Situação cadastral: ativa",
+          "Unidade: estabelecimento (CNPJ completo)",
+          "Municípios com população de 30.000 habitantes a 50.000 habitantes",
+          "População: IBGE estimativa 2026"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      },
+      {
+        "items": [
+          {
+            "id": "C-DENS",
+            "text": "Densidade por habitante não indica, sozinha, oportunidade de mercado. População: IBGE estimativa 2026."
+          },
+          {
+            "id": "C-SECT",
+            "text": "Atividade principal: CNAE 4771-7/01, 4771-7/02 e 4771-7/03."
+          }
+        ],
+        "type": "caveats"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "dim": "municipality",
+        "dir": "desc",
+        "k": 5,
+        "kind": "rank",
+        "metric": {
+          "inhabitants_per": {
+            "ibge_estimate": 2026
+          }
+        },
+        "min_base": 30
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": {
+          "sectors": {
+            "cnaes": [
+              {
+                "subclass": 4771701
+              },
+              {
+                "subclass": 4771702
+              },
+              {
+                "subclass": 4771703
+              }
+            ],
+            "ids": [
+              2
+            ],
+            "scope": "main"
+          }
+        },
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": {
+          "ufs": [
+            12
+          ]
+        },
+        "place_population": {
+          "from": 30000,
+          "to": 50000
+        },
+        "population_ref": {
+          "ibge_estimate": 2026
+        },
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "active"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": null
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Ver a lista completa",
+      "Filtrar por setor"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · farmácia · Mato Grosso · RFB 2026-10"
+  },
+  "rank_sector_change_mt": {
+    "blocks": [
+      {
+        "text": "Entre abril de 2026 e outubro de 2026, as maiores variações de estabelecimentos ativos em Mato Grosso foram: padarias (187), farmácias (147) e setor sem rótulo (id 3) (107).",
+        "type": "text"
+      },
+      {
+        "kind": "bar",
+        "series": [
+          {
+            "label": "padarias",
+            "value": 187.0
+          },
+          {
+            "label": "farmácias",
+            "value": 147.0
+          },
+          {
+            "label": "setor sem rótulo (id 3)",
+            "value": 107.0
+          }
+        ],
+        "type": "chart"
+      },
+      {
+        "columns": [
+          "Setor",
+          "Valor"
+        ],
+        "rows": [
+          [
+            "padarias",
+            "187"
+          ],
+          [
+            "farmácias",
+            "147"
+          ],
+          [
+            "setor sem rótulo (id 3)",
+            "107"
+          ]
+        ],
+        "total": null,
+        "type": "table"
+      },
+      {
+        "items": [
+          "Atividade: todas",
+          "Situação cadastral: ativa",
+          "Unidade: estabelecimento (CNPJ completo)"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "dim": "sector",
+        "dir": "desc",
+        "k": 10,
+        "kind": "rank",
+        "metric": {
+          "active_change": {
+            "pct": false
+          }
+        },
+        "min_base": 30
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": "any",
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": {
+          "ufs": [
+            12
+          ]
+        },
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "active"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": {
+          "competences": {
+            "from": 315,
+            "to": 321
+          }
+        }
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Ver a lista completa",
+      "Filtrar por setor"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · todas as atividades · Mato Grosso · RFB 2026-10"
+  },
+  "sem_filiais": {
+    "blocks": [
+      {
+        "text": "O Brasil tem 187 matrizes ativas, segundo a Receita Federal de outubro de 2026.",
+        "type": "text"
+      },
+      {
+        "label": "Matrizes ativas",
+        "type": "kpi",
+        "value": "187"
+      },
+      {
+        "items": [
+          "Atividade: todas",
+          "Situação cadastral: ativa",
+          "Unidade: estabelecimento (CNPJ completo)",
+          "Somente matrizes"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "kind": "count",
+        "metric": "stock"
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": "any",
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "yes",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": "any",
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "active"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": null
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Ver por porte",
+      "Listar os estabelecimentos",
+      "Só matrizes"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "matrizes · todas as atividades · o Brasil · RFB 2026-10"
+  },
+  "sinop_vs_sorriso": {
+    "blocks": [
+      {
+        "text": "Sinop (MT): 187 estabelecimentos ativos de padaria; Sorriso (MT): 147 (27,2% a mais).",
+        "type": "text"
+      },
+      {
+        "difference_abs": "40,0",
+        "difference_pct": "27,2%",
+        "members": [
+          {
+            "base": null,
+            "label": "Sinop (MT)",
+            "value": "187"
+          },
+          {
+            "base": null,
+            "label": "Sorriso (MT)",
+            "value": "147"
+          }
+        ],
+        "type": "comparison"
+      },
+      {
+        "kind": "bar",
+        "series": [
+          {
+            "label": "Sinop (MT)",
+            "value": 187.0
+          },
+          {
+            "label": "Sorriso (MT)",
+            "value": 147.0
+          }
+        ],
+        "type": "chart"
+      },
+      {
+        "columns": [
+          "Município",
+          "Valor"
+        ],
+        "rows": [
+          [
+            "Sinop (MT)",
+            "187"
+          ],
+          [
+            "Sorriso (MT)",
+            "147"
+          ]
+        ],
+        "total": null,
+        "type": "table"
+      },
+      {
+        "items": [
+          "Atividade: padarias (CNAE principal)",
+          "Situação cadastral: ativa",
+          "Unidade: estabelecimento (CNPJ completo)"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      },
+      {
+        "items": [
+          {
+            "id": "C-SECT",
+            "text": "Atividade principal: CNAE 1091-1/02, 4721-1/01 e 4721-1/02."
+          }
+        ],
+        "type": "caveats"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "dim": "municipality",
+        "kind": "compare",
+        "members": [
+          {
+            "municipality": 5067
+          },
+          {
+            "municipality": 5527
+          }
+        ],
+        "metric": "stock"
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": {
+          "sectors": {
+            "cnaes": [
+              {
+                "subclass": 1091102
+              },
+              {
+                "subclass": 4721101
+              },
+              {
+                "subclass": 4721102
+              }
+            ],
+            "ids": [
+              1
+            ],
+            "scope": "main"
+          }
+        },
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": "any",
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "active"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": null
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Incluir outro local",
+      "Ver a tabela completa"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · padaria · o Brasil · RFB 2026-10"
+  },
+  "so_filiais": {
+    "blocks": [
+      {
+        "text": "O Brasil tem 187 filiais ativas, segundo a Receita Federal de outubro de 2026.",
+        "type": "text"
+      },
+      {
+        "label": "Filiais ativas",
+        "type": "kpi",
+        "value": "187"
+      },
+      {
+        "items": [
+          "Atividade: todas",
+          "Situação cadastral: ativa",
+          "Unidade: estabelecimento (CNPJ completo)",
+          "Somente filiais"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "kind": "count",
+        "metric": "stock"
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": "any",
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "no",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": "any",
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "active"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": null
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Ver por porte",
+      "Listar os estabelecimentos",
+      "Só matrizes"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "filiais · todas as atividades · o Brasil · RFB 2026-10"
+  },
+  "sorriso": {
+    "blocks": [
+      {
+        "text": "Sorriso (MT) tem 187 estabelecimentos ativos, segundo a Receita Federal de outubro de 2026.",
+        "type": "text"
+      },
+      {
+        "label": "Estabelecimentos ativos",
+        "type": "kpi",
+        "value": "187"
+      },
+      {
+        "items": [
+          "Atividade: todas",
+          "Situação cadastral: ativa",
+          "Unidade: estabelecimento (CNPJ completo)"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "kind": "count",
+        "metric": "stock"
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": "any",
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": {
+          "municipalities": [
+            5527
+          ]
+        },
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "active"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": null
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Ver por porte",
+      "Listar os estabelecimentos",
+      "Só matrizes"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · todas as atividades · Sorriso (MT) · RFB 2026-10"
+  },
+  "sorriso_e_regiao": {
+    "blocks": [
+      {
+        "text": "Segundo a base da Receita Federal de outubro de 2026, a região de Sorriso (MT) tem 187 estabelecimentos ativos.",
+        "type": "text"
+      },
+      {
+        "label": "Estabelecimentos ativos",
+        "type": "kpi",
+        "value": "187"
+      },
+      {
+        "items": [
+          "Atividade: todas",
+          "Situação cadastral: ativa",
+          "Unidade: estabelecimento (CNPJ completo)",
+          "Região: Sorriso (MT) e municípios vizinhos (até 1 nível de vizinhança)"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "kind": "count",
+        "metric": "stock"
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": "any",
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": {
+          "near": {
+            "center": 5527,
+            "rule": {
+              "neighbours": 1
+            }
+          }
+        },
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "active"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": null
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Ver por porte",
+      "Listar os estabelecimentos",
+      "Só matrizes"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · todas as atividades · a região de Sorriso (MT) · RFB 2026-10"
+  },
+  "union_bakeries_pharmacies": {
+    "blocks": [
+      {
+        "text": "Sorriso (MT) tem 187 estabelecimentos ativos de padaria e farmácia, segundo a Receita Federal de outubro de 2026.",
+        "type": "text"
+      },
+      {
+        "label": "Estabelecimentos ativos",
+        "type": "kpi",
+        "value": "187"
+      },
+      {
+        "items": [
+          "Atividade: padarias e farmácias (CNAE principal)",
+          "Situação cadastral: ativa",
+          "Unidade: estabelecimento (CNPJ completo)"
+        ],
+        "type": "methodology"
+      },
+      {
+        "items": [
+          {
+            "competence": "2026-10",
+            "name": "Receita Federal — Dados Abertos do CNPJ",
+            "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+          }
+        ],
+        "type": "sources"
+      },
+      {
+        "items": [
+          {
+            "id": "C-SECT",
+            "text": "Atividade principal: CNAE 1091-1/02, 4721-1/01, 4721-1/02, 4771-7/01, 4771-7/02 e 4771-7/03."
+          }
+        ],
+        "type": "caveats"
+      }
+    ],
+    "decision": "execute",
+    "query": {
+      "op": {
+        "kind": "count",
+        "metric": "stock"
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": {
+          "sectors": {
+            "cnaes": [
+              {
+                "subclass": 1091102
+              },
+              {
+                "subclass": 4721101
+              },
+              {
+                "subclass": 4721102
+              },
+              {
+                "subclass": 4771701
+              },
+              {
+                "subclass": 4771702
+              },
+              {
+                "subclass": 4771703
+              }
+            ],
+            "ids": [
+              1,
+              2
+            ],
+            "scope": "main"
+          }
+        },
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": {
+          "municipalities": [
+            5527
+          ]
+        },
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "active"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": null
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "suggestions": [
+      "Ver por porte",
+      "Listar os estabelecimentos",
+      "Só matrizes"
+    ],
+    "timing_us": {
+      "render": 0
+    },
+    "understood": "estabelecimentos · padaria e farmácia · Sorriso (MT) · RFB 2026-10"
+  }
+}

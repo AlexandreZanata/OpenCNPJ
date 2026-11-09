@@ -1,0 +1,257 @@
+{
+ "blind_set_used": false,
+ "delivery_gate": {
+  "fmt_exit": 0,
+  "clippy_exit": 0,
+  "test_exit": 0,
+  "passed": 294,
+  "failed": 0,
+  "ignored": 5
+ },
+ "frozen_suites": {
+  "frozen-adv": {
+   "act_correct": 303,
+   "act_items": 304,
+   "decision_correct": 269,
+   "interpretation_correct": 198,
+   "interpretation_wrong": 106,
+   "items": 304,
+   "out_of_policy_execution": 12
+  },
+  "frozen-informal": {
+   "act_correct": 201,
+   "act_items": 202,
+   "decision_correct": 165,
+   "interpretation_correct": 116,
+   "interpretation_wrong": 86,
+   "items": 202,
+   "out_of_policy_execution": 2
+  },
+  "frozen-dialogues": {
+   "act_correct": 88,
+   "act_items": 122,
+   "decision_correct": 103,
+   "interpretation_correct": 81,
+   "interpretation_wrong": 41,
+   "items": 122
+  },
+  "frozen-ood": {
+   "act_correct": 400,
+   "act_items": 400,
+   "decision_correct": 377,
+   "interpretation_correct": 377,
+   "interpretation_wrong": 23,
+   "items": 400
+  }
+ },
+ "national": {
+  "categories": {
+   "activity": {
+    "gold_backend_ok": 1000,
+    "interpretation_correct": 1000,
+    "items": 1000
+   },
+   "capital_legal": {
+    "gold_backend_ok": 1000,
+    "interpretation_correct": 1000,
+    "items": 1000
+   },
+   "clarification": {
+    "interpretation_correct": 1000,
+    "items": 1000
+   },
+   "closures": {
+    "gold_backend_ok": 1000,
+    "interpretation_correct": 1000,
+    "items": 1000
+   },
+   "comparison": {
+    "gold_backend_ok": 1000,
+    "interpretation_correct": 1000,
+    "items": 1000
+   },
+   "density": {
+    "gold_backend_ok": 1000,
+    "interpretation_correct": 1000,
+    "items": 1000
+   },
+   "dialogue": {
+    "gold_backend_ok": 1000,
+    "interpretation_correct": 1000,
+    "items": 1000
+   },
+   "distribution": {
+    "gold_backend_ok": 1000,
+    "interpretation_correct": 1000,
+    "items": 1000
+   },
+   "exclusion": {
+    "gold_backend_ok": 1000,
+    "interpretation_correct": 1000,
+    "items": 1000
+   },
+   "geography": {
+    "gold_backend_ok": 1000,
+    "interpretation_correct": 1000,
+    "items": 1000
+   },
+   "historical": {
+    "gold_backend_ok": 1000,
+    "interpretation_correct": 1000,
+    "items": 1000
+   },
+   "lookup": {
+    "gold_backend_ok": 900,
+    "interpretation_correct": 1000,
+    "items": 1000
+   },
+   "market_size": {
+    "gold_backend_ok": 1000,
+    "interpretation_correct": 954,
+    "items": 1000
+   },
+   "methodology": {
+    "gold_backend_ok": 1000,
+    "interpretation_correct": 1000,
+    "items": 1000
+   },
+   "prospecting": {
+    "gold_backend_ok": 1000,
+    "interpretation_correct": 1000,
+    "items": 1000
+   },
+   "registrations": {
+    "gold_backend_ok": 1000,
+    "interpretation_correct": 1000,
+    "items": 1000
+   },
+   "structure_status": {
+    "gold_backend_ok": 1000,
+    "interpretation_correct": 1000,
+    "items": 1000
+   },
+   "tax_size": {
+    "gold_backend_ok": 1000,
+    "interpretation_correct": 1000,
+    "items": 1000
+   },
+   "trends": {
+    "gold_backend_ok": 1000,
+    "interpretation_correct": 1000,
+    "items": 1000
+   },
+   "unsupported": {
+    "interpretation_correct": 1000,
+    "items": 1000
+   }
+  },
+  "counts": {
+   "act_correct": 16900,
+   "act_items": 16900,
+   "correct_executed_answer": 17854,
+   "decision_correct": 19954,
+   "gold_backend_ok": 17900,
+   "gold_empty_records": 406,
+   "gold_zero_scalar": 2166,
+   "interpretation_correct": 19954,
+   "interpretation_wrong": 46,
+   "items": 20000,
+   "verification_engine_match": 11140,
+   "verification_marginal_match": 700,
+   "verification_no_independent_reference": 300,
+   "verification_not_numeric": 1000,
+   "verification_single_backend": 4760
+  },
+  "data_anchor": "2026-10-11",
+  "evidence_score": "Rule evidence is not a calibrated probability.",
+  "human_validation": "Not performed; human validation is deferred to product refinement.",
+  "method": "Actual text-only deterministic interpretation; gold IR used only for canonical scoring and separate backend reference, never as a prediction or conversation seed.",
+  "set": "crates/opencnpj-lab/eval/commercial-round-07/questions.jsonl",
+  "set_sha256": "a428268809cea38917247fa929c109d84da9339139f561b478bc18efaa6217af",
+  "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+ },
+ "leftover_analysis": {
+  "round": "commercial-round-07",
+  "place_typo_items": 120,
+  "place_typo_recovered": 74,
+  "place_typo_leftovers": 46,
+  "leftover_single_token": 16,
+  "leftover_multi_token": 30,
+  "all_leftovers_are_clarify": true,
+  "all_leftovers_are_market_size": true,
+  "examples": [
+   "Para o ciclo de expansão 05: quantos estabelecimentos ativos de fazenda de gado de corte existem em Maraabá/PA?",
+   "Para o ciclo de expansão 05: quantos estabelecimentos ativos e suspensos de tabacaria existem em Salvaador/BA?",
+   "Para o ciclo de expansão 05: quantas filiais ativas de loja de material elétrico existem em Três LLagoas/MS?",
+   "Como representante comercial, pergunto: quantos estabelecimentos ativos de hospital existem em Santtos/SP?",
+   "Como representante comercial, pergunto: quantas matrizes ativas de escritório de arquitetura há em São PPaulo/SP?"
+  ],
+  "rule": "Duplicated-letter place typo is recovered only for a single-token place followed by a UF and only when the fuzzy candidate is unique. Multi-word names and ambiguous candidates fail closed with a clarification; no label was changed to fit a prediction."
+ },
+ "prior_round_replays_interpret_only": {
+  "commercial-round-01": {
+   "items": 1000,
+   "interpretation_correct": 1000,
+   "interpretation_wrong": 0
+  },
+  "commercial-round-02": {
+   "items": 1000,
+   "interpretation_correct": 1000,
+   "interpretation_wrong": 0
+  },
+  "commercial-round-03": {
+   "items": 3000,
+   "interpretation_correct": 2994,
+   "interpretation_wrong": 6
+  },
+  "commercial-round-04": {
+   "items": 5000,
+   "interpretation_correct": 4987,
+   "interpretation_wrong": 13
+  },
+  "commercial-round-05": {
+   "items": 10000,
+   "interpretation_correct": 9975,
+   "interpretation_wrong": 25
+  },
+  "commercial-round-06": {
+   "items": 20000,
+   "interpretation_correct": 19954,
+   "interpretation_wrong": 46
+  }
+ },
+ "exempt_prior_overlap": {
+  "total": 274,
+  "dialogue_turns_2_4": 270,
+  "fixed_smalltalk": 4
+ },
+ "dataset": {
+  "items": 20000,
+  "categories": 20,
+  "questions_per_category": 1000,
+  "panels": 2,
+  "unique_texts": 20000,
+  "filler_only_repairs": 990,
+  "no_filler_repair": 19010,
+  "decisions": {
+   "execute": 17900,
+   "clarify": 1000,
+   "reject": 1100
+  }
+ },
+ "human_validation": "deferred to product refinement",
+ "production_readiness": "not established by synthetic evaluation",
+ "round": "commercial-round-07",
+ "source_revision": "ec5a3d26c8cb391bd3e2827c63cf84cae1d9d95c",
+ "uncommitted_changes": true,
+ "fixes_new_in_round_07": [
+  "entity words no longer act as unsupported-filter/negation cues: Não-Me-Toque/RS is a municipality, not a negation",
+  "number words in a multi-word place phrase no longer bypass fail-closed place validation: Três LLagoas/MS clarifies instead of accepting the UF alone"
+ ],
+ "fixes_retained_from_round_06": [
+  "trailing punctuation on a CNPJ lookup no longer forces clarification",
+  "sector/municipality homonym in an activity construction prefers the sector",
+  "entity-aware intent cues prevent place names such as Itaporanga d'Ajuda and Contagem from changing the intent",
+  "multi-word place typo probing fails closed instead of decomposing into unrelated municipalities"
+ ]
+}

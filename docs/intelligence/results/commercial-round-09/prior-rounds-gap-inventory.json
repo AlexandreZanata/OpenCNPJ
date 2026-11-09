@@ -1,0 +1,126 @@
+{
+  "round": "commercial-round-09",
+  "prior_rounds_audited": {
+    "commercial-round-01": 1000,
+    "commercial-round-02": 1000,
+    "commercial-round-03": 3000,
+    "commercial-round-04": 5000,
+    "commercial-round-05": 10000,
+    "commercial-round-06": 20000,
+    "commercial-round-07": 20000,
+    "commercial-round-08": 50000
+  },
+  "prior_rounds_total_items": 110000,
+  "prior_rounds_distributions": {
+    "categories": {
+      "market_size": 5500,
+      "prospecting": 5500,
+      "tax_size": 5500,
+      "structure_status": 5500,
+      "capital_legal": 5500,
+      "registrations": 5500,
+      "closures": 5500,
+      "trends": 5500,
+      "historical": 5500,
+      "geography": 5500,
+      "density": 5500,
+      "comparison": 5500,
+      "distribution": 5500,
+      "activity": 5500,
+      "exclusion": 5500,
+      "lookup": 5500,
+      "methodology": 5500,
+      "dialogue": 5500,
+      "clarification": 5500,
+      "unsupported": 5500
+    },
+    "decisions": {
+      "execute": 98450,
+      "clarify": 5500,
+      "reject": 6050
+    },
+    "intents": {
+      "count": 59635,
+      "list": 5510,
+      "trend": 5500,
+      "rank": 9105,
+      "compare": 5500,
+      "breakdown": 2750,
+      "lookup": 4950,
+      "None": 11550,
+      "meta": 5500
+    },
+    "acts": {
+      "None": 17845,
+      "new_query": 88855,
+      "replace_slot": 1520,
+      "add_filter": 680,
+      "remove_filter": 1100
+    },
+    "filter_combinations": {
+      "none": 40732,
+      "contact": 4151,
+      "mei": 1778,
+      "simples": 1338,
+      "porte": 1780,
+      "mei+porte": 5,
+      "mei+simples": 1725,
+      "head_office": 4150,
+      "status": 27145,
+      "head_office+mei": 5,
+      "capital": 2865,
+      "natureza": 905,
+      "natureza+simples": 5,
+      "capital+mei": 5,
+      "head_office+status": 690,
+      "porte+status": 20,
+      "mei+status": 652,
+      "within_ufs": 2632,
+      "place_population": 1775,
+      "exclude": 984,
+      "capital+natureza": 1720,
+      "exclude+status": 2746,
+      "simples+status": 642
+    },
+    "distinct_municipalities_used": 251,
+    "mt_municipalities_used": 10,
+    "mt_municipalities_missing": 132
+  },
+  "identified_gaps_and_round_09_remediation": [
+    {
+      "gap_id": "GAP-01-MT-GEOGRAPHY",
+      "description": "Rounds 01-08 covered only 10 of 142 Mato Grosso municipalities (7.0%) and had no stratification across MT economic axes.",
+      "round_09_target": "30,000 MT items across 6 explicit regional strata covering all 142/142 MT municipalities in municipalities.tsv."
+    },
+    {
+      "gap_id": "GAP-02-NATIONAL-UF-FLOOR",
+      "description": "Rounds 01-08 used only 251 municipalities nationwide.",
+      "round_09_target": "12,000 items across all 26 non-MT UFs (minimum >= 400 per UF) plus 8,000 national/cross-UF/comparative/unresolved cases, covering >1,200 distinct municipalities."
+    },
+    {
+      "gap_id": "GAP-03-FILTER-TRIPLES-AND-COHORTS",
+      "description": "Rounds 01-08 contained 0 three-filter combinations and 0 valid opened+closures cohort queries in the main frozen sets (leading to the Round 08 1,600-item adjudication).",
+      "round_09_target": "Include explicit 2-filter and 3-filter intersections (status + porte + contact, head_office + mei + contact, capital + natureza + head_office, opened + closures cohort, exclude_places + porte + status, etc.) verified by an independent filter-inventory pass."
+    },
+    {
+      "gap_id": "GAP-04-SUPPLY-CHAIN-AND-COMPLEMENTARY",
+      "description": "Rounds 01-08 queried only single sectors in isolation and had no supply-chain or complementary-activity comparisons.",
+      "round_09_target": "5,000 items in supply_chain_complementary comparing upstream/downstream CNAE pairs (e.g., soy wholesale vs general warehouses, cattle vs slaughterhouses, construction materials vs electrical installation) or querying complementary activity scopes."
+    },
+    {
+      "gap_id": "GAP-05-CROSS-VARIABLE-CORRELATION",
+      "description": "Rounds 01-08 had 0 cross-variable correlation or analytical feasibility items.",
+      "round_09_target": "5,000 items in cross_variable_correlation separating supported cadastral/IBGE-population proxy comparisons from unsupported statistical regressions (Pearson r, R^2, p-value) and unintegrated external sources (IBGE CEMPRE, PAM, PPM) that must fail closed."
+    },
+    {
+      "gap_id": "GAP-06-DIALOGUE-STATE-MACHINE",
+      "description": "Rounds 01-08 had no clarification-then-answer turns, no result-set reference turns, and reused session IDs across rounds.",
+      "round_09_target": "6,000 dialogue turns with globally unique r09-sess-XXXX IDs, testing slot replacement, filter addition/removal, homonym UF inheritance, focus comparison ('compara as duas'), and clarification resolution."
+    },
+    {
+      "gap_id": "GAP-07-REGIONAL-LANGUAGE-AND-MINIMAL-PAIRS",
+      "description": "Rounds 01-08 had 0 documented MT or UF regionalisms and relied on mechanical prefix scaling in Round 08.",
+      "round_09_target": ">= 8,000 MT-context cases and >= 4,000 other-UF regional cases grounded in documented sources, with minimal pairs contrasting discourse markers (execute) against abundance/quality metaphors (clarify/reject) and zero mechanical prefix padding."
+    }
+  ]
+}

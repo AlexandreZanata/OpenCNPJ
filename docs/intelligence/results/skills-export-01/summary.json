@@ -1,0 +1,50 @@
+{
+  "categories": {
+    "analytical": {
+      "interpretation_correct": 12,
+      "items": 12
+    },
+    "dialogue": {
+      "interpretation_correct": 240,
+      "items": 240
+    },
+    "format_prefix": {
+      "interpretation_correct": 354,
+      "items": 354
+    },
+    "format_suffix": {
+      "interpretation_correct": 354,
+      "items": 354
+    },
+    "only_fields": {
+      "interpretation_correct": 354,
+      "items": 354
+    },
+    "regional": {
+      "interpretation_correct": 126,
+      "items": 126
+    },
+    "stop": {
+      "interpretation_correct": 9,
+      "items": 9
+    },
+    "with_fields": {
+      "interpretation_correct": 354,
+      "items": 354
+    }
+  },
+  "counts": {
+    "act_correct": 1743,
+    "act_items": 1743,
+    "decision_correct": 1803,
+    "interpretation_correct": 1803,
+    "items": 1803
+  },
+  "data_anchor": "2026-10-11",
+  "evidence_score": "Rule evidence is not a calibrated probability.",
+  "human_validation": "Not performed; human validation is deferred to product refinement.",
+  "method": "Actual text-only deterministic interpretation; gold IR used only for canonical scoring and separate backend reference, never as a prediction or conversation seed.",
+  "set": "crates/opencnpj-lab/eval/skills-export-01/questions.jsonl",
+  "set_sha256": "fff35f2d76ebde478d13558e7ab3088a878b417ad9e4334fddfbd70bf1e6fc20",
+  "snapshot_sha256": null
+}

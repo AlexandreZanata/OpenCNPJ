@@ -1,0 +1,10 @@
+processed 50/122 correct 37
+processed 100/122 correct 64
+{
+  "act_correct": 88,
+  "act_items": 122,
+  "decision_correct": 103,
+  "interpretation_correct": 81,
+  "interpretation_wrong": 41,
+  "items": 122
+}

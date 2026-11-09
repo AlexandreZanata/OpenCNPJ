@@ -1,0 +1,117 @@
+processed 50/5000 correct 42
+processed 100/5000 correct 87
+processed 150/5000 correct 137
+processed 200/5000 correct 187
+processed 250/5000 correct 237
+processed 300/5000 correct 287
+processed 350/5000 correct 337
+processed 400/5000 correct 387
+processed 450/5000 correct 437
+processed 500/5000 correct 487
+processed 550/5000 correct 537
+processed 600/5000 correct 587
+processed 650/5000 correct 637
+processed 700/5000 correct 687
+processed 750/5000 correct 737
+processed 800/5000 correct 787
+processed 850/5000 correct 837
+processed 900/5000 correct 887
+processed 950/5000 correct 937
+processed 1000/5000 correct 987
+processed 1050/5000 correct 1037
+processed 1100/5000 correct 1087
+processed 1150/5000 correct 1137
+processed 1200/5000 correct 1187
+processed 1250/5000 correct 1237
+processed 1300/5000 correct 1287
+processed 1350/5000 correct 1337
+processed 1400/5000 correct 1387
+processed 1450/5000 correct 1437
+processed 1500/5000 correct 1487
+processed 1550/5000 correct 1537
+processed 1600/5000 correct 1587
+processed 1650/5000 correct 1637
+processed 1700/5000 correct 1687
+processed 1750/5000 correct 1737
+processed 1800/5000 correct 1786
+processed 1850/5000 correct 1836
+processed 1900/5000 correct 1886
+processed 1950/5000 correct 1936
+processed 2000/5000 correct 1986
+processed 2050/5000 correct 2036
+processed 2100/5000 correct 2086
+processed 2150/5000 correct 2136
+processed 2200/5000 correct 2186
+processed 2250/5000 correct 2236
+processed 2300/5000 correct 2286
+processed 2350/5000 correct 2336
+processed 2400/5000 correct 2386
+processed 2450/5000 correct 2436
+processed 2500/5000 correct 2486
+processed 2550/5000 correct 2536
+processed 2600/5000 correct 2586
+processed 2650/5000 correct 2636
+processed 2700/5000 correct 2686
+processed 2750/5000 correct 2736
+processed 2800/5000 correct 2786
+processed 2850/5000 correct 2836
+processed 2900/5000 correct 2886
+processed 2950/5000 correct 2936
+processed 3000/5000 correct 2986
+processed 3050/5000 correct 3036
+processed 3100/5000 correct 3086
+processed 3150/5000 correct 3136
+processed 3200/5000 correct 3186
+processed 3250/5000 correct 3236
+processed 3300/5000 correct 3286
+processed 3350/5000 correct 3336
+processed 3400/5000 correct 3386
+processed 3450/5000 correct 3436
+processed 3500/5000 correct 3486
+processed 3550/5000 correct 3536
+processed 3600/5000 correct 3586
+processed 3650/5000 correct 3636
+processed 3700/5000 correct 3686
+processed 3750/5000 correct 3736
+processed 3800/5000 correct 3786
+processed 3850/5000 correct 3836
+processed 3900/5000 correct 3886
+processed 3950/5000 correct 3936
+processed 4000/5000 correct 3986
+processed 4050/5000 correct 4036
+processed 4100/5000 correct 4086
+processed 4150/5000 correct 4136
+processed 4200/5000 correct 4186
+processed 4250/5000 correct 4236
+processed 4300/5000 correct 4286
+processed 4350/5000 correct 4336
+processed 4400/5000 correct 4386
+processed 4450/5000 correct 4436
+processed 4500/5000 correct 4486
+processed 4550/5000 correct 4536
+processed 4600/5000 correct 4586
+processed 4650/5000 correct 4636
+processed 4700/5000 correct 4686
+processed 4750/5000 correct 4736
+processed 4800/5000 correct 4786
+processed 4850/5000 correct 4836
+processed 4900/5000 correct 4886
+processed 4950/5000 correct 4936
+processed 5000/5000 correct 4986
+{
+  "act_correct": 4225,
+  "act_items": 4225,
+  "correct_executed_answer": 4461,
+  "decision_correct": 4988,
+  "gold_backend_ok": 4475,
+  "gold_empty_records": 93,
+  "gold_zero_scalar": 541,
+  "interpretation_correct": 4986,
+  "interpretation_wrong": 14,
+  "items": 5000,
+  "verification_engine_match": 2789,
+  "verification_marginal_match": 175,
+  "verification_no_independent_reference": 75,
+  "verification_not_numeric": 250,
+  "verification_single_backend": 1186
+}

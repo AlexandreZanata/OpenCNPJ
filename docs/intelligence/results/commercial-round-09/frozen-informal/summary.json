@@ -1,0 +1,36 @@
+{
+  "categories": {
+    "existing_suite": {
+      "gold_backend_mismatch": 1,
+      "gold_backend_ok": 164,
+      "interpretation_correct": 121,
+      "items": 202
+    }
+  },
+  "counts": {
+    "act_correct": 201,
+    "act_items": 202,
+    "correct_executed_answer": 85,
+    "decision_correct": 172,
+    "execution_fresh": 137,
+    "execution_reused_identical_ir": 79,
+    "gold_backend_mismatch": 1,
+    "gold_backend_ok": 164,
+    "interpretation_correct": 121,
+    "interpretation_wrong": 81,
+    "items": 202,
+    "verification_engine_match": 143,
+    "verification_marginal_match": 2,
+    "verification_mismatch": 1,
+    "verification_no_independent_reference": 3,
+    "verification_not_numeric": 1,
+    "verification_single_backend": 15
+  },
+  "data_anchor": "2026-10-11",
+  "evidence_score": "Rule evidence is not a calibrated probability.",
+  "human_validation": "Not performed; human validation is deferred to product refinement.",
+  "method": "Actual text-only deterministic interpretation; gold IR used only for canonical scoring and separate backend reference, never as a prediction or conversation seed.",
+  "set": "crates/opencnpj-lab/eval/h-informal.jsonl",
+  "set_sha256": "13a32a64716d91c0de8d79823d1e1328b5792d68b3207a90bfac99c3d6f1be7c",
+  "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+}

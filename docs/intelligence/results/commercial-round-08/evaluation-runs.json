@@ -1,0 +1,343 @@
+{
+  "post-review-interpretation": {
+    "command": [
+      "/data/opencnpj-target/release/opencnpj-intel",
+      "eval-questions",
+      "--set",
+      "crates/opencnpj-lab/eval/commercial-round-08/questions.jsonl",
+      "--out",
+      "/home/iiii/PESSOAL-PROJETOS-ALEXANDRE/OpenCNPJ/docs/intelligence/results/commercial-round-08/post-review-interpretation",
+      "--agg",
+      "/data/opencnpj-data/intelligence/agg/2026-10.ocagg",
+      "--history",
+      "/data/opencnpj-data/intelligence/backfill/aggregates",
+      "--interpret-only"
+    ],
+    "binary_sha256": "f2548db4612830a20bbfb7472a4759238fa420fd749a93d63f06969ac35f210b",
+    "exit_code": 0,
+    "counts": {
+      "act_correct": 42250,
+      "act_items": 42250,
+      "decision_correct": 48264,
+      "interpretation_correct": 48264,
+      "interpretation_wrong": 1736,
+      "items": 50000
+    },
+    "summary_path": "/home/iiii/PESSOAL-PROJETOS-ALEXANDRE/OpenCNPJ/docs/intelligence/results/commercial-round-08/post-review-interpretation/summary.json"
+  },
+  "frozen-adv": {
+    "command": [
+      "/data/opencnpj-target/release/opencnpj-intel",
+      "eval-questions",
+      "--set",
+      "crates/opencnpj-lab/eval/adv.jsonl",
+      "--out",
+      "/home/iiii/PESSOAL-PROJETOS-ALEXANDRE/OpenCNPJ/docs/intelligence/results/commercial-round-08/frozen-adv",
+      "--agg",
+      "/data/opencnpj-data/intelligence/agg/2026-10.ocagg",
+      "--history",
+      "/data/opencnpj-data/intelligence/backfill/aggregates",
+      "--interpret-only"
+    ],
+    "binary_sha256": "f2548db4612830a20bbfb7472a4759238fa420fd749a93d63f06969ac35f210b",
+    "exit_code": 0,
+    "counts": {
+      "act_correct": 303,
+      "act_items": 304,
+      "decision_correct": 280,
+      "interpretation_correct": 210,
+      "interpretation_wrong": 94,
+      "items": 304
+    },
+    "summary_path": "/home/iiii/PESSOAL-PROJETOS-ALEXANDRE/OpenCNPJ/docs/intelligence/results/commercial-round-08/frozen-adv/summary.json"
+  },
+  "frozen-informal": {
+    "command": [
+      "/data/opencnpj-target/release/opencnpj-intel",
+      "eval-questions",
+      "--set",
+      "crates/opencnpj-lab/eval/h-informal.jsonl",
+      "--out",
+      "/home/iiii/PESSOAL-PROJETOS-ALEXANDRE/OpenCNPJ/docs/intelligence/results/commercial-round-08/frozen-informal",
+      "--agg",
+      "/data/opencnpj-data/intelligence/agg/2026-10.ocagg",
+      "--history",
+      "/data/opencnpj-data/intelligence/backfill/aggregates",
+      "--interpret-only"
+    ],
+    "binary_sha256": "f2548db4612830a20bbfb7472a4759238fa420fd749a93d63f06969ac35f210b",
+    "exit_code": 0,
+    "counts": {
+      "act_correct": 201,
+      "act_items": 202,
+      "decision_correct": 167,
+      "interpretation_correct": 118,
+      "interpretation_wrong": 84,
+      "items": 202
+    },
+    "summary_path": "/home/iiii/PESSOAL-PROJETOS-ALEXANDRE/OpenCNPJ/docs/intelligence/results/commercial-round-08/frozen-informal/summary.json"
+  },
+  "frozen-dialogues": {
+    "command": [
+      "/data/opencnpj-target/release/opencnpj-intel",
+      "eval-questions",
+      "--set",
+      "crates/opencnpj-lab/eval/dialogues.jsonl",
+      "--out",
+      "/home/iiii/PESSOAL-PROJETOS-ALEXANDRE/OpenCNPJ/docs/intelligence/results/commercial-round-08/frozen-dialogues",
+      "--agg",
+      "/data/opencnpj-data/intelligence/agg/2026-10.ocagg",
+      "--history",
+      "/data/opencnpj-data/intelligence/backfill/aggregates",
+      "--interpret-only"
+    ],
+    "binary_sha256": "f2548db4612830a20bbfb7472a4759238fa420fd749a93d63f06969ac35f210b",
+    "exit_code": 0,
+    "counts": {
+      "act_correct": 88,
+      "act_items": 122,
+      "decision_correct": 103,
+      "interpretation_correct": 81,
+      "interpretation_wrong": 41,
+      "items": 122
+    },
+    "summary_path": "/home/iiii/PESSOAL-PROJETOS-ALEXANDRE/OpenCNPJ/docs/intelligence/results/commercial-round-08/frozen-dialogues/summary.json"
+  },
+  "frozen-ood": {
+    "command": [
+      "/data/opencnpj-target/release/opencnpj-intel",
+      "eval-questions",
+      "--set",
+      "crates/opencnpj-lab/eval/ood.jsonl",
+      "--out",
+      "/home/iiii/PESSOAL-PROJETOS-ALEXANDRE/OpenCNPJ/docs/intelligence/results/commercial-round-08/frozen-ood",
+      "--agg",
+      "/data/opencnpj-data/intelligence/agg/2026-10.ocagg",
+      "--history",
+      "/data/opencnpj-data/intelligence/backfill/aggregates",
+      "--interpret-only"
+    ],
+    "binary_sha256": "f2548db4612830a20bbfb7472a4759238fa420fd749a93d63f06969ac35f210b",
+    "exit_code": 0,
+    "counts": {
+      "act_correct": 400,
+      "act_items": 400,
+      "decision_correct": 377,
+      "interpretation_correct": 377,
+      "interpretation_wrong": 23,
+      "items": 400
+    },
+    "summary_path": "/home/iiii/PESSOAL-PROJETOS-ALEXANDRE/OpenCNPJ/docs/intelligence/results/commercial-round-08/frozen-ood/summary.json"
+  },
+  "replay-round-01": {
+    "command": [
+      "/data/opencnpj-target/release/opencnpj-intel",
+      "eval-questions",
+      "--set",
+      "crates/opencnpj-lab/eval/commercial-round-01/questions.jsonl",
+      "--out",
+      "/tmp/opencnpj-r08-final-replay-01",
+      "--agg",
+      "/data/opencnpj-data/intelligence/agg/2026-10.ocagg",
+      "--history",
+      "/data/opencnpj-data/intelligence/backfill/aggregates",
+      "--interpret-only"
+    ],
+    "binary_sha256": "f2548db4612830a20bbfb7472a4759238fa420fd749a93d63f06969ac35f210b",
+    "exit_code": 0,
+    "counts": {
+      "act_correct": 50,
+      "act_items": 50,
+      "decision_correct": 1000,
+      "interpretation_correct": 1000,
+      "items": 1000
+    },
+    "summary_path": "/tmp/opencnpj-r08-final-replay-01/summary.json"
+  },
+  "replay-round-02": {
+    "command": [
+      "/data/opencnpj-target/release/opencnpj-intel",
+      "eval-questions",
+      "--set",
+      "crates/opencnpj-lab/eval/commercial-round-02/questions.jsonl",
+      "--out",
+      "/tmp/opencnpj-r08-final-replay-02",
+      "--agg",
+      "/data/opencnpj-data/intelligence/agg/2026-10.ocagg",
+      "--history",
+      "/data/opencnpj-data/intelligence/backfill/aggregates",
+      "--interpret-only"
+    ],
+    "binary_sha256": "f2548db4612830a20bbfb7472a4759238fa420fd749a93d63f06969ac35f210b",
+    "exit_code": 0,
+    "counts": {
+      "act_correct": 845,
+      "act_items": 845,
+      "decision_correct": 950,
+      "interpretation_correct": 950,
+      "interpretation_wrong": 50,
+      "items": 1000
+    },
+    "summary_path": "/tmp/opencnpj-r08-final-replay-02/summary.json"
+  },
+  "replay-round-03": {
+    "command": [
+      "/data/opencnpj-target/release/opencnpj-intel",
+      "eval-questions",
+      "--set",
+      "crates/opencnpj-lab/eval/commercial-round-03/questions.jsonl",
+      "--out",
+      "/tmp/opencnpj-r08-final-replay-03",
+      "--agg",
+      "/data/opencnpj-data/intelligence/agg/2026-10.ocagg",
+      "--history",
+      "/data/opencnpj-data/intelligence/backfill/aggregates",
+      "--interpret-only"
+    ],
+    "binary_sha256": "f2548db4612830a20bbfb7472a4759238fa420fd749a93d63f06969ac35f210b",
+    "exit_code": 0,
+    "counts": {
+      "act_correct": 2535,
+      "act_items": 2535,
+      "decision_correct": 2844,
+      "interpretation_correct": 2844,
+      "interpretation_wrong": 156,
+      "items": 3000
+    },
+    "summary_path": "/tmp/opencnpj-r08-final-replay-03/summary.json"
+  },
+  "replay-round-04": {
+    "command": [
+      "/data/opencnpj-target/release/opencnpj-intel",
+      "eval-questions",
+      "--set",
+      "crates/opencnpj-lab/eval/commercial-round-04/questions.jsonl",
+      "--out",
+      "/tmp/opencnpj-r08-final-replay-04",
+      "--agg",
+      "/data/opencnpj-data/intelligence/agg/2026-10.ocagg",
+      "--history",
+      "/data/opencnpj-data/intelligence/backfill/aggregates",
+      "--interpret-only"
+    ],
+    "binary_sha256": "f2548db4612830a20bbfb7472a4759238fa420fd749a93d63f06969ac35f210b",
+    "exit_code": 0,
+    "counts": {
+      "act_correct": 4225,
+      "act_items": 4225,
+      "decision_correct": 4827,
+      "interpretation_correct": 4827,
+      "interpretation_wrong": 173,
+      "items": 5000
+    },
+    "summary_path": "/tmp/opencnpj-r08-final-replay-04/summary.json"
+  },
+  "replay-round-05": {
+    "command": [
+      "/data/opencnpj-target/release/opencnpj-intel",
+      "eval-questions",
+      "--set",
+      "crates/opencnpj-lab/eval/commercial-round-05/questions.jsonl",
+      "--out",
+      "/tmp/opencnpj-r08-final-replay-05",
+      "--agg",
+      "/data/opencnpj-data/intelligence/agg/2026-10.ocagg",
+      "--history",
+      "/data/opencnpj-data/intelligence/backfill/aggregates",
+      "--interpret-only"
+    ],
+    "binary_sha256": "f2548db4612830a20bbfb7472a4759238fa420fd749a93d63f06969ac35f210b",
+    "exit_code": 0,
+    "counts": {
+      "act_correct": 8450,
+      "act_items": 8450,
+      "decision_correct": 9655,
+      "interpretation_correct": 9655,
+      "interpretation_wrong": 345,
+      "items": 10000
+    },
+    "summary_path": "/tmp/opencnpj-r08-final-replay-05/summary.json"
+  },
+  "replay-round-06": {
+    "command": [
+      "/data/opencnpj-target/release/opencnpj-intel",
+      "eval-questions",
+      "--set",
+      "crates/opencnpj-lab/eval/commercial-round-06/questions.jsonl",
+      "--out",
+      "/tmp/opencnpj-r08-final-replay-06",
+      "--agg",
+      "/data/opencnpj-data/intelligence/agg/2026-10.ocagg",
+      "--history",
+      "/data/opencnpj-data/intelligence/backfill/aggregates",
+      "--interpret-only"
+    ],
+    "binary_sha256": "f2548db4612830a20bbfb7472a4759238fa420fd749a93d63f06969ac35f210b",
+    "exit_code": 0,
+    "counts": {
+      "act_correct": 16900,
+      "act_items": 16900,
+      "decision_correct": 19314,
+      "interpretation_correct": 19314,
+      "interpretation_wrong": 686,
+      "items": 20000
+    },
+    "summary_path": "/tmp/opencnpj-r08-final-replay-06/summary.json"
+  },
+  "replay-round-07": {
+    "command": [
+      "/data/opencnpj-target/release/opencnpj-intel",
+      "eval-questions",
+      "--set",
+      "crates/opencnpj-lab/eval/commercial-round-07/questions.jsonl",
+      "--out",
+      "/tmp/opencnpj-r08-final-replay-07",
+      "--agg",
+      "/data/opencnpj-data/intelligence/agg/2026-10.ocagg",
+      "--history",
+      "/data/opencnpj-data/intelligence/backfill/aggregates",
+      "--interpret-only"
+    ],
+    "binary_sha256": "f2548db4612830a20bbfb7472a4759238fa420fd749a93d63f06969ac35f210b",
+    "exit_code": 0,
+    "counts": {
+      "act_correct": 16900,
+      "act_items": 16900,
+      "decision_correct": 19314,
+      "interpretation_correct": 19314,
+      "interpretation_wrong": 686,
+      "items": 20000
+    },
+    "summary_path": "/tmp/opencnpj-r08-final-replay-07/summary.json"
+  },
+  "review-regressions": {
+    "command": [
+      "/data/opencnpj-target/release/opencnpj-intel",
+      "eval-questions",
+      "--set",
+      "crates/opencnpj-lab/eval/commercial-round-08/review-regressions.jsonl",
+      "--out",
+      "/home/iiii/PESSOAL-PROJETOS-ALEXANDRE/OpenCNPJ/docs/intelligence/results/commercial-round-08/review-regressions",
+      "--agg",
+      "/data/opencnpj-data/intelligence/agg/2026-10.ocagg",
+      "--history",
+      "/data/opencnpj-data/intelligence/backfill/aggregates",
+      "--snapshot",
+      "/data/opencnpj-data/snapshots/2026-10-balanced-1.2.ocnpj"
+    ],
+    "binary_sha256": "f2548db4612830a20bbfb7472a4759238fa420fd749a93d63f06969ac35f210b",
+    "exit_code": 0,
+    "counts": {
+      "correct_executed_answer": 13,
+      "decision_correct": 20,
+      "gold_backend_ok": 13,
+      "gold_zero_scalar": 1,
+      "interpretation_correct": 20,
+      "items": 20,
+      "verification_engine_match": 7,
+      "verification_no_independent_reference": 1,
+      "verification_single_backend": 5
+    },
+    "summary_path": "/home/iiii/PESSOAL-PROJETOS-ALEXANDRE/OpenCNPJ/docs/intelligence/results/commercial-round-08/review-regressions/summary.json"
+  }
+}

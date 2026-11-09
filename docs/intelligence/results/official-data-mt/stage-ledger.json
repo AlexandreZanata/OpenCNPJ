@@ -1,0 +1,240 @@
+{
+  "version": 1,
+  "updated": "2026-11-08",
+  "branch": "codex/official-data-mt",
+  "base_commit": "27c2b92",
+  "stages": [
+    {
+      "id": 0,
+      "name": "Isolate work and measured baseline",
+      "status": "complete",
+      "evidence": [
+        "docs/intelligence/results/official-data-mt/BASELINE.md",
+        "docs/intelligence/results/official-data-mt/logs/stage-0-test.log",
+        "docs/intelligence/results/official-data-mt/logs/stage-0-clippy.log"
+      ],
+      "blockers": []
+    },
+    {
+      "id": 1,
+      "name": "Source registry, asset lifecycle and typed capability foundation",
+      "status": "complete",
+      "evidence": [
+        "crates/opencnpj-insights/official/sources.toml",
+        "crates/opencnpj-insights/src/official/",
+        "crates/opencnpj-lab/src/official.rs",
+        "docs/intelligence/results/official-data-mt/SOURCES.md",
+        "docs/intelligence/results/official-data-mt/logs/stage-1-test.log",
+        "docs/intelligence/results/official-data-mt/logs/stage-1-clippy.log"
+      ],
+      "blockers": []
+    },
+    {
+      "id": 2,
+      "name": "Essential IBGE context for MT",
+      "status": "complete",
+      "evidence": [
+        "crates/opencnpj-lab/src/official.rs",
+        "crates/opencnpj-lab/src/official/ask.rs",
+        "crates/opencnpj-insights/src/official/",
+        "crates/opencnpj-insights/official/sources.toml",
+        "docs/intelligence/results/official-data-mt/STAGE-2.md",
+        "docs/intelligence/results/official-data-mt/REAL-DATA.md",
+        "docs/intelligence/results/official-data-mt/logs/stage-2-imports.log",
+        "docs/intelligence/results/official-data-mt/logs/stage-2-real-queries.log",
+        "docs/intelligence/results/official-data-mt/logs/stage-2-real-ask.log",
+        "docs/intelligence/results/official-data-mt/logs/stage-2-verify.log"
+      ],
+      "blockers": [
+        "2022 Census municipal household income not found in an admitted municipal API resource; not substituted.",
+        "IBGE reuse terms returned HTTP 403 to the automated check; licence remains review_required."
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Novo Caged and RAIS",
+      "status": "partial",
+      "evidence": [
+        "crates/opencnpj-lab/src/official.rs",
+        "crates/opencnpj-lab/src/official/xlsx.rs",
+        "crates/opencnpj-insights/official/sources.toml",
+        "docs/intelligence/results/official-data-mt/STAGE-3.md",
+        "docs/intelligence/results/official-data-mt/REAL-DATA.md",
+        "docs/intelligence/results/official-data-mt/logs/stage-3-rais-import.log",
+        "docs/intelligence/results/official-data-mt/logs/stage-3-rais-query.log"
+      ],
+      "blockers": [
+        "Novo Caged monthly aggregate blocked: no admitted stable small municipal endpoint; PDET FTP microdata and Google Drive tables not used to fabricate a series."
+      ]
+    },
+    {
+      "id": 4,
+      "name": "MT agriculture: PAM, PPM, LSPA",
+      "status": "complete",
+      "evidence": [
+        "crates/opencnpj-lab/src/official.rs",
+        "crates/opencnpj-insights/official/sources.toml",
+        "docs/intelligence/results/official-data-mt/STAGE-4.md",
+        "docs/intelligence/results/official-data-mt/REAL-DATA.md",
+        "docs/intelligence/results/official-data-mt/logs/stage-2-real-queries.log"
+      ],
+      "blockers": []
+    },
+    {
+      "id": 5,
+      "name": "MT fleet and ANTT transport specialization",
+      "status": "partial",
+      "evidence": [
+        "crates/opencnpj-insights/official/sources.toml",
+        "crates/opencnpj-lab/src/official.rs",
+        "crates/opencnpj-lab/src/official/adapters.rs",
+        "crates/opencnpj-lab/src/official/xlsx.rs",
+        "docs/intelligence/results/official-data-mt/ADAPTERS.md",
+        "docs/intelligence/results/official-data-mt/REAL-DATA.md",
+        "docs/intelligence/results/official-data-mt/STAGE-5.md",
+        "docs/intelligence/results/official-data-mt/logs/stage-5-senatran-import.log",
+        "docs/intelligence/results/official-data-mt/logs/stage-5-senatran-queries.log"
+      ],
+      "blockers": [
+        "ANTT identified resources and CNPJ/fleet ownership are still not admitted; ANTT aggregate RNTRC records are now ingestible."
+      ]
+    },
+    {
+      "id": 6,
+      "name": "First usable MT release and analytical joins",
+      "status": "complete",
+      "evidence": [
+        "docs/intelligence/results/official-data-mt/ACCEPTANCE.md",
+        "docs/intelligence/results/official-data-mt/acceptance/cases.json",
+        "docs/intelligence/results/official-data-mt/acceptance/results.json",
+        "scripts/official-data/run_acceptance.py",
+        "docs/intelligence/results/official-data-mt/logs/stage-6-acceptance.log",
+        "docs/intelligence/results/official-data-mt/logs/stage-6-test.log"
+      ],
+      "blockers": []
+    },
+    {
+      "id": 7,
+      "name": "Government-sales pack: PNCP, Compras and CGU",
+      "status": "blocked",
+      "evidence": [
+        "docs/intelligence/results/official-data-mt/STAGE-7-9.md",
+        "crates/opencnpj-insights/official/sources.toml"
+      ],
+      "blockers": [
+        "PNCP/Compras/CGU contracts were not admitted: contract-level schema, pagination, deduplication, amount semantics and sanction scope require a dedicated store. PNCP HTML returned HTTP 401; Compras guessed endpoint returned HTTP 404."
+      ]
+    },
+    {
+      "id": 8,
+      "name": "Additional verticals and local enrichment",
+      "status": "partial",
+      "evidence": [
+        "crates/opencnpj-insights/official/sources.toml",
+        "crates/opencnpj-lab/src/official/adapters.rs",
+        "docs/intelligence/results/official-data-mt/ADAPTERS.md",
+        "docs/intelligence/results/official-data-mt/STAGE-7-9.md"
+      ],
+      "blockers": [
+        "CNES, INEP, ANP, Comex Stat, BCB and MT portal ingestion adapters are implemented; analytical queries/joins over these record stores are not yet curated."
+      ]
+    },
+    {
+      "id": 9,
+      "name": "Licence-sensitive energy and fiscal context",
+      "status": "partial",
+      "evidence": [
+        "crates/opencnpj-insights/official/sources.toml",
+        "crates/opencnpj-lab/src/official/adapters.rs",
+        "docs/intelligence/results/official-data-mt/ADAPTERS.md",
+        "docs/intelligence/results/official-data-mt/STAGE-7-9.md"
+      ],
+      "blockers": [
+        "PGFN FGTS/Previdenciário and ANEEL record ingestion are implemented; ODbL adapted-database and fiscal-join assessments remain pending."
+      ]
+    },
+    {
+      "id": 10,
+      "name": "Product/API completion and full delivery",
+      "status": "complete",
+      "evidence": [
+        "crates/opencnpj/src/api.rs",
+        "crates/opencnpj/tests/accounts_contract.rs",
+        "docs/API.md",
+        "docs/intelligence/results/official-data-mt/FINAL-REPORT.md",
+        "docs/intelligence/results/official-data-mt/logs/stage-10-http-api.log",
+        "docs/intelligence/results/official-data-mt/logs/stage-10-test.log"
+      ],
+      "blockers": [
+        "Commercially enabled capabilities remain limited to the licence review decisions recorded in the source registry."
+      ]
+    },
+    {
+      "id": 11,
+      "name": "Additional source audit and CNPJ crosswalk",
+      "status": "complete",
+      "evidence": [
+        "docs/intelligence/results/official-data-mt/SOURCE-AUDIT.md",
+        "docs/intelligence/results/official-data-mt/INCONSISTENCIES.md",
+        "docs/intelligence/results/official-data-mt/audit/source-audit.json",
+        "docs/intelligence/results/official-data-mt/audit/cnpj-crosswalk-audit.json",
+        "crates/opencnpj-insights/official/audit-probes.toml",
+        "crates/opencnpj-lab/src/official.rs"
+      ],
+      "blockers": [
+        "Large national resources were bounded samples; full microdata admission still requires a dedicated streaming adapter."
+      ]
+    },
+    {
+      "id": 12,
+      "name": "Full-resource record adapters",
+      "status": "complete",
+      "evidence": [
+        "crates/opencnpj-lab/src/official/adapters.rs",
+        "crates/opencnpj-insights/src/official/records.rs",
+        "docs/intelligence/results/official-data-mt/ADAPTERS.md",
+        "docs/intelligence/results/official-data-mt/ingest/records-cnpj-audit-national.json",
+        "docs/intelligence/results/official-data-mt/logs/stage-12-verify-records-national.log"
+      ],
+      "blockers": [
+        "Adapters buffer parsed records before publication; full national runs peaked at ~10.7 GB RSS. A streaming sink is future work.",
+        "CNES DF administrative-region codes need a verified crosswalk.",
+        "Invalid PGFN CNPJs need source/crosswalk normalization before joins."
+      ]
+    },
+    {
+      "id": 13,
+      "name": "Streaming sink and remaining source adapters",
+      "status": "complete",
+      "evidence": [
+        "crates/opencnpj-insights/src/official/records.rs",
+        "crates/opencnpj-lab/src/official/adapters.rs",
+        "docs/intelligence/results/official-data-mt/ADAPTERS.md",
+        "docs/intelligence/results/official-data-mt/ingest/records-cnpj-audit-national.json",
+        "docs/intelligence/results/official-data-mt/logs/stage-13-stream-inep-national.log",
+        "docs/intelligence/results/official-data-mt/logs/stage-13-stream-pgfn-prev-national.log"
+      ],
+      "blockers": []
+    },
+    {
+      "id": 14,
+      "name": "Close streaming, CNES DF crosswalk and invalid-CNPJ quarantine",
+      "status": "complete",
+      "evidence": [
+        "crates/opencnpj-lab/src/official/adapters.rs",
+        "docs/intelligence/results/official-data-mt/ADAPTERS.md",
+        "docs/intelligence/results/official-data-mt/INCONSISTENCIES.md",
+        "docs/intelligence/results/official-data-mt/ingest/records-cnpj-audit-mt.json",
+        "docs/intelligence/results/official-data-mt/ingest/records-cnpj-audit-national.json",
+        "docs/intelligence/results/official-data-mt/logs/stage-14-ingest-aneel-stream.log",
+        "docs/intelligence/results/official-data-mt/logs/stage-14-ingest-cnes-national-df.log",
+        "docs/intelligence/results/official-data-mt/logs/stage-14-ingest-pgfn-prev-national.log",
+        "docs/intelligence/results/official-data-mt/logs/stage-14-audit-records-national.log"
+      ],
+      "blockers": [
+        "One valid ANEEL CNPJ (14955450001890) is absent from the 2026-10 snapshot and remains an explicit crosswalk exception.",
+        "The CNES DF collapse to Brasília is an intentional municipality-level normalization; it is not an administrative-region identity."
+      ]
+    }
+  ]
+}

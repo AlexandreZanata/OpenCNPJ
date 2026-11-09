@@ -47,13 +47,46 @@ reference table or the RFB layout defines them.
 | `GET /api/v1/distribution` | Snapshot files offered for download, with sizes and SHA-256 |
 | `GET /downloads/{file}` | Download a snapshot / checksum / build report (supports `Range`, resumable) |
 | `GET /api/v1/dominios`, `/api/v1/dominios/{tabela}` | Reference tables (`cnaes`, `municipios`, `naturezas`, `paises`, `qualificacoes`, `motivos`) |
+| `GET /api/v1/official/sources` | Official source/dataset registry states and locally imported `.ocind` manifests |
+| `GET /api/v1/official/query` | Typed official-indicator lookup, compare, rank, trend or ratio (requires `--official-dir`) |
 | `GET /` | Service name, version and endpoint list |
 | `GET /healthz`, `/health`, `/readyz` | Liveness / readiness |
 | `GET /metrics` | Prometheus: per-route request counts, latency histograms, status classes, caches, rejections, RSS. On the public listener only with `--auth off`; otherwise on the admin listener (staff login). |
 | `/api/v1/auth/*` | Register, login, logout, profile, key rotation, recovery — see [ACCOUNTS.md](ACCOUNTS.md) |
 
 Public without a credential: `/`, health routes, `/campos`, `/dominios*`, `/snapshot`,
-`/distribution` and `/api/v1/auth/*`. Every other route above is a data route.
+`/distribution`, `/api/v1/official/sources` and `/api/v1/auth/*`. Every other route above
+is a data route.
+
+## Official indicator endpoints
+
+Start the server with `--official-dir DIR`, pointing at the directory containing the
+immutable `.ocind` stores built by `opencnpj-intel official import-*`.
+
+`GET /api/v1/official/sources` is public and lists the compiled source registry plus the
+imported manifests (dataset, state, licence status, rows, periods and raw hash).
+
+`GET /api/v1/official/query` is a gated data route with typed parameters:
+
+| Parameter | Meaning |
+|---|---|
+| `operation` | `lookup` (default), `compare`, `rank`, `trend` or `ratio` |
+| `variable` | Curated variable ID, e.g. `populacao_estimada`, `pam_producao`, `frota_caminhao` |
+| `denominator` | Required by `ratio` |
+| `geography` | Comma-separated IBGE municipality/state codes |
+| `period` | Comma-separated reference periods (`2024`, `2023`, `202609`) |
+| `classification`, `category` | Optional source class/category pair, e.g. `81` and `2713` |
+| `level` | `rank` geography level, default `N6` |
+| `uf` | `rank` UF filter (`MT` or `51`) |
+| `limit` | `rank` size, 1-100 |
+| `ascending` | `rank` order (default descending) |
+| `scale` | `ratio` multiplier (default 1) |
+
+The response is the same source-aware envelope used by the CLI: status, operation,
+title, unit, periods, coverage, calculation, rows, sources with licence/URL/retrieval
+date, limitations and the Portuguese text. Missing, suppressed, not-available and
+observed-zero cells stay distinct. A municipal statistic is never returned as a fact
+about an individual CNPJ.
 
 ## Search parameters
 

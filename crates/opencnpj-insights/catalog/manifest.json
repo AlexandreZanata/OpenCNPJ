@@ -1,0 +1,80 @@
+{
+  "artifacts": {
+    "municipalities.tsv": {
+      "bytes": 808286,
+      "sha256": "d0bc5bbe308d35ae3b7913e617f0928ca5ac187464c49d517e11b4048d74c2b5"
+    },
+    "overrides.tsv": {
+      "bytes": 206,
+      "sha256": "e2cf75745fda1a9095fe63405914ca223a187ed026cf3842b47808cba19fb039"
+    },
+    "rfb-name-differences.tsv": {
+      "bytes": 1113,
+      "sha256": "df7d1b2139b2d074442440c07841dc4538a49d2794a88c17d8f328dada32aaee"
+    }
+  },
+  "census_year": 2022,
+  "estimate_year": 2026,
+  "neighbour_excluded_operational_areas": [
+    4300001,
+    4300002
+  ],
+  "snapshot": {
+    "competence": "2026-10",
+    "sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+  },
+  "source_manifest": {
+    "retrieved_on": "2026-11-04",
+    "sources": [
+      {
+        "bytes": 435942,
+        "file": "tabmun.csv",
+        "sha256": "3651c930ca1ddfde0bb7b47130795f332330d4c66b3db70f49f3ca3494e4242d",
+        "terms_note": "Resource licence unspecified; the Tesouro open-data portal asks for source attribution.",
+        "terms_url": "https://www.tesourotransparente.gov.br/ckan/dataset/abb968cb-3710-4f85-89cf-875c91b9c7f6/resource/eebb3bc6-9eea-4496-8bcf-304f33155282",
+        "url": "https://www.tesourotransparente.gov.br/ckan/dataset/abb968cb-3710-4f85-89cf-875c91b9c7f6/resource/eebb3bc6-9eea-4496-8bcf-304f33155282/download/tabmun.csv"
+      },
+      {
+        "bytes": 2470036,
+        "file": "ibge-municipios.json",
+        "sha256": "86ecdccdf97d72e7e5e46f0854cfcea8bacc28154cc1bc4ed0e6110e3a6c9c02",
+        "terms_note": "Public IBGE API; no dataset-specific redistribution licence stated in the API documentation.",
+        "terms_url": "https://www.ibge.gov.br/acesso-informacao/acoes-e-programas/politica-de-privacidade.html",
+        "url": "https://servicodados.ibge.gov.br/api/v1/localidades/municipios"
+      },
+      {
+        "bytes": 689303,
+        "file": "ibge-census-2022.json",
+        "sha256": "a655584dff46e1c72651a6f752d4315a93817c2a611d12e4f9dd72c8a6e7dcde",
+        "terms_note": "Public IBGE API; no dataset-specific redistribution licence stated in the API documentation.",
+        "terms_url": "https://www.ibge.gov.br/acesso-informacao/acoes-e-programas/politica-de-privacidade.html",
+        "url": "https://servicodados.ibge.gov.br/api/v3/agregados/4709/periodos/2022/variaveis/93?localidades=N6%5Ball%5D"
+      },
+      {
+        "bytes": 689494,
+        "file": "ibge-estimate-2026.json",
+        "sha256": "36b8bd4c9ec1c74f0b1e76cbb108fec91571c351b9423e508bf0f4350e6d27b0",
+        "terms_note": "Public IBGE API; no dataset-specific redistribution licence stated in the API documentation.",
+        "terms_url": "https://www.ibge.gov.br/acesso-informacao/acoes-e-programas/politica-de-privacidade.html",
+        "url": "https://servicodados.ibge.gov.br/api/v3/agregados/6579/periodos/2026/variaveis/9324?localidades=N6%5Ball%5D"
+      },
+      {
+        "bytes": 1126084,
+        "file": "ibge-neighbours-2024.ods",
+        "sha256": "c811594801deca33a34dd5fed39521220d67daf0d57892a01ae2bb329ae1c95a",
+        "terms_note": "IBGE GeoFTP lists the files as public; no dataset-specific redistribution licence stated in the directory.",
+        "terms_url": "https://www.ibge.gov.br/acesso-informacao/acoes-e-programas/politica-de-privacidade.html",
+        "url": "https://geoftp.ibge.gov.br/organizacao_do_territorio/estrutura_territorial/municipios_limitrofes/2024/BR_Municipios_2024_LIMITROFES.ods"
+      },
+      {
+        "bytes": 6477540,
+        "file": "ibge-localities-2022-gpkg.zip",
+        "sha256": "1d96d5f0b379972a506d4b18c3696af974fbe59f8f6680557cb3a6dd38a0eb57",
+        "terms_note": "IBGE GeoFTP lists the files as public; no dataset-specific redistribution licence stated in the directory.",
+        "terms_url": "https://www.ibge.gov.br/acesso-informacao/acoes-e-programas/politica-de-privacidade.html",
+        "url": "https://geoftp.ibge.gov.br/organizacao_do_territorio/estrutura_territorial/localidades/Localidades_do_Brasil/2022/Localidades_Brasil_gpkg.zip"
+      }
+    ]
+  },
+  "version": 1
+}

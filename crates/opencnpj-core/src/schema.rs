@@ -213,11 +213,17 @@ pub mod col {
         pub const DATA_INICIO: usize = 9;
         pub const CNAE_PRINCIPAL: usize = 10;
         pub const CNAE_SECUNDARIA: usize = 11;
+        pub const TIPO_LOGRADOURO: usize = 12;
+        pub const LOGRADOURO: usize = 13;
+        pub const NUMERO: usize = 14;
+        pub const COMPLEMENTO: usize = 15;
+        pub const BAIRRO: usize = 16;
         pub const CEP: usize = 17;
         pub const UF: usize = 18;
         pub const MUNICIPIO: usize = 19;
         pub const DDD_1: usize = 20;
         pub const TELEFONE_1: usize = 21;
+        pub const DDD_2: usize = 22;
         pub const TELEFONE_2: usize = 23;
         pub const EMAIL: usize = 26;
     }
@@ -262,6 +268,9 @@ mod tests {
         assert_eq!(est[col::est::DATA_INICIO].name, "data_inicio_atividade");
         assert_eq!(est[col::est::DATA_SITUACAO].name, "data_situacao_cadastral");
         assert_eq!(est[col::est::CEP].name, "cep");
+        assert_eq!(est[col::est::TIPO_LOGRADOURO].name, "tipo_logradouro");
+        assert_eq!(est[col::est::BAIRRO].name, "bairro");
+        assert_eq!(est[col::est::DDD_2].name, "ddd_2");
         assert_eq!(est[col::est::DDD_1].name, "ddd_1");
         assert_eq!(est[col::est::TELEFONE_2].name, "telefone_2");
         assert_eq!(est[col::est::EMAIL].name, "correio_eletronico");

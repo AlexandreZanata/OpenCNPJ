@@ -1,0 +1,83 @@
+{
+  "categories": {
+    "corporate_structure_hq_branches_identity": {
+      "gold_backend_ok": 80,
+      "interpretation_correct": 80,
+      "items": 80
+    },
+    "cross_variable_correlation": {
+      "gold_backend_ok": 82,
+      "interpretation_correct": 100,
+      "items": 100
+    },
+    "dialogue_corrections_references_planning": {
+      "gold_backend_ok": 116,
+      "interpretation_correct": 120,
+      "items": 120
+    },
+    "geography_catchments_comparisons": {
+      "gold_backend_ok": 100,
+      "interpretation_correct": 100,
+      "items": 100
+    },
+    "historical_stock_flows_seasonality": {
+      "gold_backend_ok": 100,
+      "interpretation_correct": 100,
+      "items": 100
+    },
+    "market_size_density_competition": {
+      "gold_backend_ok": 80,
+      "interpretation_correct": 100,
+      "items": 100
+    },
+    "prospecting_qualification_territory": {
+      "gold_backend_ok": 140,
+      "interpretation_correct": 140,
+      "items": 140
+    },
+    "source_quality_provenance_uncertainty": {
+      "gold_backend_ok": 20,
+      "interpretation_correct": 60,
+      "items": 60
+    },
+    "supply_chain_complementary": {
+      "gold_backend_ok": 100,
+      "interpretation_correct": 100,
+      "items": 100
+    },
+    "tax_size_legal_capital_numeric": {
+      "gold_backend_ok": 40,
+      "interpretation_correct": 40,
+      "items": 40
+    },
+    "unsupported_missing_contradictions": {
+      "interpretation_correct": 60,
+      "items": 60
+    }
+  },
+  "counts": {
+    "act_correct": 806,
+    "act_items": 838,
+    "correct_executed_answer": 858,
+    "decision_correct": 1000,
+    "execution_fresh": 856,
+    "execution_reused_identical_ir": 2,
+    "gold_backend_ok": 858,
+    "gold_empty_records": 77,
+    "gold_zero_scalar": 156,
+    "interpretation_correct": 1000,
+    "items": 1000,
+    "verification_engine_match": 546,
+    "verification_marginal_match": 5,
+    "verification_no_independent_reference": 37,
+    "verification_not_numeric": 20,
+    "verification_single_backend": 250
+  },
+  "data_anchor": "2026-10-11",
+  "evidence_score": "Rule evidence is not a calibrated probability.",
+  "human_validation": "Not performed; human validation is deferred to product refinement.",
+  "method": "Actual text-only deterministic interpretation; gold IR used only for canonical scoring and separate backend reference, never as a prediction or conversation seed.",
+  "set": "crates/opencnpj-lab/eval/commercial-round-14/batches/batch-001.jsonl",
+  "set_sha256": "2e7fbc6c04c45f34a57258a46ba6a68979dc17d0526b276d96c37bd5f8add479",
+  "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
+}

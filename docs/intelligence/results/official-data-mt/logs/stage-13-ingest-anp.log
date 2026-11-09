@@ -1,0 +1,3 @@
+raw	/data/opencnpj-data/intelligence/official/ingest/raw/anp_precos_revenda_latest.csv	bytes=8130008	sha256=a04fd8b6beb1d4e16493552700aef1370ef904eadd2ba461f1a7a35473ae44f0
+published	/data/opencnpj-data/intelligence/official/ingest/mt/anp-precos-revenda.ocrec	rows=843	total=47555	out_of_scope=46712	rejected=0	duplicates=0	bytes=618496	sha256=a7b392fe8aae94f15b0e9d71d3f7f77dfdb5ff126067230425ca183dfa938502
+elapsed 1.22 maxrss 30560

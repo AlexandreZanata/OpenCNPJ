@@ -1,0 +1,1020 @@
+# Official source registry. Checked 2026-11-08.
+#
+# `state` is a lifecycle state for the resource as verified by this repository:
+# discovered, verified, fetched, normalized, queryable, commercially_enabled,
+# stale, failed or unavailable. `licence_status` is separate from `state`.
+
+version = 1
+
+[[source]]
+id = "ibge"
+category = "statistics"
+title = "Instituto Brasileiro de Geografia e Estatística"
+publisher = "IBGE"
+discovery_url = "https://servicodados.ibge.gov.br/api/v3/agregados"
+metadata_url = "https://servicodados.ibge.gov.br/api/v3/agregados/6579/metadados"
+licence = "IBGE public statistics; resource-level terms require review"
+licence_url = "https://www.ibge.gov.br/acesso-informacao/termos-de-uso.html"
+licence_status = "review_required"
+attribution = "Fonte: IBGE"
+cadence = "annual or monthly, by aggregate"
+state = "verified"
+checked_at = "2026-11-08"
+notes = "The metadata API returned HTTP 200; the terms page returned HTTP 403 to an automated request on the check date. Do not label the data CC BY without a resource-level review."
+
+[[source]]
+id = "mte"
+category = "labour"
+title = "Ministério do Trabalho e Emprego - estatísticas"
+publisher = "MTE"
+discovery_url = "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/estatisticas-trabalho"
+metadata_url = "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/estatisticas-trabalho"
+licence = "Public employment statistics; resource-level terms not yet verified"
+licence_url = "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/estatisticas-trabalho"
+licence_status = "review_required"
+attribution = "Fonte: MTE"
+cadence = "monthly (Novo Caged) and annual (RAIS)"
+state = "discovered"
+checked_at = "2026-11-08"
+notes = "No verified small bulk aggregate endpoint was admitted in this slice. Public microdata are non-identified and are not company-level workforce facts."
+
+[[source]]
+id = "senatran"
+category = "transport"
+title = "Senatran - frota de veículos"
+publisher = "Ministério dos Transportes / Senatran"
+discovery_url = "https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2026"
+metadata_url = "https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2026"
+licence = "Public fleet statistics; resource-level terms not yet verified"
+licence_url = "https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2026"
+licence_status = "review_required"
+attribution = "Fonte: Senatran"
+cadence = "monthly"
+state = "verified"
+checked_at = "2026-11-08"
+notes = "The page returned HTTP 200 and links monthly XLSX files. Registered fleet is not circulating fleet and does not identify a CNPJ's vehicles."
+
+[[source]]
+id = "antt"
+category = "transport"
+title = "ANTT - RNTRC"
+publisher = "Agência Nacional de Transportes Terrestres"
+discovery_url = "https://dados.antt.gov.br/pt_BR/dataset/rntrc-veiculos"
+metadata_url = "https://dados.antt.gov.br/pt_BR/dataset/rntrc-veiculos"
+licence = "Creative Commons Attribution (declared for the checked vehicle resource)"
+licence_url = "https://dados.antt.gov.br/pt_BR/dataset/rntrc-veiculos"
+licence_status = "verified"
+attribution = "Fonte: ANTT"
+cadence = "monthly history; identified resources have separate coverage"
+state = "discovered"
+checked_at = "2026-11-08"
+notes = "Aggregate history and identified resources have different schemas. No CNPJ/fleet linkage is promised before inspecting the admitted resource."
+
+[[source]]
+id = "pncp"
+category = "procurement"
+title = "Portal Nacional de Contratações Públicas"
+publisher = "PNCP"
+discovery_url = "https://www.gov.br/pncp/pt-br/acesso-a-informacao/dados-abertos"
+metadata_url = "https://pncp.gov.br/api/consulta/swagger-ui/index.html"
+licence = "Public procurement data; reuse terms require review"
+licence_url = "https://www.gov.br/pncp/pt-br/acesso-a-informacao/dados-abertos"
+licence_status = "review_required"
+attribution = "Fonte: PNCP"
+cadence = "publication follows each responsible organization"
+state = "discovered"
+checked_at = "2026-11-08"
+notes = "The institutional page returned HTTP 401 to an automated request. No universal real-time coverage or fixed SLA is claimed."
+
+[[source]]
+id = "compras"
+category = "procurement"
+title = "Compras.gov.br - dados abertos"
+publisher = "Ministério da Gestão e da Inovação em Serviços Públicos"
+discovery_url = "https://dadosabertos.compras.gov.br/swagger-ui/index.html"
+metadata_url = "https://dadosabertos.compras.gov.br/swagger-ui/index.html"
+licence = "Public procurement data; reuse terms require review"
+licence_url = "https://dadosabertos.compras.gov.br/swagger-ui/index.html"
+licence_status = "review_required"
+attribution = "Fonte: Compras.gov.br"
+cadence = "publication follows each responsible organization"
+state = "verified"
+checked_at = "2026-11-08"
+notes = "Swagger UI returned HTTP 200. Estimated, awarded, contracted and paid amounts are distinct concepts."
+
+[[source]]
+id = "cgu"
+category = "compliance"
+title = "CGU - CEIS e CNEP"
+publisher = "Controladoria-Geral da União"
+discovery_url = "https://portaldatransparencia.gov.br/download-de-dados/ceis"
+metadata_url = "https://portaldatransparencia.gov.br/origem-dos-dados"
+licence = "Public sanction records; reuse terms require review"
+licence_url = "https://portaldatransparencia.gov.br/download-de-dados/ceis"
+licence_status = "review_required"
+attribution = "Fonte: CGU"
+cadence = "declared updates every four hours; publication gaps remain possible"
+state = "verified"
+checked_at = "2026-11-08"
+notes = "A missing sanction record is not a certificate of good standing. Match CNPJ, sanction scope and effective dates."
+
+[[source]]
+id = "cnes"
+category = "health"
+title = "CNES - Cadastro Nacional de Estabelecimentos de Saúde"
+publisher = "Ministério da Saúde"
+discovery_url = "https://dadosabertos.saude.gov.br/dataset/cnes-cadastro-nacional-de-estabelecimentos-de-saude"
+metadata_url = "https://dadosabertos.saude.gov.br/dataset/cnes-cadastro-nacional-de-estabelecimentos-de-saude"
+licence = "Public health-establishment data; reuse terms require review"
+licence_url = "https://dadosabertos.saude.gov.br/dataset/cnes-cadastro-nacional-de-estabelecimentos-de-saude"
+licence_status = "review_required"
+attribution = "Fonte: Ministério da Saúde / CNES"
+cadence = "establishments update at least monthly; national publication can lag"
+state = "discovered"
+checked_at = "2026-11-08"
+notes = "CNES IDs are not CNPJs. Personal-professional fields are out of scope."
+
+[[source]]
+id = "inep"
+category = "education"
+title = "INEP - Censo Escolar"
+publisher = "INEP"
+discovery_url = "https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/microdados/censo-escolar"
+metadata_url = "https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/microdados/censo-escolar"
+licence = "Public education microdata; reuse terms require review"
+licence_url = "https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/microdados/censo-escolar"
+licence_status = "review_required"
+attribution = "Fonte: INEP"
+cadence = "annual"
+state = "discovered"
+checked_at = "2026-11-08"
+notes = "School IDs are not CNPJs. Student-level information is out of scope."
+
+[[source]]
+id = "anp"
+category = "fuel"
+title = "ANP - levantamento de preços de combustíveis"
+publisher = "Agência Nacional do Petróleo, Gás Natural e Biocombustíveis"
+discovery_url = "https://www.gov.br/anp/pt-br/assuntos/precos-e-defesa-da-concorrencia/precos/precos-revenda-e-de-distribuicao-combustiveis/informacoes-levantamento-de-precos-de-combustiveis"
+metadata_url = "https://www.gov.br/anp/pt-br/assuntos/precos-e-defesa-da-concorrencia/precos/precos-revenda-e-de-distribuicao-combustiveis/informacoes-levantamento-de-precos-de-combustiveis"
+licence = "Public sampled prices; reuse terms require review"
+licence_url = "https://www.gov.br/anp/pt-br/assuntos/precos-e-defesa-da-concorrencia/precos/precos-revenda-e-de-distribuicao-combustiveis/informacoes-levantamento-de-precos-de-combustiveis"
+licence_status = "review_required"
+attribution = "Fonte: ANP"
+cadence = "weekly sample, with historical series"
+state = "discovered"
+checked_at = "2026-11-08"
+notes = "The survey is a sample, not every station or municipality and not a live pump-price feed."
+
+[[source]]
+id = "comexstat"
+category = "trade"
+title = "Comex Stat"
+publisher = "MDIC"
+discovery_url = "https://comexstat.mdic.gov.br/pt/home"
+metadata_url = "https://www.gov.br/mdic/pt-br/assuntos/comercio-exterior/estatisticas/perguntas-frequentes-faq"
+licence = "Public trade statistics; reuse terms require review"
+licence_url = "https://www.gov.br/mdic/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta"
+licence_status = "review_required"
+attribution = "Fonte: MDIC / Comex Stat"
+cadence = "monthly"
+state = "verified"
+checked_at = "2026-11-08"
+notes = "Municipal detail uses the declarant's fiscal domicile and SH4. Do not create CNPJ-level exporter lists from municipal totals."
+
+[[source]]
+id = "bcb"
+category = "macroeconomy"
+title = "Banco Central do Brasil - dados abertos"
+publisher = "BCB"
+discovery_url = "https://www.bcb.gov.br/acessoinformacao/dadosabertos"
+metadata_url = "https://www.bcb.gov.br/acessoinformacao/dadosabertos"
+licence = "Public economic series; reuse terms require review"
+licence_url = "https://www.bcb.gov.br/acessoinformacao/dadosabertos"
+licence_status = "review_required"
+attribution = "Fonte: BCB"
+cadence = "series-specific"
+state = "verified"
+checked_at = "2026-11-08"
+notes = "Each series has its own frequency, unit and revision policy. No company banking balances or credit limits."
+
+[[source]]
+id = "aneel"
+category = "energy"
+title = "ANEEL - geração distribuída"
+publisher = "ANEEL"
+discovery_url = "https://dadosabertos.aneel.gov.br/dataset/relacao-de-empreendimentos-de-geracao-distribuida"
+metadata_url = "https://dadosabertos.aneel.gov.br/dataset/relacao-de-empreendimentos-de-geracao-distribuida"
+licence = "Open Database License (ODbL)"
+licence_url = "https://opendatacommons.org/licenses/odbl/summary/"
+licence_status = "verified"
+attribution = "Fonte: ANEEL"
+cadence = "not confirmed in this review"
+state = "discovered"
+checked_at = "2026-11-08"
+notes = "ODbL adapted-database obligations must be assessed before commercial enablement. A generator register does not identify every installer or prove consumption."
+
+[[source]]
+id = "pgfn"
+category = "fiscal"
+title = "PGFN - dívida ativa da União"
+publisher = "Procuradoria-Geral da Fazenda Nacional"
+discovery_url = "https://www.gov.br/pgfn/pt-br/assuntos/divida-ativa-da-uniao/transparencia-fiscal-1/dados-abertos"
+metadata_url = "https://www.gov.br/pgfn/pt-br/assuntos/divida-ativa-da-uniao/transparencia-fiscal-1/dados-abertos"
+licence = "Public fiscal records; reuse terms require review"
+licence_url = "https://www.gov.br/pgfn/pt-br/assuntos/divida-ativa-da-uniao/transparencia-fiscal-1/dados-abertos"
+licence_status = "review_required"
+attribution = "Fonte: PGFN"
+cadence = "quarterly"
+state = "discovered"
+checked_at = "2026-11-08"
+notes = "Federal/FGTS scope. A record is not insolvency, a universal credit score or a current tax-clearance certificate. Personal debt stays out of business prospecting."
+
+[[source]]
+id = "mt"
+category = "local_government"
+title = "Dados Abertos MT"
+publisher = "Governo do Estado de Mato Grosso"
+discovery_url = "https://dadosabertos.mt.gov.br/"
+metadata_url = "https://www.seplag.mt.gov.br/portais"
+licence = "Dataset-specific; not yet verified"
+licence_url = "https://dadosabertos.mt.gov.br/"
+licence_status = "review_required"
+attribution = "Fonte: Governo de Mato Grosso"
+cadence = "dataset-specific"
+state = "discovered"
+checked_at = "2026-11-08"
+notes = "A portal group or dashboard is not an admitted bulk dataset. Only individually verified resources may be added."
+
+[[dataset]]
+id = "ibge-6579"
+category = "population"
+source_id = "ibge"
+title = "IBGE - População residente estimada"
+aggregate = "6579"
+api_url = "https://servicodados.ibge.gov.br/api/v3/agregados/6579"
+metadata_url = "https://servicodados.ibge.gov.br/api/v3/agregados/6579/metadados"
+default_localities = "N3[51]|N6[N3[51]]"
+cadence = "annual"
+coverage = "Mato Grosso and its municipalities"
+state = "verified"
+limitations = [
+  "Population estimates are annual and are not a 2022 Census observation.",
+  "A municipal population is not a count of an individual CNPJ's customers."
+]
+
+[[dataset]]
+id = "ibge-9922"
+category = "census"
+source_id = "ibge"
+title = "IBGE - Censo 2022: domicílios e moradores"
+aggregate = "9922"
+api_url = "https://servicodados.ibge.gov.br/api/v3/agregados/9922"
+metadata_url = "https://servicodados.ibge.gov.br/api/v3/agregados/9922/metadados"
+default_localities = "N6[N3[51]]"
+cadence = "2022 Census observation"
+coverage = "Mato Grosso municipalities"
+state = "verified"
+limitations = [
+  "The 2022 Census observation remains anchored to 2022 despite later publication.",
+  "Municipal household averages are not an individual household or CNPJ attribute."
+]
+
+[[dataset]]
+id = "ibge-5938"
+category = "economy"
+source_id = "ibge"
+title = "IBGE - PIB dos municípios"
+aggregate = "5938"
+api_url = "https://servicodados.ibge.gov.br/api/v3/agregados/5938"
+metadata_url = "https://servicodados.ibge.gov.br/api/v3/agregados/5938/metadados"
+default_localities = "N3[51]|N6[N3[51]]"
+cadence = "annual, with publication lag"
+coverage = "Mato Grosso and its municipalities"
+state = "verified"
+limitations = [
+  "PIB municipal per capita is not household income or purchasing power.",
+  "The 2022-2023 edition does not provide every traditional sector detail uniformly across years."
+]
+
+[[dataset]]
+id = "ibge-9509"
+category = "economy"
+source_id = "ibge"
+title = "IBGE - CEMPRE"
+aggregate = "9509"
+api_url = "https://servicodados.ibge.gov.br/api/v3/agregados/9509"
+metadata_url = "https://servicodados.ibge.gov.br/api/v3/agregados/9509/metadados"
+default_localities = "N6[N3[51]]"
+cadence = "annual"
+coverage = "Mato Grosso municipalities"
+state = "verified"
+limitations = [
+  "CEMPRE active units are not the RFB administrative active status and are not interchangeable.",
+  "Aggregate payroll and employment are not a particular CNPJ's headcount or payroll."
+]
+
+[[dataset]]
+id = "ibge-1612"
+category = "agriculture"
+source_id = "ibge"
+title = "IBGE - PAM lavouras temporárias"
+aggregate = "1612"
+api_url = "https://servicodados.ibge.gov.br/api/v3/agregados/1612"
+metadata_url = "https://servicodados.ibge.gov.br/api/v3/agregados/1612/metadados"
+default_localities = "N6[N3[51]]"
+cadence = "annual"
+coverage = "Mato Grosso municipalities"
+state = "verified"
+limitations = [
+  "Annual municipal production cannot be divided into monthly municipal production.",
+  "A production total does not identify a farm, a CNPJ's land, machinery or purchasing intent."
+]
+
+[[dataset]]
+id = "ibge-1613"
+category = "agriculture"
+source_id = "ibge"
+title = "IBGE - PAM lavouras permanentes"
+aggregate = "1613"
+api_url = "https://servicodados.ibge.gov.br/api/v3/agregados/1613"
+metadata_url = "https://servicodados.ibge.gov.br/api/v3/agregados/1613/metadados"
+default_localities = "N6[N3[51]]"
+cadence = "annual"
+coverage = "Mato Grosso municipalities"
+state = "verified"
+limitations = [
+  "Annual municipal production cannot be divided into monthly municipal production.",
+  "Coffee total and variety categories must not be summed blindly."
+]
+
+[[dataset]]
+id = "ibge-3939"
+category = "agriculture"
+source_id = "ibge"
+title = "IBGE - PPM efetivo dos rebanhos"
+aggregate = "3939"
+api_url = "https://servicodados.ibge.gov.br/api/v3/agregados/3939"
+metadata_url = "https://servicodados.ibge.gov.br/api/v3/agregados/3939/metadados"
+default_localities = "N6[N3[51]]"
+cadence = "annual"
+coverage = "Mato Grosso municipalities"
+state = "verified"
+limitations = [
+  "Herd totals do not identify ownership, a rural property or a CNPJ.",
+  "Animal categories are distinct and must not be summed without an explicit rule."
+]
+
+[[dataset]]
+id = "ibge-6588"
+category = "agriculture"
+source_id = "ibge"
+title = "IBGE - LSPA série histórica"
+aggregate = "6588"
+api_url = "https://servicodados.ibge.gov.br/api/v3/agregados/6588"
+metadata_url = "https://servicodados.ibge.gov.br/api/v3/agregados/6588/metadados"
+default_localities = "N3[51]"
+cadence = "monthly"
+coverage = "Mato Grosso state; municipal detail is not released by this resource"
+state = "verified"
+limitations = [
+  "LSPA is monthly only at the published geographic levels.",
+  "Do not synthesize monthly municipal production by dividing an annual municipal figure."
+]
+
+[[variable]]
+id = "populacao_estimada"
+dataset_id = "ibge-6579"
+source_variable = "9324"
+label = "População residente estimada"
+unit = "Pessoas"
+synonyms = ["populacao", "populacao residente", "populacao estimada", "habitantes"]
+
+[[variable]]
+id = "domicilios_ocupados"
+dataset_id = "ibge-9922"
+source_variable = "381"
+label = "Domicílios particulares permanentes ocupados"
+unit = "Domicílios"
+synonyms = ["domicilios", "domicilios ocupados", "domicilios particulares"]
+
+[[variable]]
+id = "moradores_domicilios"
+dataset_id = "ibge-9922"
+source_variable = "382"
+label = "Moradores em domicílios particulares permanentes ocupados"
+unit = "Pessoas"
+synonyms = ["moradores", "moradores em domicilios"]
+
+[[variable]]
+id = "media_moradores"
+dataset_id = "ibge-9922"
+source_variable = "5930"
+label = "Média de moradores em domicílios ocupados"
+unit = "Pessoas por domicílio"
+synonyms = ["media de moradores", "moradores por domicilio"]
+
+[[variable]]
+id = "pib_municipal"
+dataset_id = "ibge-5938"
+source_variable = "37"
+label = "Produto Interno Bruto a preços correntes"
+unit = "Mil Reais"
+synonyms = ["pib", "produto interno bruto"]
+
+[[variable]]
+id = "va_agropecuaria"
+dataset_id = "ibge-5938"
+source_variable = "513"
+label = "Valor adicionado bruto da agropecuária"
+unit = "Mil Reais"
+synonyms = ["valor adicionado agropecuario", "va agropecuaria"]
+
+[[variable]]
+id = "va_industria"
+dataset_id = "ibge-5938"
+source_variable = "517"
+label = "Valor adicionado bruto da indústria"
+unit = "Mil Reais"
+synonyms = ["valor adicionado industria", "va industria"]
+
+[[variable]]
+id = "va_servicos"
+dataset_id = "ibge-5938"
+source_variable = "6575"
+label = "Valor adicionado bruto dos serviços"
+unit = "Mil Reais"
+synonyms = ["valor adicionado servicos", "va servicos"]
+
+[[variable]]
+id = "cempre_unidades_locais"
+dataset_id = "ibge-9509"
+source_variable = "706"
+label = "Número de unidades locais"
+unit = "Unidades"
+synonyms = ["unidades locais", "unidades locais cempre"]
+
+[[variable]]
+id = "cempre_empresas"
+dataset_id = "ibge-9509"
+source_variable = "367"
+label = "Número de empresas e outras organizações atuantes"
+unit = "Unidades"
+synonyms = ["empresas atuantes", "organizacoes atuantes"]
+
+[[variable]]
+id = "cempre_pessoal_total"
+dataset_id = "ibge-9509"
+source_variable = "707"
+label = "Pessoal ocupado total"
+unit = "Pessoas"
+synonyms = ["pessoal ocupado", "pessoal ocupado total"]
+
+[[variable]]
+id = "cempre_pessoal_assalariado"
+dataset_id = "ibge-9509"
+source_variable = "708"
+label = "Pessoal ocupado assalariado"
+unit = "Pessoas"
+synonyms = ["pessoal assalariado", "pessoal ocupado assalariado"]
+
+[[variable]]
+id = "cempre_salarios"
+dataset_id = "ibge-9509"
+source_variable = "662"
+label = "Salários e outras remunerações"
+unit = "Mil Reais"
+synonyms = ["salarios", "remuneracoes", "salarios e outras remuneracoes"]
+
+[[variable]]
+id = "cempre_salario_medio"
+dataset_id = "ibge-9509"
+source_variable = "10143"
+label = "Salário médio mensal em reais"
+unit = "Reais"
+synonyms = ["salario medio", "salario medio mensal"]
+
+[[variable]]
+id = "pam_area_plantada"
+dataset_id = "ibge-1612"
+source_variable = "109"
+label = "Área plantada"
+unit = "Hectares"
+synonyms = ["area plantada"]
+
+[[variable]]
+id = "pam_area_colhida"
+dataset_id = "ibge-1612"
+source_variable = "216"
+label = "Área colhida"
+unit = "Hectares"
+synonyms = ["area colhida"]
+
+[[variable]]
+id = "pam_producao"
+dataset_id = "ibge-1612"
+source_variable = "214"
+label = "Quantidade produzida"
+unit = "Toneladas"
+synonyms = ["producao agricola", "quantidade produzida"]
+
+[[variable]]
+id = "pam_rendimento"
+dataset_id = "ibge-1612"
+source_variable = "112"
+label = "Rendimento médio da produção"
+unit = "Quilogramas por hectare"
+synonyms = ["rendimento agricola", "produtividade agricola"]
+
+[[variable]]
+id = "pam_valor_producao"
+dataset_id = "ibge-1612"
+source_variable = "215"
+label = "Valor da produção"
+unit = "Mil Reais"
+synonyms = ["valor da producao"]
+
+[[variable]]
+id = "cafe_area_plantada"
+dataset_id = "ibge-1613"
+source_variable = "2313"
+label = "Área destinada à colheita de café"
+unit = "Hectares"
+synonyms = ["area plantada de cafe"]
+
+[[variable]]
+id = "cafe_area_colhida"
+dataset_id = "ibge-1613"
+source_variable = "216"
+label = "Área colhida de café"
+unit = "Hectares"
+synonyms = ["area colhida de cafe"]
+
+[[variable]]
+id = "cafe_producao"
+dataset_id = "ibge-1613"
+source_variable = "214"
+label = "Quantidade produzida de café"
+unit = "Toneladas"
+synonyms = ["producao de cafe", "quantidade produzida de cafe"]
+
+[[variable]]
+id = "cafe_rendimento"
+dataset_id = "ibge-1613"
+source_variable = "112"
+label = "Rendimento médio do café"
+unit = "Quilogramas por hectare"
+synonyms = ["rendimento do cafe", "produtividade do cafe"]
+
+[[variable]]
+id = "cafe_valor_producao"
+dataset_id = "ibge-1613"
+source_variable = "215"
+label = "Valor da produção de café"
+unit = "Mil Reais"
+synonyms = ["valor da producao de cafe"]
+
+[[variable]]
+id = "ppm_efetivo"
+dataset_id = "ibge-3939"
+source_variable = "105"
+label = "Efetivo dos rebanhos"
+unit = "Cabeças"
+synonyms = ["rebanho", "efetivo de rebanho", "cabecas"]
+
+[[variable]]
+id = "lspa_area_plantada"
+dataset_id = "ibge-6588"
+source_variable = "109"
+label = "Área plantada"
+unit = "Hectares"
+synonyms = ["area plantada lspa"]
+
+[[variable]]
+id = "lspa_producao"
+dataset_id = "ibge-6588"
+source_variable = "35"
+label = "Produção"
+unit = "Toneladas"
+synonyms = ["producao lspa"]
+
+[[variable]]
+id = "lspa_rendimento"
+dataset_id = "ibge-6588"
+source_variable = "36"
+label = "Rendimento médio"
+unit = "Quilogramas por hectare"
+synonyms = ["rendimento lspa"]
+
+[[category]]
+id = "soja"
+dataset_id = "ibge-1612"
+classification_id = "81"
+category_id = "2713"
+label = "Soja (em grão)"
+synonyms = ["soja"]
+
+[[category]]
+id = "milho"
+dataset_id = "ibge-1612"
+classification_id = "81"
+category_id = "2711"
+label = "Milho (em grão)"
+synonyms = ["milho"]
+
+[[category]]
+id = "algodao"
+dataset_id = "ibge-1612"
+classification_id = "81"
+category_id = "2689"
+label = "Algodão herbáceo (em caroço)"
+synonyms = ["algodao", "algodao herbaceo"]
+
+[[category]]
+id = "arroz"
+dataset_id = "ibge-1612"
+classification_id = "81"
+category_id = "2692"
+label = "Arroz (em casca)"
+synonyms = ["arroz"]
+
+[[category]]
+id = "feijao"
+dataset_id = "ibge-1612"
+classification_id = "81"
+category_id = "2702"
+label = "Feijão (em grão)"
+synonyms = ["feijao"]
+
+[[category]]
+id = "cana"
+dataset_id = "ibge-1612"
+classification_id = "81"
+category_id = "2696"
+label = "Cana-de-açúcar"
+synonyms = ["cana", "cana de acucar"]
+
+[[category]]
+id = "cafe"
+dataset_id = "ibge-1613"
+classification_id = "82"
+category_id = "2723"
+label = "Café (em grão) Total"
+synonyms = ["cafe"]
+
+[[category]]
+id = "bovino"
+dataset_id = "ibge-3939"
+classification_id = "79"
+category_id = "2670"
+label = "Bovino"
+synonyms = ["bovino", "bovinos", "gado bovino", "boi", "bois"]
+
+[[category]]
+id = "suino"
+dataset_id = "ibge-3939"
+classification_id = "79"
+category_id = "32794"
+label = "Suíno - total"
+synonyms = ["suino", "suinos", "gado suino"]
+
+[[category]]
+id = "galinaceos"
+dataset_id = "ibge-3939"
+classification_id = "79"
+category_id = "32796"
+label = "Galináceos - total"
+synonyms = ["galinaceos", "aves", "galinhas"]
+
+[[category]]
+id = "ovino"
+dataset_id = "ibge-3939"
+classification_id = "79"
+category_id = "2677"
+label = "Ovino"
+synonyms = ["ovino", "ovinos", "gado ovino"]
+
+[[category]]
+id = "lspa_soja"
+dataset_id = "ibge-6588"
+classification_id = "48"
+category_id = "39443"
+label = "Soja - LSPA"
+synonyms = ["soja lspa", "producao de soja lspa"]
+
+[[dataset]]
+id = "mte-rais-2024"
+category = "labour"
+source_id = "mte"
+title = "RAIS 2024 - empregos formais por município e atividade"
+aggregate = "rais-2024-tabela-4"
+api_url = "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/acoes-e-programas/programas-projetos-acoes-obras-e-atividades/estatisticas-trabalho/rais/rais-2024/rais-2024-1/rais-complementar-tabelas-2023x2024.xlsx/@@download/file"
+metadata_url = "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/acoes-e-programas/programas-projetos-acoes-obras-e-atividades/estatisticas-trabalho/rais/rais-2024/rais-2024-1"
+cadence = "annual"
+coverage = "Brazil, states and municipalities; this import keeps the MT slice"
+state = "verified"
+limitations = [
+  "RAIS is an annual administrative record, not a current monthly stock.",
+  "A municipal or sector total is not an individual CNPJ's headcount.",
+  "RAIS codes have six digits; the import bridges them to seven-digit IBGE codes.",
+  "The public microdata are non-identified."
+]
+
+[[variable]]
+id = "rais_emprego_agropecuaria"
+dataset_id = "mte-rais-2024"
+source_variable = "agropecuaria"
+label = "Empregos formais - agropecuária"
+unit = "Vínculos"
+synonyms = ["emprego agropecuario", "empregos na agropecuaria", "rais agropecuaria"]
+
+[[variable]]
+id = "rais_emprego_industria"
+dataset_id = "mte-rais-2024"
+source_variable = "industria"
+label = "Empregos formais - indústria"
+unit = "Vínculos"
+synonyms = ["emprego na industria", "empregos na industria", "rais industria"]
+
+[[variable]]
+id = "rais_emprego_construcao"
+dataset_id = "mte-rais-2024"
+source_variable = "construcao"
+label = "Empregos formais - construção"
+unit = "Vínculos"
+synonyms = ["emprego na construcao", "empregos na construcao", "rais construcao"]
+
+[[variable]]
+id = "rais_emprego_comercio"
+dataset_id = "mte-rais-2024"
+source_variable = "comercio"
+label = "Empregos formais - comércio"
+unit = "Vínculos"
+synonyms = ["emprego no comercio", "empregos no comercio", "rais comercio"]
+
+[[variable]]
+id = "rais_emprego_servicos"
+dataset_id = "mte-rais-2024"
+source_variable = "servicos"
+label = "Empregos formais - serviços"
+unit = "Vínculos"
+synonyms = ["emprego nos servicos", "empregos nos servicos", "rais servicos"]
+
+[[variable]]
+id = "rais_emprego_total"
+dataset_id = "mte-rais-2024"
+source_variable = "total"
+label = "Empregos formais - total"
+unit = "Vínculos"
+synonyms = ["emprego formal", "empregos formais", "estoque de empregos", "rais total"]
+
+[[dataset]]
+id = "senatran-frota-2026-09"
+category = "transport"
+source_id = "senatran"
+title = "Senatran - frota por município e tipo (setembro/2026)"
+aggregate = "frota-municipio-tipo-202609"
+api_url = "https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2026-2/Frota_por_municipio_e_tipo_Setembro_2026.xlsx/@@download/file"
+metadata_url = "https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2026"
+cadence = "monthly"
+coverage = "Brazilian municipalities; this import keeps the MT slice"
+state = "verified"
+limitations = [
+  "Registered fleet is not circulating fleet.",
+  "A municipal fleet total does not identify vehicles owned by an individual CNPJ.",
+  "The publication month is not a real-time circulation feed.",
+  "Municipality names were bridged to seven-digit IBGE codes through the versioned catalogue."
+]
+
+[[variable]]
+id = "frota_total"
+dataset_id = "senatran-frota-2026-09"
+source_variable = "TOTAL"
+label = "Frota registrada total"
+unit = "Veículos"
+synonyms = ["frota", "frota total", "veiculos registrados"]
+
+[[variable]]
+id = "frota_caminhao"
+dataset_id = "senatran-frota-2026-09"
+source_variable = "CAMINHAO"
+label = "Frota registrada de caminhões"
+unit = "Veículos"
+synonyms = ["caminhoes", "caminhao", "frota de caminhoes"]
+
+[[variable]]
+id = "frota_caminhonete"
+dataset_id = "senatran-frota-2026-09"
+source_variable = "CAMINHONETE"
+label = "Frota registrada de caminhonetes"
+unit = "Veículos"
+synonyms = ["caminhonetes", "caminhonete"]
+
+[[variable]]
+id = "frota_motocicleta"
+dataset_id = "senatran-frota-2026-09"
+source_variable = "MOTOCICLETA"
+label = "Frota registrada de motocicletas"
+unit = "Veículos"
+synonyms = ["motocicletas", "motocicleta", "motos", "moto"]
+
+[[variable]]
+id = "frota_automovel"
+dataset_id = "senatran-frota-2026-09"
+source_variable = "AUTOMOVEL"
+label = "Frota registrada de automóveis"
+unit = "Veículos"
+synonyms = ["automoveis", "automovel", "carros"]
+
+[[variable]]
+id = "frota_onibus"
+dataset_id = "senatran-frota-2026-09"
+source_variable = "ONIBUS"
+label = "Frota registrada de ônibus"
+unit = "Veículos"
+synonyms = ["onibus", "frota de onibus"]
+
+[[dataset]]
+id = "antt-rntrc-veiculos"
+category = "transport"
+source_id = "antt"
+title = "ANTT RNTRC - veículos por UF e categoria"
+aggregate = "rntrc-veiculos"
+api_url = "https://dados.antt.gov.br/dataset/2b564396-5593-4b5c-ba2c-3de3fa0a92c0/resource/c1367dd9-2874-4d97-bca3-3940e70bf224/download/rntrc-veiculos.json"
+metadata_url = "https://dados.antt.gov.br/dataset/rntrc-veiculos"
+cadence = "periodic; check the dataset page"
+coverage = "Brazil by UF and vehicle category; this adapter keeps the MT slice"
+state = "verified"
+limitations = [
+  "RNTRC vehicle data are aggregate records by transport category, not identified company fleets.",
+  "Operational registration is not service quality or a client list.",
+  "A vehicle record does not identify a CNPJ owner."
+]
+
+[[dataset]]
+id = "cnes-estabelecimentos"
+category = "health"
+source_id = "cnes"
+title = "CNES - estabelecimentos de saúde"
+aggregate = "cnes-estabelecimentos"
+api_url = "https://s3.sa-east-1.amazonaws.com/ckan.saude.gov.br/CNES/cnes_estabelecimentos_csv.zip"
+metadata_url = "https://dadosabertos.saude.gov.br/dataset/cnes-cadastro-nacional-de-estabelecimentos-de-saude"
+cadence = "monthly"
+coverage = "Brazil; this adapter keeps the MT slice"
+state = "verified"
+limitations = [
+  "CNES IDs are not CNPJs; the CNPJ fields are links where present.",
+  "Personal-professional fields are out of scope.",
+  "National publication and completeness can lag."
+]
+
+[[dataset]]
+id = "inep-censo-escolar-2024"
+category = "education"
+source_id = "inep"
+title = "INEP Censo Escolar 2024 - escolas"
+aggregate = "censo-escolar-2024"
+api_url = "http://download.inep.gov.br/dados_abertos/microdados_censo_escolar_2024.zip"
+metadata_url = "https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/microdados/censo-escolar"
+cadence = "annual"
+coverage = "Brazil; this adapter keeps the MT slice"
+state = "verified"
+limitations = [
+  "School codes are not CNPJs.",
+  "Student-level information is out of scope.",
+  "The INEP HTTPS certificate chain failed verification on the check date; the official HTTP endpoint is used."
+]
+
+[[dataset]]
+id = "pgfn-fgts-2026Q3"
+category = "fiscal"
+source_id = "pgfn"
+title = "PGFN - dívida ativa FGTS 2026Q3"
+aggregate = "divida-ativa-fgts-2026Q3"
+api_url = "https://dadosabertos.pgfn.gov.br/2026_trimestre_03/Dados_abertos_FGTS.zip"
+metadata_url = "https://www.gov.br/pgfn/pt-br/assuntos/divida-ativa-da-uniao/transparencia-fiscal-1/dados-abertos"
+cadence = "quarterly"
+coverage = "Brazil; this adapter keeps the MT legal-person slice"
+state = "verified"
+limitations = [
+  "Federal/FGTS scope; not every tax liability.",
+  "A debt record is not insolvency, a credit score or a current tax-clearance certificate.",
+  "Natural-person records are excluded from this business-prospecting slice."
+]
+
+[[dataset]]
+id = "pgfn-previdenciario-2026Q3"
+category = "fiscal"
+source_id = "pgfn"
+title = "PGFN - dívida ativa previdenciária 2026Q3"
+aggregate = "divida-ativa-previdenciario-2026Q3"
+api_url = "https://dadosabertos.pgfn.gov.br/2026_trimestre_03/Dados_abertos_Previdenciario.zip"
+metadata_url = "https://www.gov.br/pgfn/pt-br/assuntos/divida-ativa-da-uniao/transparencia-fiscal-1/dados-abertos"
+cadence = "quarterly"
+coverage = "Brazil; this adapter keeps the MT legal-person slice"
+state = "verified"
+limitations = [
+  "Federal/FGTS scope; not every tax liability.",
+  "A debt record is not insolvency, a credit score or a current tax-clearance certificate.",
+  "Natural-person records are excluded from this business-prospecting slice."
+]
+
+[[dataset]]
+id = "bcb-sgs-1"
+category = "macroeconomy"
+source_id = "bcb"
+title = "BCB SGS 1 - dólar comercial (venda)"
+aggregate = "bcb-sgs-1"
+api_url = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.1/dados?formato=json&dataInicial=01/01/2017"
+metadata_url = "https://www.bcb.gov.br/estabilidadefinanceira/sgs"
+cadence = "daily"
+coverage = "Brazil"
+state = "verified"
+limitations = [
+  "Series revisions and unit are specific to SGS series 1.",
+  "It is not a company banking balance or credit limit."
+]
+
+[[dataset]]
+id = "bcb-sgs-433"
+category = "macroeconomy"
+source_id = "bcb"
+title = "BCB SGS 433 - IPCA mensal"
+aggregate = "bcb-sgs-433"
+api_url = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados?formato=json"
+metadata_url = "https://www.bcb.gov.br/estabilidadefinanceira/sgs"
+cadence = "monthly"
+coverage = "Brazil"
+state = "verified"
+limitations = [
+  "Series revisions and unit are specific to SGS series 433.",
+  "It is not municipal household income."
+]
+
+[[dataset]]
+id = "aneel-gd"
+category = "energy"
+source_id = "aneel"
+title = "ANEEL - empreendimentos de geração distribuída"
+aggregate = "empreendimento-geracao-distribuida"
+api_url = "https://dadosabertos.aneel.gov.br/dataset/5e0fafd2-21b9-4d5b-b622-40438d40aba2/resource/b1bd71e7-d0ad-4214-9053-cbd58e9564a7/download/empreendimento-geracao-distribuida.zip"
+metadata_url = "https://dadosabertos.aneel.gov.br/dataset/relacao-de-empreendimentos-de-geracao-distribuida"
+cadence = "continuous publication"
+coverage = "Brazil; this adapter keeps the MT legal-person slice"
+state = "verified"
+limitations = [
+  "ODbL adapted-database obligations require assessment before commercial enablement.",
+  "A generator register does not identify every installer or prove consumption.",
+  "Natural-person CPF records are excluded from the business slice."
+]
+
+[[dataset]]
+id = "anp-precos-revenda"
+category = "fuel"
+source_id = "anp"
+title = "ANP - preços de revenda de combustíveis"
+aggregate = "ultimas-4-semanas-gasolina-etanol"
+api_url = "https://www.gov.br/anp/pt-br/centrais-de-conteudo/dados-abertos/arquivos/shpc/qus/ultimas-4-semanas-gasolina-etanol.csv"
+metadata_url = "https://www.gov.br/anp/pt-br/centrais-de-conteudo/dados-abertos/serie-historica-de-precos-de-combustiveis"
+cadence = "weekly sample"
+coverage = "Brazil; this adapter keeps the MT slice"
+state = "verified"
+limitations = [
+  "The survey is a sample, not every station or municipality.",
+  "Collection dates and prices are as published; they are not a live feed.",
+  "Natural-person CPF records are excluded."
+]
+
+[[dataset]]
+id = "comex-exp-2025-mun"
+category = "trade"
+source_id = "comexstat"
+title = "Comex Stat - exportações municipais 2025"
+aggregate = "EXP_2025_MUN"
+api_url = "https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun/EXP_2025_MUN.csv"
+metadata_url = "https://comexstat.mdic.gov.br/pt/home"
+cadence = "monthly"
+coverage = "Brazil by municipality; this adapter keeps the MT slice"
+state = "verified"
+limitations = [
+  "Municipal detail uses the declarant's fiscal domicile and SH4, not a CNPJ exporter list.",
+  "Values are FOB and net kilograms; they are not company revenue.",
+  "The HTTPS chain failed verification on the check date; the official HTTP endpoint or a local artifact is used."
+]
+
+[[dataset]]
+id = "mt-convenios-2024"
+category = "local_government"
+source_id = "mt"
+title = "MT - convênios e acordos 2024"
+aggregate = "transparencia_csv"
+api_url = "https://dadosabertos.mt.gov.br/dataset/db568036-af7f-4d4a-977c-536f58a50136/resource/aafe6bb4-7e3b-4d7a-9c27-30b4eeccdcdc/download/transparencia_csv.csv"
+metadata_url = "https://dadosabertos.mt.gov.br/dataset/consulta-de-convenios-e-acordos"
+cadence = "dataset-specific"
+coverage = "Mato Grosso state convenios"
+state = "verified"
+limitations = [
+  "A convenio is not a contract, payment or private B2B demand.",
+  "Natural-person CPF records are excluded; only 14-digit CNPJs are stored.",
+  "Values and dates are kept exactly as published."
+]

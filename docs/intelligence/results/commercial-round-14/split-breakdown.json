@@ -1,0 +1,377 @@
+{
+  "round": "commercial-round-14",
+  "total_items": 50000,
+  "raw_interpretation_correct": 50000,
+  "adjudicated_interpretation_correct": 50000,
+  "by_split": {
+    "synthetic_challenge": {
+      "items": 5000,
+      "raw_interpretation_correct": 5000,
+      "adjudicated_interpretation_correct": 5000,
+      "gold_backend_ok": 4200
+    },
+    "synthetic_dev": {
+      "items": 35000,
+      "raw_interpretation_correct": 35000,
+      "adjudicated_interpretation_correct": 35000,
+      "gold_backend_ok": 30200
+    },
+    "synthetic_eval": {
+      "items": 10000,
+      "raw_interpretation_correct": 10000,
+      "adjudicated_interpretation_correct": 10000,
+      "gold_backend_ok": 8500
+    }
+  },
+  "by_provenance": {
+    "synthetic_business_scenario": {
+      "items": 10110,
+      "raw_interpretation_correct": 10110,
+      "adjudicated_interpretation_correct": 10110,
+      "gold_backend_ok": 8801
+    },
+    "synthetic_regional_grounded": {
+      "items": 39890,
+      "raw_interpretation_correct": 39890,
+      "adjudicated_interpretation_correct": 39890,
+      "gold_backend_ok": 34099
+    }
+  },
+  "by_category": {
+    "corporate_structure_hq_branches_identity": {
+      "items": 4000,
+      "raw_interpretation_correct": 4000,
+      "adjudicated_interpretation_correct": 4000,
+      "gold_backend_ok": 4000
+    },
+    "cross_variable_correlation": {
+      "items": 5000,
+      "raw_interpretation_correct": 5000,
+      "adjudicated_interpretation_correct": 5000,
+      "gold_backend_ok": 4100
+    },
+    "dialogue_corrections_references_planning": {
+      "items": 6000,
+      "raw_interpretation_correct": 6000,
+      "adjudicated_interpretation_correct": 6000,
+      "gold_backend_ok": 5800
+    },
+    "geography_catchments_comparisons": {
+      "items": 5000,
+      "raw_interpretation_correct": 5000,
+      "adjudicated_interpretation_correct": 5000,
+      "gold_backend_ok": 5000
+    },
+    "historical_stock_flows_seasonality": {
+      "items": 5000,
+      "raw_interpretation_correct": 5000,
+      "adjudicated_interpretation_correct": 5000,
+      "gold_backend_ok": 5000
+    },
+    "market_size_density_competition": {
+      "items": 5000,
+      "raw_interpretation_correct": 5000,
+      "adjudicated_interpretation_correct": 5000,
+      "gold_backend_ok": 4000
+    },
+    "prospecting_qualification_territory": {
+      "items": 7000,
+      "raw_interpretation_correct": 7000,
+      "adjudicated_interpretation_correct": 7000,
+      "gold_backend_ok": 7000
+    },
+    "source_quality_provenance_uncertainty": {
+      "items": 3000,
+      "raw_interpretation_correct": 3000,
+      "adjudicated_interpretation_correct": 3000,
+      "gold_backend_ok": 1000
+    },
+    "supply_chain_complementary": {
+      "items": 5000,
+      "raw_interpretation_correct": 5000,
+      "adjudicated_interpretation_correct": 5000,
+      "gold_backend_ok": 5000
+    },
+    "tax_size_legal_capital_numeric": {
+      "items": 2000,
+      "raw_interpretation_correct": 2000,
+      "adjudicated_interpretation_correct": 2000,
+      "gold_backend_ok": 2000
+    },
+    "unsupported_missing_contradictions": {
+      "items": 3000,
+      "raw_interpretation_correct": 3000,
+      "adjudicated_interpretation_correct": 3000
+    }
+  },
+  "by_geographic_stratum": {
+    "mt_east_araguaia_xingu": {
+      "items": 4500,
+      "raw_interpretation_correct": 4500,
+      "adjudicated_interpretation_correct": 4500,
+      "gold_backend_ok": 3878
+    },
+    "mt_metropolitan": {
+      "items": 5000,
+      "raw_interpretation_correct": 5000,
+      "adjudicated_interpretation_correct": 5000,
+      "gold_backend_ok": 4291
+    },
+    "mt_north_agro_industrial": {
+      "items": 6000,
+      "raw_interpretation_correct": 6000,
+      "adjudicated_interpretation_correct": 6000,
+      "gold_backend_ok": 5128
+    },
+    "mt_pantanal": {
+      "items": 5000,
+      "raw_interpretation_correct": 5000,
+      "adjudicated_interpretation_correct": 5000,
+      "gold_backend_ok": 4248
+    },
+    "mt_south_logistics_industrial": {
+      "items": 5000,
+      "raw_interpretation_correct": 5000,
+      "adjudicated_interpretation_correct": 5000,
+      "gold_backend_ok": 4292
+    },
+    "mt_west_parecis_guapore": {
+      "items": 4500,
+      "raw_interpretation_correct": 4500,
+      "adjudicated_interpretation_correct": 4500,
+      "gold_backend_ok": 3844
+    },
+    "national_cross_uf_comparative": {
+      "items": 8000,
+      "raw_interpretation_correct": 8000,
+      "adjudicated_interpretation_correct": 8000,
+      "gold_backend_ok": 7067
+    },
+    "other_26_ufs": {
+      "items": 12000,
+      "raw_interpretation_correct": 12000,
+      "adjudicated_interpretation_correct": 12000,
+      "gold_backend_ok": 10152
+    }
+  },
+  "by_uf": {
+    "AC": {
+      "items": 408,
+      "raw_interpretation_correct": 408,
+      "adjudicated_interpretation_correct": 408,
+      "gold_backend_ok": 348
+    },
+    "AL": {
+      "items": 533,
+      "raw_interpretation_correct": 533,
+      "adjudicated_interpretation_correct": 533,
+      "gold_backend_ok": 457
+    },
+    "AM": {
+      "items": 473,
+      "raw_interpretation_correct": 473,
+      "adjudicated_interpretation_correct": 473,
+      "gold_backend_ok": 401
+    },
+    "AP": {
+      "items": 506,
+      "raw_interpretation_correct": 506,
+      "adjudicated_interpretation_correct": 506,
+      "gold_backend_ok": 441
+    },
+    "BA": {
+      "items": 577,
+      "raw_interpretation_correct": 577,
+      "adjudicated_interpretation_correct": 577,
+      "gold_backend_ok": 503
+    },
+    "BR": {
+      "items": 2206,
+      "raw_interpretation_correct": 2206,
+      "adjudicated_interpretation_correct": 2206,
+      "gold_backend_ok": 1847
+    },
+    "CE": {
+      "items": 622,
+      "raw_interpretation_correct": 622,
+      "adjudicated_interpretation_correct": 622,
+      "gold_backend_ok": 540
+    },
+    "DF": {
+      "items": 418,
+      "raw_interpretation_correct": 418,
+      "adjudicated_interpretation_correct": 418,
+      "gold_backend_ok": 358
+    },
+    "ES": {
+      "items": 536,
+      "raw_interpretation_correct": 536,
+      "adjudicated_interpretation_correct": 536,
+      "gold_backend_ok": 461
+    },
+    "GO": {
+      "items": 584,
+      "raw_interpretation_correct": 584,
+      "adjudicated_interpretation_correct": 584,
+      "gold_backend_ok": 497
+    },
+    "MA": {
+      "items": 597,
+      "raw_interpretation_correct": 597,
+      "adjudicated_interpretation_correct": 597,
+      "gold_backend_ok": 521
+    },
+    "MG": {
+      "items": 669,
+      "raw_interpretation_correct": 669,
+      "adjudicated_interpretation_correct": 669,
+      "gold_backend_ok": 593
+    },
+    "MS": {
+      "items": 639,
+      "raw_interpretation_correct": 639,
+      "adjudicated_interpretation_correct": 639,
+      "gold_backend_ok": 544
+    },
+    "MT": {
+      "items": 32266,
+      "raw_interpretation_correct": 32266,
+      "adjudicated_interpretation_correct": 32266,
+      "gold_backend_ok": 28110
+    },
+    "MULTI": {
+      "items": 583,
+      "raw_interpretation_correct": 583,
+      "adjudicated_interpretation_correct": 583,
+      "gold_backend_ok": 583
+    },
+    "PA": {
+      "items": 535,
+      "raw_interpretation_correct": 535,
+      "adjudicated_interpretation_correct": 535,
+      "gold_backend_ok": 463
+    },
+    "PB": {
+      "items": 584,
+      "raw_interpretation_correct": 584,
+      "adjudicated_interpretation_correct": 584,
+      "gold_backend_ok": 506
+    },
+    "PE": {
+      "items": 541,
+      "raw_interpretation_correct": 541,
+      "adjudicated_interpretation_correct": 541,
+      "gold_backend_ok": 460
+    },
+    "PI": {
+      "items": 573,
+      "raw_interpretation_correct": 573,
+      "adjudicated_interpretation_correct": 573,
+      "gold_backend_ok": 487
+    },
+    "PR": {
+      "items": 586,
+      "raw_interpretation_correct": 586,
+      "adjudicated_interpretation_correct": 586,
+      "gold_backend_ok": 508
+    },
+    "RJ": {
+      "items": 582,
+      "raw_interpretation_correct": 582,
+      "adjudicated_interpretation_correct": 582,
+      "gold_backend_ok": 487
+    },
+    "RN": {
+      "items": 451,
+      "raw_interpretation_correct": 451,
+      "adjudicated_interpretation_correct": 451,
+      "gold_backend_ok": 383
+    },
+    "RO": {
+      "items": 571,
+      "raw_interpretation_correct": 571,
+      "adjudicated_interpretation_correct": 571,
+      "gold_backend_ok": 476
+    },
+    "RR": {
+      "items": 407,
+      "raw_interpretation_correct": 407,
+      "adjudicated_interpretation_correct": 407,
+      "gold_backend_ok": 341
+    },
+    "RS": {
+      "items": 714,
+      "raw_interpretation_correct": 714,
+      "adjudicated_interpretation_correct": 714,
+      "gold_backend_ok": 632
+    },
+    "SC": {
+      "items": 526,
+      "raw_interpretation_correct": 526,
+      "adjudicated_interpretation_correct": 526,
+      "gold_backend_ok": 451
+    },
+    "SE": {
+      "items": 532,
+      "raw_interpretation_correct": 532,
+      "adjudicated_interpretation_correct": 532,
+      "gold_backend_ok": 451
+    },
+    "SP": {
+      "items": 645,
+      "raw_interpretation_correct": 645,
+      "adjudicated_interpretation_correct": 645,
+      "gold_backend_ok": 556
+    },
+    "TO": {
+      "items": 582,
+      "raw_interpretation_correct": 582,
+      "adjudicated_interpretation_correct": 582,
+      "gold_backend_ok": 495
+    },
+    "UNRESOLVED": {
+      "items": 554,
+      "raw_interpretation_correct": 554,
+      "adjudicated_interpretation_correct": 554
+    }
+  },
+  "by_register": {
+    "conversational_professional": {
+      "items": 35000,
+      "raw_interpretation_correct": 35000,
+      "adjudicated_interpretation_correct": 35000,
+      "gold_backend_ok": 29897
+    },
+    "formal_technical": {
+      "items": 10000,
+      "raw_interpretation_correct": 10000,
+      "adjudicated_interpretation_correct": 10000,
+      "gold_backend_ok": 8669
+    },
+    "noisy_short": {
+      "items": 5000,
+      "raw_interpretation_correct": 5000,
+      "adjudicated_interpretation_correct": 5000,
+      "gold_backend_ok": 4334
+    }
+  },
+  "by_decision": {
+    "clarify": {
+      "items": 4400,
+      "raw_interpretation_correct": 4400,
+      "adjudicated_interpretation_correct": 4400
+    },
+    "execute": {
+      "items": 42900,
+      "raw_interpretation_correct": 42900,
+      "adjudicated_interpretation_correct": 42900,
+      "gold_backend_ok": 42900
+    },
+    "reject": {
+      "items": 2700,
+      "raw_interpretation_correct": 2700,
+      "adjudicated_interpretation_correct": 2700
+    }
+  },
+  "by_batch_count": 99
+}

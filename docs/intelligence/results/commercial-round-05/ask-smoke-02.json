@@ -1,0 +1,177 @@
+{
+  "context": {
+    "focus": [
+      {
+        "municipality": 5067
+      },
+      {
+        "municipality": 5527
+      }
+    ],
+    "last": {
+      "op": {
+        "kind": "count",
+        "metric": "stock"
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": {
+          "sectors": {
+            "cnaes": [
+              {
+                "subclass": 1091102
+              },
+              {
+                "subclass": 4721101
+              },
+              {
+                "subclass": 4721102
+              }
+            ],
+            "ids": [
+              13
+            ],
+            "scope": "main"
+          }
+        },
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": {
+          "municipalities": [
+            5067
+          ]
+        },
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "active"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": null
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    },
+    "pending": [],
+    "result_members": []
+  },
+  "execution": {
+    "backend": "aggregates",
+    "reference": null,
+    "status": "ok",
+    "value": {
+      "scalar": 321
+    },
+    "verification": "not_requested"
+  },
+  "interpretation": {
+    "act": "replace_slot",
+    "decision": "execute",
+    "evidence": 1.0,
+    "notes": [],
+    "options": [],
+    "reason": "",
+    "request": {
+      "op": {
+        "kind": "count",
+        "metric": "stock"
+      },
+      "output": {
+        "display_order": [],
+        "page": 1,
+        "with_methodology": false
+      },
+      "scope": {
+        "activity": {
+          "sectors": {
+            "cnaes": [
+              {
+                "subclass": 1091102
+              },
+              {
+                "subclass": 4721101
+              },
+              {
+                "subclass": 4721102
+              }
+            ],
+            "ids": [
+              13
+            ],
+            "scope": "main"
+          }
+        },
+        "capital": null,
+        "contact": "any",
+        "exclude": {
+          "municipalities": [],
+          "sector_cnaes": [],
+          "sectors": [],
+          "ufs": []
+        },
+        "head_office": "any",
+        "mei": "any",
+        "natureza": [],
+        "opened": null,
+        "place": {
+          "municipalities": [
+            5067
+          ]
+        },
+        "place_population": null,
+        "population_ref": null,
+        "porte": [
+          "unreported",
+          "micro",
+          "small",
+          "other"
+        ],
+        "simples": "any",
+        "status": [
+          "active"
+        ],
+        "status_date": null,
+        "within_ufs": []
+      },
+      "time": {
+        "anchor": 46305,
+        "competence": 321,
+        "period": null
+      },
+      "unit": "establishments",
+      "versions": {
+        "municipalities": 202610,
+        "sectors": 1
+      }
+    }
+  }
+}

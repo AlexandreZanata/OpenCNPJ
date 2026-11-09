@@ -1,0 +1,39 @@
+processed 50/1000 correct 50
+processed 100/1000 correct 100
+processed 150/1000 correct 150
+processed 200/1000 correct 200
+processed 250/1000 correct 249
+processed 300/1000 correct 299
+processed 350/1000 correct 349
+processed 400/1000 correct 399
+processed 450/1000 correct 449
+processed 500/1000 correct 499
+processed 550/1000 correct 549
+processed 600/1000 correct 599
+processed 650/1000 correct 649
+processed 700/1000 correct 699
+processed 750/1000 correct 748
+processed 800/1000 correct 798
+processed 850/1000 correct 848
+processed 900/1000 correct 898
+processed 950/1000 correct 948
+processed 1000/1000 correct 998
+{
+  "act_correct": 806,
+  "act_items": 838,
+  "correct_executed_answer": 856,
+  "decision_correct": 1000,
+  "execution_fresh": 858,
+  "execution_reused_identical_ir": 2,
+  "gold_backend_ok": 858,
+  "gold_empty_records": 77,
+  "gold_zero_scalar": 156,
+  "interpretation_correct": 998,
+  "interpretation_wrong": 2,
+  "items": 1000,
+  "verification_engine_match": 546,
+  "verification_marginal_match": 5,
+  "verification_no_independent_reference": 37,
+  "verification_not_numeric": 20,
+  "verification_single_backend": 250
+}

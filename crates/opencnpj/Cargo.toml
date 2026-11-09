@@ -12,6 +12,7 @@ default-run = "opencnpj"
 opencnpj-core.workspace = true
 opencnpj-store.workspace = true
 opencnpj-ingest.workspace = true
+opencnpj-insights.workspace = true
 anyhow.workspace = true
 thiserror.workspace = true
 clap.workspace = true

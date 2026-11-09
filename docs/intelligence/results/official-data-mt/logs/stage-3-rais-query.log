@@ -1,0 +1,12 @@
+Consulta: Empregos formais - total
+Período: 2023, 2024.
+Unidade: Vínculos.
+Sorriso (5107925) [2023]: 38.783
+Sorriso (5107925) [2024]: 39.482
+Cobertura: Mato Grosso municipalities (RAIS 2024).
+Fonte: RAIS 2024 - empregos formais por município e atividade (mte-rais-2024, https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/acoes-e-programas/programas-projetos-acoes-obras-e-atividades/estatisticas-trabalho/rais/rais-2024/rais-2024-1/rais-complementar-tabelas-2023x2024.xlsx/@@download/file). Licença: Public employment statistics; resource-level terms not yet verified (review_required).
+Limitação: A municipal or sector total is not an individual CNPJ's headcount.
+Limitação: RAIS codes have six digits; the import bridges them to seven-digit IBGE codes.
+Limitação: RAIS is an annual administrative record, not a current monthly stock.
+Limitação: The public microdata are non-identified.
+Limitação: Uma estatística municipal não é um fato observado sobre um CNPJ individual.
