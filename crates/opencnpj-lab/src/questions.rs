@@ -311,11 +311,20 @@ pub fn ask(args: AskArgs) -> Result<()> {
 fn increment(counts: &mut BTreeMap<String, u64>, key: &str) {
     *counts.entry(key.into()).or_default() += 1;
 }
-fn interpretation_match(prediction: &Interpretation, gold: &eval::Gold, expected: Option<&ValidRequest>) -> bool {
+pub(crate) fn interpretation_match(prediction: &Interpretation, gold: &eval::Gold, expected: Option<&ValidRequest>) -> bool {
     let export = gold.export.clone().map(serde_json::from_value::<opencnpj_query::export::Export>).transpose();
+    let company = gold.company.clone().map(serde_json::from_value::<opencnpj_nlu::policy::CompanySearch>).transpose();
     match gold.decision.as_str() {
         "execute" | "execute_with_note" => {
-            prediction.request.as_ref().zip(expected).is_some_and(|(a, b)| a == b) && export.is_ok_and(|e| e == prediction.export)
+            if gold.company.is_some() {
+                matches!(prediction.decision, opencnpj_nlu::policy::Decision::Execute | opencnpj_nlu::policy::Decision::ExecuteWithNote)
+                    && prediction.request.is_none()
+                    && company.is_ok_and(|c| c == prediction.company)
+            } else {
+                prediction.request.as_ref().zip(expected).is_some_and(|(a, b)| a == b)
+                    && export.is_ok_and(|e| e == prediction.export)
+                    && company.is_ok_and(|c| c == prediction.company)
+            }
         }
         "clarify" => prediction.decision == opencnpj_nlu::policy::Decision::Clarify,
         "reject" => prediction.decision == opencnpj_nlu::policy::Decision::Reject,
@@ -324,7 +333,7 @@ fn interpretation_match(prediction: &Interpretation, gold: &eval::Gold, expected
 }
 
 /// Items of one dialogue share a session id; every other item starts a conversation.
-fn session_of(item: &eval::Item) -> String {
+pub(crate) fn session_of(item: &eval::Item) -> String {
     item.context
         .as_ref()
         .and_then(|c| c.get("session_id"))
@@ -412,7 +421,7 @@ pub fn evaluate(args: EvalArgs) -> Result<()> {
         let slice = slices.entry(category.into()).or_default();
         increment(slice, "items");
         increment(&mut counts, "items");
-        let executed = prediction.request.is_some();
+        let executed = prediction.request.is_some() || prediction.company.is_some();
         if executed && !matches!(item.gold.decision.as_str(), "execute" | "execute_with_note") {
             increment(&mut counts, "out_of_policy_execution");
         }
@@ -529,6 +538,37 @@ mod tests {
         let assets = Assets::open(&data).unwrap();
         let items = eval::load_items(&root.join("crates/opencnpj-lab/eval/skills-export-01/questions.jsonl")).unwrap();
         assert!(items.len() >= 1500);
+        let (mut state, mut session) = (Conversation::default(), String::new());
+        let mut wrong = Vec::new();
+        for item in &items {
+            if session_of(item) != session {
+                (state, session) = (Conversation::default(), session_of(item));
+            }
+            let prediction = assets.interpreter.interpret(&item.text, &mut state);
+            let expected = item.gold.ir.clone().map(|ir| assets.canonical(serde_json::from_value(ir).unwrap()).unwrap());
+            if !interpretation_match(&prediction, &item.gold, expected.as_ref()) {
+                wrong.push(&item.id);
+            }
+        }
+        assert!(wrong.is_empty(), "{} wrong: {wrong:?}", wrong.len());
+    }
+
+    /// Every company-name search of the skills round, refusals and activity lists included,
+    /// is interpreted to its gold company search or gold request.
+    #[test]
+    fn skills_company_round_is_interpreted_exactly() {
+        let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
+        let data = DataArgs {
+            catalog: root.join("crates/opencnpj-insights/catalog/municipalities.tsv"),
+            sectors: root.join("crates/opencnpj-insights/catalog/sectors.toml"),
+            anchor: "2026-10-11".into(),
+            agg: None,
+            history: None,
+            snapshot: None,
+        };
+        let assets = Assets::open(&data).unwrap();
+        let items = eval::load_items(&root.join("crates/opencnpj-lab/eval/skills-company-01/questions.jsonl")).unwrap();
+        assert!(items.len() >= 600);
         let (mut state, mut session) = (Conversation::default(), String::new());
         let mut wrong = Vec::new();
         for item in &items {

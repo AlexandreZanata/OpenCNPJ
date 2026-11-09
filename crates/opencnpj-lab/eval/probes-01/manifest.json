@@ -1,0 +1,14 @@
+{
+  "set": "probes-01",
+  "items": 28,
+  "sha256": "c4b9282307230efa177f3dce59eaf53b292a41f2609386f45c640a42197aa3eb",
+  "families": {
+    "closed_word_read_as_active": 6,
+    "inactive_read_as_active": 3,
+    "legal_form_read_as_status": 3,
+    "list_year_dropped": 6,
+    "unknown_kind_dropped": 6,
+    "row_count_truncated": 3,
+    "city_before_state_dropped": 1
+  }
+}

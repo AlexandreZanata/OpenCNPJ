@@ -1,8 +1,10 @@
 {
   "set": "skills-export-01",
-  "items": 1803,
-  "sha256": "fff35f2d76ebde478d13558e7ab3088a878b417ad9e4334fddfbd70bf1e6fc20",
+  "items": 1881,
+  "sha256": "84359bb0b38d5425b50d164e6c6522b859724bba06e42bbad6aed89d5b1e6a56",
   "families": {
+    "agro/export": 50,
+    "agro/list": 25,
     "analytical/rank": 12,
     "dialogue/data": 120,
     "dialogue/export": 120,
@@ -30,6 +32,7 @@
     "regional/sul": 18,
     "stop/clarify": 5,
     "stop/reject": 4,
+    "stop/unknown_kind": 3,
     "with_fields/active": 48,
     "with_fields/closed_all_uf": 18,
     "with_fields/closed_year": 96,

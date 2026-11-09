@@ -15,7 +15,8 @@ use opencnpj_query::{
     ir::*,
     validate::{self, Capabilities, IssueKind},
 };
-use policy::{Decision, Interpretation};
+use policy::{CompanySearch, Decision, Interpretation};
+use spotter::Entity;
 
 /// An immutable catalogue pack and the exact capabilities of the served data.
 pub struct Interpreter {
@@ -39,6 +40,12 @@ impl Interpreter {
         }
     }
 
+    /// Catalogue entities spotted in `text` as `(start, end, readings)` over
+    /// [`normalize::words`]; homonym cities share a span. Read-only, for audits and contracts.
+    pub fn entities(&self, text: &str) -> Vec<(usize, usize, Vec<Entity>)> {
+        self.pack.lexicon.scan(&normalize::words(text)).into_iter().map(|hit| (hit.start, hit.end, hit.values)).collect()
+    }
+
     pub fn interpret(&self, text: &str, state: &mut Conversation) -> Interpretation {
         if text.trim().is_empty() || text.chars().count() > 500 || text.chars().any(|c| c.is_control() && !c.is_whitespace()) {
             return Interpretation::stop(Decision::Reject, "Envie uma pergunta de até 500 caracteres, sem caracteres de controle.");
@@ -54,6 +61,9 @@ impl Interpreter {
         // export of the current thread.
         let Some(delivery) = self.delivery.delivery(text, state.export.as_ref().filter(|_| state.last.is_some())) else {
             let (result, _) = self.answer(text, state, false);
+            if let Some(company) = self.company(text, &result, state) {
+                return company;
+            }
             // Refinements and clarification answers keep the file of the thread; a new
             // question starts without one.
             state.export = if matches!(result.act.as_str(), "new_query" | "meta_question") { None } else { state.export.take() };
@@ -95,6 +105,151 @@ impl Interpreter {
         state.export = Some(export.clone());
         result.export = Some(export);
         result
+    }
+
+    /// A company looked up by name, for a question the cadastral grammar did not execute
+    /// ("encontre a empresa Zaflas", "zaflas"). Privacy and unavailable-data refusals stand.
+    fn company(&self, text: &str, result: &Interpretation, state: &mut Conversation) -> Option<Interpretation> {
+        // Validation failures for impossible requests must stand.
+        if result.reason.starts_with("A consulta não é compatível") {
+            return None;
+        }
+        // Only a refusal, or a question about words the grammar did not recognize, gives way.
+        let unrecognized = result.decision == Decision::Clarify
+            && ["Não reconheci", "Qual atividade", "Que tipo de loja"].iter().any(|start| result.reason.starts_with(start));
+        if result.request.is_some() || !result.options.is_empty() || !(result.decision == Decision::Reject || unrecognized) {
+            return None;
+        }
+        let n = normalize::words(text).join(" ");
+        if grammar::cue(&n, &self.policy.privacy) || grammar::cue(&n, &self.policy.unavailable) {
+            return None;
+        }
+        let named = self.delivery.company_name(text, result.decision == Decision::Reject)?;
+        // A CNPJ, valid or not, is answered by the lookup rules.
+        if named.split_whitespace().any(|token| token.chars().filter(char::is_ascii_digit).count() >= 8) {
+            return None;
+        }
+        let (name, municipalities, ufs) = self.place_suffix(&named);
+        // A bare name stays short once its place is split off, and never reads like a data
+        // question ("empresas ativas em Várzea Grande", "nr de pet shop em Florianópolis").
+        let bare = self.delivery.company_name(text, false).is_none();
+        let data_words = normalize::words(&name).iter().any(|w| {
+            matches!(
+                w.as_str(),
+                "nr" | "numero"
+                    | "quantidade"
+                    | "total"
+                    | "empresas"
+                    | "estabelecimentos"
+                    | "cnpjs"
+                    | "negocios"
+                    | "ativas"
+                    | "ativos"
+                    | "abertas"
+                    | "abertos"
+                    | "baixadas"
+                    | "baixados"
+                    | "lista"
+                    | "listagem"
+            )
+        });
+        if bare && (normalize::words(&name).len() > 5 || data_words) {
+            return None;
+        }
+        let words = normalize::words(&name);
+        let hits = self.pack.lexicon.scan(&words);
+        let only_sectors = !hits.is_empty()
+            && hits.iter().map(|h| h.end - h.start).sum::<usize>() == words.len()
+            && hits.iter().all(|h| h.values.iter().all(|e| matches!(e, Entity::Sector(_))));
+        if only_sectors {
+            // "busque padarias em Cuiabá" names an activity, not a company: list it.
+            let (listed, _) = self.answer(&format!("liste {named}"), state, false);
+            return listed.request.is_some().then_some(listed);
+        }
+        let has_sector = hits.iter().any(|h| h.values.iter().any(|e| matches!(e, Entity::Sector(_))));
+        if has_sector {
+            let cadastral_modifier = words.iter().any(|w| {
+                matches!(
+                    w.as_str(),
+                    "telefone"
+                        | "email"
+                        | "contato"
+                        | "abertas"
+                        | "aberta"
+                        | "ativas"
+                        | "ativa"
+                        | "baixadas"
+                        | "baixada"
+                        | "inaptas"
+                        | "inapta"
+                        | "fechadas"
+                        | "fechada"
+                        | "menos"
+                        | "tirando"
+                        | "sem"
+                        | "exceto"
+                        | "x"
+                        | "versus"
+                        | "vs"
+                        | "qtd"
+                        | "quantidade"
+                        | "total"
+                        | "cresceram"
+                        | "cresceu"
+                        | "variacao"
+                        | "crescimento"
+                        | "agora"
+                )
+            });
+            if cadastral_modifier {
+                return None;
+            }
+        }
+        state.export = None;
+        state.pending.clear();
+        Some(Interpretation {
+            decision: Decision::Execute,
+            request: None,
+            act: "company_search".into(),
+            reason: String::new(),
+            notes: Vec::new(),
+            evidence: 1.0,
+            options: Vec::new(),
+            export: None,
+            company: Some(CompanySearch { name, municipalities, ufs }),
+        })
+    }
+
+    /// Split a trailing place ("Padaria Pão Quente em Cuiabá/MT") from a company name.
+    fn place_suffix(&self, name: &str) -> (String, Vec<MunicipalityId>, Vec<UfId>) {
+        let tokens: Vec<&str> = name.split_whitespace().collect();
+        for at in (1..tokens.len().saturating_sub(1)).rev() {
+            if !matches!(normalize::fold(tokens[at]).as_str(), "em" | "de" | "do" | "da" | "no" | "na") {
+                continue;
+            }
+            let words = normalize::words(&tokens[at + 1..].join(" "));
+            let hits = self.pack.lexicon.scan(&words);
+            let covered = hits.iter().map(|h| h.end - h.start).sum::<usize>() == words.len();
+            if !covered || hits.iter().any(|h| h.values.iter().any(|e| matches!(e, Entity::Sector(_)))) {
+                continue;
+            }
+            let ufs: Vec<UfId> =
+                hits.iter().flat_map(|h| &h.values).filter_map(|e| if let Entity::Uf(id) = e { Some(*id) } else { None }).collect();
+            let municipalities: Vec<MunicipalityId> = hits
+                .iter()
+                .flat_map(|h| &h.values)
+                .filter_map(|e| match e {
+                    Entity::Municipality { id, uf } if ufs.is_empty() || ufs.contains(uf) => Some(*id),
+                    _ => None,
+                })
+                .collect();
+            if municipalities.is_empty() && ufs.is_empty() {
+                continue;
+            }
+            let ufs = if municipalities.is_empty() { ufs } else { Vec::new() };
+            return (tokens[..at].join(" "), municipalities, ufs);
+        }
+        (name.to_owned(), Vec::new(), Vec::new())
     }
 
     /// Interpret the data question. `export` makes a record count a record list; the
@@ -156,6 +311,7 @@ impl Interpreter {
                     evidence: 1.0,
                     options: Vec::new(),
                     export: None,
+                    company: None,
                 };
                 return (result, None);
             }
@@ -216,6 +372,7 @@ impl Interpreter {
                     evidence: 1.0,
                     options: Vec::new(),
                     export: None,
+                    company: None,
                 }
             }
             Err(issues) => {

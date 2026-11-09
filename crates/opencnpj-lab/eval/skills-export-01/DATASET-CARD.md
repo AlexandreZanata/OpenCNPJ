@@ -23,7 +23,8 @@ columns, plus dialogues that request or refine a file in follow-up turns. Design
 | `analytical/rank` | "Exporte em Excel o ranking das 10 cidades de MT com mais padarias ativas" |
 | `dialogue/*` | Count → "Agora me mande isso em Excel" → "Só o nome e o CNPJ" → "Agora em CSV"; count → "E só as matrizes?" → "Agora liste esses estabelecimentos" → "Me mande isso em TXT" |
 | `regional/*` | "Bah, tchê, me passa uma planilha das farmácias ativas de Sinop/MT, visse?", "Égua, maninho, me manda uma tabela dos restaurantes…" (South, Northeast, Minas, Centre-West, North, Southeast, general informal) |
-| `stop/*` | A file without a subject or in PDF/Word/JSON (clarify); revenue, profit, partners or owners in a file (reject) |
+| `agro/*` | "Lista de empresas agrícolas em Sorriso mt, e um exel com todas", "quero a lista de fazendas de Sinop mt", "Me mande um CSV com os produtores rurais ativos de Goiânia/GO" (CNPJ division 01) |
+| `stop/*` | A file without a subject or in PDF/Word/JSON, or companies of an unknown kind (clarify); revenue, profit, partners or owners in a file (reject) |
 
 Data parts: active stock, closures in a year ("fecharam em", "baixadas/baixados em"),
 registrations in a year ("abertas/abertos em"), and every closure of a sector in a state

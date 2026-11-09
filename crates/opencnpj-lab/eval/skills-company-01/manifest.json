@@ -1,0 +1,24 @@
+{
+  "set": "skills-company-01",
+  "items": 1068,
+  "sha256": "ebdecc179b6fa5eb9b3844fc9fa26a6a95b7bb7f53fedc66c8e40e7dce1e6a33",
+  "families": {
+    "activity_list/municipality": 72,
+    "bare/name": 12,
+    "bare/place": 24,
+    "opener/direct": 240,
+    "place/municipality": 400,
+    "place/uf": 80,
+    "refusal/privacy": 28,
+    "refusal/stop": 4,
+    "refusal/unavailable": 28,
+    "regional/centro_oeste": 24,
+    "regional/mineiro": 24,
+    "regional/nordeste": 36,
+    "regional/norte": 24,
+    "regional/sudeste": 36,
+    "regional/sul": 36
+  },
+  "anchor": "2026-10-11",
+  "generator": "author_skills_company.py"
+}

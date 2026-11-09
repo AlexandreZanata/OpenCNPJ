@@ -1,0 +1,112 @@
+{
+  "adv": {
+    "items": {
+      "all": 304
+    }
+  },
+  "commercial-round-01": {
+    "items": {
+      "all": 1000
+    }
+  },
+  "commercial-round-02": {
+    "items": {
+      "all": 1000
+    }
+  },
+  "commercial-round-03": {
+    "items": {
+      "all": 3000
+    }
+  },
+  "commercial-round-04": {
+    "items": {
+      "all": 5000
+    }
+  },
+  "commercial-round-05": {
+    "items": {
+      "all": 10000
+    }
+  },
+  "commercial-round-06": {
+    "items": {
+      "all": 20000
+    }
+  },
+  "commercial-round-07": {
+    "items": {
+      "all": 20000
+    }
+  },
+  "commercial-round-08": {
+    "items": {
+      "all": 50000
+    }
+  },
+  "commercial-round-09": {
+    "items": {
+      "all": 50000
+    }
+  },
+  "commercial-round-10": {
+    "items": {
+      "all": 50000
+    }
+  },
+  "commercial-round-11": {
+    "items": {
+      "all": 50000
+    }
+  },
+  "commercial-round-12": {
+    "items": {
+      "all": 50000
+    }
+  },
+  "commercial-round-13": {
+    "items": {
+      "all": 50000
+    }
+  },
+  "commercial-round-14": {
+    "items": {
+      "all": 50000
+    }
+  },
+  "commercial-round-15": {
+    "items": {
+      "all": 50000
+    }
+  },
+  "dialogues": {
+    "items": {
+      "all": 122
+    }
+  },
+  "h-informal": {
+    "items": {
+      "all": 202
+    }
+  },
+  "ood": {
+    "items": {
+      "all": 400
+    }
+  },
+  "probes-01": {
+    "items": {
+      "all": 28
+    }
+  },
+  "skills-company-01": {
+    "items": {
+      "all": 1068
+    }
+  },
+  "skills-export-01": {
+    "items": {
+      "all": 1881
+    }
+  }
+}

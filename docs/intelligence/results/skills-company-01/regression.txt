@@ -1,0 +1,22 @@
+adv	items=304	before_correct=186	after_correct=186	changed=0
+commercial-round-01	items=1000	before_correct=950	after_correct=950	changed=0
+commercial-round-02	items=1000	before_correct=900	after_correct=900	changed=0
+commercial-round-03	items=3000	before_correct=2694	after_correct=2694	changed=0
+commercial-round-04	items=5000	before_correct=4576	after_correct=4576	changed=0
+commercial-round-05	items=10000	before_correct=9154	after_correct=9154	changed=0
+commercial-round-06	items=20000	before_correct=18312	after_correct=18312	changed=0
+commercial-round-07	items=20000	before_correct=18312	after_correct=18312	changed=0
+commercial-round-08	items=50000	before_correct=45759	after_correct=45759	changed=0
+commercial-round-09	items=50000	before_correct=47975	after_correct=47975	changed=0
+commercial-round-10	items=50000	before_correct=48000	after_correct=48000	changed=0
+commercial-round-11	items=50000	before_correct=48000	after_correct=48000	changed=0
+commercial-round-12	items=50000	before_correct=47500	after_correct=47500	changed=0
+commercial-round-13	items=50000	before_correct=47800	after_correct=47800	changed=0
+commercial-round-14	items=50000	before_correct=47900	after_correct=47900	changed=0
+commercial-round-15	items=50000	before_correct=47900	after_correct=47900	changed=0
+dialogues	items=122	before_correct=84	after_correct=84	changed=0
+h-informal	items=202	before_correct=118	after_correct=118	changed=0
+ood	items=400	before_correct=400	after_correct=400	changed=0
+skills-company-01	items=1068	before_correct=60	after_correct=1068	changed=1008
+skills-export-01	items=1881	before_correct=1803	after_correct=1881	changed=78
+TOTAL	changed=1086	{'better': 1086}

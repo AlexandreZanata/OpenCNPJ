@@ -1,0 +1,44 @@
+{
+  "categories": {
+    "city_before_state_dropped": {
+      "interpretation_correct": 1,
+      "items": 1
+    },
+    "closed_word_read_as_active": {
+      "items": 6
+    },
+    "inactive_read_as_active": {
+      "items": 3
+    },
+    "legal_form_read_as_status": {
+      "interpretation_correct": 3,
+      "items": 3
+    },
+    "list_year_dropped": {
+      "items": 6
+    },
+    "row_count_truncated": {
+      "items": 3
+    },
+    "unknown_kind_dropped": {
+      "items": 6
+    }
+  },
+  "counts": {
+    "act_correct": 28,
+    "act_items": 28,
+    "decision_correct": 19,
+    "interpretation_correct": 4,
+    "interpretation_wrong": 24,
+    "invalid_gold": 3,
+    "items": 28,
+    "out_of_policy_execution": 9
+  },
+  "data_anchor": "2026-10-11",
+  "evidence_score": "Rule evidence is not a calibrated probability.",
+  "human_validation": "Not performed; human validation is deferred to product refinement.",
+  "method": "Actual text-only deterministic interpretation; gold IR used only for canonical scoring and separate backend reference, never as a prediction or conversation seed.",
+  "set": "crates/opencnpj-lab/eval/probes-01/questions.jsonl",
+  "set_sha256": "c4b9282307230efa177f3dce59eaf53b292a41f2609386f45c640a42197aa3eb",
+  "snapshot_sha256": null
+}

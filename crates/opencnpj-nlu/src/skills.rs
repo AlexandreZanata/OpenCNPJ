@@ -37,6 +37,8 @@ pub(crate) struct Vocabulary {
     articles: Vec<Phrase>,
     previous: Vec<Phrase>,
     tail: Vec<Phrase>,
+    company: Vec<Phrase>,
+    company_nouns: Vec<Phrase>,
     /// Column phrases, the columns they name, and whether the phrase is a bare "número".
     fields: Vec<(Phrase, Vec<ExportField>, bool)>,
 }
@@ -137,6 +139,8 @@ impl Vocabulary {
             articles: section(&file.roles, "articles")?,
             previous: section(&file.roles, "previous")?,
             tail: section(&file.roles, "tail")?,
+            company: section(&file.roles, "company")?,
+            company_nouns: section(&file.roles, "company_nouns")?,
             fields,
         })
     }
@@ -406,6 +410,80 @@ impl Vocabulary {
         }
     }
 
+    /// The company named after a search phrase ("encontre a empresa Zaflas", "qual o CNPJ
+    /// da Padaria Pão Quente?"), in its original spelling. With `bare`, a short question
+    /// that is only a name ("zaflas") counts too.
+    pub(crate) fn company_name(&self, text: &str, bare: bool) -> Option<String> {
+        let words = words(text);
+        let mut start = 0;
+        let mut opened = false;
+        while start < words.len() {
+            if let Some(end) = at(&self.company, &words, start) {
+                start = end;
+                opened = true;
+                break;
+            }
+            match at(&self.request, &words, start) {
+                Some(end) => start = end,
+                None => break,
+            }
+        }
+        if !opened && (start > 0 || !bare) {
+            return None;
+        }
+        while let Some(end) = at(&self.company_nouns, &words, start).or_else(|| at(&self.articles, &words, start)) {
+            start = end;
+        }
+        let mut end = words.len();
+        while let Some(from) = ending(&self.tail, &words, end).filter(|from| *from > start) {
+            end = from;
+        }
+        if start >= end {
+            return None;
+        }
+        if !opened {
+            // A bare name: a few words, no question, not conversational, not a dialogue connective,
+            // not only courtesy or greetings.
+            let question = words[start..end].iter().any(|w| {
+                matches!(
+                    w.key.as_str(),
+                    "quantos"
+                        | "quantas"
+                        | "quanto"
+                        | "quanta"
+                        | "qual"
+                        | "quais"
+                        | "como"
+                        | "onde"
+                        | "quando"
+                        | "porque"
+                        | "por"
+                        | "que"
+                        | "quem"
+                )
+            });
+            let connective = matches!(
+                words[start].key.as_str(),
+                "e" | "so" | "apenas" | "tambem" | "ou" | "mas" | "ja" | "porte" | "do" | "da" | "de" | "no" | "na" | "em"
+            ) || (end - start >= 2 && words[start].key == "na" && words[start + 1].key == "verdade")
+                || (end - start >= 2 && matches!(words[start].key.as_str(), "a" | "o") && words[start + 1].key == "do");
+            let conversational = words[start..end]
+                .iter()
+                .any(|w| matches!(w.key.as_str(), "vai" | "chover" | "chuva" | "clima" | "previsao" | "amanha" | "ontem" | "hoje"));
+            let filler =
+                (start..end).all(|i| [&self.request, &self.tail, &self.previous].iter().any(|list| ending(list, &words, i + 1).is_some()));
+            // A trailing place ("… em Sorriso/MT") is checked by the caller, not counted here.
+            let named = words[start..end].iter().rposition(|w| matches!(w.key.as_str(), "em" | "no" | "na")).unwrap_or(end - start);
+            if named > 5 || question || connective || conversational || filler {
+                return None;
+            }
+        }
+        let (first, last) = (words[start].token, words[end - 1].token);
+        let name = text.split_whitespace().skip(first).take(last - first + 1).collect::<Vec<_>>().join(" ");
+        let name = name.trim_matches(|c: char| c.is_ascii_punctuation() || matches!(c, '“' | '”' | '«' | '»')).trim().to_owned();
+        (!name.is_empty()).then_some(name)
+    }
+
     /// A delivery follow-up whose remaining words only point at the previous answer.
     pub(crate) fn refers_to_previous(&self, rest: &str) -> bool {
         let words = words(rest);
@@ -438,7 +516,7 @@ mod tests {
     fn lists_include_each_other_and_cycles_fail() {
         let text = |lists: &str| {
             format!(
-                "[lists]\n{lists}\n[formats]\nxlsx=[\"excel\"]\ncsv=[\"csv\"]\ntxt=[\"txt\"]\nunsupported=[\"pdf\"]\n[roles]\nrequest=[\"@a\"]\nactions=[\"manda\"]\nexport_verbs=[\"exporte\"]\nfile_nouns=[\"arquivo\"]\nleft_glue=[\"um\"]\nright_glue=[\"com\"]\nintros=[\"apenas\"]\narticles=[\"o\"]\nprevious=[\"isso\"]\ntail=[\"valeu\"]\n[fields]\ncnpj=[\"cnpj\"]\n"
+                "[lists]\n{lists}\n[formats]\nxlsx=[\"excel\"]\ncsv=[\"csv\"]\ntxt=[\"txt\"]\nunsupported=[\"pdf\"]\n[roles]\nrequest=[\"@a\"]\nactions=[\"manda\"]\nexport_verbs=[\"exporte\"]\nfile_nouns=[\"arquivo\"]\nleft_glue=[\"um\"]\nright_glue=[\"com\"]\nintros=[\"apenas\"]\narticles=[\"o\"]\nprevious=[\"isso\"]\ntail=[\"valeu\"]\ncompany=[\"encontre\"]\ncompany_nouns=[\"a empresa\"]\n[fields]\ncnpj=[\"cnpj\"]\n"
             )
         };
         let nested = Vocabulary::parse(&text("a=[\"@b\", \"Por Favor\"]\nb=[\"@c\", \"me\"]\nc=[\"Tchê\"]")).unwrap();
@@ -497,6 +575,23 @@ mod tests {
         assert_eq!(d.unsupported.as_deref(), Some("PDF"));
         // A table shown in the chat is not a file.
         assert!(vocabulary().delivery("me mostra uma tabela das padarias de Sinop/MT por porte", None).is_none());
+    }
+
+    #[test]
+    fn company_names_follow_search_phrases() {
+        let v = vocabulary();
+        assert_eq!(v.company_name("encontre a empresa zaflas", false).as_deref(), Some("zaflas"));
+        assert_eq!(
+            v.company_name("Qual o CNPJ da Padaria Pão Quente em Cuiabá/MT?", false).as_deref(),
+            Some("Padaria Pão Quente em Cuiabá/MT")
+        );
+        assert_eq!(v.company_name("Bah, me fala sobre a firma chamada \"Zaflas\", por favor", false).as_deref(), Some("Zaflas"));
+        assert_eq!(v.company_name("dados da empresa MITEL TELEINFORMATICA", false).as_deref(), Some("MITEL TELEINFORMATICA"));
+        assert_eq!(v.company_name("quantas padarias existem em Cuiabá", false), None);
+        assert_eq!(v.company_name("zaflas", true).as_deref(), Some("zaflas"));
+        assert_eq!(v.company_name("bom dia", true), None);
+        assert_eq!(v.company_name("quantas lojas tem aqui", true), None);
+        assert_eq!(v.company_name("Cerealista Grão Fino em Sorriso/MT", true).as_deref(), Some("Cerealista Grão Fino em Sorriso/MT"));
     }
 
     #[test]

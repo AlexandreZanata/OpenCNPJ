@@ -1,5 +1,6 @@
-# Vocabulary of file requests ("me manda um Excel com...", "bah, tchê, me passa uma
-# planilha", "oxe, gera um CSV aí, visse?").
+# Vocabulary of user requests: files ("me manda um Excel com...", "bah, tchê, me passa uma
+# planilha", "oxe, gera um CSV aí, visse?") and companies looked up by name ("encontre a
+# empresa Zaflas", "qual o CNPJ da Padaria Pão Quente em Cuiabá/MT?").
 #
 # Every list is a set of word-bounded phrases, compared after accent folding and the
 # colloquial rewrites of `normalize` ("pra" -> "para", "vc" -> "voce"). An item "@name"
@@ -51,6 +52,24 @@ excel = [
 csv = ["csv", "cvs", "arquivo csv", "separado por virgula", "separado por ponto e virgula", "valores separados por virgula"]
 txt = ["txt", "arquivo de texto", "arquivo texto", "texto simples", "texto puro", "bloco de notas", "notepad", "formato de texto", "formato texto"]
 
+# Verbs and phrases that introduce a company looked up by name.
+busca = [
+    "encontre", "encontra", "encontrar", "ache", "acha", "achar", "busque", "busca", "buscar", "procure", "procura", "procurar",
+    "pesquise", "pesquisa", "pesquisar", "localize", "localiza", "localizar", "consulte", "consulta", "consultar", "verifique",
+    "verifica", "checa", "cheque", "quero ver", "quero saber sobre", "quero saber da", "quero saber do", "quero informacoes sobre",
+    "me fala sobre", "me fale sobre", "me conta sobre", "fala sobre", "fale sobre", "o que voce sabe sobre", "o que tem sobre",
+    "quem e a empresa", "quem e a firma", "informacoes sobre", "informacoes da", "informacoes do", "dados da", "dados do", "dados de",
+    "ficha da", "ficha do", "cadastro da", "cadastro do", "cnpj da", "cnpj do", "cnpj de", "qual o cnpj da", "qual o cnpj do",
+    "qual e o cnpj da", "qual e o cnpj do", "qual cnpj da", "qual cnpj do", "situacao da", "situacao do", "endereco da",
+    "endereco do", "existe a empresa", "existe empresa", "tem alguma empresa", "tem empresa",
+]
+# Words between the verb and the name ("a empresa", "a firma chamada").
+empresa = [
+    "a empresa", "empresa", "da empresa", "a firma", "firma", "a loja", "o comercio", "a companhia", "a marca", "o estabelecimento",
+    "a razao social", "razao social", "o nome fantasia", "nome fantasia", "chamada", "chamado", "de nome", "com o nome", "com nome",
+    "que se chama", "com a razao social", "o cnpj da", "o cnpj do", "os dados da", "os dados do",
+]
+
 [formats]
 xlsx = ["@excel"]
 csv = ["@csv"]
@@ -93,6 +112,10 @@ previous = [
 ]
 # Courtesy and regional tags cut at the end of a file request ("…, visse?").
 tail = ["@cortesia", "@regional", "ai", "ae", "rapidinho", "rapidao", "por gentileza"]
+
+# Phrases opening a company search, and the words that may follow them before the name.
+company = ["@busca"]
+company_nouns = ["@empresa"]
 
 [fields]
 all = [

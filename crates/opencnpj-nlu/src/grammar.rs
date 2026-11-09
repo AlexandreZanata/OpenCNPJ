@@ -367,6 +367,20 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
         {
             return Err(clarify("Qual atividade você quer pesquisar? Não reconheci esse setor no catálogo."));
         }
+        // "empresas agricolas": a word describing the companies that names no known activity,
+        // status or filter must not be dropped, or every company would be answered. A singular
+        // "a empresa Zaflas" names one company and is left to the company search.
+        let unknown_at = |at: usize| {
+            words.get(at).is_some_and(|next| {
+                !hits.iter().any(|h| h.start <= at && at < h.end)
+                    && next.len() > 3
+                    && time::number(next).is_none()
+                    && !known_descriptor(next)
+            })
+        };
+        if matches!(word.as_str(), "empresas" | "estabelecimentos" | "negocios" | "firmas" | "companhias") && unknown_at(i + 1) {
+            return Err(clarify("Qual atividade você quer pesquisar? Não reconheci esse tipo de empresa no catálogo de setores."));
+        }
         if matches!(word.as_str(), "sem" | "nao" | "exceto" | "excluindo" | "fora") {
             let end = (i + 7).min(words.len());
             let supported = has(
@@ -548,9 +562,12 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
         if !geographic && !city && cue(&words[hit.start..hit.end].join(" "), &cues.count) {
             continue;
         }
+        // The state right after a city ("Belém/PA", "Belém PA", "Belém do Pará") qualifies it.
         let local_uf = hits
             .iter()
-            .find(|h| h.start == hit.end)
+            .find(|h| {
+                h.start == hit.end || h.start == hit.end + 1 && words.get(hit.end).is_some_and(|w| matches!(w.as_str(), "do" | "da" | "de"))
+            })
             .and_then(|h| h.values.iter().find_map(|e| if let Entity::Uf(id) = e { Some(*id) } else { None }));
         if !has_sector
             && !state_name
@@ -798,7 +815,7 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
         return Err(clarify("Qual atividade e município você quer pesquisar?"));
     }
     filters(n, m, &raw, &mut request, &mut act, population)?;
-    if has(n, &["nao estao ativas", "nao estao ativos", "nao tao ativas", "nao tao ativos"]) {
+    if has(n, &["nao estao ativas", "nao estao ativos", "nao tao ativas", "nao tao ativos", "inativas", "inativos", "inativa", "inativo"]) {
         notes.push("Considerei suspensas, inaptas e baixadas; situação nula não foi incluída.".into());
     }
     if matches!(request.scope.place, PlaceFilter::Near { .. }) && !ufs.is_empty() {
@@ -891,12 +908,13 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
         if islist {
             let explicit = list_limit(n);
             // An exported list shows one page and writes the requested rows to the file.
+            // Above 100 rows a chat list is refused with a clamped option, never truncated.
             let limit = match explicit {
-                Some(rows) if export => rows.min(100),
-                Some(rows) => rows,
+                Some(rows) if export => rows.min(100) as u16,
+                Some(rows) => u16::try_from(rows).unwrap_or(u16::MAX),
                 None => 20,
             };
-            rows = explicit.filter(|_| export).map(u32::from);
+            rows = explicit.filter(|_| export);
             let order = if has(n, &["capital social", "capital"]) && has(n, &["maior", "mais", "ordenados"]) {
                 ListOrder::CapitalDesc
             } else if has(n, &["antigos para os mais novos", "mais antigos", "mais antigas"])
@@ -918,6 +936,13 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
                 None
             };
             let period = temporal.or(if inherited { request.time.period } else { None });
+            // A period with no event ("padarias de 2025", "desde 2020") filters nothing a list
+            // can apply: ask whether it is the opening or the closure, never drop it.
+            if flow.is_none() && temporal.is_some() && request.scope.opened.is_none() && request.scope.status_date.is_none() {
+                return Err(clarify(
+                    "Esse período se refere à abertura ou à baixa das empresas? Ex.: “abertas em 2025” ou “que fecharam em 2025”.",
+                ));
+            }
             request.op = Op::List { order, limit };
             request.time.period = None;
             // The event a list names filters its records: a closure by the date of the
@@ -1046,6 +1071,126 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
     Ok(Frame { request, act, notes, rows })
 }
 
+/// Words that describe companies without naming an activity: status, size, legal form,
+/// registration events and connectives ("empresas ativas", "padarias e matrizes").
+fn known_descriptor(word: &str) -> bool {
+    matches!(
+        word,
+        "ativas"
+            | "ativos"
+            | "ativa"
+            | "ativo"
+            | "abertas"
+            | "abertos"
+            | "aberta"
+            | "baixadas"
+            | "baixados"
+            | "baixada"
+            | "fechadas"
+            | "fechados"
+            | "encerradas"
+            | "encerrados"
+            | "extintas"
+            | "extintos"
+            | "suspensas"
+            | "suspensos"
+            | "inaptas"
+            | "inaptos"
+            | "nulas"
+            | "inativas"
+            | "inativos"
+            | "novas"
+            | "novos"
+            | "registradas"
+            | "registrados"
+            | "cadastradas"
+            | "cadastrados"
+            | "criadas"
+            | "criados"
+            | "existentes"
+            | "optantes"
+            | "matrizes"
+            | "matriz"
+            | "filiais"
+            | "filial"
+            | "sediadas"
+            | "sediados"
+            | "brasileiras"
+            | "locais"
+            | "listadas"
+            | "encontradas"
+            | "mais"
+            | "menos"
+            | "maiores"
+            | "menores"
+            | "pequenas"
+            | "grandes"
+            | "micro"
+            | "microempresas"
+            | "individuais"
+            | "limitadas"
+            | "ltda"
+            | "tiveram"
+            | "fecharam"
+            | "abriram"
+            | "estao"
+            | "foram"
+            | "sao"
+            | "possuem"
+            | "existem"
+            | "havia"
+            | "tinham"
+            | "estavam"
+            | "com"
+            | "sem"
+            | "nao"
+            | "para"
+            | "pelo"
+            | "pela"
+            | "entre"
+            | "desse"
+            | "dessa"
+            | "desses"
+            | "dessas"
+            | "neste"
+            | "nesta"
+            | "nesse"
+            | "nessa"
+            | "deste"
+            | "desta"
+            | "todas"
+            | "todos"
+            | "cujo"
+            | "cuja"
+            | "onde"
+            | "aqui"
+            | "agora"
+            | "hoje"
+            | "ainda"
+            | "situacao"
+            | "porte"
+            | "capital"
+            | "cadastro"
+            | "listar"
+            | "contar"
+            | "funcionando"
+            | "operando"
+            | "atuantes"
+            | "atuando"
+            | "presentes"
+            | "instaladas"
+            | "localizadas"
+            | "situadas"
+            | "suas"
+            | "seus"
+            | "telefone"
+            | "email"
+            | "contatos"
+            | "simples"
+            | "demais"
+    )
+}
+
 /// Mask entities while keeping the separators needed to parse literal dates.
 fn temporal_text(text: &str, hits: &[Hit]) -> String {
     let mut at = 0;
@@ -1152,15 +1297,22 @@ fn dimension(n: &str) -> Option<Dim> {
     }
 }
 
-fn list_limit(n: &str) -> Option<u16> {
+/// An explicit row count ("liste 50", "as 5000 padarias"). Counts after "de" stay small
+/// so a year ("de 2025 em …") is never read as a count.
+fn list_limit(n: &str) -> Option<u32> {
     let t: Vec<String> = n.split_whitespace().map(str::to_owned).collect();
+    if let Some((q, end)) = time::quantity(&t, 0)
+        && !(1900..=2100).contains(&q)
+        && t.get(end).is_some_and(|s| time::number(s).is_none())
+    {
+        return u32::try_from(q).ok();
+    }
     for i in 0..t.len() {
         if matches!(t[i].as_str(), "liste" | "listar" | "traga" | "tragam" | "traz" | "trazem" | "top" | "os" | "as" | "de")
             && let Some((q, end)) = time::quantity(&t, i + 1)
-            && q <= 1000
-            && (t[i] != "de" || t.get(end).is_some_and(|s| s == "em" || s == "por"))
+            && (if t[i] == "de" { q <= 1000 && t.get(end).is_some_and(|s| s == "em" || s == "por") } else { q <= 1_000_000 })
         {
-            return u16::try_from(q).ok();
+            return u32::try_from(q).ok();
         }
         if matches!(t[i].as_str(), "lista" | "listagem" | "relacao") {
             let mut j = i + 1;
@@ -1168,9 +1320,9 @@ fn list_limit(n: &str) -> Option<u16> {
                 j += 1;
             }
             if let Some((q, _)) = time::quantity(&t, j)
-                && q <= 1000
+                && q <= 1_000_000
             {
-                return u16::try_from(q).ok();
+                return u32::try_from(q).ok();
             }
         }
     }
@@ -1363,15 +1515,20 @@ fn filters(n: &str, m: &str, raw: &str, r: &mut Request, act: &mut String, popul
     if has(n, &["todas as situacoes", "em qualquer situacao"]) {
         r.scope.status = Some(StatusSet::ALL);
     } else {
+        // "sociedade anônima fechada" is a legal form (natureza 2054), not a closed status.
+        let status_text = n.replace("anonimas fechadas", "anonimas").replace("anonima fechada", "anonima");
         let mut statuses = Vec::new();
         for (phrases, status) in [
             (&["ativos", "ativas", "ativa", "ativo", "funcionando", "em funcionamento"][..], Status::Active),
             (&["suspensos", "suspensas", "suspensa"][..], Status::Suspended),
             (&["inaptos", "inaptas", "inapta"][..], Status::Unfit),
-            (&["baixados", "baixadas", "baixada"][..], Status::Closed),
+            (
+                &["baixados", "baixadas", "baixada", "fechadas", "fechados", "encerradas", "encerrados", "extintas", "extintos"][..],
+                Status::Closed,
+            ),
             (&["situacao cadastral nula", "situacao nula"][..], Status::Null),
         ] {
-            if has(n, phrases) {
+            if has(&status_text, phrases) {
                 statuses.push(status);
             }
         }
@@ -1379,7 +1536,7 @@ fn filters(n: &str, m: &str, raw: &str, r: &mut Request, act: &mut String, popul
             r.scope.status = Some(StatusSet::new(statuses));
         }
     }
-    if has(n, &["nao estao ativas", "nao estao ativos", "nao tao ativas", "nao tao ativos"]) {
+    if has(n, &["nao estao ativas", "nao estao ativos", "nao tao ativas", "nao tao ativos", "inativas", "inativos", "inativa", "inativo"]) {
         r.scope.status = Some(StatusSet::new([Status::Suspended, Status::Unfit, Status::Closed]));
     }
     let code_words: Vec<_> = n.split_whitespace().collect();

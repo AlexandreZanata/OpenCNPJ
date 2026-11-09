@@ -1,0 +1,46 @@
+Q: Lista de empresas agricolas em sorriso mt, e um exel com todas
+   execute | Encontrei 952 estabelecimentos ativos de atividade agropecuária em Sorriso (MT). Mostrando 20.
+   activities on page: ['Atividades de apoio à agricultura não especificadas anteriormente', 'Atividades de apoio à pecuária não especificadas anteriormente', 'Atividades de pós-colheita', 'Criação de bovinos para corte', 'Criação de outros galináceos, exceto para corte', 'Criação de suínos'] …
+   file: opencnpj-estabelecimentos-ativos-de-atividade-agropecuaria-em-sorriso-mt.xlsx rows=952 columns=['CNPJ', 'Razão social', 'Nome fantasia', 'Matriz/filial', 'Situação cadastral', 'Início de atividade', 'CNAE principal', 'Atividade principal', 'Porte', 'Capital social (R$)', 'Município', 'UF'] notes=[]
+   suggestions: ['E só as matrizes?', 'Mostre os mais recentes primeiro', 'Agora em CSV']
+   129.7 ms
+Q: quero a lista de empresas agricolas de sorriso mt
+   execute | Encontrei 952 estabelecimentos ativos de atividade agropecuária em Sorriso (MT). Mostrando 20.
+   activities on page: ['Atividades de apoio à agricultura não especificadas anteriormente', 'Atividades de apoio à pecuária não especificadas anteriormente', 'Atividades de pós-colheita', 'Criação de bovinos para corte', 'Criação de outros galináceos, exceto para corte', 'Criação de suínos'] …
+   suggestions: ['E só as matrizes?', 'Mostre os mais recentes primeiro', 'Me mande isso em Excel']
+   22.7 ms
+Q: quantas fazendas ativas existem em Sorriso/MT?
+   execute | Segundo a base da Receita Federal de outubro de 2026, Sorriso (MT) tem 952 estabelecimentos ativos de atividade agropecuária.
+   extras: ['Evolução mensal de 10/2025 a 09/2026', 'Alguns desses estabelecimentos (mais recentes primeiro)']
+   suggestions: ['Agora liste esses estabelecimentos', 'E só as matrizes?', 'Distribua por porte']
+   1053.0 ms
+Q: quero a lista de empresas xyzolicas de sorriso mt
+   clarify | Qual atividade você quer pesquisar? Não reconheci esse tipo de empresa no catálogo de setores.
+   0.2 ms
+Q: encontre a empresa zaflas
+   execute | Encontrei 4 estabelecimentos para “zaflas”.
+   activities on page: ['Comercio varejista de artigos de armarinho', 'Comércio atacadista de artigos do vestuário e acessórios, exceto profissionais e de segurança', 'Desenvolvimento e licenciamento de programas de computador não-customizáveis', 'Fabricação de jogos eletrônicos']
+   suggestions: ['Dados do CNPJ 50.423.090/0001-00', 'Dados do CNPJ 11.739.229/0001-69', 'Dados do CNPJ 67.852.667/0001-93']
+   330.8 ms
+Q: zaflas
+   execute | Encontrei 4 estabelecimentos para “zaflas”.
+   activities on page: ['Comercio varejista de artigos de armarinho', 'Comércio atacadista de artigos do vestuário e acessórios, exceto profissionais e de segurança', 'Desenvolvimento e licenciamento de programas de computador não-customizáveis', 'Fabricação de jogos eletrônicos']
+   suggestions: ['Dados do CNPJ 50.423.090/0001-00', 'Dados do CNPJ 11.739.229/0001-69', 'Dados do CNPJ 67.852.667/0001-93']
+   2.0 ms
+Q: qual o CNPJ da MITEL TELEINFORMATICA?
+   execute | Encontrei MITEL TELEINFORMATICA LTDA (00.074.676/0001-20), situação baixada, em Cuiabá/MT.
+   company: {'cnpj': '00.074.676/0001-20', 'razao_social': 'MITEL TELEINFORMATICA LTDA', 'Nome fantasia': 'MITEL TELEINFORMATICA', 'Matriz/filial': 'Matriz'}
+   4.8 ms
+Q: dados do CNPJ 00.074.676/0001-20
+   execute | MITEL TELEINFORMATICA LTDA (00.074.676/0001-20) — situação Baixada.
+   company: {'cnpj': '00.074.676/0001-20', 'razao_social': 'MITEL TELEINFORMATICA LTDA', 'Nome fantasia': 'MITEL TELEINFORMATICA', 'Matriz/filial': 'Matriz'}
+   suggestions: ['Me mande isso em Excel', 'Me mande isso em CSV']
+   17.4 ms
+Q: encontre o dono da zaflas
+   reject | A pesquisa de pessoas, CPFs e sócios não está disponível no chat. Posso pesquisar estabelecimentos por município e atividade.
+   0.1 ms
+Q: me mande apenas o nome e o telefone em um excel das empresas de TI que tiveram baixa em Mato Grosso
+   execute | Encontrei 1.052 estabelecimentos baixados de serviço de tecnologia da informação em Mato Grosso. Mostrando 20.
+   file: opencnpj-estabelecimentos-baixados-de-servico-de-tecnologia-da-informacao-em-mato-grosso.xlsx rows=1052 columns=['Razão social', 'Telefone'] notes=['Cada linha é um estabelecimento: empresas com filiais aparecem uma vez por estabelecimento. Inclua o CNPJ para distingui-las ou peça “só as matrizes” para uma linha por empresa.']
+   suggestions: ['E só as matrizes?', 'Mostre os mais recentes primeiro', 'Agora em CSV']
+   101.4 ms
