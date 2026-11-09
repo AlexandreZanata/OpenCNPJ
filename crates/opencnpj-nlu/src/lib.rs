@@ -24,6 +24,7 @@ pub struct Interpreter {
     anchor: Day,
     cues: grammar::Cues,
     policy: grammar::Policy,
+    delivery: skills::Vocabulary,
 }
 
 impl Interpreter {
@@ -34,6 +35,7 @@ impl Interpreter {
             anchor,
             cues: toml::from_str(include_str!("../lang/pt-BR/cues.toml")).expect("embedded grammar cues"),
             policy: toml::from_str(include_str!("../lang/pt-BR/policy.toml")).expect("embedded policy"),
+            delivery: skills::Vocabulary::embedded(),
         }
     }
 
@@ -50,13 +52,19 @@ impl Interpreter {
         }
         // A delivery phrase is cut before the grammar; a bare column list refines the
         // export of the current thread.
-        let Some(delivery) = skills::delivery(text, state.export.as_ref().filter(|_| state.last.is_some())) else {
+        let Some(delivery) = self.delivery.delivery(text, state.export.as_ref().filter(|_| state.last.is_some())) else {
             let (result, _) = self.answer(text, state, false);
             // Refinements and clarification answers keep the file of the thread; a new
             // question starts without one.
             state.export = if matches!(result.act.as_str(), "new_query" | "meta_question") { None } else { state.export.take() };
             return Interpretation { export: state.export.clone(), ..result };
         };
+        if let Some(format) = &delivery.unsupported {
+            return Interpretation::stop(
+                Decision::Clarify,
+                format!("Ainda não gero arquivos {format}. Posso entregar em Excel, CSV ou TXT: qual prefere?"),
+            );
+        }
         if state.last.is_none() && normalize::words(&delivery.rest).is_empty() {
             return Interpretation::stop(
                 Decision::Clarify,
@@ -64,7 +72,7 @@ impl Interpreter {
             );
         }
         // "Agora em CSV", "manda essa lista": the file of the previous answer.
-        let previous = state.last.is_some() && skills::refers_to_previous(&delivery.rest);
+        let previous = state.last.is_some() && self.delivery.refers_to_previous(&delivery.rest);
         let (mut result, rows) = self.answer(if previous { "" } else { &delivery.rest }, state, true);
         if previous && result.request.is_some() {
             result.act = "export".into();

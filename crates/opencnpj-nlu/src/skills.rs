@@ -1,9 +1,12 @@
 //! Delivery skills layered over the data question.
 //!
-//! A delivery phrase ("me mande um Excel com…", "em CSV", "apenas o nome e o CNPJ") is
-//! cut from the question before the grammar runs, so its words never act as a place,
-//! sector, filter or intent. The rest is interpreted like any other question, and the
-//! removed span becomes a typed [`Export`].
+//! A delivery phrase ("me mande um Excel com…", "bah, tchê, me passa uma planilha", "em
+//! CSV", "apenas o nome e o CNPJ") is cut from the question before the grammar runs, so
+//! its words never act as a place, sector, filter or intent. The rest is interpreted like
+//! any other question, and the removed span becomes a typed [`Export`]. The vocabulary is
+//! data (`lang/pt-BR/delivery.toml`), whose lists include each other recursively.
+
+use std::collections::{BTreeMap, BTreeSet};
 
 use crate::normalize;
 use opencnpj_query::export::{Export, ExportField, ExportFormat};
@@ -13,6 +16,130 @@ pub(crate) struct Delivery {
     /// The question without the delivery phrase, in its original spelling and case.
     pub rest: String,
     pub notes: Vec<String>,
+    /// A format the service cannot write (PDF, Word…) was asked for.
+    pub unsupported: Option<String>,
+}
+
+type Phrase = Vec<String>;
+
+/// Phrase lists of the delivery vocabulary, each sorted longest first.
+#[derive(Debug)]
+pub(crate) struct Vocabulary {
+    formats: Vec<(Phrase, ExportFormat)>,
+    unsupported: Vec<Phrase>,
+    request: Vec<Phrase>,
+    actions: Vec<Phrase>,
+    export_verbs: Vec<Phrase>,
+    file_nouns: Vec<Phrase>,
+    left_glue: Vec<Phrase>,
+    right_glue: Vec<Phrase>,
+    intros: Vec<Phrase>,
+    articles: Vec<Phrase>,
+    previous: Vec<Phrase>,
+    tail: Vec<Phrase>,
+    /// Column phrases, the columns they name, and whether the phrase is a bare "número".
+    fields: Vec<(Phrase, Vec<ExportField>, bool)>,
+}
+
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct File {
+    lists: BTreeMap<String, Vec<String>>,
+    formats: BTreeMap<String, Vec<String>>,
+    roles: BTreeMap<String, Vec<String>>,
+    fields: BTreeMap<String, Vec<String>>,
+}
+
+/// Expand `items`, replacing "@name" by the list `name`, recursively. `path` holds the
+/// lists being expanded, so a list that includes itself is reported instead of looping.
+fn expand(
+    items: &[String],
+    lists: &BTreeMap<String, Vec<String>>,
+    path: &mut Vec<String>,
+    out: &mut BTreeSet<Phrase>,
+) -> Result<(), String> {
+    for item in items {
+        if let Some(name) = item.strip_prefix('@') {
+            if path.iter().any(|seen| seen == name) {
+                return Err(format!("delivery vocabulary cycle: {} -> {name}", path.join(" -> ")));
+            }
+            let list = lists.get(name).ok_or_else(|| format!("unknown delivery list @{name}"))?;
+            path.push(name.to_owned());
+            expand(list, lists, path, out)?;
+            path.pop();
+        } else {
+            let phrase = normalize::words(item);
+            if phrase.is_empty() {
+                return Err(format!("empty delivery phrase {item:?}"));
+            }
+            out.insert(phrase);
+        }
+    }
+    Ok(())
+}
+
+fn longest_first(phrases: BTreeSet<Phrase>) -> Vec<Phrase> {
+    let mut phrases: Vec<Phrase> = phrases.into_iter().collect();
+    phrases.sort_by(|a, b| b.len().cmp(&a.len()).then_with(|| a.cmp(b)));
+    phrases
+}
+
+impl Vocabulary {
+    pub(crate) fn embedded() -> Self {
+        Self::parse(include_str!("../lang/pt-BR/delivery.toml")).expect("embedded delivery vocabulary")
+    }
+
+    pub(crate) fn parse(text: &str) -> Result<Self, String> {
+        let file: File = toml::from_str(text).map_err(|e| e.to_string())?;
+        let resolve = |items: &[String]| -> Result<Vec<Phrase>, String> {
+            let mut out = BTreeSet::new();
+            expand(items, &file.lists, &mut Vec::new(), &mut out)?;
+            Ok(longest_first(out))
+        };
+        let section = |map: &BTreeMap<String, Vec<String>>, key: &str| -> Result<Vec<Phrase>, String> {
+            resolve(map.get(key).ok_or_else(|| format!("missing delivery entry {key}"))?)
+        };
+        // Every list must resolve, including the ones no role uses yet.
+        for list in file.lists.values() {
+            resolve(list)?;
+        }
+        let mut formats = Vec::new();
+        for (name, format) in [("xlsx", ExportFormat::Xlsx), ("csv", ExportFormat::Csv), ("txt", ExportFormat::Txt)] {
+            formats.extend(section(&file.formats, name)?.into_iter().map(|phrase| (phrase, format)));
+        }
+        formats.sort_by(|a, b| b.0.len().cmp(&a.0.len()).then_with(|| a.0.cmp(&b.0)));
+        let mut fields = Vec::new();
+        for (name, items) in &file.fields {
+            let (columns, bare) = match name.as_str() {
+                "all" => (ExportField::ALL.to_vec(), false),
+                "cnpj_number" => (vec![ExportField::Cnpj], true),
+                "contacts" => (vec![ExportField::Telefone, ExportField::Email], false),
+                "full_address" => (vec![ExportField::Endereco, ExportField::Bairro, ExportField::Cep], false),
+                other => {
+                    let field: ExportField = serde_json::from_value(serde_json::Value::String(other.to_owned()))
+                        .map_err(|_| format!("unknown export field {other}"))?;
+                    (vec![field], false)
+                }
+            };
+            fields.extend(resolve(items)?.into_iter().map(|phrase| (phrase, columns.clone(), bare)));
+        }
+        fields.sort_by(|a, b| b.0.len().cmp(&a.0.len()).then_with(|| a.0.cmp(&b.0)));
+        Ok(Self {
+            formats,
+            unsupported: section(&file.formats, "unsupported")?,
+            request: section(&file.roles, "request")?,
+            actions: section(&file.roles, "actions")?,
+            export_verbs: section(&file.roles, "export_verbs")?,
+            file_nouns: section(&file.roles, "file_nouns")?,
+            left_glue: section(&file.roles, "left_glue")?,
+            right_glue: section(&file.roles, "right_glue")?,
+            intros: section(&file.roles, "intros")?,
+            articles: section(&file.roles, "articles")?,
+            previous: section(&file.roles, "previous")?,
+            tail: section(&file.roles, "tail")?,
+            fields,
+        })
+    }
 }
 
 struct Word {
@@ -21,244 +148,6 @@ struct Word {
     /// The original token ends with a comma after this word ("nome, CNPJ").
     comma: bool,
 }
-
-const FORMATS: &[(&str, ExportFormat)] = &[
-    ("planilha do excel", ExportFormat::Xlsx),
-    ("planilha excel", ExportFormat::Xlsx),
-    ("planilhas", ExportFormat::Xlsx),
-    ("planilha", ExportFormat::Xlsx),
-    ("excel", ExportFormat::Xlsx),
-    ("exel", ExportFormat::Xlsx),
-    ("excell", ExportFormat::Xlsx),
-    ("xlsx", ExportFormat::Xlsx),
-    ("xls", ExportFormat::Xlsx),
-    ("csv", ExportFormat::Csv),
-    ("txt", ExportFormat::Txt),
-    ("arquivo de texto", ExportFormat::Txt),
-    ("arquivo texto", ExportFormat::Txt),
-    ("texto simples", ExportFormat::Txt),
-    ("texto puro", ExportFormat::Txt),
-    ("bloco de notas", ExportFormat::Txt),
-    ("formato de texto", ExportFormat::Txt),
-    ("formato texto", ExportFormat::Txt),
-];
-
-/// Verbs that ask for a file even without naming its format.
-const EXPORT_VERBS: &[&str] = &["exporte", "exporta", "exportar", "exportem", "exportacao", "download"];
-
-/// Request and politeness words that may surround a delivery phrase.
-const VERBS: &[&str] = &[
-    "me",
-    "nos",
-    "mim",
-    "voce",
-    "pode",
-    "poderia",
-    "podes",
-    "consegue",
-    "conseguiria",
-    "por",
-    "favor",
-    "gostaria",
-    "queria",
-    "quero",
-    "preciso",
-    "precisava",
-    "mande",
-    "manda",
-    "mandar",
-    "mandem",
-    "envie",
-    "envia",
-    "enviar",
-    "enviem",
-    "gere",
-    "gera",
-    "gerar",
-    "gerem",
-    "crie",
-    "cria",
-    "criar",
-    "monte",
-    "monta",
-    "montar",
-    "prepare",
-    "prepara",
-    "preparar",
-    "faca",
-    "faz",
-    "fazer",
-    "exporte",
-    "exporta",
-    "exportar",
-    "exportem",
-    "baixe",
-    "baixar",
-    "salve",
-    "salvar",
-    "devolva",
-    "devolve",
-    "retorne",
-    "retorna",
-    "extraia",
-    "extrair",
-    "passe",
-    "passa",
-    "passar",
-    "coloque",
-    "coloca",
-    "colocar",
-    "ola",
-    "oi",
-    "download",
-    "exportacao",
-];
-
-/// Articles and prepositions between the request and the format ("em um", "no formato").
-const LEFT_GLUE: &[&str] = &[
-    "um",
-    "uma",
-    "o",
-    "a",
-    "num",
-    "numa",
-    "em",
-    "no",
-    "na",
-    "para",
-    "como",
-    "via",
-    "de",
-    "do",
-    "formato",
-    "arquivo",
-    "arquivos",
-    "documento",
-    "tipo",
-];
-
-/// Words that join the format to the data question ("um Excel com as padarias").
-const RIGHT_GLUE: &[&str] = &["com", "contendo", "de", "do", "da", "dos", "das", "sobre", "listando", "mostrando"];
-
-/// Words that open a column list on their own.
-const FIELD_INTROS: &[&str] = &[
-    "contendo apenas",
-    "contendo somente",
-    "com as colunas",
-    "com os campos",
-    "com as informacoes",
-    "com apenas",
-    "com somente",
-    "so com",
-    "apenas com",
-    "somente com",
-    "contendo",
-    "apenas",
-    "somente",
-    "so",
-    "unicamente",
-    "exclusivamente",
-    "colunas",
-    "campos",
-];
-
-const ARTICLES: &[&str] = &["o", "a", "os", "as", "seu", "sua", "seus", "suas"];
-const GENITIVES: &[&str] = &["de", "do", "da", "dos", "das"];
-
-/// Column names, longest phrases first within each spelling family.
-const FIELDS: &[(&str, &[ExportField])] = &[
-    ("todos os dados disponiveis", &ExportField::ALL),
-    ("todos os dados", &ExportField::ALL),
-    ("todas as colunas", &ExportField::ALL),
-    ("todos os campos", &ExportField::ALL),
-    ("todas as informacoes", &ExportField::ALL),
-    ("dados completos", &ExportField::ALL),
-    ("numero do cnpj", &[ExportField::Cnpj]),
-    ("numero de cnpj", &[ExportField::Cnpj]),
-    ("numero de inscricao", &[ExportField::Cnpj]),
-    ("numero de telefone", &[ExportField::Telefone]),
-    ("numero do telefone", &[ExportField::Telefone]),
-    ("numeros de telefone", &[ExportField::Telefone]),
-    ("numero", &[ExportField::Cnpj]),
-    ("numeros", &[ExportField::Cnpj]),
-    ("cnpjs", &[ExportField::Cnpj]),
-    ("cnpj", &[ExportField::Cnpj]),
-    ("inscricao", &[ExportField::Cnpj]),
-    ("nome fantasia", &[ExportField::NomeFantasia]),
-    ("nomes fantasia", &[ExportField::NomeFantasia]),
-    ("fantasia", &[ExportField::NomeFantasia]),
-    ("razao social", &[ExportField::RazaoSocial]),
-    ("nome empresarial", &[ExportField::RazaoSocial]),
-    ("nome da empresa", &[ExportField::RazaoSocial]),
-    ("nome das empresas", &[ExportField::RazaoSocial]),
-    ("nomes das empresas", &[ExportField::RazaoSocial]),
-    ("nome", &[ExportField::RazaoSocial]),
-    ("nomes", &[ExportField::RazaoSocial]),
-    ("matriz ou filial", &[ExportField::MatrizFilial]),
-    ("matriz filial", &[ExportField::MatrizFilial]),
-    ("tipo de unidade", &[ExportField::MatrizFilial]),
-    ("data da situacao cadastral", &[ExportField::DataSituacao]),
-    ("data da situacao", &[ExportField::DataSituacao]),
-    ("data da baixa", &[ExportField::DataSituacao]),
-    ("data de baixa", &[ExportField::DataSituacao]),
-    ("data do encerramento", &[ExportField::DataSituacao]),
-    ("data de encerramento", &[ExportField::DataSituacao]),
-    ("data do fechamento", &[ExportField::DataSituacao]),
-    ("motivo da baixa", &[ExportField::MotivoSituacao]),
-    ("motivo da situacao", &[ExportField::MotivoSituacao]),
-    ("motivo", &[ExportField::MotivoSituacao]),
-    ("situacao cadastral", &[ExportField::Situacao]),
-    ("situacao", &[ExportField::Situacao]),
-    ("status", &[ExportField::Situacao]),
-    ("data de inicio de atividade", &[ExportField::DataInicio]),
-    ("data de inicio da atividade", &[ExportField::DataInicio]),
-    ("data de inicio", &[ExportField::DataInicio]),
-    ("inicio de atividade", &[ExportField::DataInicio]),
-    ("inicio da atividade", &[ExportField::DataInicio]),
-    ("data de abertura", &[ExportField::DataInicio]),
-    ("data da abertura", &[ExportField::DataInicio]),
-    ("data de fundacao", &[ExportField::DataInicio]),
-    ("abertura", &[ExportField::DataInicio]),
-    ("fundacao", &[ExportField::DataInicio]),
-    ("cnae principal", &[ExportField::CnaePrincipal]),
-    ("codigo cnae", &[ExportField::CnaePrincipal]),
-    ("codigo da atividade", &[ExportField::CnaePrincipal]),
-    ("cnaes", &[ExportField::CnaePrincipal]),
-    ("cnae", &[ExportField::CnaePrincipal]),
-    ("descricao da atividade", &[ExportField::CnaeDescricao]),
-    ("atividade principal", &[ExportField::CnaeDescricao]),
-    ("ramo de atividade", &[ExportField::CnaeDescricao]),
-    ("atividade", &[ExportField::CnaeDescricao]),
-    ("natureza juridica", &[ExportField::NaturezaJuridica]),
-    ("natureza", &[ExportField::NaturezaJuridica]),
-    ("porte", &[ExportField::Porte]),
-    ("capital social", &[ExportField::CapitalSocial]),
-    ("capital", &[ExportField::CapitalSocial]),
-    ("opcao pelo simples", &[ExportField::Simples]),
-    ("simples nacional", &[ExportField::Simples]),
-    ("simples", &[ExportField::Simples]),
-    ("opcao pelo mei", &[ExportField::Mei]),
-    ("mei", &[ExportField::Mei]),
-    ("endereco completo", &[ExportField::Endereco, ExportField::Bairro, ExportField::Cep]),
-    ("enderecos", &[ExportField::Endereco]),
-    ("endereco", &[ExportField::Endereco]),
-    ("logradouro", &[ExportField::Endereco]),
-    ("bairro", &[ExportField::Bairro]),
-    ("cep", &[ExportField::Cep]),
-    ("municipio", &[ExportField::Municipio]),
-    ("cidade", &[ExportField::Municipio]),
-    ("uf", &[ExportField::Uf]),
-    ("estado", &[ExportField::Uf]),
-    ("telefones", &[ExportField::Telefone]),
-    ("telefone", &[ExportField::Telefone]),
-    ("fone", &[ExportField::Telefone]),
-    ("contatos", &[ExportField::Telefone, ExportField::Email]),
-    ("contato", &[ExportField::Telefone, ExportField::Email]),
-    ("e mail", &[ExportField::Email]),
-    ("emails", &[ExportField::Email]),
-    ("email", &[ExportField::Email]),
-    ("correio eletronico", &[ExportField::Email]),
-];
 
 fn words(text: &str) -> Vec<Word> {
     let mut out = Vec::new();
@@ -271,20 +160,21 @@ fn words(text: &str) -> Vec<Word> {
     out
 }
 
-fn phrase_at(words: &[Word], at: usize, phrase: &str) -> Option<usize> {
-    let needle: Vec<&str> = phrase.split(' ').collect();
-    let end = at + needle.len();
-    (end <= words.len() && words[at..end].iter().zip(&needle).all(|(w, n)| w.key == *n)).then_some(end)
+fn matches_at(words: &[Word], at: usize, phrase: &[String]) -> bool {
+    at + phrase.len() <= words.len() && words[at..at + phrase.len()].iter().zip(phrase).all(|(w, p)| w.key == *p)
 }
 
-fn format_at(words: &[Word], at: usize) -> Option<(usize, ExportFormat)> {
-    FORMATS.iter().find_map(|(phrase, format)| phrase_at(words, at, phrase).map(|end| (end, *format)))
+/// End of the longest phrase of `list` starting at `at`.
+fn at(list: &[Phrase], words: &[Word], at: usize) -> Option<usize> {
+    list.iter().find(|phrase| matches_at(words, at, phrase)).map(|phrase| at + phrase.len())
 }
 
-fn field_at(words: &[Word], at: usize) -> Option<(usize, &'static [ExportField], bool)> {
-    FIELDS
-        .iter()
-        .find_map(|(phrase, fields)| phrase_at(words, at, phrase).map(|end| (end, *fields, matches!(*phrase, "numero" | "numeros"))))
+/// Start of the longest phrase of `list` ending at `end`.
+fn ending(list: &[Phrase], words: &[Word], end: usize) -> Option<usize> {
+    list.iter()
+        .filter(|phrase| phrase.len() <= end)
+        .find(|phrase| matches_at(words, end - phrase.len(), phrase))
+        .map(|phrase| end - phrase.len())
 }
 
 struct FieldList {
@@ -294,224 +184,267 @@ struct FieldList {
     bare_number: bool,
 }
 
-/// `[article] field ((, | e | , e) [article] field)*`, then one optional genitive.
-fn field_list(words: &[Word], mut at: usize) -> Option<FieldList> {
-    let mut list = FieldList { end: at, fields: Vec::new(), named: 0, bare_number: false };
-    loop {
-        let mut next = at;
-        if words.get(next).is_some_and(|w| ARTICLES.contains(&w.key.as_str())) {
-            next += 1;
-        }
-        let Some((end, fields, bare)) = field_at(words, next) else { break };
-        for field in fields {
-            if !list.fields.contains(field) {
-                list.fields.push(*field);
-            }
-        }
-        list.named += 1;
-        list.bare_number |= bare;
-        list.end = end;
-        at = end;
-        let comma = words[end - 1].comma;
-        if words.get(at).is_some_and(|w| matches!(w.key.as_str(), "e" | "mais")) {
-            at += 1;
-        } else if !comma {
-            break;
-        }
+impl Vocabulary {
+    fn field_at(&self, words: &[Word], start: usize) -> Option<(usize, &[ExportField], bool)> {
+        self.fields
+            .iter()
+            .find(|(phrase, _, _)| matches_at(words, start, phrase))
+            .map(|(phrase, fields, bare)| (start + phrase.len(), fields.as_slice(), *bare))
     }
-    if list.named == 0 {
-        return None;
-    }
-    // A list ends at the end of the question, at punctuation or before a connector.
-    let boundary = list.end == words.len()
-        || words[list.end - 1].comma
-        || matches!(
-            words[list.end].key.as_str(),
-            "de" | "do" | "da" | "dos" | "das" | "em" | "no" | "na" | "para" | "num" | "numa" | "que"
-        )
-        || format_at(words, list.end).is_some()
-        || VERBS.contains(&words[list.end].key.as_str());
-    if !boundary {
-        return None;
-    }
-    if words.get(list.end).is_some_and(|w| GENITIVES.contains(&w.key.as_str())) {
-        list.end += 1;
-    }
-    Some(list)
-}
 
-/// Extract a file delivery. `previous` is the export of the conversation, which a bare
-/// column list ("só o nome e o CNPJ") refines.
-pub(crate) fn delivery(text: &str, previous: Option<&Export>) -> Option<Delivery> {
-    let words = words(text);
-    let format = (0..words.len()).find_map(|at| format_at(&words, at).map(|(end, format)| (at, end, format)));
-    let verb = words.iter().position(|w| EXPORT_VERBS.contains(&w.key.as_str()));
-    let mut removed = vec![false; words.len()];
-    let mut notes = Vec::new();
-    let mut fields: Vec<ExportField> = Vec::new();
-    let mut bare_number = false;
-    let mut take = |list: &FieldList, start: usize, removed: &mut Vec<bool>| {
-        for field in &list.fields {
-            if !fields.contains(field) {
-                fields.push(*field);
+    /// `[article] field ((, | e | , e) [article] field)*`, then one optional genitive.
+    fn field_list(&self, words: &[Word], mut next: usize) -> Option<FieldList> {
+        let mut list = FieldList { end: next, fields: Vec::new(), named: 0, bare_number: false };
+        loop {
+            let start = at(&self.articles, words, next).unwrap_or(next);
+            let Some((end, fields, bare)) = self.field_at(words, start) else { break };
+            for field in fields {
+                if !list.fields.contains(field) {
+                    list.fields.push(*field);
+                }
+            }
+            list.named += 1;
+            list.bare_number |= bare;
+            list.end = end;
+            next = end;
+            let comma = words[end - 1].comma;
+            if words.get(next).is_some_and(|w| matches!(w.key.as_str(), "e" | "mais")) {
+                next += 1;
+            } else if !comma {
+                break;
             }
         }
-        bare_number |= list.bare_number;
-        removed[start..list.end].iter_mut().for_each(|r| *r = true);
-    };
-    let delivered = format.is_some() || verb.is_some();
-    if !delivered && previous.is_none() {
-        return None;
-    }
-    // Column lists: after an explicit introduction, or right after a request verb.
-    let mut at = 0;
-    while at < words.len() {
-        let intro = FIELD_INTROS.iter().find_map(|phrase| phrase_at(&words, at, phrase));
-        let after_verb = delivered && VERBS.contains(&words[at].key.as_str()) && !matches!(words[at].key.as_str(), "por" | "favor");
-        if let Some(end) = intro.or(after_verb.then_some(at + 1))
-            && let Some(list) = field_list(&words, end)
-        {
-            take(&list, if intro.is_some() { at } else { end }, &mut removed);
-            at = list.end;
-            continue;
+        if list.named == 0 {
+            return None;
         }
-        at += 1;
+        // A list ends at the end of the question, at punctuation or before a connector.
+        let boundary = list.end == words.len()
+            || words[list.end - 1].comma
+            || matches!(
+                words[list.end].key.as_str(),
+                "de" | "do" | "da" | "dos" | "das" | "em" | "no" | "na" | "para" | "num" | "numa" | "que"
+            )
+            || self.format_at(words, list.end).is_some()
+            || at(&self.request, words, list.end).is_some();
+        if !boundary {
+            return None;
+        }
+        if words.get(list.end).is_some_and(|w| matches!(w.key.as_str(), "de" | "do" | "da" | "dos" | "das")) {
+            list.end += 1;
+        }
+        Some(list)
     }
-    if let Some((start, end, _)) = format {
-        removed[start..end].iter_mut().for_each(|r| *r = true);
-        // "com"/"contendo" right after the format introduces columns even for one name.
-        let mut right = end;
-        if let Some(word) = words.get(right)
-            && RIGHT_GLUE.contains(&word.key.as_str())
-        {
-            if matches!(word.key.as_str(), "com" | "contendo")
-                && let Some(list) = field_list(&words, right + 1)
+
+    fn format_at(&self, words: &[Word], start: usize) -> Option<(usize, ExportFormat)> {
+        self.formats.iter().find(|(phrase, _)| matches_at(words, start, phrase)).map(|(phrase, format)| (start + phrase.len(), *format))
+    }
+
+    /// A file noun ("uma tabela", "um relatório") preceded by a hand-over or make verb.
+    fn requested_file(&self, words: &[Word]) -> Option<(usize, usize)> {
+        (0..words.len()).find_map(|start| {
+            let end = at(&self.file_nouns, words, start)?;
+            let mut left = start;
+            while let Some(from) = ending(&self.left_glue, words, left).filter(|from| *from < left) {
+                left = from;
+            }
+            ending(&self.actions, words, left).map(|_| (start, end))
+        })
+    }
+
+    /// Extract a file delivery. `previous` is the export of the conversation, which a bare
+    /// column list ("só o nome e o CNPJ") refines.
+    pub(crate) fn delivery(&self, text: &str, previous: Option<&Export>) -> Option<Delivery> {
+        let words = words(text);
+        let format = (0..words.len()).find_map(|start| self.format_at(&words, start).map(|(end, format)| (start, end, format)));
+        let unsupported = (0..words.len()).find_map(|start| at(&self.unsupported, &words, start).map(|end| (start, end)));
+        let noun = if format.is_none() { self.requested_file(&words) } else { None };
+        let verb = (0..words.len()).find_map(|start| at(&self.export_verbs, &words, start).map(|end| (start, end)));
+        let mut removed = vec![false; words.len()];
+        let mut notes = Vec::new();
+        let mut fields: Vec<ExportField> = Vec::new();
+        let mut bare_number = false;
+        let mut take = |list: &FieldList, start: usize, removed: &mut Vec<bool>| {
+            for field in &list.fields {
+                if !fields.contains(field) {
+                    fields.push(*field);
+                }
+            }
+            bare_number |= list.bare_number;
+            removed[start..list.end].iter_mut().for_each(|r| *r = true);
+        };
+        let unsupported = unsupported.filter(|_| format.is_none());
+        let delivered = format.is_some() || verb.is_some() || noun.is_some() || unsupported.is_some();
+        if !delivered && previous.is_none() {
+            return None;
+        }
+        // Column lists: after an explicit introduction, or right after a request word.
+        let mut start = 0;
+        while start < words.len() {
+            let intro = at(&self.intros, &words, start);
+            let after_request = if delivered { at(&self.request, &words, start) } else { None };
+            let opened = intro.or(after_request);
+            if let Some(end) = opened
+                && let Some(list) = self.field_list(&words, end)
             {
-                take(&list, right, &mut removed);
-                right = list.end;
-            } else {
+                take(&list, if intro.is_some() { start } else { end }, &mut removed);
+                start = list.end;
+                continue;
+            }
+            start += 1;
+        }
+        // The file itself: a format, an unsupported format or a requested file noun.
+        let core = format.map(|(s, e, _)| (s, e)).or(unsupported).or(noun);
+        if let Some((start, end)) = core {
+            removed[start..end].iter_mut().for_each(|r| *r = true);
+            // Tags after the file ("um CSV aí", "uma planilha, por favor") belong to it.
+            let mut end = end;
+            while let Some(tag_end) = at(&self.tail, &words, end) {
+                removed[end..tag_end].iter_mut().for_each(|r| *r = true);
+                end = tag_end;
+            }
+            // "com"/"contendo" right after the file introduces columns even for one name;
+            // so does a list placed right after it ("numa planilha o nome e o CEP das …").
+            let genitive = |list: &FieldList| matches!(words[list.end - 1].key.as_str(), "de" | "do" | "da" | "dos" | "das");
+            if let Some(list) = self.field_list(&words, end).filter(genitive) {
+                take(&list, end, &mut removed);
+            } else if let Some(glue_end) = at(&self.right_glue, &words, end) {
+                let opener = matches!(words[end].key.as_str(), "com" | "contendo");
+                match self.field_list(&words, glue_end).filter(|_| opener) {
+                    Some(list) => take(&list, end, &mut removed),
+                    None => removed[end..glue_end].iter_mut().for_each(|r| *r = true),
+                }
+            }
+            self.cut_left(&words, start, &mut removed);
+        }
+        if let Some((start, end)) = verb {
+            // "Exporte as farmácias…": the verb and the request words before it.
+            removed[start..end].iter_mut().for_each(|r| *r = true);
+            self.cut_left(&words, start, &mut removed);
+            let mut right = end;
+            while core.is_none() && words.get(right).is_some_and(|w| matches!(w.key.as_str(), "para" | "em" | "como")) {
                 removed[right] = true;
                 right += 1;
             }
         }
-        let _ = right;
+        if !delivered && fields.is_empty() {
+            return None;
+        }
+        if delivered {
+            // A request opening the question ("Bah, tchê, me passa …") is cut as well.
+            let mut start = 0;
+            while start < words.len() {
+                if removed[start] || matches!(words[start].key.as_str(), "agora") {
+                    start += 1;
+                } else if let Some(end) = at(&self.request, &words, start) {
+                    removed[start..end].iter_mut().for_each(|r| *r = true);
+                    start = end;
+                } else {
+                    break;
+                }
+            }
+            // So are courtesy and regional tags closing it ("…, visse?", "valeu").
+            let mut end = words.len();
+            while end > 0 {
+                if removed[end - 1] {
+                    end -= 1;
+                } else if let Some(from) = ending(&self.tail, &words, end) {
+                    removed[from..end].iter_mut().for_each(|r| *r = true);
+                    end = from;
+                } else {
+                    break;
+                }
+            }
+        }
+        // Keep a token unless every word in it belongs to the delivery phrase.
+        let rest = text
+            .split_whitespace()
+            .enumerate()
+            .filter(|(token, _)| {
+                words.iter().zip(&removed).any(|(w, r)| w.token == *token && !*r) || words.iter().all(|w| w.token != *token)
+            })
+            .map(|(_, raw)| raw)
+            .collect::<Vec<_>>()
+            .join(" ");
+        let format = match (format, previous) {
+            (Some((_, _, format)), _) => format,
+            (None, Some(previous)) if !delivered => previous.format,
+            _ => {
+                if unsupported.is_none() {
+                    notes.push("Gerei o arquivo em Excel (.xlsx). Peça CSV ou TXT se preferir outro formato.".into());
+                }
+                ExportFormat::Xlsx
+            }
+        };
+        if bare_number {
+            notes.push("Considerei “número” como o número de inscrição no CNPJ. Para contatos, peça o telefone.".into());
+        }
+        // "Agora em CSV" changes the format of the previous file and keeps its columns.
+        let rest = rest.trim_matches([',', ';', ' ']).to_owned();
+        let fields = match previous {
+            Some(previous) if fields.is_empty() && (!delivered || self.refers_to_previous(&rest)) => previous.fields.clone(),
+            _ => fields,
+        };
+        let unsupported =
+            unsupported.map(|(start, end)| words[start..end].iter().map(|w| w.key.to_uppercase()).collect::<Vec<_>>().join(" "));
+        Some(Delivery { export: Export { format, fields, rows: None }, rest, notes, unsupported })
+    }
+
+    /// Cut the glue and request words that lead to a file phrase starting at `start`.
+    fn cut_left(&self, words: &[Word], start: usize, removed: &mut [bool]) {
         let mut left = start;
         while left > 0 {
-            let word = &words[left - 1];
-            if removed[left - 1] || LEFT_GLUE.contains(&word.key.as_str()) || VERBS.contains(&word.key.as_str()) {
-                removed[left - 1] = true;
+            if removed[left - 1] {
                 left -= 1;
-            } else {
-                break;
-            }
-        }
-    }
-    if let Some(at) = verb {
-        // "Exporte as farmácias…": the verb and the request words before it.
-        let mut left = at + 1;
-        while left > 0 && (removed[left - 1] || VERBS.contains(&words[left - 1].key.as_str())) {
-            removed[left - 1] = true;
-            left -= 1;
-        }
-        let mut right = at + 1;
-        while words.get(right).is_some_and(|w| matches!(w.key.as_str(), "para" | "em" | "como")) && format.is_none() {
-            removed[right] = true;
-            right += 1;
-        }
-    }
-    if !delivered && fields.is_empty() {
-        return None;
-    }
-    // A request opening the question ("Por favor, me mande …") is cut as well.
-    if delivered {
-        for (word, removed) in words.iter().zip(removed.iter_mut()) {
-            if matches!(word.key.as_str(), "agora" | "entao") || *removed {
                 continue;
             }
-            if !VERBS.contains(&word.key.as_str()) {
-                break;
-            }
-            *removed = true;
+            let from = ending(&self.left_glue, words, left)
+                .or_else(|| ending(&self.file_nouns, words, left))
+                .or_else(|| ending(&self.request, words, left));
+            let Some(from) = from else { break };
+            removed[from..left].iter_mut().for_each(|r| *r = true);
+            left = from;
         }
     }
-    // Keep a token unless every word in it belongs to the delivery phrase.
-    let tokens: Vec<&str> = text.split_whitespace().collect();
-    let rest = tokens
-        .iter()
-        .enumerate()
-        .filter(|(token, _)| words.iter().zip(&removed).any(|(w, r)| w.token == *token && !*r) || words.iter().all(|w| w.token != *token))
-        .map(|(_, raw)| *raw)
-        .collect::<Vec<_>>()
-        .join(" ");
-    let format = match (format, previous) {
-        (Some((_, _, format)), _) => format,
-        (None, Some(previous)) if !delivered => previous.format,
-        _ => {
-            notes.push("Gerei o arquivo em Excel (.xlsx). Peça CSV ou TXT se preferir outro formato.".into());
-            ExportFormat::Xlsx
-        }
-    };
-    if bare_number {
-        notes.push("Considerei “número” como o número de inscrição no CNPJ. Para contatos, peça o telefone.".into());
-    }
-    // "Agora em CSV" changes the format of the previous file and keeps its columns.
-    let rest = rest.trim_matches([',', ';', ' ']).to_owned();
-    let fields = match previous {
-        Some(previous) if fields.is_empty() && (!delivered || refers_to_previous(&rest)) => previous.fields.clone(),
-        _ => fields,
-    };
-    Some(Delivery { export: Export { format, fields, rows: None }, rest, notes })
-}
 
-/// A delivery follow-up whose remaining words only point at the previous answer.
-pub(crate) fn refers_to_previous(rest: &str) -> bool {
-    normalize::words(rest).iter().all(|w| {
-        VERBS.contains(&w.as_str())
-            || matches!(
-                w.as_str(),
-                "agora"
-                    | "isso"
-                    | "isto"
-                    | "esse"
-                    | "essa"
-                    | "esses"
-                    | "essas"
-                    | "este"
-                    | "esta"
-                    | "estes"
-                    | "estas"
-                    | "resultado"
-                    | "resultados"
-                    | "lista"
-                    | "listagem"
-                    | "relacao"
-                    | "tabela"
-                    | "dados"
-                    | "mesmo"
-                    | "mesma"
-                    | "mesmos"
-                    | "mesmas"
-                    | "tambem"
-                    | "e"
-                    | "o"
-                    | "a"
-                    | "os"
-                    | "as"
-                    | "ai"
-                    | "aqui"
-                    | "entao"
-                    | "agr"
-            )
-    })
+    /// A delivery follow-up whose remaining words only point at the previous answer.
+    pub(crate) fn refers_to_previous(&self, rest: &str) -> bool {
+        let words = words(rest);
+        let mut start = 0;
+        while start < words.len() {
+            let end = [&self.previous, &self.request, &self.tail].iter().filter_map(|list| at(list, &words, start)).max();
+            match end {
+                Some(end) => start = end,
+                None => return false,
+            }
+        }
+        true
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
+    fn vocabulary() -> Vocabulary {
+        Vocabulary::embedded()
+    }
+
     fn cut(text: &str) -> (Export, String) {
-        let d = delivery(text, None).unwrap_or_else(|| panic!("no delivery in {text}"));
+        let d = vocabulary().delivery(text, None).unwrap_or_else(|| panic!("no delivery in {text}"));
         (d.export, d.rest)
+    }
+
+    #[test]
+    fn lists_include_each_other_and_cycles_fail() {
+        let text = |lists: &str| {
+            format!(
+                "[lists]\n{lists}\n[formats]\nxlsx=[\"excel\"]\ncsv=[\"csv\"]\ntxt=[\"txt\"]\nunsupported=[\"pdf\"]\n[roles]\nrequest=[\"@a\"]\nactions=[\"manda\"]\nexport_verbs=[\"exporte\"]\nfile_nouns=[\"arquivo\"]\nleft_glue=[\"um\"]\nright_glue=[\"com\"]\nintros=[\"apenas\"]\narticles=[\"o\"]\nprevious=[\"isso\"]\ntail=[\"valeu\"]\n[fields]\ncnpj=[\"cnpj\"]\n"
+            )
+        };
+        let nested = Vocabulary::parse(&text("a=[\"@b\", \"Por Favor\"]\nb=[\"@c\", \"me\"]\nc=[\"Tchê\"]")).unwrap();
+        assert_eq!(nested.request, [vec!["por".to_owned(), "favor".to_owned()], vec!["me".to_owned()], vec!["tche".to_owned()]]);
+        assert!(Vocabulary::parse(&text("a=[\"@b\"]\nb=[\"@a\"]")).unwrap_err().contains("cycle"));
+        assert!(Vocabulary::parse(&text("a=[\"@missing\"]")).unwrap_err().contains("unknown"));
     }
 
     #[test]
@@ -544,23 +477,49 @@ mod tests {
     }
 
     #[test]
+    fn regional_requests_and_file_nouns_are_cut() {
+        let (export, rest) = cut("Bah, tchê, me passa uma planilha das farmácias de Sinop/MT");
+        assert_eq!(export.format, ExportFormat::Xlsx);
+        assert_eq!(rest, "farmácias de Sinop/MT");
+        let (export, rest) = cut("Oxe, gera um CSV aí das padarias de Cuiabá/MT, visse?");
+        assert_eq!(export.format, ExportFormat::Csv);
+        assert_eq!(rest, "padarias de Cuiabá/MT");
+        let (_, rest) = cut("Uai, cê consegue me mandar um ecxel com as academias de Sorriso/MT?");
+        assert_eq!(rest, "as academias de Sorriso/MT?");
+        let d = vocabulary().delivery("Égua, maninho, me manda uma tabela com nome e telefone das padarias de Sinop/MT", None).unwrap();
+        assert_eq!((d.export.format, d.export.fields.clone()), (ExportFormat::Xlsx, vec![ExportField::RazaoSocial, ExportField::Telefone]));
+        assert_eq!(d.rest, "padarias de Sinop/MT");
+        assert_eq!(d.notes.len(), 1);
+        let (export, rest) = cut("Fala, parceiro, bota numa planilha o nome e o endereço completo das padarias de Goiânia/GO");
+        assert_eq!(export.fields, [ExportField::RazaoSocial, ExportField::Endereco, ExportField::Bairro, ExportField::Cep]);
+        assert_eq!(rest, "padarias de Goiânia/GO");
+        let d = vocabulary().delivery("me manda um PDF das padarias de Sinop/MT", None).unwrap();
+        assert_eq!(d.unsupported.as_deref(), Some("PDF"));
+        // A table shown in the chat is not a file.
+        assert!(vocabulary().delivery("me mostra uma tabela das padarias de Sinop/MT por porte", None).is_none());
+    }
+
+    #[test]
     fn data_words_are_not_columns() {
         let (export, rest) = cut("Exporte em CSV somente as matrizes ativas de padarias em Sorriso MT");
         assert!(export.fields.is_empty());
         assert_eq!(rest, "somente as matrizes ativas de padarias em Sorriso MT");
-        assert!(delivery("quantas padarias ativas existem em Sorriso", None).is_none());
-        assert!(delivery("quantas empresas tiveram baixa em 2025 em Sinop MT", None).is_none());
+        assert!(vocabulary().delivery("quantas padarias ativas existem em Sorriso", None).is_none());
+        assert!(vocabulary().delivery("quantas empresas tiveram baixa em 2025 em Sinop MT", None).is_none());
+        assert!(vocabulary().delivery("Uai, quantas padarias tem em Cuiabá/MT?", None).is_none());
     }
 
     #[test]
     fn a_bare_column_list_refines_the_previous_export() {
+        let vocabulary = vocabulary();
         let previous = Export { format: ExportFormat::Csv, fields: Vec::new(), rows: None };
-        let d = delivery("só o nome e o CNPJ", Some(&previous)).unwrap();
+        let d = vocabulary.delivery("só o nome e o CNPJ", Some(&previous)).unwrap();
         assert_eq!(d.export.format, ExportFormat::Csv);
         assert_eq!(d.export.fields, [ExportField::RazaoSocial, ExportField::Cnpj]);
-        assert!(refers_to_previous(&d.rest));
-        let d = delivery("agora em txt", Some(&previous)).unwrap();
+        assert!(vocabulary.refers_to_previous(&d.rest));
+        let d = vocabulary.delivery("agora em txt", Some(&previous)).unwrap();
         assert_eq!(d.export.format, ExportFormat::Txt);
-        assert!(refers_to_previous(&d.rest));
+        assert!(vocabulary.refers_to_previous(&d.rest));
+        assert!(vocabulary.refers_to_previous("bah, manda isso de novo"));
     }
 }
