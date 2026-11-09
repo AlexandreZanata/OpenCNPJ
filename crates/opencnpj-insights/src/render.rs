@@ -464,6 +464,44 @@ fn payload_blocks(request: &opencnpj_query::ir::Request, input: &RenderInput<'_>
     Ok(())
 }
 
+/// An aggregate answer as a table for files: the row label, the displayed metric as a
+/// number (`None` where a ratio has no denominator) and the row's base.
+#[derive(Debug, Clone, PartialEq)]
+pub struct ValueTable {
+    pub columns: [String; 3],
+    pub rows: Vec<(String, Option<f64>, u64)>,
+    /// Counts are whole numbers; ratios, percentages and densities are not.
+    pub integer: bool,
+}
+
+pub fn value_table(query: &ValidRequest, value: &Value, labels: &Labels) -> ValueTable {
+    let request = query.as_request();
+    let integer = matches!(request.op.metric(), Some(Metric::Stock | Metric::Flow(_) | Metric::ActiveChange { pct: false }));
+    let base = match request.op.metric() {
+        Some(Metric::Per10k(_) | Metric::InhabitantsPer(_)) => "População",
+        Some(Metric::Share) => "Total do recorte",
+        Some(Metric::ActiveChange { pct: true }) => "Estoque inicial",
+        _ => "Base",
+    };
+    let dim = request.op.dimension();
+    let rows = match value {
+        Value::Scalar { value } => vec![(place_label(request, labels), Some(*value as f64), 0)],
+        Value::Ratio { num, den } => vec![(place_label(request, labels), display_ratio(request, *num, *den), *den)],
+        Value::Rows(rows) => {
+            rows.iter().map(|row| (row_label(request, row.key, dim, labels), metric_value(request, *row), row.base)).collect()
+        }
+    };
+    ValueTable { columns: [column_label(dim, request), kpi_label(request), base.into()], rows, integer }
+}
+
+/// A short title for the answer ("Estabelecimentos baixados de padaria em Sorriso (MT)").
+pub fn title(query: &ValidRequest, labels: &Labels) -> String {
+    let request = query.as_request();
+    let any_activity = matches!(request.scope.activity, opencnpj_query::ir::ActivityFilter::Any);
+    let activity = if any_activity { String::new() } else { format!(" de {}", sector_label(request, labels).0) };
+    capitalize(&format!("{} {}{activity} {}", unit(request).1, status_adjective(request).1, place_em(request, labels)))
+}
+
 /// Shown where a ratio has no denominator; never replaced by a made-up number (SR-11).
 const NO_DATA: &str = "sem dado";
 
@@ -1190,7 +1228,8 @@ fn bounds(from: Option<String>, to: Option<String>) -> String {
 
 /// Masks 11-digit runs (owner CPFs embedded in MEI/EI names) as `***.456.789-**`, keeping
 /// the six digits RFB itself publishes for partners. Longer digit runs (CNPJs) are kept.
-fn mask_cpf(text: &str) -> String {
+/// Mask an owner CPF embedded in an MEI/EI name (SR-14, D-05).
+pub fn mask_cpf(text: &str) -> String {
     let chars: Vec<char> = text.chars().collect();
     let mut out = String::with_capacity(text.len());
     let mut i = 0;

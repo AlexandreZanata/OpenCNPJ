@@ -9,6 +9,7 @@ use opencnpj_insights::{
     catalog::municipalities::{MunicipalityCatalogue, Place},
     execute::{self, AggregateSet, ExecContext, Value},
     plan::{self, Backend},
+    render::SectorLabel,
 };
 use opencnpj_nlu::{Interpreter, context::Conversation, lang::LanguagePack, policy::Interpretation};
 use opencnpj_query::{ir::*, validate::ValidRequest};
@@ -64,14 +65,16 @@ pub struct EvalArgs {
     pub milestone: bool,
 }
 
-struct Assets {
-    catalogue: MunicipalityCatalogue,
-    sectors: execute::SectorMap,
-    interpreter: Interpreter,
-    aggregates: Option<AggregateSet>,
-    snapshot: Option<Snapshot>,
-    anchor: Day,
-    snapshot_sha256: Option<String>,
+pub(crate) struct Assets {
+    pub(crate) catalogue: MunicipalityCatalogue,
+    pub(crate) sectors: execute::SectorMap,
+    /// Display names by sector id, for rendered answers.
+    pub(crate) sector_labels: BTreeMap<u16, SectorLabel>,
+    pub(crate) interpreter: Interpreter,
+    pub(crate) aggregates: Option<AggregateSet>,
+    pub(crate) snapshot: Option<Snapshot>,
+    pub(crate) anchor: Day,
+    pub(crate) snapshot_sha256: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -88,10 +91,12 @@ struct Sector {
 struct Display {
     sing: String,
     plural: String,
+    #[serde(default)]
+    gender: String,
 }
 
 impl Assets {
-    fn open(args: &DataArgs) -> Result<Self> {
+    pub(crate) fn open(args: &DataArgs) -> Result<Self> {
         let parts = args.anchor.split('-').map(str::parse::<u16>).collect::<std::result::Result<Vec<_>, _>>()?;
         ensure!(parts.len() == 3, "anchor must be YYYY-MM-DD");
         let anchor = Day::from_ymd(parts[0], u8::try_from(parts[1])?, u8::try_from(parts[2])?).context("invalid data anchor")?;
@@ -104,7 +109,12 @@ impl Assets {
             }
         }
         let file: SectorFile = toml::from_str(&fs::read_to_string(&args.sectors)?)?;
+        let mut sector_labels = BTreeMap::new();
         for (i, s) in file.sector.into_iter().enumerate() {
+            sector_labels.insert(
+                u16::try_from(i)?,
+                SectorLabel { singular: s.display.sing.clone(), plural: s.display.plural.clone(), feminine: s.display.gender == "f" },
+            );
             let mut aliases = s.aliases;
             aliases.extend([s.display.sing, s.display.plural]);
             pack.sector(
@@ -139,10 +149,10 @@ impl Assets {
             vec![caps.current]
         };
         let interpreter = Interpreter::new(pack, caps, anchor);
-        Ok(Self { catalogue, sectors, interpreter, aggregates, snapshot, anchor, snapshot_sha256 })
+        Ok(Self { catalogue, sectors, sector_labels, interpreter, aggregates, snapshot, anchor, snapshot_sha256 })
     }
 
-    fn canonical(&self, request: Request) -> Result<ValidRequest> {
+    pub(crate) fn canonical(&self, request: Request) -> Result<ValidRequest> {
         query::validate_request(request, &self.catalogue, &self.sectors, self.anchor)
     }
 
@@ -150,13 +160,7 @@ impl Assets {
         let selected = plan::plan(request)?;
         let context = ExecContext::new(&self.catalogue, &self.sectors);
         if selected.backend == Backend::Static {
-            let text=match request.op {
-                Op::Meta{topic:MetaTopic::DataDate}=>format!("Competência {}; referência {}.",request.time.competence,request.time.anchor),
-                Op::Meta{topic:MetaTopic::Sources}=>"Receita Federal: dados cadastrais; IBGE: população e geografia. Veja os manifestos dos catálogos e agregados.".into(),
-                Op::Meta{topic:MetaTopic::Cnaes}=>format!("CNAEs da consulta: {:?}",request.scope.activity),
-                Op::Meta{topic:MetaTopic::Methodology}=>"A unidade padrão é o estabelecimento. Estoque ativo usa situação 02. Registros usam início de atividade; baixas usam a última data da situação 08. Capital social não é faturamento.".into(),
-                _=>"Posso contar e listar estabelecimentos, comparar locais e setores, mostrar distribuições, registros, baixas, estoque histórico e densidade por habitante.".into(),
-            };
+            let text = meta_text(request);
             return Ok(json!({"status":"ok","backend":"static","text":text,"verification":"not_numeric"}));
         }
         let engine = self.snapshot.as_ref().map(|snapshot| query::EngineExecutor { snapshot, context: &context, limits: Limits::DEFAULT });
@@ -237,7 +241,20 @@ impl Assets {
     }
 }
 
-fn value_json(value: &Value) -> Json {
+/// Answer to a question about the service itself.
+pub(crate) fn meta_text(request: &ValidRequest) -> String {
+    match request.op {
+        Op::Meta { topic: MetaTopic::DataDate } => format!("Competência {}; referência {}.", request.time.competence, request.time.anchor),
+        Op::Meta { topic: MetaTopic::Sources } => {
+            "Receita Federal: dados cadastrais; IBGE: população e geografia. Veja os manifestos dos catálogos e agregados.".into()
+        }
+        Op::Meta { topic: MetaTopic::Cnaes } => format!("CNAEs da consulta: {:?}", request.scope.activity),
+        Op::Meta { topic: MetaTopic::Methodology } => "A unidade padrão é o estabelecimento. Estoque ativo usa situação 02. Registros usam início de atividade; baixas usam a última data da situação 08. Capital social não é faturamento.".into(),
+        _ => "Posso contar e listar estabelecimentos, comparar locais e setores, mostrar distribuições, registros, baixas, estoque histórico e densidade por habitante. Também entrego os resultados em Excel, CSV ou TXT: peça \"me mande um Excel com…\".".into(),
+    }
+}
+
+pub(crate) fn value_json(value: &Value) -> Json {
     match value {
         Value::Scalar { value } => json!({"scalar":value}),
         Value::Ratio { num, den } => json!({"numerator":num,"denominator":den}),
@@ -245,7 +262,7 @@ fn value_json(value: &Value) -> Json {
     }
 }
 
-fn remember_execution(state: &mut Conversation, interpretation: &Interpretation, execution: &Json) {
+pub(crate) fn remember_execution(state: &mut Conversation, interpretation: &Interpretation, execution: &Json) {
     if execution["status"] != "ok" {
         return;
     }
@@ -295,12 +312,26 @@ fn increment(counts: &mut BTreeMap<String, u64>, key: &str) {
     *counts.entry(key.into()).or_default() += 1;
 }
 fn interpretation_match(prediction: &Interpretation, gold: &eval::Gold, expected: Option<&ValidRequest>) -> bool {
+    let export = gold.export.clone().map(serde_json::from_value::<opencnpj_query::export::Export>).transpose();
     match gold.decision.as_str() {
-        "execute" | "execute_with_note" => prediction.request.as_ref().zip(expected).is_some_and(|(a, b)| a == b),
+        "execute" | "execute_with_note" => {
+            prediction.request.as_ref().zip(expected).is_some_and(|(a, b)| a == b) && export.is_ok_and(|e| e == prediction.export)
+        }
         "clarify" => prediction.decision == opencnpj_nlu::policy::Decision::Clarify,
         "reject" => prediction.decision == opencnpj_nlu::policy::Decision::Reject,
         _ => false,
     }
+}
+
+/// Items of one dialogue share a session id; every other item starts a conversation.
+fn session_of(item: &eval::Item) -> String {
+    item.context
+        .as_ref()
+        .and_then(|c| c.get("session_id"))
+        .and_then(Json::as_str)
+        .map(str::to_owned)
+        .or_else(|| item.id.split_once('#').map(|(id, _)| id.to_owned()))
+        .unwrap_or_else(|| item.id.clone())
 }
 
 pub fn evaluate(args: EvalArgs) -> Result<()> {
@@ -320,14 +351,7 @@ pub fn evaluate(args: EvalArgs) -> Result<()> {
     let mut state = Conversation::default();
     let mut previous_session = String::new();
     for (index, item) in items.iter().enumerate() {
-        let session = item
-            .context
-            .as_ref()
-            .and_then(|c| c.get("session_id"))
-            .and_then(Json::as_str)
-            .map(str::to_owned)
-            .or_else(|| item.id.split_once('#').map(|(id, _)| id.to_owned()))
-            .unwrap_or_else(|| item.id.clone());
+        let session = session_of(item);
         if session != previous_session {
             state = Conversation::default();
             previous_session = session;
@@ -348,7 +372,7 @@ pub fn evaluate(args: EvalArgs) -> Result<()> {
         writeln!(
             predictions,
             "{}",
-            json!({"id":item.id,"decision":serde_json::to_value(prediction.decision)?,"intent":pred_json.as_ref().and_then(|ir|ir.get("op")).and_then(|op|op.get("kind")),"ir":pred_json,"confidence":prediction.evidence})
+            json!({"id":item.id,"decision":serde_json::to_value(prediction.decision)?,"intent":pred_json.as_ref().and_then(|ir|ir.get("op")).and_then(|op|op.get("kind")),"ir":pred_json,"export":prediction.export,"confidence":prediction.evidence})
         )?;
         let mut execute = |r: &ValidRequest| {
             let key = serde_json::to_string(r).expect("ValidRequest serializes");
@@ -487,5 +511,36 @@ mod tests {
         assert_eq!(categories.len(), 20);
         assert!(categories.values().all(|n| *n == 50));
         assert_eq!(decisions, BTreeMap::from([("execute".into(), 895), ("clarify".into(), 50), ("reject".into(), 55)]));
+    }
+
+    /// Every file request of the skills round, dialogues included, is interpreted to its
+    /// gold request and gold export.
+    #[test]
+    fn skills_export_round_is_interpreted_exactly() {
+        let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
+        let data = DataArgs {
+            catalog: root.join("crates/opencnpj-insights/catalog/municipalities.tsv"),
+            sectors: root.join("crates/opencnpj-insights/catalog/sectors.toml"),
+            anchor: "2026-10-11".into(),
+            agg: None,
+            history: None,
+            snapshot: None,
+        };
+        let assets = Assets::open(&data).unwrap();
+        let items = eval::load_items(&root.join("crates/opencnpj-lab/eval/skills-export-01/questions.jsonl")).unwrap();
+        assert!(items.len() >= 1500);
+        let (mut state, mut session) = (Conversation::default(), String::new());
+        let mut wrong = Vec::new();
+        for item in &items {
+            if session_of(item) != session {
+                (state, session) = (Conversation::default(), session_of(item));
+            }
+            let prediction = assets.interpreter.interpret(&item.text, &mut state);
+            let expected = item.gold.ir.clone().map(|ir| assets.canonical(serde_json::from_value(ir).unwrap()).unwrap());
+            if !interpretation_match(&prediction, &item.gold, expected.as_ref()) {
+                wrong.push(&item.id);
+            }
+        }
+        assert!(wrong.is_empty(), "{} wrong: {wrong:?}", wrong.len());
     }
 }

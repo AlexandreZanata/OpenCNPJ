@@ -1,12 +1,14 @@
 //! Development CLI for OpenCNPJ Intelligence artifacts and experiments.
 
 mod aggregate;
+mod assistant;
 mod backfill;
 mod catalog;
 mod eval;
 mod oracle;
 mod query;
 mod questions;
+mod serve;
 mod synth;
 
 use clap::{CommandFactory, Parser, Subcommand, error::ErrorKind};
@@ -34,6 +36,10 @@ enum Command {
     DiffAgg(aggregate::DiffArgs),
     /// Interpret a Portuguese question and optionally execute it on real data.
     Ask(questions::AskArgs),
+    /// Answer one chat turn (rendered blocks, extras, file offer) and optionally write the file.
+    Answer(serve::AnswerArgs),
+    /// Serve the chat page and its API with every asset loaded once.
+    Serve(serve::ServeArgs),
     /// Interpret every question and audit predictions and backend results.
     EvalQuestions(questions::EvalArgs),
     /// Execute a query written in the intermediate language.
@@ -61,6 +67,8 @@ enum Command {
 fn main() -> anyhow::Result<()> {
     match Cli::parse().command {
         Some(Command::Ask(args)) => questions::ask(args),
+        Some(Command::Answer(args)) => serve::answer(args),
+        Some(Command::Serve(args)) => serve::serve(args),
         Some(Command::EvalQuestions(args)) => questions::evaluate(args),
         Some(Command::Catalog { command }) => catalog::run(command),
         Some(Command::Agg { command }) => aggregate::run(command),

@@ -37,6 +37,10 @@ pub struct Gold {
     pub ir: Option<Value>,
     #[serde(default)]
     pub act: Option<String>,
+    /// File delivery requested with the question (`opencnpj_query::export::Export`).
+    /// Null or absent means the question asks for no file.
+    #[serde(default)]
+    pub export: Option<Value>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -720,7 +724,7 @@ mod tests {
         Item {
             id: id.into(),
             text: String::new(),
-            gold: Gold { decision: decision.into(), intent: Some(intent.into()), ir, act: Some("new_query".into()) },
+            gold: Gold { decision: decision.into(), intent: Some(intent.into()), ir, act: Some("new_query".into()), export: None },
             meta: Value::Null,
             rules: Vec::new(),
             context: None,
