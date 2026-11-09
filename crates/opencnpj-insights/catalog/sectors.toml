@@ -1948,7 +1948,7 @@ since = "v1"
 id = "meat_processing"
 display = { sing = "frigorífico", plural = "frigoríficos", gender = "m" }
 aliases = ["frigorifico", "frigorificos", "abatedouro", "abatedouros", "abate de bovinos", "abate de suínos", "abate de aves"]
-cnae_core = ["1011201", "1011202", "1011203", "1011204", "1011205", "1012101", "1012102", "1012103", "1012104", "1012105"]
+cnae_core = ["1011201", "1011202", "1011203", "1011204", "1011205", "1012101", "1012102", "1012103", "1012104"]
 cnae_extended = []
 scope = "main"
 since = "v1"
