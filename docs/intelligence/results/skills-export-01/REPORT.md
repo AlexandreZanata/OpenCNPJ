@@ -1,7 +1,7 @@
 # Skills Export 01 — results (2026-11-09)
 
 Design: [16-SKILLS.md](../../16-SKILLS.md). Dataset: `crates/opencnpj-lab/eval/skills-export-01`
-(`questions.jsonl` sha256 `bfbfe7e2cedd36209e47b4cf2956647a08d8f415e9678f84433fc1522480f7b2`).
+(`questions.jsonl` sha256 `fff35f2d76ebde478d13558e7ab3088a878b417ad9e4334fddfbd70bf1e6fc20`, 1,803 items).
 
 Host: 13th Gen Intel Core i7-13620H, 16 logical CPUs, 31 GiB RAM, release build
 (`cargo build --release -p opencnpj-lab --bin opencnpj-intel`). Data: RFB 2026-10,
@@ -17,7 +17,7 @@ target/release/opencnpj-intel eval-questions --interpret-only \
 Raw counts (`summary.json`):
 
 ```json
-{"act_correct": 1614, "act_items": 1614, "decision_correct": 1674, "interpretation_correct": 1674, "items": 1674}
+{"act_correct": 1743, "act_items": 1743, "decision_correct": 1803, "interpretation_correct": 1803, "items": 1803}
 ```
 
 `interpretation_correct` requires the canonical request **and** the export spec (format,
@@ -111,3 +111,30 @@ Latency after the change, same command as §4: [latency-rollup.txt](latency-roll
 |---|---|---|
 | Quantas empresas tiveram baixa em Sorriso/MT em 2025? | 433.4 | 19.0 |
 | Mostre a evolução mensal de registros de empresas em Cuiabá/MT em 2025. | 375.2 | 3.5 |
+
+## 6. Regional vocabulary (recursive dictionary)
+
+The delivery vocabulary moved to `crates/opencnpj-nlu/lang/pt-BR/delivery.toml`: lists
+include each other with `@name`, resolved recursively at start-up (cycles and unknown
+names fail). It covers courtesy, modal openers, hand-over and make verbs, format
+spellings and typos, file nouns ("tabela", "relatório", "arquivo"), unsupported formats
+(PDF, Word, JSON… answered with a clarification) and regional tags from the South
+("bah", "tchê", "me alcança"), Northeast ("oxe", "visse", "meu rei"), Minas ("uai sô",
+"cê consegue"), Centre-West ("vôte", "tchá por Deus"), North ("égua", "maninho") and
+Southeast ("mano", "mermão", "fala, parceiro"). Regional words are cut only next to a
+file request; data questions are untouched (§2 was re-run on the final binary:
+`total changed 0`).
+
+The dataset gained 126 `regional/*` items and 3 unsupported-format clarifications (§1:
+1,803/1,803).
+
+Free-form regional requests outside the templates, asked on the running service with the
+2026-10 data; every file was downloaded and its rows counted (XLSX rows, CSV lines, TXT
+header) against the rows the answer offered:
+
+```sh
+python3 regional_live.py http://127.0.0.1:5175
+```
+
+Raw output: [regional-live.txt](regional-live.txt) — 15 files in 11 states, all `OK`;
+"Me manda um PDF…" answers with a clarification.

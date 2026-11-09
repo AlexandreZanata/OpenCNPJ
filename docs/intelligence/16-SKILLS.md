@@ -72,6 +72,15 @@ and case, which the grammar needs for UF acronyms.
 | Bare "número" | "apenas o nome e o número" | CNPJ, with a note (phone is "telefone") |
 | "todos os dados" | todas as colunas, dados completos | all 22 columns |
 
+The vocabulary is data: `crates/opencnpj-nlu/lang/pt-BR/delivery.toml`. Every list may
+include another with `@name` ("pedido" = courtesy + pronouns + modal + verbs + regional
+tags), resolved recursively when the interpreter starts; a cycle or an unknown name is an
+error. Regional lists cover the South, Northeast, Minas, Centre-West, North and
+Southeast, and are cut only around a file request ("Bah, tchê, me passa uma planilha…",
+"Oxe, gera um CSV aí…, visse?"). A file noun with a hand-over verb ("me manda uma
+tabela", "puxa um relatório") asks for Excel; an unsupported format (PDF, Word, JSON)
+gets a clarification.
+
 A column list after `com` needs two names unless it follows the format directly
 ("um Excel com o CNPJ das padarias"), so `com capital social acima de…` stays a filter.
 

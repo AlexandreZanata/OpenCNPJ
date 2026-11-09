@@ -182,6 +182,50 @@ def items():
     return out
 
 
+# Regional requests: (opener, region). Gold does not depend on the opener.
+REGIONAL_OPENERS = [
+    ("Bah, tchê, me passa", "sul"),
+    ("Barbaridade, guri, me alcança", "sul"),
+    ("Oxe, gera", "nordeste"),
+    ("Oxente, me manda", "nordeste"),
+    ("Ô meu rei, me envia", "nordeste"),
+    ("Uai sô, cê consegue me mandar", "mineiro"),
+    ("Uai, me arruma", "mineiro"),
+    ("Vôte, me manda aí", "centro_oeste"),
+    ("Tchá por Deus, gera", "centro_oeste"),
+    ("Égua, maninho, me manda", "norte"),
+    ("Mano, joga num", "sudeste"),
+    ("Mermão, manda aí", "sudeste"),
+    ("Fala, parceiro, bota numa", "sudeste"),
+    ("Opa, dá pra me mandar", "geral"),
+    ("Tem como me passar", "geral"),
+]
+# (surface, format or None for a file noun that defaults to Excel with a note)
+REGIONAL_FILES = [
+    ("uma planilha", "xlsx"), ("um Excel", "xlsx"), ("um ecxel", "xlsx"), ("uma planilhinha", "xlsx"), ("um CSV", "csv"),
+    ("um TXT", "txt"), ("uma tabela", None), ("um relatório", None), ("um arquivo", None),
+]
+REGIONAL_TAILS = ["", ", visse?", ", por favor", " aí", ", valeu"]
+
+
+def regional():
+    out = []
+    parts = [p for p in data_parts() if p[0] in ("active", "closed_year")]
+    combos = itertools.product(REGIONAL_OPENERS, REGIONAL_FILES)
+    for n, ((opener, region), (surface, fmt)) in enumerate(combos):
+        kind, art, text, gold = parts[(n * 7) % len(parts)]
+        tail = REGIONAL_TAILS[n % len(REGIONAL_TAILS)]
+        # "joga num"/"bota numa" already carry the article of the file.
+        noun = surface.split(" ", 1)[1] if opener.endswith((" num", " numa")) else surface
+        if opener.endswith(" num") and surface.startswith("uma "):
+            continue
+        if opener.endswith(" numa") and surface.startswith("um "):
+            continue
+        decision = "execute" if fmt else "execute_with_note"
+        out.append((f"{opener} {noun} {GENITIVE[art]} {text}{tail}", gold, export(fmt or "xlsx"), decision, f"regional/{region}"))
+    return out
+
+
 def dialogues():
     sessions = []
     for i, ((key, plural, art, setor), (city, code)) in enumerate(itertools.product(SECTORS, PLACES[:5])):
@@ -217,6 +261,9 @@ STOPS = [
     ("Gere uma planilha com os CPFs dos sócios das farmácias de Sinop/MT", "reject"),
     ("Me mande um CSV com o lucro dos restaurantes de Sorriso/MT", "reject"),
     ("Quero um TXT com os donos das academias de Cuiabá/MT", "reject"),
+    ("Me manda um PDF das padarias de Sinop/MT", "clarify"),
+    ("Bah, gera um Word com as farmácias de Cuiabá/MT", "clarify"),
+    ("Oxe, me manda em JSON os restaurantes de Sorriso/MT", "clarify"),
 ]
 
 
@@ -240,6 +287,8 @@ def main():
 
     for n, (text, gold_ir, gold_export, decision, family) in enumerate(items()):
         add(f"skills-export-01-{n:05d}", text, gold_ir, gold_export, decision, family)
+    for n, (text, gold_ir, gold_export, decision, family) in enumerate(regional()):
+        add(f"skills-export-01-r{n:04d}", text, gold_ir, gold_export, decision, family)
     for session in dialogues():
         for turn, (sid, text, gold_ir, gold_export, decision, act) in enumerate(session):
             add(f"{sid}#{turn}", text, gold_ir, gold_export, decision, "dialogue/" + ("export" if gold_export else "data"), act, sid)
