@@ -9,7 +9,9 @@ use crate::{
     questions::{self, Assets, DataArgs},
 };
 use anyhow::{Context, Result, bail};
+use opencnpj_core::schema::col;
 use opencnpj_insights::{
+    agg,
     catalog::municipalities::Place,
     execute::{self, ExecContext, Value},
     export::{self as files, Cell, RecordLabels, Sheet},
@@ -18,14 +20,17 @@ use opencnpj_insights::{
 };
 use opencnpj_nlu::{
     context::Conversation,
-    policy::{Decision, Interpretation},
+    policy::{CompanySearch, Decision, Interpretation},
 };
 use opencnpj_query::{
     export::{Export, ExportField, default_fields},
     ir::*,
     validate::ValidRequest,
 };
-use opencnpj_store::{DocRecord, search::Limits};
+use opencnpj_store::{
+    DocRecord,
+    search::{self, Limits, Query},
+};
 use serde_json::{Value as Json, json};
 use std::{collections::BTreeMap, io::Cursor, time::Instant};
 
@@ -71,6 +76,10 @@ const PREVIEW_FIELDS: [ExportField; 9] = [
     ExportField::Porte,
     ExportField::CapitalSocial,
 ];
+
+/// Rows are establishments: without the CNPJ, a company's branches look like repeats.
+const BRANCHES_NOTE: &str = "Cada linha é um estabelecimento: empresas com filiais aparecem uma vez por estabelecimento. \
+     Inclua o CNPJ para distingui-las ou peça “só as matrizes” para uma linha por empresa.";
 
 pub(crate) struct Options {
     /// Never write phone or e-mail columns (`--hide-contacts`).
@@ -153,6 +162,9 @@ impl Assistant {
         let started = Instant::now();
         let interpretation = self.assets.interpreter.interpret(question, state);
         let mut timing = BTreeMap::from([("interpret".to_owned(), micros(started))]);
+        if let Some(company) = &interpretation.company {
+            return self.ask_company(company, &interpretation, state, started, timing);
+        }
         let Some(request) = interpretation.request.clone() else {
             return json!({
                 "interpretation": interpretation,
@@ -204,6 +216,206 @@ impl Assistant {
             "answer": answer,
             "extras": extras,
             "export": export,
+            "context": state,
+            "timing_us": timing,
+        })
+    }
+
+    fn ask_company(
+        &self,
+        company: &CompanySearch,
+        interpretation: &Interpretation,
+        state: &Conversation,
+        started: Instant,
+        mut timing: BTreeMap<String, u64>,
+    ) -> Json {
+        let reject = |reason: String, timing: &BTreeMap<String, u64>| {
+            json!({
+                "interpretation": interpretation,
+                "answer": {"decision": "reject", "understood": "", "blocks": [{"type": "reject", "reason": reason}], "suggestions": []},
+                "extras": [],
+                "export": null,
+                "context": state,
+                "timing_us": {"interpret": timing["interpret"], "total": micros(started)},
+            })
+        };
+        let Some(snapshot) = &self.assets.snapshot else {
+            return reject(
+                "Esta consulta precisa da base completa de estabelecimentos, que não está carregada neste servidor.".to_owned(),
+                &timing,
+            );
+        };
+        let executed = Instant::now();
+        let mut pairs = vec![
+            ("q".to_owned(), company.name.clone()),
+            ("field".to_owned(), "any".to_owned()),
+            ("fuzzy".to_owned(), "false".to_owned()),
+            ("limit".to_owned(), "50".to_owned()),
+        ];
+        let toms: Vec<String> =
+            company.municipalities.iter().filter_map(|id| self.assets.catalogue.get(id.0).map(|row| format!("{:04}", row.tom))).collect();
+        if !toms.is_empty() {
+            pairs.push(("municipio".to_owned(), toms.join(",")));
+        }
+        let ufs: Vec<&str> = company.ufs.iter().filter_map(|uf| agg::uf_code(*uf)).collect();
+        if !ufs.is_empty() {
+            pairs.push(("uf".to_owned(), ufs.join(",")));
+        }
+        let mut q = match crate::query::parse(&pairs) {
+            Ok(q) => q,
+            Err(error) => return reject(format!("Não consegui executar esta consulta: {error}."), &timing),
+        };
+        let mut result = match search::search(snapshot, &q, &Limits::DEFAULT) {
+            Ok(result) => result,
+            Err(error) => return reject(format!("Não consegui executar esta consulta: {error}."), &timing),
+        };
+        let mut fuzzy_note = false;
+        if result.total == 0 {
+            q.fuzzy = true;
+            if let Ok(retry) = search::search(snapshot, &q, &Limits::DEFAULT)
+                && retry.total > 0
+            {
+                result = retry;
+                fuzzy_note = true;
+            }
+        }
+        timing.insert("execute".into(), micros(executed));
+        let rendered = Instant::now();
+        let decoded = match self.decode(&result.docs) {
+            Ok(decoded) => decoded,
+            Err(error) => return reject(format!("Não consegui executar esta consulta: {error}."), &timing),
+        };
+        let mut roots = Vec::new();
+        for record in &decoded {
+            if !roots.iter().any(|r: &String| r == &record.company.basico) {
+                roots.push(record.company.basico.clone());
+            }
+        }
+        let mut preview = PREVIEW_FIELDS.to_vec();
+        if self.options.hide_contacts {
+            preview.retain(|f| !f.is_contact());
+        }
+        let mut blocks = Vec::new();
+        let mut suggestions = Vec::new();
+        if decoded.is_empty() {
+            blocks.push(json!({
+                "type": "text",
+                "text": format!("Não encontrei empresas com o nome “{}”. Confira a grafia ou informe o CNPJ.", company.name),
+            }));
+        } else if roots.len() == 1 {
+            let primary = decoded
+                .iter()
+                .find(|r| {
+                    r.estab
+                        .and_then(|i| r.company.estabelecimentos.get(i))
+                        .and_then(|row| row.get(col::est::MATRIZ_FILIAL))
+                        .is_some_and(|v| v.trim() == "1")
+                })
+                .unwrap_or(&decoded[0]);
+            let summary = files::record_cells(
+                snapshot,
+                &self.record_labels,
+                primary,
+                &[ExportField::Cnpj, ExportField::RazaoSocial, ExportField::Situacao, ExportField::Municipio, ExportField::Uf],
+            );
+            let cnpj = summary[0].display();
+            let razao = summary[1].display();
+            let situacao = summary[2].display().to_lowercase();
+            let municipio = summary[3].display();
+            let uf = summary[4].display();
+            let place = match (municipio.is_empty(), uf.is_empty()) {
+                (false, false) => format!(", em {municipio}/{uf}"),
+                (false, true) => format!(", em {municipio}"),
+                (true, false) => format!(", em {uf}"),
+                (true, true) => String::new(),
+            };
+            let tail = if result.total > 1 { format!(" ({} estabelecimentos).", group(result.total)) } else { ".".to_owned() };
+            blocks.push(json!({
+                "type": "text",
+                "text": format!("Encontrei {razao} ({cnpj}), situação {situacao}{place}{tail}"),
+            }));
+            if let Ok(fields) = self.company_fields(primary)
+                && !fields.is_empty()
+            {
+                blocks.push(json!({"type": "company", "fields": fields}));
+            }
+            if decoded.len() > 1
+                && let Ok(rows) = self.cells(&decoded, &preview)
+            {
+                blocks.push(json!({
+                    "type": "records",
+                    "columns": preview.iter().map(|f| f.header()).collect::<Vec<_>>(),
+                    "rows": rows.iter().map(|row| row.iter().map(Cell::display).collect::<Vec<_>>()).collect::<Vec<_>>(),
+                    "total": result.total,
+                    "page": 1,
+                }));
+            }
+        } else {
+            let text = if result.total as usize > decoded.len() {
+                format!(
+                    "Encontrei {} estabelecimentos para “{}”. Mostrando {}.",
+                    group(result.total),
+                    company.name,
+                    group(decoded.len() as u64)
+                )
+            } else {
+                format!("Encontrei {} estabelecimentos para “{}”.", group(result.total), company.name)
+            };
+            blocks.push(json!({"type": "text", "text": text}));
+            if let Ok(rows) = self.cells(&decoded, &preview) {
+                blocks.push(json!({
+                    "type": "records",
+                    "columns": preview.iter().map(|f| f.header()).collect::<Vec<_>>(),
+                    "rows": rows.iter().map(|row| row.iter().map(Cell::display).collect::<Vec<_>>()).collect::<Vec<_>>(),
+                    "total": result.total,
+                    "page": 1,
+                }));
+            }
+            let mut seen_roots = Vec::new();
+            for record in &decoded {
+                if seen_roots.len() >= 5 {
+                    break;
+                }
+                if seen_roots.iter().any(|r: &String| r == &record.company.basico) {
+                    continue;
+                }
+                seen_roots.push(record.company.basico.clone());
+                let cells = files::record_cells(snapshot, &self.record_labels, record, &[ExportField::Cnpj]);
+                let cnpj = cells[0].display();
+                if !cnpj.is_empty() {
+                    suggestions.push(format!("Dados do CNPJ {cnpj}"));
+                }
+            }
+        }
+        blocks.push(json!({
+            "type": "sources",
+            "items": [{
+                "name": "Receita Federal — Dados Abertos do CNPJ",
+                "competence": self.provenance.competence.to_string(),
+                "snapshot_sha256": self.provenance.snapshot_sha256,
+            }],
+        }));
+        let mut notes = interpretation.notes.clone();
+        if fuzzy_note {
+            notes.push("Não achei esse nome exato; mostrei nomes parecidos.".to_owned());
+        }
+        if !notes.is_empty() {
+            blocks.push(json!({"type": "notice", "text": notes.join(" ")}));
+        }
+        let decision = if notes.is_empty() { "execute" } else { "execute_with_note" };
+        let understood = format!("busca por nome · “{}” · RFB {}", company.name, self.provenance.competence);
+        timing.insert("render".into(), micros(rendered));
+        timing.insert("total".into(), micros(started));
+        json!({
+            "interpretation": interpretation,
+            "answer": {
+                "decision": decision,
+                "understood": understood,
+                "blocks": blocks,
+                "suggestions": suggestions,
+            },
+            "extras": [],
+            "export": null,
             "context": state,
             "timing_us": timing,
         })
@@ -277,6 +489,26 @@ impl Assistant {
         Ok(records.iter().map(|record| files::record_cells(snapshot, &self.record_labels, record, fields)).collect())
     }
 
+    fn company_fields(&self, record: &DocRecord) -> Result<Vec<(String, String)>> {
+        let first = self.cells(std::slice::from_ref(record), &ExportField::ALL)?;
+        let mut fields = Vec::new();
+        if let Some(row) = first.first() {
+            for (field, cell) in ExportField::ALL.iter().zip(row) {
+                if (self.options.hide_contacts && field.is_contact()) || matches!(cell, Cell::Empty) {
+                    continue;
+                }
+                let key = match field {
+                    ExportField::Cnpj => "cnpj".to_owned(),
+                    ExportField::RazaoSocial => "razao_social".to_owned(),
+                    ExportField::Situacao => "situacao".to_owned(),
+                    other => other.header().to_owned(),
+                };
+                fields.push((key, cell.display()));
+            }
+        }
+        Ok(fields)
+    }
+
     fn title(&self, request: &ValidRequest) -> String {
         render::title(request, &self.labels)
     }
@@ -291,22 +523,7 @@ impl Assistant {
                 let fields = self.preview_fields(request, interpretation.export.as_ref());
                 records = Some((fields.clone(), self.cells(&decoded, &fields)?));
                 if matches!(request.op, Op::Lookup { .. }) {
-                    let first = self.cells(&decoded[..decoded.len().min(1)], &ExportField::ALL)?;
-                    let mut fields = Vec::new();
-                    if let Some(row) = first.first() {
-                        for (field, cell) in ExportField::ALL.iter().zip(row) {
-                            if (self.options.hide_contacts && field.is_contact()) || matches!(cell, Cell::Empty) {
-                                continue;
-                            }
-                            let key = match field {
-                                ExportField::Cnpj => "cnpj".to_owned(),
-                                ExportField::RazaoSocial => "razao_social".to_owned(),
-                                ExportField::Situacao => "situacao".to_owned(),
-                                other => other.header().to_owned(),
-                            };
-                            fields.push((key, cell.display()));
-                        }
-                    }
+                    let fields = decoded.first().map(|record| self.company_fields(record)).transpose()?.unwrap_or_default();
                     if fields.is_empty() {
                         bail!("o CNPJ informado não consta na base de {}", self.provenance.competence);
                     }
@@ -374,6 +591,27 @@ impl Assistant {
     /// of the real establishments. Only cheap backends are used; nothing is estimated.
     fn extras(&self, request: &ValidRequest, outcome: &Outcome) -> Vec<Json> {
         let mut extras = Vec::new();
+        if let Op::Lookup { id } = &request.op {
+            let Some(snapshot) = &self.assets.snapshot else { return extras };
+            let prefix = &id.as_str()[..id.as_str().len().min(8)];
+            let q = Query { cnpj_prefixes: vec![prefix.to_owned()], limit: 50, ..Default::default() };
+            if let Ok(result) = search::search(snapshot, &q, &Limits::DEFAULT)
+                && result.docs.len() > 1
+                && let Ok(records) = self.decode(&result.docs)
+            {
+                let fields = self.preview_fields(request, None);
+                if let Ok(rows) = self.cells(&records, &fields) {
+                    extras.push(json!({
+                        "type": "records",
+                        "title": "Estabelecimentos desta empresa",
+                        "columns": fields.iter().map(|f| f.header()).collect::<Vec<_>>(),
+                        "rows": rows.iter().map(|row| row.iter().map(Cell::display).collect::<Vec<_>>()).collect::<Vec<_>>(),
+                        "total": result.total,
+                    }));
+                }
+            }
+            return extras;
+        }
         let Op::Count { metric } = request.op else { return extras };
         let base = request.as_request();
         let series: Vec<(FlowMetric, &str)> = match metric {
@@ -506,6 +744,9 @@ impl Assistant {
         if hidden {
             notes.push("Telefone e e-mail não são disponibilizados por este servidor.".to_owned());
         }
+        if matches!(outcome, Outcome::Records { .. }) && !columns.iter().any(|c| c == ExportField::Cnpj.header()) {
+            notes.push(BRANCHES_NOTE.to_owned());
+        }
         json!({
             "format": export.format,
             "label": export.format.label(),
@@ -570,7 +811,17 @@ impl Assistant {
             if hidden {
                 about.push(("Contatos".to_owned(), "Telefone e e-mail não são disponibilizados por este servidor.".to_owned()));
             }
-            Sheet { title, columns: fields.iter().map(|f| f.header().to_owned()).collect(), rows: self.cells(&records, &fields)?, about }
+            let rows = self.cells(&records, &fields)?;
+            let distinct =
+                rows.iter().map(|row| row.iter().map(Cell::display).collect::<Vec<_>>()).collect::<std::collections::BTreeSet<_>>();
+            let repeated = rows.len() - distinct.len();
+            if repeated > 0 {
+                about.push((
+                    "Linhas repetidas".to_owned(),
+                    format!("{} linhas iguais nas colunas escolhidas. {BRANCHES_NOTE}", group(repeated as u64)),
+                ));
+            }
+            Sheet { title, columns: fields.iter().map(|f| f.header().to_owned()).collect(), rows, about }
         } else {
             let value = match self.run(&request)? {
                 Outcome::Value(value) => value,

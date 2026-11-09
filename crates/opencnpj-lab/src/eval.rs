@@ -41,6 +41,10 @@ pub struct Gold {
     /// Null or absent means the question asks for no file.
     #[serde(default)]
     pub export: Option<Value>,
+    /// Company looked up by name (`opencnpj_nlu::policy::CompanySearch`).
+    /// Null or absent means the question is not a company-name search.
+    #[serde(default)]
+    pub company: Option<Value>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -724,7 +728,14 @@ mod tests {
         Item {
             id: id.into(),
             text: String::new(),
-            gold: Gold { decision: decision.into(), intent: Some(intent.into()), ir, act: Some("new_query".into()), export: None },
+            gold: Gold {
+                decision: decision.into(),
+                intent: Some(intent.into()),
+                ir,
+                act: Some("new_query".into()),
+                export: None,
+                company: None,
+            },
             meta: Value::Null,
             rules: Vec::new(),
             context: None,
