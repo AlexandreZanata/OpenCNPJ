@@ -1,6 +1,7 @@
 import { currentRoute, onRouteChange } from "./core/router.js";
 import { AppShell } from "./features/layout/app-shell.js";
 import { ConsultaPage } from "./pages/consulta-page.js";
+import { LocalConsultaPage } from "./pages/local-consulta-page.js";
 import { PlaceholderPage } from "./pages/placeholder-page.js";
 import { config } from "./config.js";
 import { MockQueryService } from "./services/mock-query-service.js";
@@ -10,8 +11,8 @@ function bootstrap() {
     const root = document.getElementById("app");
     if (!root)
         throw new Error("Missing #app root element");
-    // Swap MockQueryService for an HTTP implementation to talk to the real API.
-    const controller = new ConsultaController(new MockQueryService(), DEMO_QUERY, config.pageSize);
+    const local = new URLSearchParams(window.location.search).get("local") === "1";
+    const controller = local ? null : new ConsultaController(new MockQueryService(), DEMO_QUERY, config.pageSize);
     const shell = AppShell();
     root.replaceChildren(shell.el);
     let page = null;
@@ -19,9 +20,11 @@ function bootstrap() {
     const show = (route) => {
         page?.destroy();
         shell.setRoute(route);
-        page = route === "consulta" ? ConsultaPage({ controller, examples: EXAMPLE_QUERIES }) : PlaceholderPage(route);
+        page = route === "consulta"
+            ? controller ? ConsultaPage({ controller, examples: EXAMPLE_QUERIES }) : LocalConsultaPage()
+            : PlaceholderPage(route);
         shell.outlet.replaceChildren(page.el);
-        if (route === "consulta" && !started) {
+        if (route === "consulta" && controller && !started) {
             started = true;
             void controller.start();
         }

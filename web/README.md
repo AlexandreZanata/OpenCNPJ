@@ -65,3 +65,31 @@ O layout implementa exatamente a interface de inteligência empresarial:
 - **Gráficos em CSS/SVG**: Gráfico de aberturas mensais com eixos e gráfico donut de distribuição por porte (ME, EPP, Demais).
 - **Tabela de Empresas**: Tabela com ordenação por colunas, menu para exibir/ocultar colunas, exportação (CSV / NDJSON) e paginação completa.
 - **Design Responsivo**: Adaptável para desktop (1536px), notebooks e dispositivos móveis.
+
+## Chat with official data
+
+The static server shows the original demo. The chat page (`?local=1`) talks to the
+local engine service, which keeps the catalogues, aggregates and snapshot in memory and
+answers each question in milliseconds: the lead sentence, KPIs, monthly charts, tables,
+the establishments with CNPJ, and Excel, CSV or TXT files on request ("me mande um Excel
+com…", "apenas o nome e o CNPJ"). Follow-ups reuse the conversation ("e só as matrizes?",
+"agora em CSV"). See `docs/intelligence/16-SKILLS.md`.
+
+```sh
+sh scripts/build.sh
+cargo build --release -p opencnpj-lab --bin opencnpj-intel
+../target/release/opencnpj-intel serve \
+  --catalog ../crates/opencnpj-insights/catalog/municipalities.tsv \
+  --sectors ../crates/opencnpj-insights/catalog/sectors.toml \
+  --agg "$AGGREGATE" --history "$HISTORY" --snapshot "$SNAPSHOT" \
+  --web dist --listen 127.0.0.1:5174
+```
+
+Open [Consulta com IA](http://127.0.0.1:5174/?local=1#/consulta), pick an example from
+"Experimente" or type a question; "Nova conversa" clears the context. Without
+`--snapshot` the service answers aggregate questions (counts, comparisons, series) and
+declines lists and files of companies.
+
+To share a local preview, pass `--listen` with the computer's LAN IPv4 address and
+`--allow-network` with its subnet in CIDR notation (for example
+`--listen 192.168.0.10:5174 --allow-network 192.168.0.0/24`). Other clients get 403.
