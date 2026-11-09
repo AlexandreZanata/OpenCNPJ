@@ -1,0 +1,268 @@
+{
+  "round": "commercial-round-15",
+  "status": "complete",
+  "review_date": "2026-11-08",
+  "finalized_at_utc": "2026-11-09T11:50:56.648280+00:00",
+  "source_revision": "150d55e22989a6d7089b26c2cbc40538d087cfec",
+  "human_validation": "deferred to product refinement",
+  "blind_set_used": false,
+  "production_readiness": "not established",
+  "set_sha256": "ab2d7f2c0409abf1803bc71ad66f54bfa040f5b1ffb5e690a88db9eecad30a4e",
+  "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b",
+  "final_binary_sha256": "268e1b52087e2ead523f56560a8ddf5db8b879ff81f17678ed420646fc77540c",
+  "pilot_before_fix": {
+    "act_correct": 808,
+    "act_items": 840,
+    "correct_executed_answer": 852,
+    "decision_correct": 992,
+    "execution_fresh": 860,
+    "gold_backend_ok": 860,
+    "gold_empty_records": 79,
+    "gold_zero_scalar": 154,
+    "interpretation_correct": 992,
+    "interpretation_wrong": 8,
+    "items": 1000,
+    "verification_engine_match": 550,
+    "verification_marginal_match": 4,
+    "verification_no_independent_reference": 38,
+    "verification_not_numeric": 20,
+    "verification_single_backend": 248
+  },
+  "pilot_after_fix": {
+    "act_correct": 808,
+    "act_items": 840,
+    "correct_executed_answer": 860,
+    "decision_correct": 1000,
+    "execution_fresh": 860,
+    "gold_backend_ok": 860,
+    "gold_empty_records": 79,
+    "gold_zero_scalar": 154,
+    "interpretation_correct": 1000,
+    "items": 1000,
+    "verification_engine_match": 550,
+    "verification_marginal_match": 4,
+    "verification_no_independent_reference": 38,
+    "verification_not_numeric": 20,
+    "verification_single_backend": 248
+  },
+  "national_evaluation": {
+    "act_correct": 40364,
+    "act_items": 42000,
+    "correct_executed_answer": 43000,
+    "decision_correct": 50000,
+    "execution_fresh": 40840,
+    "execution_reused_identical_ir": 2160,
+    "gold_backend_ok": 43000,
+    "gold_empty_records": 3904,
+    "gold_zero_scalar": 8427,
+    "interpretation_correct": 50000,
+    "items": 50000,
+    "verification_engine_match": 27500,
+    "verification_marginal_match": 195,
+    "verification_no_independent_reference": 1905,
+    "verification_not_numeric": 1000,
+    "verification_single_backend": 12400
+  },
+  "separate_adjudication_patch": {
+    "items": 0,
+    "original_questions_modified": false,
+    "raw_frozen_label_agreement": 50000,
+    "agreement_with_documented_replacement_labels": 50000,
+    "reason": "No post-freeze label adjudications were needed; exact-name municipality resolution is encoded before predictions."
+  },
+  "frozen_suites": {
+    "frozen-adv": {
+      "act_correct": 303,
+      "act_items": 304,
+      "correct_executed_answer": 155,
+      "decision_correct": 285,
+      "execution_fresh": 182,
+      "execution_reused_identical_ir": 133,
+      "gold_backend_mismatch": 1,
+      "gold_backend_ok": 242,
+      "gold_zero_scalar": 4,
+      "interpretation_correct": 214,
+      "interpretation_wrong": 90,
+      "items": 304,
+      "out_of_policy_execution": 1,
+      "verification_engine_match": 191,
+      "verification_marginal_match": 2,
+      "verification_mismatch": 1,
+      "verification_no_independent_reference": 28,
+      "verification_not_numeric": 2,
+      "verification_single_backend": 19
+    },
+    "frozen-informal": {
+      "act_correct": 201,
+      "act_items": 202,
+      "correct_executed_answer": 85,
+      "decision_correct": 172,
+      "execution_fresh": 137,
+      "execution_reused_identical_ir": 79,
+      "gold_backend_mismatch": 1,
+      "gold_backend_ok": 164,
+      "interpretation_correct": 121,
+      "interpretation_wrong": 81,
+      "items": 202,
+      "verification_engine_match": 143,
+      "verification_marginal_match": 2,
+      "verification_mismatch": 1,
+      "verification_no_independent_reference": 3,
+      "verification_not_numeric": 1,
+      "verification_single_backend": 15
+    },
+    "frozen-dialogues": {
+      "act_correct": 89,
+      "act_items": 122,
+      "correct_executed_answer": 68,
+      "decision_correct": 106,
+      "execution_fresh": 74,
+      "execution_reused_identical_ir": 52,
+      "gold_backend_ok": 104,
+      "interpretation_correct": 84,
+      "interpretation_wrong": 38,
+      "items": 122,
+      "verification_engine_match": 104
+    },
+    "frozen-ood": {
+      "act_correct": 400,
+      "act_items": 400,
+      "decision_correct": 400,
+      "interpretation_correct": 400,
+      "items": 400
+    }
+  },
+  "prior_round_replays": {
+    "replay-round-01": {
+      "act_correct": 50,
+      "act_items": 50,
+      "decision_correct": 1000,
+      "interpretation_correct": 1000,
+      "items": 1000
+    },
+    "replay-round-02": {
+      "act_correct": 845,
+      "act_items": 845,
+      "decision_correct": 950,
+      "interpretation_correct": 950,
+      "interpretation_wrong": 50,
+      "items": 1000
+    },
+    "replay-round-03": {
+      "act_correct": 2535,
+      "act_items": 2535,
+      "decision_correct": 2844,
+      "interpretation_correct": 2844,
+      "interpretation_wrong": 156,
+      "items": 3000
+    },
+    "replay-round-04": {
+      "act_correct": 4225,
+      "act_items": 4225,
+      "decision_correct": 4826,
+      "interpretation_correct": 4826,
+      "interpretation_wrong": 174,
+      "items": 5000
+    },
+    "replay-round-05": {
+      "act_correct": 8450,
+      "act_items": 8450,
+      "decision_correct": 9654,
+      "interpretation_correct": 9654,
+      "interpretation_wrong": 346,
+      "items": 10000
+    },
+    "replay-round-06": {
+      "act_correct": 16900,
+      "act_items": 16900,
+      "decision_correct": 19312,
+      "interpretation_correct": 19312,
+      "interpretation_wrong": 688,
+      "items": 20000
+    },
+    "replay-round-07": {
+      "act_correct": 16900,
+      "act_items": 16900,
+      "decision_correct": 19312,
+      "interpretation_correct": 19312,
+      "interpretation_wrong": 688,
+      "items": 20000
+    },
+    "replay-round-08": {
+      "act_correct": 42250,
+      "act_items": 42250,
+      "decision_correct": 48259,
+      "interpretation_correct": 48259,
+      "interpretation_wrong": 1741,
+      "items": 50000
+    },
+    "replay-round-09": {
+      "act_correct": 40402,
+      "act_items": 40500,
+      "decision_correct": 49975,
+      "interpretation_correct": 49975,
+      "interpretation_wrong": 25,
+      "items": 50000,
+      "out_of_policy_execution": 25
+    },
+    "replay-round-10": {
+      "act_correct": 39400,
+      "act_items": 41000,
+      "decision_correct": 50000,
+      "interpretation_correct": 50000,
+      "items": 50000
+    },
+    "replay-round-11": {
+      "act_correct": 40400,
+      "act_items": 41800,
+      "decision_correct": 50000,
+      "interpretation_correct": 50000,
+      "items": 50000
+    },
+    "replay-round-12": {
+      "act_correct": 40244,
+      "act_items": 41700,
+      "decision_correct": 50000,
+      "interpretation_correct": 50000,
+      "items": 50000
+    },
+    "replay-round-13": {
+      "act_correct": 40139,
+      "act_items": 41800,
+      "decision_correct": 50000,
+      "interpretation_correct": 50000,
+      "items": 50000
+    },
+    "replay-round-14": {
+      "act_correct": 40257,
+      "act_items": 41900,
+      "decision_correct": 50000,
+      "interpretation_correct": 50000,
+      "items": 50000
+    }
+  },
+  "round_08_replay_adjudicated_agreement": 49859,
+  "metamorphic_checks": {
+    "stats": {
+      "equivalence_groups_checked": 1348,
+      "equivalence_items_checked": 3508,
+      "equivalence_groups_passed": 1348,
+      "monotonic_subset_pairs_checked": 1428,
+      "monotonic_subset_pairs_passed": 1428,
+      "partition_sum_breakdowns_checked": 2600,
+      "partition_sum_breakdowns_passed": 2600,
+      "negation_exclusion_items_checked": 1600,
+      "negation_exclusion_items_passed": 1600,
+      "ranking_prefix_pairs_checked": 1682,
+      "ranking_prefix_pairs_passed": 1682
+    },
+    "violations": 0,
+    "status": "PASS"
+  },
+  "delivery_gate": {
+    "fmt": 0,
+    "clippy": 0,
+    "test": 0,
+    "build": 0
+  }
+}

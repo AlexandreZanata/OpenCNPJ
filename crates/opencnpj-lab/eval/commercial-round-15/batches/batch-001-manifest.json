@@ -3,7 +3,7 @@
   "items": 1000,
   "first_id": "commercial-r15-00001",
   "last_id": "commercial-r15-01000",
-  "sha256": "da8f5d0b8133303c2105770ded5e02a085e3addfbe138bd89f2364e29574c1bc",
+  "sha256": "dec03515c6a767b16c9b20603c67c872171ae37a651a27b6a10e921c8be993d5",
   "by_family": {
     "market_size_density_competition": 100,
     "prospecting_qualification_territory": 140,
@@ -50,9 +50,9 @@
     "capital_range_mei_list": 14,
     "colloquial_sector:academia": 3,
     "colloquial_sector:posto": 2,
-    "colloquial_sector:confeiteiro": 2,
+    "colloquial_sector:doceria": 1,
     "opened_to_closure_cohort_boundary": 18,
-    "colloquial_sector:doceiro": 1,
+    "colloquial_sector:confeiteiro": 1,
     "exact_day_range_registrations": 16,
     "colloquial_sector:adega": 2,
     "state_internal_exclusion": 12,
@@ -60,6 +60,7 @@
     "two_municipality_exclusion": 12,
     "three_city_density_compare": 13,
     "two_city_density_compare": 2,
+    "colloquial_sector:doceiro": 1,
     "colloquial_sector:pet": 1,
     "supply:gráfica+serviço de fretamento de ônibus": 1,
     "cnae_section_division_breakdown": 20,
@@ -105,7 +106,7 @@
     "supply:choperia+frete rodoviário municipal": 1,
     "supply:adega+estúdio fotográfico": 1,
     "supply:lanterneiro+corretor de imóveis": 1,
-    "supply:confeiteiro+gráfica": 1,
+    "supply:doceria+gráfica": 1,
     "supply:eletricista+empresa de transporte de passageiros": 1
   }
 }

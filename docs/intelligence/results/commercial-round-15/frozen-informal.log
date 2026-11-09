@@ -1,0 +1,23 @@
+processed 50/202 correct 18
+processed 100/202 correct 60
+processed 150/202 correct 84
+processed 200/202 correct 120
+{
+  "act_correct": 201,
+  "act_items": 202,
+  "correct_executed_answer": 85,
+  "decision_correct": 172,
+  "execution_fresh": 137,
+  "execution_reused_identical_ir": 79,
+  "gold_backend_mismatch": 1,
+  "gold_backend_ok": 164,
+  "interpretation_correct": 121,
+  "interpretation_wrong": 81,
+  "items": 202,
+  "verification_engine_match": 143,
+  "verification_marginal_match": 2,
+  "verification_mismatch": 1,
+  "verification_no_independent_reference": 3,
+  "verification_not_numeric": 1,
+  "verification_single_backend": 15
+}

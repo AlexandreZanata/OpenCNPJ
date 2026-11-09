@@ -77,6 +77,6 @@
   "human_validation": "Not performed; human validation is deferred to product refinement.",
   "method": "Actual text-only deterministic interpretation; gold IR used only for canonical scoring and separate backend reference, never as a prediction or conversation seed.",
   "set": "crates/opencnpj-lab/eval/commercial-round-15/batches/batch-001.jsonl",
-  "set_sha256": "da8f5d0b8133303c2105770ded5e02a085e3addfbe138bd89f2364e29574c1bc",
+  "set_sha256": "dec03515c6a767b16c9b20603c67c872171ae37a651a27b6a10e921c8be993d5",
   "snapshot_sha256": "76f36078c1e5b727af8416262309d1285e39f054514218a75a46206d5786037b"
 }

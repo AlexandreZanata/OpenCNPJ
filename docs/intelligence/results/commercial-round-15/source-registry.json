@@ -20,7 +20,7 @@
     "municipalities_count": 5572,
     "mt_municipalities_count": 142,
     "sectors_catalog_path": "crates/opencnpj-insights/catalog/sectors.toml",
-    "sectors_catalog_sha256": "317661637b9f6e3200911939ab6d184d315defa481af6ec643c6a47e68ed9562",
+    "sectors_catalog_sha256": "dd687269dc255770fb63f9918467892c4c0ee0bffdcba0ef69634dc4932e0820",
     "sectors_catalog_version": 1,
     "sectors_count": 214
   },
