@@ -17,3 +17,6 @@ pub mod render;
 
 /// Excel, CSV and plain-text files delivered with an answer.
 pub mod export;
+
+/// Official source-backed indicators and immutable `.ocind` assets.
+pub mod official;

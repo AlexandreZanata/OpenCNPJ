@@ -1,0 +1,3 @@
+raw	/data/opencnpj-data/intelligence/official/ingest/raw/inep_censo_escolar_2024.zip	bytes=33829396	sha256=ae29d81d45ddecef59e11eda39788cbfd30dfa1cc71be9d29f23051fc2d640db
+published	/data/opencnpj-data/intelligence/official/ingest/national/inep-censo-escolar-2024.ocrec	rows=215545	total=215545	out_of_scope=0	rejected=0	duplicates=0	bytes=2673111040	sha256=40ae4bb680f96c1d5451e9791bc40612973e183913ad7f3f6711793a27c870df
+elapsed 575.16 s maxrss 10564192 KB

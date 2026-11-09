@@ -1,0 +1,195 @@
+# Read-only probes for the additional source audit. A probe is a discovery,
+# metadata or data-resource check; it does not admit the resource.
+version = 1
+
+[[probe]]
+source_id = "ibge"
+category = "population"
+label = "ibge-6579-metadata"
+url = "https://servicodados.ibge.gov.br/api/v3/agregados/6579/metadados"
+kind = "metadata"
+max_bytes = 524288
+
+[[probe]]
+source_id = "ibge"
+category = "economy"
+label = "ibge-5938-metadata"
+url = "https://servicodados.ibge.gov.br/api/v3/agregados/5938/metadados"
+kind = "metadata"
+max_bytes = 1048576
+
+[[probe]]
+source_id = "ibge"
+category = "economy"
+label = "ibge-9509-metadata"
+url = "https://servicodados.ibge.gov.br/api/v3/agregados/9509/metadados"
+kind = "metadata"
+max_bytes = 524288
+
+[[probe]]
+source_id = "ibge"
+category = "agriculture"
+label = "ibge-1612-metadata"
+url = "https://servicodados.ibge.gov.br/api/v3/agregados/1612/metadados"
+kind = "metadata"
+max_bytes = 524288
+
+[[probe]]
+source_id = "ibge"
+category = "agriculture"
+label = "ibge-6588-metadata"
+url = "https://servicodados.ibge.gov.br/api/v3/agregados/6588/metadados"
+kind = "metadata"
+max_bytes = 524288
+
+[[probe]]
+source_id = "ibge"
+category = "census"
+label = "ibge-9922-metadata"
+url = "https://servicodados.ibge.gov.br/api/v3/agregados/9922/metadados"
+kind = "metadata"
+max_bytes = 524288
+
+[[probe]]
+source_id = "mte"
+category = "labour"
+label = "mte-rais-2024-xlsx"
+url = "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/acoes-e-programas/programas-projetos-acoes-obras-e-atividades/estatisticas-trabalho/rais/rais-2024/rais-2024-1/rais-complementar-tabelas-2023x2024.xlsx/@@download/file"
+kind = "data"
+max_bytes = 4194304
+
+[[probe]]
+source_id = "mte"
+category = "labour"
+label = "mte-novo-caged-page"
+url = "https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/acoes-e-programas/programas-projetos-acoes-obras-e-atividades/estatisticas-trabalho/novo-caged"
+kind = "discovery_page"
+max_bytes = 524288
+
+[[probe]]
+source_id = "senatran"
+category = "transport"
+label = "senatran-fleet-202609-xlsx"
+url = "https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2026-2/Frota_por_municipio_e_tipo_Setembro_2026.xlsx/@@download/file"
+kind = "data"
+max_bytes = 1048576
+
+[[probe]]
+source_id = "antt"
+category = "transport"
+label = "antt-rntrc-page"
+url = "https://dados.antt.gov.br/pt_BR/dataset/rntrc-veiculos"
+kind = "discovery_page"
+max_bytes = 524288
+
+[[probe]]
+source_id = "pncp"
+category = "procurement"
+label = "pncp-contracts-202609"
+url = "https://pncp.gov.br/api/consulta/v1/contratos?dataInicial=20260901&dataFinal=20260930&codigoModalidadeContratacao=6&pagina=1"
+kind = "data"
+max_bytes = 1572864
+
+[[probe]]
+source_id = "compras"
+category = "procurement"
+label = "compras-swagger"
+url = "https://dadosabertos.compras.gov.br/swagger-ui/index.html"
+kind = "discovery_page"
+max_bytes = 524288
+
+[[probe]]
+source_id = "cgu"
+category = "compliance"
+label = "cgu-ceis-page"
+url = "https://portaldatransparencia.gov.br/download-de-dados/ceis"
+kind = "discovery_page"
+max_bytes = 524288
+
+[[probe]]
+source_id = "cnes"
+category = "health"
+label = "cnes-dataset-page"
+url = "https://dadosabertos.saude.gov.br/dataset/cnes-cadastro-nacional-de-estabelecimentos-de-saude"
+kind = "discovery_page"
+max_bytes = 524288
+
+[[probe]]
+source_id = "inep"
+category = "education"
+label = "inep-censo-escolar-page"
+url = "https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/microdados/censo-escolar"
+kind = "discovery_page"
+max_bytes = 524288
+
+[[probe]]
+source_id = "anp"
+category = "fuel"
+label = "anp-prices-page"
+url = "https://www.gov.br/anp/pt-br/assuntos/precos-e-defesa-da-concorrencia/precos/precos-revenda-e-de-distribuicao-combustiveis/informacoes-levantamento-de-precos-de-combustiveis"
+kind = "discovery_page"
+max_bytes = 524288
+
+[[probe]]
+source_id = "comexstat"
+category = "trade"
+label = "comexstat-page"
+url = "https://comexstat.mdic.gov.br/pt/home"
+kind = "discovery_page"
+max_bytes = 524288
+
+[[probe]]
+source_id = "bcb"
+category = "macroeconomy"
+label = "bcb-sgs-series-1"
+url = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.1/dados/ultimos/5?formato=json"
+kind = "data"
+max_bytes = 65536
+
+[[probe]]
+source_id = "aneel"
+category = "energy"
+label = "aneel-distributed-generation-page"
+url = "https://dadosabertos.aneel.gov.br/dataset/relacao-de-empreendimentos-de-geracao-distribuida"
+kind = "discovery_page"
+max_bytes = 524288
+
+[[probe]]
+source_id = "pgfn"
+category = "fiscal"
+label = "pgfn-active-debt-page"
+url = "https://www.gov.br/pgfn/pt-br/assuntos/divida-ativa-da-uniao/transparencia-fiscal-1/dados-abertos"
+kind = "discovery_page"
+max_bytes = 524288
+
+[[probe]]
+source_id = "mt"
+category = "local_government"
+label = "mt-open-data-page"
+url = "https://dadosabertos.mt.gov.br/"
+kind = "discovery_page"
+max_bytes = 524288
+
+[[probe]]
+source_id = "antt"
+category = "transport"
+label = "antt-rntrc-veiculos-json"
+url = "https://dados.antt.gov.br/dataset/2b564396-5593-4b5c-ba2c-3de3fa0a92c0/resource/c1367dd9-2874-4d97-bca3-3940e70bf224/download/rntrc-veiculos.json"
+kind = "data"
+max_bytes = 1048576
+
+[[probe]]
+source_id = "aneel"
+category = "energy"
+label = "aneel-gd-eolica-csv"
+url = "https://dadosabertos.aneel.gov.br/dataset/5e0fafd2-21b9-4d5b-b622-40438d40aba2/resource/5f903d78-25ae-4a3f-a2bd-9a93351c59fb/download/empreendimento-gd-informacoes-tecnicas-eolica.csv"
+kind = "data"
+max_bytes = 1048576
+
+[[probe]]
+source_id = "pgfn"
+category = "fiscal"
+label = "pgfn-dictionary-xlsx"
+url = "https://www.gov.br/pgfn/pt-br/assuntos/divida-ativa-da-uniao/transparencia-fiscal-1/arquivos-dados-abertos/dicionario_de_campos.xlsx/@@download/file"
+kind = "metadata"
+max_bytes = 524288

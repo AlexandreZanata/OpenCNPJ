@@ -1,0 +1,3 @@
+raw	/data/opencnpj-data/intelligence/official/ingest/raw/pgfn_fgts_2026Q3.zip	bytes=18475361	sha256=a011daf66131376f5d68271181e3179a25189633a1a4d79f31850740811b7356
+published	/data/opencnpj-data/intelligence/official/ingest/national/pgfn-fgts-2026Q3.ocrec	rows=549458	total=552079	out_of_scope=2621	rejected=0	duplicates=0	bytes=451731456	sha256=de8bd16f72256c33f6c07c8e16c09370a15e6cb8d9d6b8af5cf7decbd7730eed
+elapsed 63.93 s maxrss 1895972 KB

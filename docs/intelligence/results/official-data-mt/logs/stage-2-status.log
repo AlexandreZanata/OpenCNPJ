@@ -1,0 +1,9 @@
+source	dataset	state	imported	rows	period	licence
+ibge	ibge-1612	queryable	yes	25560	2020..2025	review_required
+ibge	ibge-1613	queryable	yes	4200	2020..2025	review_required
+ibge	ibge-3939	queryable	yes	3408	2020..2025	review_required
+ibge	ibge-5938	queryable	yes	12496	2002..2023	review_required
+ibge	ibge-6579	queryable	yes	3146	2001..2026	review_required
+ibge	ibge-6588	queryable	yes	723	200609..202609	review_required
+ibge	ibge-9509	queryable	yes	2538	2022..2024	review_required
+ibge	ibge-9922	queryable	yes	423	2022..2022	review_required

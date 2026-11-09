@@ -1,0 +1,3 @@
+raw	/data/opencnpj-data/intelligence/official/ingest/raw/comex_exp_2025_mun.csv	bytes=60077097	sha256=a8ab76c8c93676b6a6fc3979ebbe6baacf6c675651c2710bbb9d11529de73f0f
+published	/data/opencnpj-data/intelligence/official/ingest/mt/comex-exp-2025-mun.ocrec	rows=13271	total=1207088	out_of_scope=1193817	rejected=0	duplicates=0	bytes=4296704	sha256=25fa3903acb29e7327325e3f4951f0304caf73ccb90fedb2ae0985e533d43620
+elapsed 11.93 maxrss 82608

@@ -1,0 +1,4342 @@
+[
+  {
+    "id": "pop-lookup-1",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5103403",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-lookup-2",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5108402",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-lookup-3",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5107602",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-lookup-4",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5107909",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-lookup-5",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5107925",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-lookup-6",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5107958",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-lookup-7",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5107040",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-lookup-8",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5105259",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-lookup-9",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5102504",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-lookup-10",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5101803",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-lookup-11",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5100250",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-lookup-12",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5103205",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-lookup-13",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5104104",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-lookup-14",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5105150",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-lookup-15",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5105101",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-lookup-16",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5106000",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-lookup-17",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5106224",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-lookup-18",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5107875",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-lookup-19",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5102678",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-lookup-20",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5103502",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-known-cuiaba",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5103403",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_first_value": 682932,
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-known-sorriso",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5107925",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_first_value": 120985,
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-compare-1",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "compare",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5103403",
+      "--geography",
+      "5108402",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-compare-2",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "compare",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5108402",
+      "--geography",
+      "5107602",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-compare-3",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "compare",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5107602",
+      "--geography",
+      "5107909",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-compare-4",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "compare",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5107909",
+      "--geography",
+      "5107925",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-compare-5",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "compare",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5107925",
+      "--geography",
+      "5107958",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-compare-6",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "compare",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5107958",
+      "--geography",
+      "5107040",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-compare-7",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "compare",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5107040",
+      "--geography",
+      "5105259",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-compare-8",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "compare",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5105259",
+      "--geography",
+      "5102504",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-compare-9",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "compare",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5102504",
+      "--geography",
+      "5101803",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-compare-10",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "compare",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5101803",
+      "--geography",
+      "5100250",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-rank-2020",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "rank",
+      "--variable",
+      "populacao_estimada",
+      "--period",
+      "2020",
+      "--uf",
+      "MT",
+      "--limit",
+      "10"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-rank-2021",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "rank",
+      "--variable",
+      "populacao_estimada",
+      "--period",
+      "2021",
+      "--uf",
+      "MT",
+      "--limit",
+      "10"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-rank-2024",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "rank",
+      "--variable",
+      "populacao_estimada",
+      "--period",
+      "2024",
+      "--uf",
+      "MT",
+      "--limit",
+      "10"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-trend-1",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "trend",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5103403",
+      "--period",
+      "2020",
+      "--period",
+      "2021",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-trend-2",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "trend",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5108402",
+      "--period",
+      "2020",
+      "--period",
+      "2021",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-trend-3",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "trend",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5107602",
+      "--period",
+      "2020",
+      "--period",
+      "2021",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-trend-4",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "trend",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5107909",
+      "--period",
+      "2020",
+      "--period",
+      "2021",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-trend-5",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "trend",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5107925",
+      "--period",
+      "2020",
+      "--period",
+      "2021",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-trend-6",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "trend",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5107958",
+      "--period",
+      "2020",
+      "--period",
+      "2021",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-trend-7",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "trend",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5107040",
+      "--period",
+      "2020",
+      "--period",
+      "2021",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-trend-8",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "trend",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5105259",
+      "--period",
+      "2020",
+      "--period",
+      "2021",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-trend-9",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "trend",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5102504",
+      "--period",
+      "2020",
+      "--period",
+      "2021",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "pop-trend-10",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "trend",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5101803",
+      "--period",
+      "2020",
+      "--period",
+      "2021",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "census-domicilios_ocupados-1",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "domicilios_ocupados",
+      "--geography",
+      "5103403",
+      "--period",
+      "2022"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "census-domicilios_ocupados-2",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "domicilios_ocupados",
+      "--geography",
+      "5108402",
+      "--period",
+      "2022"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "census-domicilios_ocupados-3",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "domicilios_ocupados",
+      "--geography",
+      "5107602",
+      "--period",
+      "2022"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "census-domicilios_ocupados-4",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "domicilios_ocupados",
+      "--geography",
+      "5107909",
+      "--period",
+      "2022"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "census-domicilios_ocupados-5",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "domicilios_ocupados",
+      "--geography",
+      "5107925",
+      "--period",
+      "2022"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "census-moradores_domicilios-1",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "moradores_domicilios",
+      "--geography",
+      "5103403",
+      "--period",
+      "2022"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "census-moradores_domicilios-2",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "moradores_domicilios",
+      "--geography",
+      "5108402",
+      "--period",
+      "2022"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "census-moradores_domicilios-3",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "moradores_domicilios",
+      "--geography",
+      "5107602",
+      "--period",
+      "2022"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "census-moradores_domicilios-4",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "moradores_domicilios",
+      "--geography",
+      "5107909",
+      "--period",
+      "2022"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "census-moradores_domicilios-5",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "moradores_domicilios",
+      "--geography",
+      "5107925",
+      "--period",
+      "2022"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "census-media_moradores-1",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "media_moradores",
+      "--geography",
+      "5103403",
+      "--period",
+      "2022"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "census-media_moradores-2",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "media_moradores",
+      "--geography",
+      "5108402",
+      "--period",
+      "2022"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "census-media_moradores-3",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "media_moradores",
+      "--geography",
+      "5107602",
+      "--period",
+      "2022"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "census-media_moradores-4",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "media_moradores",
+      "--geography",
+      "5107909",
+      "--period",
+      "2022"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "census-media_moradores-5",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "media_moradores",
+      "--geography",
+      "5107925",
+      "--period",
+      "2022"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "gdp-lookup-1",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pib_municipal",
+      "--geography",
+      "5103403",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Mil Reais"
+  },
+  {
+    "id": "gdp-lookup-2",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pib_municipal",
+      "--geography",
+      "5108402",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Mil Reais"
+  },
+  {
+    "id": "gdp-lookup-3",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pib_municipal",
+      "--geography",
+      "5107602",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Mil Reais"
+  },
+  {
+    "id": "gdp-lookup-4",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pib_municipal",
+      "--geography",
+      "5107909",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Mil Reais"
+  },
+  {
+    "id": "gdp-lookup-5",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pib_municipal",
+      "--geography",
+      "5107925",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Mil Reais"
+  },
+  {
+    "id": "gdp-lookup-6",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pib_municipal",
+      "--geography",
+      "5107958",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Mil Reais"
+  },
+  {
+    "id": "gdp-lookup-7",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pib_municipal",
+      "--geography",
+      "5107040",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Mil Reais"
+  },
+  {
+    "id": "gdp-lookup-8",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pib_municipal",
+      "--geography",
+      "5105259",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Mil Reais"
+  },
+  {
+    "id": "gdp-lookup-9",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pib_municipal",
+      "--geography",
+      "5102504",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Mil Reais"
+  },
+  {
+    "id": "gdp-lookup-10",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pib_municipal",
+      "--geography",
+      "5101803",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Mil Reais"
+  },
+  {
+    "id": "gdp-lookup-11",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pib_municipal",
+      "--geography",
+      "5100250",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Mil Reais"
+  },
+  {
+    "id": "gdp-lookup-12",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pib_municipal",
+      "--geography",
+      "5103205",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Mil Reais"
+  },
+  {
+    "id": "gdp-lookup-13",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pib_municipal",
+      "--geography",
+      "5104104",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Mil Reais"
+  },
+  {
+    "id": "gdp-lookup-14",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pib_municipal",
+      "--geography",
+      "5105150",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Mil Reais"
+  },
+  {
+    "id": "gdp-lookup-15",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pib_municipal",
+      "--geography",
+      "5105101",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Mil Reais"
+  },
+  {
+    "id": "gdp-lookup-16",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pib_municipal",
+      "--geography",
+      "5106000",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Mil Reais"
+  },
+  {
+    "id": "gdp-lookup-17",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pib_municipal",
+      "--geography",
+      "5106224",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Mil Reais"
+  },
+  {
+    "id": "gdp-lookup-18",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pib_municipal",
+      "--geography",
+      "5107875",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Mil Reais"
+  },
+  {
+    "id": "gdp-lookup-19",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pib_municipal",
+      "--geography",
+      "5102678",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Mil Reais"
+  },
+  {
+    "id": "gdp-lookup-20",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pib_municipal",
+      "--geography",
+      "5103502",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Mil Reais"
+  },
+  {
+    "id": "gdp-known-sorriso",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pib_municipal",
+      "--geography",
+      "5107925",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok",
+    "expected_first_value": 13748757,
+    "expected_unit": "Mil Reais"
+  },
+  {
+    "id": "gdp-rank-2020",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "rank",
+      "--variable",
+      "pib_municipal",
+      "--period",
+      "2020",
+      "--uf",
+      "MT",
+      "--limit",
+      "10"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Mil Reais"
+  },
+  {
+    "id": "gdp-rank-2023",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "rank",
+      "--variable",
+      "pib_municipal",
+      "--period",
+      "2023",
+      "--uf",
+      "MT",
+      "--limit",
+      "10"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Mil Reais"
+  },
+  {
+    "id": "gdp-trend-1",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "trend",
+      "--variable",
+      "pib_municipal",
+      "--geography",
+      "5103403",
+      "--period",
+      "2015",
+      "--period",
+      "2020",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Mil Reais"
+  },
+  {
+    "id": "gdp-trend-2",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "trend",
+      "--variable",
+      "pib_municipal",
+      "--geography",
+      "5108402",
+      "--period",
+      "2015",
+      "--period",
+      "2020",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Mil Reais"
+  },
+  {
+    "id": "gdp-trend-3",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "trend",
+      "--variable",
+      "pib_municipal",
+      "--geography",
+      "5107602",
+      "--period",
+      "2015",
+      "--period",
+      "2020",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Mil Reais"
+  },
+  {
+    "id": "gdp-trend-4",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "trend",
+      "--variable",
+      "pib_municipal",
+      "--geography",
+      "5107909",
+      "--period",
+      "2015",
+      "--period",
+      "2020",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Mil Reais"
+  },
+  {
+    "id": "gdp-trend-5",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "trend",
+      "--variable",
+      "pib_municipal",
+      "--geography",
+      "5107925",
+      "--period",
+      "2015",
+      "--period",
+      "2020",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Mil Reais"
+  },
+  {
+    "id": "cempre-cempre_unidades_locais-1",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "cempre_unidades_locais",
+      "--geography",
+      "5103403",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "cempre-cempre_unidades_locais-2",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "cempre_unidades_locais",
+      "--geography",
+      "5108402",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "cempre-cempre_unidades_locais-3",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "cempre_unidades_locais",
+      "--geography",
+      "5107602",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "cempre-cempre_unidades_locais-4",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "cempre_unidades_locais",
+      "--geography",
+      "5107909",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "cempre-cempre_unidades_locais-5",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "cempre_unidades_locais",
+      "--geography",
+      "5107925",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "cempre-cempre_pessoal_total-1",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "cempre_pessoal_total",
+      "--geography",
+      "5103403",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "cempre-cempre_pessoal_total-2",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "cempre_pessoal_total",
+      "--geography",
+      "5108402",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "cempre-cempre_pessoal_total-3",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "cempre_pessoal_total",
+      "--geography",
+      "5107602",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "cempre-cempre_pessoal_total-4",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "cempre_pessoal_total",
+      "--geography",
+      "5107909",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "cempre-cempre_pessoal_total-5",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "cempre_pessoal_total",
+      "--geography",
+      "5107925",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "cempre-cempre_salario_medio-1",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "cempre_salario_medio",
+      "--geography",
+      "5103403",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "cempre-cempre_salario_medio-2",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "cempre_salario_medio",
+      "--geography",
+      "5108402",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "cempre-cempre_salario_medio-3",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "cempre_salario_medio",
+      "--geography",
+      "5107602",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "cempre-cempre_salario_medio-4",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "cempre_salario_medio",
+      "--geography",
+      "5107909",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "cempre-cempre_salario_medio-5",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "cempre_salario_medio",
+      "--geography",
+      "5107925",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "cempre-rank-unidades-2023",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "rank",
+      "--variable",
+      "cempre_unidades_locais",
+      "--period",
+      "2023",
+      "--uf",
+      "MT",
+      "--limit",
+      "10"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "pam-soy-production-1",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pam_producao",
+      "--classification",
+      "81",
+      "--category",
+      "2713",
+      "--geography",
+      "5103403",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Toneladas"
+  },
+  {
+    "id": "pam-soy-production-2",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pam_producao",
+      "--classification",
+      "81",
+      "--category",
+      "2713",
+      "--geography",
+      "5108402",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Toneladas"
+  },
+  {
+    "id": "pam-soy-production-3",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pam_producao",
+      "--classification",
+      "81",
+      "--category",
+      "2713",
+      "--geography",
+      "5107602",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Toneladas"
+  },
+  {
+    "id": "pam-soy-production-4",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pam_producao",
+      "--classification",
+      "81",
+      "--category",
+      "2713",
+      "--geography",
+      "5107909",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Toneladas"
+  },
+  {
+    "id": "pam-soy-production-5",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pam_producao",
+      "--classification",
+      "81",
+      "--category",
+      "2713",
+      "--geography",
+      "5107925",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Toneladas"
+  },
+  {
+    "id": "pam-soy-production-6",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pam_producao",
+      "--classification",
+      "81",
+      "--category",
+      "2713",
+      "--geography",
+      "5107958",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Toneladas"
+  },
+  {
+    "id": "pam-soy-production-7",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pam_producao",
+      "--classification",
+      "81",
+      "--category",
+      "2713",
+      "--geography",
+      "5107040",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Toneladas"
+  },
+  {
+    "id": "pam-soy-production-8",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pam_producao",
+      "--classification",
+      "81",
+      "--category",
+      "2713",
+      "--geography",
+      "5105259",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Toneladas"
+  },
+  {
+    "id": "pam-soy-production-9",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pam_producao",
+      "--classification",
+      "81",
+      "--category",
+      "2713",
+      "--geography",
+      "5102504",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Toneladas"
+  },
+  {
+    "id": "pam-soy-production-10",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pam_producao",
+      "--classification",
+      "81",
+      "--category",
+      "2713",
+      "--geography",
+      "5101803",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Toneladas"
+  },
+  {
+    "id": "pam-soy-area-1",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pam_area_plantada",
+      "--classification",
+      "81",
+      "--category",
+      "2713",
+      "--geography",
+      "5103403",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Hectares"
+  },
+  {
+    "id": "pam-soy-area-2",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pam_area_plantada",
+      "--classification",
+      "81",
+      "--category",
+      "2713",
+      "--geography",
+      "5108402",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Hectares"
+  },
+  {
+    "id": "pam-soy-area-3",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pam_area_plantada",
+      "--classification",
+      "81",
+      "--category",
+      "2713",
+      "--geography",
+      "5107602",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Hectares"
+  },
+  {
+    "id": "pam-soy-area-4",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pam_area_plantada",
+      "--classification",
+      "81",
+      "--category",
+      "2713",
+      "--geography",
+      "5107909",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Hectares"
+  },
+  {
+    "id": "pam-soy-area-5",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pam_area_plantada",
+      "--classification",
+      "81",
+      "--category",
+      "2713",
+      "--geography",
+      "5107925",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Hectares"
+  },
+  {
+    "id": "pam-soy-rank-2024",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "rank",
+      "--variable",
+      "pam_producao",
+      "--classification",
+      "81",
+      "--category",
+      "2713",
+      "--period",
+      "2024",
+      "--uf",
+      "MT",
+      "--limit",
+      "10"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Toneladas"
+  },
+  {
+    "id": "pam-soy-known-sorriso",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pam_producao",
+      "--classification",
+      "81",
+      "--category",
+      "2713",
+      "--geography",
+      "5107925",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_first_value": 2084520,
+    "expected_unit": "Toneladas"
+  },
+  {
+    "id": "pam-corn-production-1",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pam_producao",
+      "--classification",
+      "81",
+      "--category",
+      "2711",
+      "--geography",
+      "5103403",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Toneladas"
+  },
+  {
+    "id": "pam-corn-production-2",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pam_producao",
+      "--classification",
+      "81",
+      "--category",
+      "2711",
+      "--geography",
+      "5108402",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Toneladas"
+  },
+  {
+    "id": "pam-corn-production-3",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pam_producao",
+      "--classification",
+      "81",
+      "--category",
+      "2711",
+      "--geography",
+      "5107602",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Toneladas"
+  },
+  {
+    "id": "pam-corn-production-4",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pam_producao",
+      "--classification",
+      "81",
+      "--category",
+      "2711",
+      "--geography",
+      "5107909",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Toneladas"
+  },
+  {
+    "id": "pam-corn-production-5",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pam_producao",
+      "--classification",
+      "81",
+      "--category",
+      "2711",
+      "--geography",
+      "5107925",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Toneladas"
+  },
+  {
+    "id": "pam-cotton-area-rank-2024",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "rank",
+      "--variable",
+      "pam_area_plantada",
+      "--classification",
+      "81",
+      "--category",
+      "2689",
+      "--period",
+      "2024",
+      "--uf",
+      "MT",
+      "--limit",
+      "10"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Hectares"
+  },
+  {
+    "id": "pam-coffee-production-1",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "cafe_producao",
+      "--classification",
+      "82",
+      "--category",
+      "2723",
+      "--geography",
+      "5103403",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Toneladas"
+  },
+  {
+    "id": "pam-coffee-production-2",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "cafe_producao",
+      "--classification",
+      "82",
+      "--category",
+      "2723",
+      "--geography",
+      "5108402",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Toneladas"
+  },
+  {
+    "id": "pam-coffee-production-3",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "cafe_producao",
+      "--classification",
+      "82",
+      "--category",
+      "2723",
+      "--geography",
+      "5107602",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Toneladas"
+  },
+  {
+    "id": "ppm-bovine-1",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "ppm_efetivo",
+      "--classification",
+      "79",
+      "--category",
+      "2670",
+      "--geography",
+      "5103403",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Cabeças"
+  },
+  {
+    "id": "ppm-bovine-2",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "ppm_efetivo",
+      "--classification",
+      "79",
+      "--category",
+      "2670",
+      "--geography",
+      "5108402",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Cabeças"
+  },
+  {
+    "id": "ppm-bovine-3",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "ppm_efetivo",
+      "--classification",
+      "79",
+      "--category",
+      "2670",
+      "--geography",
+      "5107602",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Cabeças"
+  },
+  {
+    "id": "ppm-bovine-4",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "ppm_efetivo",
+      "--classification",
+      "79",
+      "--category",
+      "2670",
+      "--geography",
+      "5107909",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Cabeças"
+  },
+  {
+    "id": "ppm-bovine-5",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "ppm_efetivo",
+      "--classification",
+      "79",
+      "--category",
+      "2670",
+      "--geography",
+      "5107925",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Cabeças"
+  },
+  {
+    "id": "ppm-bovine-6",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "ppm_efetivo",
+      "--classification",
+      "79",
+      "--category",
+      "2670",
+      "--geography",
+      "5107958",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Cabeças"
+  },
+  {
+    "id": "ppm-bovine-7",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "ppm_efetivo",
+      "--classification",
+      "79",
+      "--category",
+      "2670",
+      "--geography",
+      "5107040",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Cabeças"
+  },
+  {
+    "id": "ppm-bovine-8",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "ppm_efetivo",
+      "--classification",
+      "79",
+      "--category",
+      "2670",
+      "--geography",
+      "5105259",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Cabeças"
+  },
+  {
+    "id": "ppm-bovine-9",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "ppm_efetivo",
+      "--classification",
+      "79",
+      "--category",
+      "2670",
+      "--geography",
+      "5102504",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Cabeças"
+  },
+  {
+    "id": "ppm-bovine-10",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "ppm_efetivo",
+      "--classification",
+      "79",
+      "--category",
+      "2670",
+      "--geography",
+      "5101803",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Cabeças"
+  },
+  {
+    "id": "ppm-bovine-11",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "ppm_efetivo",
+      "--classification",
+      "79",
+      "--category",
+      "2670",
+      "--geography",
+      "5100250",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Cabeças"
+  },
+  {
+    "id": "ppm-bovine-12",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "ppm_efetivo",
+      "--classification",
+      "79",
+      "--category",
+      "2670",
+      "--geography",
+      "5103205",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Cabeças"
+  },
+  {
+    "id": "ppm-bovine-13",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "ppm_efetivo",
+      "--classification",
+      "79",
+      "--category",
+      "2670",
+      "--geography",
+      "5104104",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Cabeças"
+  },
+  {
+    "id": "ppm-bovine-14",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "ppm_efetivo",
+      "--classification",
+      "79",
+      "--category",
+      "2670",
+      "--geography",
+      "5105150",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Cabeças"
+  },
+  {
+    "id": "ppm-bovine-15",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "ppm_efetivo",
+      "--classification",
+      "79",
+      "--category",
+      "2670",
+      "--geography",
+      "5105101",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Cabeças"
+  },
+  {
+    "id": "ppm-bovine-16",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "ppm_efetivo",
+      "--classification",
+      "79",
+      "--category",
+      "2670",
+      "--geography",
+      "5106000",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Cabeças"
+  },
+  {
+    "id": "ppm-bovine-17",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "ppm_efetivo",
+      "--classification",
+      "79",
+      "--category",
+      "2670",
+      "--geography",
+      "5106224",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Cabeças"
+  },
+  {
+    "id": "ppm-bovine-18",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "ppm_efetivo",
+      "--classification",
+      "79",
+      "--category",
+      "2670",
+      "--geography",
+      "5107875",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Cabeças"
+  },
+  {
+    "id": "ppm-bovine-19",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "ppm_efetivo",
+      "--classification",
+      "79",
+      "--category",
+      "2670",
+      "--geography",
+      "5102678",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Cabeças"
+  },
+  {
+    "id": "ppm-bovine-20",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "ppm_efetivo",
+      "--classification",
+      "79",
+      "--category",
+      "2670",
+      "--geography",
+      "5103502",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Cabeças"
+  },
+  {
+    "id": "ppm-bovine-known-sorriso",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "ppm_efetivo",
+      "--classification",
+      "79",
+      "--category",
+      "2670",
+      "--geography",
+      "5107925",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_first_value": 99790,
+    "expected_unit": "Cabeças"
+  },
+  {
+    "id": "ppm-bovine-rank-2024",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "rank",
+      "--variable",
+      "ppm_efetivo",
+      "--classification",
+      "79",
+      "--category",
+      "2670",
+      "--period",
+      "2024",
+      "--uf",
+      "MT",
+      "--limit",
+      "10"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Cabeças"
+  },
+  {
+    "id": "ppm-swine-1",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "ppm_efetivo",
+      "--classification",
+      "79",
+      "--category",
+      "32794",
+      "--geography",
+      "5103403",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Cabeças"
+  },
+  {
+    "id": "ppm-swine-2",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "ppm_efetivo",
+      "--classification",
+      "79",
+      "--category",
+      "32794",
+      "--geography",
+      "5108402",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Cabeças"
+  },
+  {
+    "id": "ppm-swine-3",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "ppm_efetivo",
+      "--classification",
+      "79",
+      "--category",
+      "32794",
+      "--geography",
+      "5107602",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Cabeças"
+  },
+  {
+    "id": "ppm-swine-4",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "ppm_efetivo",
+      "--classification",
+      "79",
+      "--category",
+      "32794",
+      "--geography",
+      "5107909",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Cabeças"
+  },
+  {
+    "id": "ppm-swine-5",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "ppm_efetivo",
+      "--classification",
+      "79",
+      "--category",
+      "32794",
+      "--geography",
+      "5107925",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Cabeças"
+  },
+  {
+    "id": "ppm-poultry-1",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "ppm_efetivo",
+      "--classification",
+      "79",
+      "--category",
+      "32796",
+      "--geography",
+      "5103403",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Cabeças"
+  },
+  {
+    "id": "ppm-poultry-2",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "ppm_efetivo",
+      "--classification",
+      "79",
+      "--category",
+      "32796",
+      "--geography",
+      "5108402",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Cabeças"
+  },
+  {
+    "id": "ppm-poultry-3",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "ppm_efetivo",
+      "--classification",
+      "79",
+      "--category",
+      "32796",
+      "--geography",
+      "5107602",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Cabeças"
+  },
+  {
+    "id": "ppm-poultry-4",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "ppm_efetivo",
+      "--classification",
+      "79",
+      "--category",
+      "32796",
+      "--geography",
+      "5107909",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Cabeças"
+  },
+  {
+    "id": "ppm-poultry-5",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "ppm_efetivo",
+      "--classification",
+      "79",
+      "--category",
+      "32796",
+      "--geography",
+      "5107925",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Cabeças"
+  },
+  {
+    "id": "lspa-soy-production-trend",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "trend",
+      "--variable",
+      "lspa_producao",
+      "--classification",
+      "48",
+      "--category",
+      "39443",
+      "--geography",
+      "51",
+      "--period",
+      "202601",
+      "--period",
+      "202605",
+      "--period",
+      "202609"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Toneladas"
+  },
+  {
+    "id": "lspa-soy-production-known-202609",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "lspa_producao",
+      "--classification",
+      "48",
+      "--category",
+      "39443",
+      "--geography",
+      "51",
+      "--period",
+      "202609"
+    ],
+    "expected_status": "ok",
+    "expected_first_value": 50665337,
+    "expected_unit": "Toneladas"
+  },
+  {
+    "id": "rais-total-1",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "rais_emprego_total",
+      "--geography",
+      "5103403",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "rais-total-2",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "rais_emprego_total",
+      "--geography",
+      "5108402",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "rais-total-3",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "rais_emprego_total",
+      "--geography",
+      "5107602",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "rais-total-4",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "rais_emprego_total",
+      "--geography",
+      "5107909",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "rais-total-5",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "rais_emprego_total",
+      "--geography",
+      "5107925",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "rais-total-6",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "rais_emprego_total",
+      "--geography",
+      "5107958",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "rais-total-7",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "rais_emprego_total",
+      "--geography",
+      "5107040",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "rais-total-8",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "rais_emprego_total",
+      "--geography",
+      "5105259",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "rais-total-9",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "rais_emprego_total",
+      "--geography",
+      "5102504",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "rais-total-10",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "rais_emprego_total",
+      "--geography",
+      "5101803",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "rais-total-11",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "rais_emprego_total",
+      "--geography",
+      "5100250",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "rais-total-12",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "rais_emprego_total",
+      "--geography",
+      "5103205",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "rais-total-13",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "rais_emprego_total",
+      "--geography",
+      "5104104",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "rais-total-14",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "rais_emprego_total",
+      "--geography",
+      "5105150",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "rais-total-15",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "rais_emprego_total",
+      "--geography",
+      "5105101",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "rais-total-16",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "rais_emprego_total",
+      "--geography",
+      "5106000",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "rais-total-17",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "rais_emprego_total",
+      "--geography",
+      "5106224",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "rais-total-18",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "rais_emprego_total",
+      "--geography",
+      "5107875",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "rais-total-19",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "rais_emprego_total",
+      "--geography",
+      "5102678",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "rais-total-20",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "rais_emprego_total",
+      "--geography",
+      "5103502",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "rais-known-sorriso",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "rais_emprego_total",
+      "--geography",
+      "5107925",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_first_value": 39482,
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "rais-rank-total-2024",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "rank",
+      "--variable",
+      "rais_emprego_total",
+      "--period",
+      "2024",
+      "--uf",
+      "MT",
+      "--limit",
+      "10"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "rais_emprego_industria-1",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "rais_emprego_industria",
+      "--geography",
+      "5103403",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "rais_emprego_industria-2",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "rais_emprego_industria",
+      "--geography",
+      "5108402",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "rais_emprego_industria-3",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "rais_emprego_industria",
+      "--geography",
+      "5107602",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "rais_emprego_industria-4",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "rais_emprego_industria",
+      "--geography",
+      "5107909",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "rais_emprego_industria-5",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "rais_emprego_industria",
+      "--geography",
+      "5107925",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "rais_emprego_comercio-1",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "rais_emprego_comercio",
+      "--geography",
+      "5103403",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "rais_emprego_comercio-2",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "rais_emprego_comercio",
+      "--geography",
+      "5108402",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "rais_emprego_comercio-3",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "rais_emprego_comercio",
+      "--geography",
+      "5107602",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "rais_emprego_comercio-4",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "rais_emprego_comercio",
+      "--geography",
+      "5107909",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "rais_emprego_comercio-5",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "rais_emprego_comercio",
+      "--geography",
+      "5107925",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "rais_emprego_servicos-1",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "rais_emprego_servicos",
+      "--geography",
+      "5103403",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "rais_emprego_servicos-2",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "rais_emprego_servicos",
+      "--geography",
+      "5108402",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "rais_emprego_servicos-3",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "rais_emprego_servicos",
+      "--geography",
+      "5107602",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "rais_emprego_servicos-4",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "rais_emprego_servicos",
+      "--geography",
+      "5107909",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "rais_emprego_servicos-5",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "rais_emprego_servicos",
+      "--geography",
+      "5107925",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "fleet-total-1",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "frota_total",
+      "--geography",
+      "5103403",
+      "--period",
+      "202609"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Veículos"
+  },
+  {
+    "id": "fleet-total-2",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "frota_total",
+      "--geography",
+      "5108402",
+      "--period",
+      "202609"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Veículos"
+  },
+  {
+    "id": "fleet-total-3",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "frota_total",
+      "--geography",
+      "5107602",
+      "--period",
+      "202609"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Veículos"
+  },
+  {
+    "id": "fleet-total-4",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "frota_total",
+      "--geography",
+      "5107909",
+      "--period",
+      "202609"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Veículos"
+  },
+  {
+    "id": "fleet-total-5",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "frota_total",
+      "--geography",
+      "5107925",
+      "--period",
+      "202609"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Veículos"
+  },
+  {
+    "id": "fleet-total-6",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "frota_total",
+      "--geography",
+      "5107958",
+      "--period",
+      "202609"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Veículos"
+  },
+  {
+    "id": "fleet-total-7",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "frota_total",
+      "--geography",
+      "5107040",
+      "--period",
+      "202609"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Veículos"
+  },
+  {
+    "id": "fleet-total-8",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "frota_total",
+      "--geography",
+      "5105259",
+      "--period",
+      "202609"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Veículos"
+  },
+  {
+    "id": "fleet-total-9",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "frota_total",
+      "--geography",
+      "5102504",
+      "--period",
+      "202609"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Veículos"
+  },
+  {
+    "id": "fleet-total-10",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "frota_total",
+      "--geography",
+      "5101803",
+      "--period",
+      "202609"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Veículos"
+  },
+  {
+    "id": "fleet-total-11",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "frota_total",
+      "--geography",
+      "5100250",
+      "--period",
+      "202609"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Veículos"
+  },
+  {
+    "id": "fleet-total-12",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "frota_total",
+      "--geography",
+      "5103205",
+      "--period",
+      "202609"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Veículos"
+  },
+  {
+    "id": "fleet-total-13",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "frota_total",
+      "--geography",
+      "5104104",
+      "--period",
+      "202609"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Veículos"
+  },
+  {
+    "id": "fleet-total-14",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "frota_total",
+      "--geography",
+      "5105150",
+      "--period",
+      "202609"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Veículos"
+  },
+  {
+    "id": "fleet-total-15",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "frota_total",
+      "--geography",
+      "5105101",
+      "--period",
+      "202609"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Veículos"
+  },
+  {
+    "id": "fleet-total-16",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "frota_total",
+      "--geography",
+      "5106000",
+      "--period",
+      "202609"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Veículos"
+  },
+  {
+    "id": "fleet-total-17",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "frota_total",
+      "--geography",
+      "5106224",
+      "--period",
+      "202609"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Veículos"
+  },
+  {
+    "id": "fleet-total-18",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "frota_total",
+      "--geography",
+      "5107875",
+      "--period",
+      "202609"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Veículos"
+  },
+  {
+    "id": "fleet-total-19",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "frota_total",
+      "--geography",
+      "5102678",
+      "--period",
+      "202609"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Veículos"
+  },
+  {
+    "id": "fleet-total-20",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "frota_total",
+      "--geography",
+      "5103502",
+      "--period",
+      "202609"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Veículos"
+  },
+  {
+    "id": "fleet-known-sorriso-total",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "frota_total",
+      "--geography",
+      "5107925",
+      "--period",
+      "202609"
+    ],
+    "expected_status": "ok",
+    "expected_first_value": 112951,
+    "expected_unit": "Veículos"
+  },
+  {
+    "id": "fleet-known-sorriso-trucks",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "frota_caminhao",
+      "--geography",
+      "5107925",
+      "--period",
+      "202609"
+    ],
+    "expected_status": "ok",
+    "expected_first_value": 3794,
+    "expected_unit": "Veículos"
+  },
+  {
+    "id": "fleet-truck-rank-202609",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "rank",
+      "--variable",
+      "frota_caminhao",
+      "--period",
+      "202609",
+      "--uf",
+      "MT",
+      "--limit",
+      "10"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Veículos"
+  },
+  {
+    "id": "fleet-truck-compare-1",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "compare",
+      "--variable",
+      "frota_caminhao",
+      "--geography",
+      "5103403",
+      "--geography",
+      "5108402",
+      "--period",
+      "202609"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Veículos"
+  },
+  {
+    "id": "fleet-truck-compare-2",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "compare",
+      "--variable",
+      "frota_caminhao",
+      "--geography",
+      "5108402",
+      "--geography",
+      "5107602",
+      "--period",
+      "202609"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Veículos"
+  },
+  {
+    "id": "fleet-truck-compare-3",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "compare",
+      "--variable",
+      "frota_caminhao",
+      "--geography",
+      "5107602",
+      "--geography",
+      "5107909",
+      "--period",
+      "202609"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Veículos"
+  },
+  {
+    "id": "fleet-truck-compare-4",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "compare",
+      "--variable",
+      "frota_caminhao",
+      "--geography",
+      "5107909",
+      "--geography",
+      "5107925",
+      "--period",
+      "202609"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Veículos"
+  },
+  {
+    "id": "fleet-truck-compare-5",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "compare",
+      "--variable",
+      "frota_caminhao",
+      "--geography",
+      "5107925",
+      "--geography",
+      "5107958",
+      "--period",
+      "202609"
+    ],
+    "expected_status": "ok",
+    "expected_unit": "Veículos"
+  },
+  {
+    "id": "gdp-per-capita-1",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "ratio",
+      "--variable",
+      "pib_municipal",
+      "--denominator",
+      "populacao_estimada",
+      "--geography",
+      "5103403"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "gdp-per-capita-2",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "ratio",
+      "--variable",
+      "pib_municipal",
+      "--denominator",
+      "populacao_estimada",
+      "--geography",
+      "5108402"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "gdp-per-capita-3",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "ratio",
+      "--variable",
+      "pib_municipal",
+      "--denominator",
+      "populacao_estimada",
+      "--geography",
+      "5107602"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "gdp-per-capita-4",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "ratio",
+      "--variable",
+      "pib_municipal",
+      "--denominator",
+      "populacao_estimada",
+      "--geography",
+      "5107909"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "gdp-per-capita-5",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "ratio",
+      "--variable",
+      "pib_municipal",
+      "--denominator",
+      "populacao_estimada",
+      "--geography",
+      "5107925"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "gdp-per-capita-6",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "ratio",
+      "--variable",
+      "pib_municipal",
+      "--denominator",
+      "populacao_estimada",
+      "--geography",
+      "5107958"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "gdp-per-capita-7",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "ratio",
+      "--variable",
+      "pib_municipal",
+      "--denominator",
+      "populacao_estimada",
+      "--geography",
+      "5107040"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "gdp-per-capita-8",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "ratio",
+      "--variable",
+      "pib_municipal",
+      "--denominator",
+      "populacao_estimada",
+      "--geography",
+      "5105259"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "gdp-per-capita-9",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "ratio",
+      "--variable",
+      "pib_municipal",
+      "--denominator",
+      "populacao_estimada",
+      "--geography",
+      "5102504"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "gdp-per-capita-10",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "ratio",
+      "--variable",
+      "pib_municipal",
+      "--denominator",
+      "populacao_estimada",
+      "--geography",
+      "5101803"
+    ],
+    "expected_status": "ok"
+  },
+  {
+    "id": "gdp-per-capita-known-sorriso",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "ratio",
+      "--variable",
+      "pib_municipal",
+      "--denominator",
+      "populacao_estimada",
+      "--geography",
+      "5107925"
+    ],
+    "expected_status": "ok",
+    "expected_first_value": 131.89351281322084
+  },
+  {
+    "id": "ask-pop-sorriso",
+    "kind": "ask",
+    "text": "Qual a população estimada de Sorriso em 2024?",
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "ask-pop-cuiaba",
+    "kind": "ask",
+    "text": "População de Cuiabá em 2024",
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "ask-compare-sorriso-sinop",
+    "kind": "ask",
+    "text": "Compare Sorriso e Sinop na população de 2024",
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "ask-rank-pop-mt",
+    "kind": "ask",
+    "text": "Ranking dos municípios de MT por população em 2024",
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "ask-trend-pop-sorriso",
+    "kind": "ask",
+    "text": "Evolução da população de Sorriso entre 2020 e 2024",
+    "expected_status": "ok",
+    "expected_unit": "Pessoas"
+  },
+  {
+    "id": "ask-pib-sorriso",
+    "kind": "ask",
+    "text": "PIB de Sorriso em 2023",
+    "expected_status": "ok",
+    "expected_unit": "Mil Reais"
+  },
+  {
+    "id": "ask-pib-per-capita",
+    "kind": "ask",
+    "text": "PIB per capita de Sorriso",
+    "expected_status": "ok",
+    "expected_unit": "Mil Reais por Pessoas"
+  },
+  {
+    "id": "ask-soy-production",
+    "kind": "ask",
+    "text": "Produção de soja em Sorriso em 2024",
+    "expected_status": "ok",
+    "expected_unit": "Toneladas"
+  },
+  {
+    "id": "ask-soy-trend",
+    "kind": "ask",
+    "text": "Evolução da produção de soja em Sorriso entre 2020 e 2024",
+    "expected_status": "ok",
+    "expected_unit": "Toneladas"
+  },
+  {
+    "id": "ask-cattle",
+    "kind": "ask",
+    "text": "Rebanho bovino de Sorriso em 2024",
+    "expected_status": "ok",
+    "expected_unit": "Cabeças"
+  },
+  {
+    "id": "ask-rais",
+    "kind": "ask",
+    "text": "Empregos formais em Sorriso em 2024",
+    "expected_status": "ok",
+    "expected_unit": "Vínculos"
+  },
+  {
+    "id": "ask-fleet",
+    "kind": "ask",
+    "text": "Frota total de Sorriso em setembro de 2026",
+    "expected_status": "ok",
+    "expected_unit": "Veículos"
+  },
+  {
+    "id": "ask-refuse-cnpj-headcount",
+    "kind": "ask",
+    "text": "Quantos funcionários tem o CNPJ de Sorriso?",
+    "expected_status": "unavailable"
+  },
+  {
+    "id": "ask-refuse-neighbourhood",
+    "kind": "ask",
+    "text": "População do bairro Centro de Sorriso em 2024",
+    "expected_status": "unavailable"
+  },
+  {
+    "id": "ask-refuse-income",
+    "kind": "ask",
+    "text": "Renda domiciliar de Sorriso em 2024",
+    "expected_status": "unavailable"
+  },
+  {
+    "id": "ask-clarify-crop",
+    "kind": "ask",
+    "text": "Produção agrícola em Sorriso em 2024",
+    "expected_status": "clarification_required"
+  },
+  {
+    "id": "ask-unsupported",
+    "kind": "ask",
+    "text": "Qual a marca de trator mais vendida em Sorriso?",
+    "expected_status": "unsupported"
+  },
+  {
+    "id": "pop-missing-2023",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "populacao_estimada",
+      "--geography",
+      "5107925",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "empty"
+  },
+  {
+    "id": "ratio-missing-2023",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "ratio",
+      "--variable",
+      "pib_municipal",
+      "--denominator",
+      "populacao_estimada",
+      "--geography",
+      "5107925",
+      "--period",
+      "2023"
+    ],
+    "expected_status": "no_observed_value"
+  },
+  {
+    "id": "census-missing-boa-esperanca",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "domicilios_ocupados",
+      "--geography",
+      "5101837",
+      "--period",
+      "2022"
+    ],
+    "expected_status": "empty"
+  },
+  {
+    "id": "gdp-future-2024-empty",
+    "kind": "query",
+    "args": [
+      "--operation",
+      "lookup",
+      "--variable",
+      "pib_municipal",
+      "--geography",
+      "5107925",
+      "--period",
+      "2024"
+    ],
+    "expected_status": "empty"
+  }
+]

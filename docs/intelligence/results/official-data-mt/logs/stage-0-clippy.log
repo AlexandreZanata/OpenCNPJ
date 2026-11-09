@@ -1,0 +1,12 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on build directory
+    Checking opencnpj-core v0.1.0 (/tmp/opencnpj-official-data-mt/crates/opencnpj-core)
+    Checking opencnpj-desktop v0.1.0 (/tmp/opencnpj-official-data-mt/crates/opencnpj-desktop)
+    Checking opencnpj-store v0.1.0 (/tmp/opencnpj-official-data-mt/crates/opencnpj-store)
+    Checking opencnpj-query v0.1.0 (/tmp/opencnpj-official-data-mt/crates/opencnpj-query)
+    Checking opencnpj-ingest v0.1.0 (/tmp/opencnpj-official-data-mt/crates/opencnpj-ingest)
+    Checking opencnpj-nlu v0.1.0 (/tmp/opencnpj-official-data-mt/crates/opencnpj-nlu)
+    Checking opencnpj v0.1.0 (/tmp/opencnpj-official-data-mt/crates/opencnpj)
+    Checking opencnpj-insights v0.1.0 (/tmp/opencnpj-official-data-mt/crates/opencnpj-insights)
+    Checking opencnpj-lab v0.1.0 (/tmp/opencnpj-official-data-mt/crates/opencnpj-lab)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 31.25s

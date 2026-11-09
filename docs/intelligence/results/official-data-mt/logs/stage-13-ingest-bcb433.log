@@ -1,0 +1,3 @@
+raw	/data/opencnpj-data/intelligence/official/ingest/raw/bcb_sgs_433.json	bytes=20880	sha256=540656f19548e17043022e1de473236a4db6cbac569ef07b369b8a9bb0f0cd70
+published	/data/opencnpj-data/intelligence/official/ingest/national/bcb-sgs-433.ocrec	rows=561	total=561	out_of_scope=0	rejected=0	duplicates=0	bytes=126976	sha256=240bb6584a3c9327e6a92a4642eaab046b909cc16c2067c6604d45de2bfc2aa8
+elapsed 0.09 maxrss 22040

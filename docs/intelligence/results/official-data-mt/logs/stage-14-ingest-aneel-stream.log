@@ -1,0 +1,3 @@
+raw	/data/opencnpj-data/intelligence/official/ingest/raw/aneel_gd.zip	bytes=113023842	sha256=4d8d7c0871582542f35108bcd1f39282d6c944e20b46da61dee940ec047485ba
+published	/data/opencnpj-data/intelligence/official/ingest/mt/aneel-gd.ocrec	rows=15651	total=4735908	out_of_scope=4720257	rejected=0	duplicates=0	bytes=22953984	sha256=3498eed2b3790b23feec2d9188d83d87236b257791ce60d09255aec092a2507b
+elapsed 167.19 s maxrss 24992 KB

@@ -1,0 +1,4914 @@
+{
+  "cases": 261,
+  "passed": 261,
+  "failed": 0,
+  "data_dir": "/data/opencnpj-data/intelligence/official",
+  "binary": "/home/iiii/PESSOAL-PROJETOS-ALEXANDRE/OpenCNPJ/target/debug/opencnpj-intel",
+  "results": [
+    {
+      "id": "pop-lookup-1",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5103403",
+        "geography_name": "Cuiabá - MT",
+        "period": "2024",
+        "value": 682932.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-lookup-2",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5108402",
+        "geography_name": "Várzea Grande - MT",
+        "period": "2024",
+        "value": 314627.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-lookup-3",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107602",
+        "geography_name": "Rondonópolis - MT",
+        "period": "2024",
+        "value": 259167.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-lookup-4",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107909",
+        "geography_name": "Sinop - MT",
+        "period": "2024",
+        "value": 216029.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-lookup-5",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso - MT",
+        "period": "2024",
+        "value": 120985.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-lookup-6",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107958",
+        "geography_name": "Tangará da Serra - MT",
+        "period": "2024",
+        "value": 112547.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-lookup-7",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107040",
+        "geography_name": "Primavera do Leste - MT",
+        "period": "2024",
+        "value": 92927.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-lookup-8",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5105259",
+        "geography_name": "Lucas do Rio Verde - MT",
+        "period": "2024",
+        "value": 92256.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-lookup-9",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5102504",
+        "geography_name": "Cáceres - MT",
+        "period": "2024",
+        "value": 91626.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-lookup-10",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5101803",
+        "geography_name": "Barra do Garças - MT",
+        "period": "2024",
+        "value": 72694.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-lookup-11",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5100250",
+        "geography_name": "Alta Floresta - MT",
+        "period": "2024",
+        "value": 61291.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-lookup-12",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5103205",
+        "geography_name": "Colíder - MT",
+        "period": "2024",
+        "value": 32010.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-lookup-13",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5104104",
+        "geography_name": "Guarantã do Norte - MT",
+        "period": "2024",
+        "value": 31328.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-lookup-14",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5105150",
+        "geography_name": "Juína - MT",
+        "period": "2024",
+        "value": 47800.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-lookup-15",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5105101",
+        "geography_name": "Juara - MT",
+        "period": "2024",
+        "value": 35899.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-lookup-16",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5106000",
+        "geography_name": "Nortelândia - MT",
+        "period": "2024",
+        "value": 5935.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-lookup-17",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5106224",
+        "geography_name": "Nova Mutum - MT",
+        "period": "2024",
+        "value": 61223.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-lookup-18",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107875",
+        "geography_name": "Sapezal - MT",
+        "period": "2024",
+        "value": 31499.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-lookup-19",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5102678",
+        "geography_name": "Campo Verde - MT",
+        "period": "2024",
+        "value": 47831.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-lookup-20",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5103502",
+        "geography_name": "Diamantino - MT",
+        "period": "2024",
+        "value": 22479.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-known-cuiaba",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5103403",
+        "geography_name": "Cuiabá - MT",
+        "period": "2024",
+        "value": 682932.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "expected_first_value": 682932,
+      "passed": true
+    },
+    {
+      "id": "pop-known-sorriso",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso - MT",
+        "period": "2024",
+        "value": 120985.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "expected_first_value": 120985,
+      "passed": true
+    },
+    {
+      "id": "pop-compare-1",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "compare",
+      "unit": "Pessoas",
+      "rows": 2,
+      "first": {
+        "geography_code": "5103403",
+        "geography_name": "Cuiabá - MT",
+        "period": "2024",
+        "value": 682932.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-compare-2",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "compare",
+      "unit": "Pessoas",
+      "rows": 2,
+      "first": {
+        "geography_code": "5108402",
+        "geography_name": "Várzea Grande - MT",
+        "period": "2024",
+        "value": 314627.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-compare-3",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "compare",
+      "unit": "Pessoas",
+      "rows": 2,
+      "first": {
+        "geography_code": "5107602",
+        "geography_name": "Rondonópolis - MT",
+        "period": "2024",
+        "value": 259167.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-compare-4",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "compare",
+      "unit": "Pessoas",
+      "rows": 2,
+      "first": {
+        "geography_code": "5107909",
+        "geography_name": "Sinop - MT",
+        "period": "2024",
+        "value": 216029.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-compare-5",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "compare",
+      "unit": "Pessoas",
+      "rows": 2,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso - MT",
+        "period": "2024",
+        "value": 120985.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-compare-6",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "compare",
+      "unit": "Pessoas",
+      "rows": 2,
+      "first": {
+        "geography_code": "5107958",
+        "geography_name": "Tangará da Serra - MT",
+        "period": "2024",
+        "value": 112547.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-compare-7",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "compare",
+      "unit": "Pessoas",
+      "rows": 2,
+      "first": {
+        "geography_code": "5107040",
+        "geography_name": "Primavera do Leste - MT",
+        "period": "2024",
+        "value": 92927.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-compare-8",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "compare",
+      "unit": "Pessoas",
+      "rows": 2,
+      "first": {
+        "geography_code": "5105259",
+        "geography_name": "Lucas do Rio Verde - MT",
+        "period": "2024",
+        "value": 92256.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-compare-9",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "compare",
+      "unit": "Pessoas",
+      "rows": 2,
+      "first": {
+        "geography_code": "5102504",
+        "geography_name": "Cáceres - MT",
+        "period": "2024",
+        "value": 91626.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-compare-10",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "compare",
+      "unit": "Pessoas",
+      "rows": 2,
+      "first": {
+        "geography_code": "5101803",
+        "geography_name": "Barra do Garças - MT",
+        "period": "2024",
+        "value": 72694.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-rank-2020",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "rank",
+      "unit": "Pessoas",
+      "rows": 10,
+      "first": {
+        "geography_code": "5103403",
+        "geography_name": "Cuiabá - MT",
+        "period": "2020",
+        "value": 618124.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-rank-2021",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "rank",
+      "unit": "Pessoas",
+      "rows": 10,
+      "first": {
+        "geography_code": "5103403",
+        "geography_name": "Cuiabá - MT",
+        "period": "2021",
+        "value": 623614.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-rank-2024",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "rank",
+      "unit": "Pessoas",
+      "rows": 10,
+      "first": {
+        "geography_code": "5103403",
+        "geography_name": "Cuiabá - MT",
+        "period": "2024",
+        "value": 682932.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-trend-1",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "trend",
+      "unit": "Pessoas",
+      "rows": 3,
+      "first": {
+        "geography_code": "5103403",
+        "geography_name": "Cuiabá - MT",
+        "period": "2020",
+        "value": 618124.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-trend-2",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "trend",
+      "unit": "Pessoas",
+      "rows": 3,
+      "first": {
+        "geography_code": "5108402",
+        "geography_name": "Várzea Grande - MT",
+        "period": "2020",
+        "value": 287526.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-trend-3",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "trend",
+      "unit": "Pessoas",
+      "rows": 3,
+      "first": {
+        "geography_code": "5107602",
+        "geography_name": "Rondonópolis - MT",
+        "period": "2020",
+        "value": 236042.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-trend-4",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "trend",
+      "unit": "Pessoas",
+      "rows": 3,
+      "first": {
+        "geography_code": "5107909",
+        "geography_name": "Sinop - MT",
+        "period": "2020",
+        "value": 146005.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-trend-5",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "trend",
+      "unit": "Pessoas",
+      "rows": 3,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso - MT",
+        "period": "2020",
+        "value": 92769.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-trend-6",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "trend",
+      "unit": "Pessoas",
+      "rows": 3,
+      "first": {
+        "geography_code": "5107958",
+        "geography_name": "Tangará da Serra - MT",
+        "period": "2020",
+        "value": 105711.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-trend-7",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "trend",
+      "unit": "Pessoas",
+      "rows": 3,
+      "first": {
+        "geography_code": "5107040",
+        "geography_name": "Primavera do Leste - MT",
+        "period": "2020",
+        "value": 63092.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-trend-8",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "trend",
+      "unit": "Pessoas",
+      "rows": 3,
+      "first": {
+        "geography_code": "5105259",
+        "geography_name": "Lucas do Rio Verde - MT",
+        "period": "2020",
+        "value": 67620.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-trend-9",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "trend",
+      "unit": "Pessoas",
+      "rows": 3,
+      "first": {
+        "geography_code": "5102504",
+        "geography_name": "Cáceres - MT",
+        "period": "2020",
+        "value": 94861.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pop-trend-10",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "trend",
+      "unit": "Pessoas",
+      "rows": 3,
+      "first": {
+        "geography_code": "5101803",
+        "geography_name": "Barra do Garças - MT",
+        "period": "2020",
+        "value": 61135.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "census-domicilios_ocupados-1",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Domicílios",
+      "rows": 1,
+      "first": {
+        "geography_code": "5103403",
+        "geography_name": "Cuiabá - MT",
+        "period": "2022",
+        "value": 232201.0,
+        "status": "observed",
+        "category_label": "Total"
+      },
+      "passed": true
+    },
+    {
+      "id": "census-domicilios_ocupados-2",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Domicílios",
+      "rows": 1,
+      "first": {
+        "geography_code": "5108402",
+        "geography_name": "Várzea Grande - MT",
+        "period": "2022",
+        "value": 103287.0,
+        "status": "observed",
+        "category_label": "Total"
+      },
+      "passed": true
+    },
+    {
+      "id": "census-domicilios_ocupados-3",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Domicílios",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107602",
+        "geography_name": "Rondonópolis - MT",
+        "period": "2022",
+        "value": 86838.0,
+        "status": "observed",
+        "category_label": "Total"
+      },
+      "passed": true
+    },
+    {
+      "id": "census-domicilios_ocupados-4",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Domicílios",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107909",
+        "geography_name": "Sinop - MT",
+        "period": "2022",
+        "value": 68530.0,
+        "status": "observed",
+        "category_label": "Total"
+      },
+      "passed": true
+    },
+    {
+      "id": "census-domicilios_ocupados-5",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Domicílios",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso - MT",
+        "period": "2022",
+        "value": 37031.0,
+        "status": "observed",
+        "category_label": "Total"
+      },
+      "passed": true
+    },
+    {
+      "id": "census-moradores_domicilios-1",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5103403",
+        "geography_name": "Cuiabá - MT",
+        "period": "2022",
+        "value": 646568.0,
+        "status": "observed",
+        "category_label": "Total"
+      },
+      "passed": true
+    },
+    {
+      "id": "census-moradores_domicilios-2",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5108402",
+        "geography_name": "Várzea Grande - MT",
+        "period": "2022",
+        "value": 298978.0,
+        "status": "observed",
+        "category_label": "Total"
+      },
+      "passed": true
+    },
+    {
+      "id": "census-moradores_domicilios-3",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107602",
+        "geography_name": "Rondonópolis - MT",
+        "period": "2022",
+        "value": 242747.0,
+        "status": "observed",
+        "category_label": "Total"
+      },
+      "passed": true
+    },
+    {
+      "id": "census-moradores_domicilios-4",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107909",
+        "geography_name": "Sinop - MT",
+        "period": "2022",
+        "value": 195459.0,
+        "status": "observed",
+        "category_label": "Total"
+      },
+      "passed": true
+    },
+    {
+      "id": "census-moradores_domicilios-5",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso - MT",
+        "period": "2022",
+        "value": 110143.0,
+        "status": "observed",
+        "category_label": "Total"
+      },
+      "passed": true
+    },
+    {
+      "id": "census-media_moradores-1",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas por domicílio",
+      "rows": 1,
+      "first": {
+        "geography_code": "5103403",
+        "geography_name": "Cuiabá - MT",
+        "period": "2022",
+        "value": 2.78,
+        "status": "observed",
+        "category_label": "Total"
+      },
+      "passed": true
+    },
+    {
+      "id": "census-media_moradores-2",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas por domicílio",
+      "rows": 1,
+      "first": {
+        "geography_code": "5108402",
+        "geography_name": "Várzea Grande - MT",
+        "period": "2022",
+        "value": 2.89,
+        "status": "observed",
+        "category_label": "Total"
+      },
+      "passed": true
+    },
+    {
+      "id": "census-media_moradores-3",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas por domicílio",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107602",
+        "geography_name": "Rondonópolis - MT",
+        "period": "2022",
+        "value": 2.8,
+        "status": "observed",
+        "category_label": "Total"
+      },
+      "passed": true
+    },
+    {
+      "id": "census-media_moradores-4",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas por domicílio",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107909",
+        "geography_name": "Sinop - MT",
+        "period": "2022",
+        "value": 2.85,
+        "status": "observed",
+        "category_label": "Total"
+      },
+      "passed": true
+    },
+    {
+      "id": "census-media_moradores-5",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas por domicílio",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso - MT",
+        "period": "2022",
+        "value": 2.97,
+        "status": "observed",
+        "category_label": "Total"
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-lookup-1",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Mil Reais",
+      "rows": 1,
+      "first": {
+        "geography_code": "5103403",
+        "geography_name": "Cuiabá - MT",
+        "period": "2023",
+        "value": 39050753.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-lookup-2",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Mil Reais",
+      "rows": 1,
+      "first": {
+        "geography_code": "5108402",
+        "geography_name": "Várzea Grande - MT",
+        "period": "2023",
+        "value": 13984218.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-lookup-3",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Mil Reais",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107602",
+        "geography_name": "Rondonópolis - MT",
+        "period": "2023",
+        "value": 16568250.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-lookup-4",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Mil Reais",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107909",
+        "geography_name": "Sinop - MT",
+        "period": "2023",
+        "value": 11736047.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-lookup-5",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Mil Reais",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso - MT",
+        "period": "2023",
+        "value": 13748757.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-lookup-6",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Mil Reais",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107958",
+        "geography_name": "Tangará da Serra - MT",
+        "period": "2023",
+        "value": 5602200.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-lookup-7",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Mil Reais",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107040",
+        "geography_name": "Primavera do Leste - MT",
+        "period": "2023",
+        "value": 8571209.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-lookup-8",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Mil Reais",
+      "rows": 1,
+      "first": {
+        "geography_code": "5105259",
+        "geography_name": "Lucas do Rio Verde - MT",
+        "period": "2023",
+        "value": 8238966.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-lookup-9",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Mil Reais",
+      "rows": 1,
+      "first": {
+        "geography_code": "5102504",
+        "geography_name": "Cáceres - MT",
+        "period": "2023",
+        "value": 2795729.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-lookup-10",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Mil Reais",
+      "rows": 1,
+      "first": {
+        "geography_code": "5101803",
+        "geography_name": "Barra do Garças - MT",
+        "period": "2023",
+        "value": 3537696.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-lookup-11",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Mil Reais",
+      "rows": 1,
+      "first": {
+        "geography_code": "5100250",
+        "geography_name": "Alta Floresta - MT",
+        "period": "2023",
+        "value": 3034593.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-lookup-12",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Mil Reais",
+      "rows": 1,
+      "first": {
+        "geography_code": "5103205",
+        "geography_name": "Colíder - MT",
+        "period": "2023",
+        "value": 1958222.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-lookup-13",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Mil Reais",
+      "rows": 1,
+      "first": {
+        "geography_code": "5104104",
+        "geography_name": "Guarantã do Norte - MT",
+        "period": "2023",
+        "value": 1286329.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-lookup-14",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Mil Reais",
+      "rows": 1,
+      "first": {
+        "geography_code": "5105150",
+        "geography_name": "Juína - MT",
+        "period": "2023",
+        "value": 1845536.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-lookup-15",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Mil Reais",
+      "rows": 1,
+      "first": {
+        "geography_code": "5105101",
+        "geography_name": "Juara - MT",
+        "period": "2023",
+        "value": 1859025.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-lookup-16",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Mil Reais",
+      "rows": 1,
+      "first": {
+        "geography_code": "5106000",
+        "geography_name": "Nortelândia - MT",
+        "period": "2023",
+        "value": 399399.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-lookup-17",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Mil Reais",
+      "rows": 1,
+      "first": {
+        "geography_code": "5106224",
+        "geography_name": "Nova Mutum - MT",
+        "period": "2023",
+        "value": 7647129.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-lookup-18",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Mil Reais",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107875",
+        "geography_name": "Sapezal - MT",
+        "period": "2023",
+        "value": 6410247.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-lookup-19",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Mil Reais",
+      "rows": 1,
+      "first": {
+        "geography_code": "5102678",
+        "geography_name": "Campo Verde - MT",
+        "period": "2023",
+        "value": 5099105.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-lookup-20",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Mil Reais",
+      "rows": 1,
+      "first": {
+        "geography_code": "5103502",
+        "geography_name": "Diamantino - MT",
+        "period": "2023",
+        "value": 5741878.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-known-sorriso",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Mil Reais",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso - MT",
+        "period": "2023",
+        "value": 13748757.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "expected_first_value": 13748757,
+      "passed": true
+    },
+    {
+      "id": "gdp-rank-2020",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "rank",
+      "unit": "Mil Reais",
+      "rows": 10,
+      "first": {
+        "geography_code": "5103403",
+        "geography_name": "Cuiabá - MT",
+        "period": "2020",
+        "value": 26555611.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-rank-2023",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "rank",
+      "unit": "Mil Reais",
+      "rows": 10,
+      "first": {
+        "geography_code": "5103403",
+        "geography_name": "Cuiabá - MT",
+        "period": "2023",
+        "value": 39050753.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-trend-1",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "trend",
+      "unit": "Mil Reais",
+      "rows": 3,
+      "first": {
+        "geography_code": "5103403",
+        "geography_name": "Cuiabá - MT",
+        "period": "2015",
+        "value": 21226684.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-trend-2",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "trend",
+      "unit": "Mil Reais",
+      "rows": 3,
+      "first": {
+        "geography_code": "5108402",
+        "geography_name": "Várzea Grande - MT",
+        "period": "2015",
+        "value": 6268147.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-trend-3",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "trend",
+      "unit": "Mil Reais",
+      "rows": 3,
+      "first": {
+        "geography_code": "5107602",
+        "geography_name": "Rondonópolis - MT",
+        "period": "2015",
+        "value": 8327436.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-trend-4",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "trend",
+      "unit": "Mil Reais",
+      "rows": 3,
+      "first": {
+        "geography_code": "5107909",
+        "geography_name": "Sinop - MT",
+        "period": "2015",
+        "value": 4428309.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-trend-5",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "trend",
+      "unit": "Mil Reais",
+      "rows": 3,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso - MT",
+        "period": "2015",
+        "value": 4657120.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "cempre-cempre_unidades_locais-1",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Unidades",
+      "rows": 1,
+      "first": {
+        "geography_code": "5103403",
+        "geography_name": "Cuiabá - MT",
+        "period": "2023",
+        "value": 55952.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "cempre-cempre_unidades_locais-2",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Unidades",
+      "rows": 1,
+      "first": {
+        "geography_code": "5108402",
+        "geography_name": "Várzea Grande - MT",
+        "period": "2023",
+        "value": 13694.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "cempre-cempre_unidades_locais-3",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Unidades",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107602",
+        "geography_name": "Rondonópolis - MT",
+        "period": "2023",
+        "value": 16086.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "cempre-cempre_unidades_locais-4",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Unidades",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107909",
+        "geography_name": "Sinop - MT",
+        "period": "2023",
+        "value": 13449.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "cempre-cempre_unidades_locais-5",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Unidades",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso - MT",
+        "period": "2023",
+        "value": 9251.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "cempre-cempre_pessoal_total-1",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5103403",
+        "geography_name": "Cuiabá - MT",
+        "period": "2023",
+        "value": 368506.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "cempre-cempre_pessoal_total-2",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5108402",
+        "geography_name": "Várzea Grande - MT",
+        "period": "2023",
+        "value": 72253.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "cempre-cempre_pessoal_total-3",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107602",
+        "geography_name": "Rondonópolis - MT",
+        "period": "2023",
+        "value": 93029.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "cempre-cempre_pessoal_total-4",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107909",
+        "geography_name": "Sinop - MT",
+        "period": "2023",
+        "value": 69421.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "cempre-cempre_pessoal_total-5",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso - MT",
+        "period": "2023",
+        "value": 56389.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "cempre-cempre_salario_medio-1",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Reais",
+      "rows": 1,
+      "first": {
+        "geography_code": "5103403",
+        "geography_name": "Cuiabá - MT",
+        "period": "2023",
+        "value": 4196.29,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "cempre-cempre_salario_medio-2",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Reais",
+      "rows": 1,
+      "first": {
+        "geography_code": "5108402",
+        "geography_name": "Várzea Grande - MT",
+        "period": "2023",
+        "value": 2793.8,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "cempre-cempre_salario_medio-3",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Reais",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107602",
+        "geography_name": "Rondonópolis - MT",
+        "period": "2023",
+        "value": 3135.8,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "cempre-cempre_salario_medio-4",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Reais",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107909",
+        "geography_name": "Sinop - MT",
+        "period": "2023",
+        "value": 3189.48,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "cempre-cempre_salario_medio-5",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Reais",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso - MT",
+        "period": "2023",
+        "value": 2848.4,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "cempre-rank-unidades-2023",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "rank",
+      "unit": "Unidades",
+      "rows": 10,
+      "first": {
+        "geography_code": "5103403",
+        "geography_name": "Cuiabá - MT",
+        "period": "2023",
+        "value": 55952.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "pam-soy-production-1",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Toneladas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5103403",
+        "geography_name": "Cuiabá - MT",
+        "period": "2024",
+        "value": 4257.0,
+        "status": "observed",
+        "category_label": "Soja (em grão)"
+      },
+      "passed": true
+    },
+    {
+      "id": "pam-soy-production-2",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Toneladas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5108402",
+        "geography_name": "Várzea Grande - MT",
+        "period": "2024",
+        "value": 0.0,
+        "status": "observed",
+        "category_label": "Soja (em grão)"
+      },
+      "passed": true
+    },
+    {
+      "id": "pam-soy-production-3",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Toneladas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107602",
+        "geography_name": "Rondonópolis - MT",
+        "period": "2024",
+        "value": 316726.0,
+        "status": "observed",
+        "category_label": "Soja (em grão)"
+      },
+      "passed": true
+    },
+    {
+      "id": "pam-soy-production-4",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Toneladas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107909",
+        "geography_name": "Sinop - MT",
+        "period": "2024",
+        "value": 612480.0,
+        "status": "observed",
+        "category_label": "Soja (em grão)"
+      },
+      "passed": true
+    },
+    {
+      "id": "pam-soy-production-5",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Toneladas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso - MT",
+        "period": "2024",
+        "value": 2084520.0,
+        "status": "observed",
+        "category_label": "Soja (em grão)"
+      },
+      "passed": true
+    },
+    {
+      "id": "pam-soy-production-6",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Toneladas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107958",
+        "geography_name": "Tangará da Serra - MT",
+        "period": "2024",
+        "value": 364048.0,
+        "status": "observed",
+        "category_label": "Soja (em grão)"
+      },
+      "passed": true
+    },
+    {
+      "id": "pam-soy-production-7",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Toneladas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107040",
+        "geography_name": "Primavera do Leste - MT",
+        "period": "2024",
+        "value": 904800.0,
+        "status": "observed",
+        "category_label": "Soja (em grão)"
+      },
+      "passed": true
+    },
+    {
+      "id": "pam-soy-production-8",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Toneladas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5105259",
+        "geography_name": "Lucas do Rio Verde - MT",
+        "period": "2024",
+        "value": 744720.0,
+        "status": "observed",
+        "category_label": "Soja (em grão)"
+      },
+      "passed": true
+    },
+    {
+      "id": "pam-soy-production-9",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Toneladas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5102504",
+        "geography_name": "Cáceres - MT",
+        "period": "2024",
+        "value": 47000.0,
+        "status": "observed",
+        "category_label": "Soja (em grão)"
+      },
+      "passed": true
+    },
+    {
+      "id": "pam-soy-production-10",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Toneladas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5101803",
+        "geography_name": "Barra do Garças - MT",
+        "period": "2024",
+        "value": 185556.0,
+        "status": "observed",
+        "category_label": "Soja (em grão)"
+      },
+      "passed": true
+    },
+    {
+      "id": "pam-soy-area-1",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Hectares",
+      "rows": 1,
+      "first": {
+        "geography_code": "5103403",
+        "geography_name": "Cuiabá - MT",
+        "period": "2024",
+        "value": 1290.0,
+        "status": "observed",
+        "category_label": "Soja (em grão)"
+      },
+      "passed": true
+    },
+    {
+      "id": "pam-soy-area-2",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Hectares",
+      "rows": 1,
+      "first": {
+        "geography_code": "5108402",
+        "geography_name": "Várzea Grande - MT",
+        "period": "2024",
+        "value": 0.0,
+        "status": "observed",
+        "category_label": "Soja (em grão)"
+      },
+      "passed": true
+    },
+    {
+      "id": "pam-soy-area-3",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Hectares",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107602",
+        "geography_name": "Rondonópolis - MT",
+        "period": "2024",
+        "value": 97755.0,
+        "status": "observed",
+        "category_label": "Soja (em grão)"
+      },
+      "passed": true
+    },
+    {
+      "id": "pam-soy-area-4",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Hectares",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107909",
+        "geography_name": "Sinop - MT",
+        "period": "2024",
+        "value": 178000.0,
+        "status": "observed",
+        "category_label": "Soja (em grão)"
+      },
+      "passed": true
+    },
+    {
+      "id": "pam-soy-area-5",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Hectares",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso - MT",
+        "period": "2024",
+        "value": 600000.0,
+        "status": "observed",
+        "category_label": "Soja (em grão)"
+      },
+      "passed": true
+    },
+    {
+      "id": "pam-soy-rank-2024",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "rank",
+      "unit": "Toneladas",
+      "rows": 10,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso - MT",
+        "period": "2024",
+        "value": 2084520.0,
+        "status": "observed",
+        "category_label": "Soja (em grão)"
+      },
+      "passed": true
+    },
+    {
+      "id": "pam-soy-known-sorriso",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Toneladas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso - MT",
+        "period": "2024",
+        "value": 2084520.0,
+        "status": "observed",
+        "category_label": "Soja (em grão)"
+      },
+      "expected_first_value": 2084520,
+      "passed": true
+    },
+    {
+      "id": "pam-corn-production-1",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Toneladas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5103403",
+        "geography_name": "Cuiabá - MT",
+        "period": "2024",
+        "value": 3550.0,
+        "status": "observed",
+        "category_label": "Milho (em grão)"
+      },
+      "passed": true
+    },
+    {
+      "id": "pam-corn-production-2",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Toneladas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5108402",
+        "geography_name": "Várzea Grande - MT",
+        "period": "2024",
+        "value": 150.0,
+        "status": "observed",
+        "category_label": "Milho (em grão)"
+      },
+      "passed": true
+    },
+    {
+      "id": "pam-corn-production-3",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Toneladas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107602",
+        "geography_name": "Rondonópolis - MT",
+        "period": "2024",
+        "value": 354200.0,
+        "status": "observed",
+        "category_label": "Milho (em grão)"
+      },
+      "passed": true
+    },
+    {
+      "id": "pam-corn-production-4",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Toneladas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107909",
+        "geography_name": "Sinop - MT",
+        "period": "2024",
+        "value": 1054920.0,
+        "status": "observed",
+        "category_label": "Milho (em grão)"
+      },
+      "passed": true
+    },
+    {
+      "id": "pam-corn-production-5",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Toneladas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso - MT",
+        "period": "2024",
+        "value": 3660000.0,
+        "status": "observed",
+        "category_label": "Milho (em grão)"
+      },
+      "passed": true
+    },
+    {
+      "id": "pam-cotton-area-rank-2024",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "rank",
+      "unit": "Hectares",
+      "rows": 10,
+      "first": {
+        "geography_code": "5107875",
+        "geography_name": "Sapezal - MT",
+        "period": "2024",
+        "value": 228004.0,
+        "status": "observed",
+        "category_label": "Algodão herbáceo (em caroço)"
+      },
+      "passed": true
+    },
+    {
+      "id": "pam-coffee-production-1",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Toneladas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5103403",
+        "geography_name": "Cuiabá - MT",
+        "period": "2024",
+        "value": 0.0,
+        "status": "observed",
+        "category_label": "Café (em grão) Total"
+      },
+      "passed": true
+    },
+    {
+      "id": "pam-coffee-production-2",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Toneladas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5108402",
+        "geography_name": "Várzea Grande - MT",
+        "period": "2024",
+        "value": 0.0,
+        "status": "observed",
+        "category_label": "Café (em grão) Total"
+      },
+      "passed": true
+    },
+    {
+      "id": "pam-coffee-production-3",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Toneladas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107602",
+        "geography_name": "Rondonópolis - MT",
+        "period": "2024",
+        "value": 0.0,
+        "status": "observed",
+        "category_label": "Café (em grão) Total"
+      },
+      "passed": true
+    },
+    {
+      "id": "ppm-bovine-1",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Cabeças",
+      "rows": 1,
+      "first": {
+        "geography_code": "5103403",
+        "geography_name": "Cuiabá - MT",
+        "period": "2024",
+        "value": 130171.0,
+        "status": "observed",
+        "category_label": "Bovino"
+      },
+      "passed": true
+    },
+    {
+      "id": "ppm-bovine-2",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Cabeças",
+      "rows": 1,
+      "first": {
+        "geography_code": "5108402",
+        "geography_name": "Várzea Grande - MT",
+        "period": "2024",
+        "value": 32596.0,
+        "status": "observed",
+        "category_label": "Bovino"
+      },
+      "passed": true
+    },
+    {
+      "id": "ppm-bovine-3",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Cabeças",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107602",
+        "geography_name": "Rondonópolis - MT",
+        "period": "2024",
+        "value": 383997.0,
+        "status": "observed",
+        "category_label": "Bovino"
+      },
+      "passed": true
+    },
+    {
+      "id": "ppm-bovine-4",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Cabeças",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107909",
+        "geography_name": "Sinop - MT",
+        "period": "2024",
+        "value": 65568.0,
+        "status": "observed",
+        "category_label": "Bovino"
+      },
+      "passed": true
+    },
+    {
+      "id": "ppm-bovine-5",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Cabeças",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso - MT",
+        "period": "2024",
+        "value": 99790.0,
+        "status": "observed",
+        "category_label": "Bovino"
+      },
+      "passed": true
+    },
+    {
+      "id": "ppm-bovine-6",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Cabeças",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107958",
+        "geography_name": "Tangará da Serra - MT",
+        "period": "2024",
+        "value": 359004.0,
+        "status": "observed",
+        "category_label": "Bovino"
+      },
+      "passed": true
+    },
+    {
+      "id": "ppm-bovine-7",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Cabeças",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107040",
+        "geography_name": "Primavera do Leste - MT",
+        "period": "2024",
+        "value": 96715.0,
+        "status": "observed",
+        "category_label": "Bovino"
+      },
+      "passed": true
+    },
+    {
+      "id": "ppm-bovine-8",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Cabeças",
+      "rows": 1,
+      "first": {
+        "geography_code": "5105259",
+        "geography_name": "Lucas do Rio Verde - MT",
+        "period": "2024",
+        "value": 50315.0,
+        "status": "observed",
+        "category_label": "Bovino"
+      },
+      "passed": true
+    },
+    {
+      "id": "ppm-bovine-9",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Cabeças",
+      "rows": 1,
+      "first": {
+        "geography_code": "5102504",
+        "geography_name": "Cáceres - MT",
+        "period": "2024",
+        "value": 1365224.0,
+        "status": "observed",
+        "category_label": "Bovino"
+      },
+      "passed": true
+    },
+    {
+      "id": "ppm-bovine-10",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Cabeças",
+      "rows": 1,
+      "first": {
+        "geography_code": "5101803",
+        "geography_name": "Barra do Garças - MT",
+        "period": "2024",
+        "value": 388772.0,
+        "status": "observed",
+        "category_label": "Bovino"
+      },
+      "passed": true
+    },
+    {
+      "id": "ppm-bovine-11",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Cabeças",
+      "rows": 1,
+      "first": {
+        "geography_code": "5100250",
+        "geography_name": "Alta Floresta - MT",
+        "period": "2024",
+        "value": 691455.0,
+        "status": "observed",
+        "category_label": "Bovino"
+      },
+      "passed": true
+    },
+    {
+      "id": "ppm-bovine-12",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Cabeças",
+      "rows": 1,
+      "first": {
+        "geography_code": "5103205",
+        "geography_name": "Colíder - MT",
+        "period": "2024",
+        "value": 402037.0,
+        "status": "observed",
+        "category_label": "Bovino"
+      },
+      "passed": true
+    },
+    {
+      "id": "ppm-bovine-13",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Cabeças",
+      "rows": 1,
+      "first": {
+        "geography_code": "5104104",
+        "geography_name": "Guarantã do Norte - MT",
+        "period": "2024",
+        "value": 304392.0,
+        "status": "observed",
+        "category_label": "Bovino"
+      },
+      "passed": true
+    },
+    {
+      "id": "ppm-bovine-14",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Cabeças",
+      "rows": 1,
+      "first": {
+        "geography_code": "5105150",
+        "geography_name": "Juína - MT",
+        "period": "2024",
+        "value": 802085.0,
+        "status": "observed",
+        "category_label": "Bovino"
+      },
+      "passed": true
+    },
+    {
+      "id": "ppm-bovine-15",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Cabeças",
+      "rows": 1,
+      "first": {
+        "geography_code": "5105101",
+        "geography_name": "Juara - MT",
+        "period": "2024",
+        "value": 926926.0,
+        "status": "observed",
+        "category_label": "Bovino"
+      },
+      "passed": true
+    },
+    {
+      "id": "ppm-bovine-16",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Cabeças",
+      "rows": 1,
+      "first": {
+        "geography_code": "5106000",
+        "geography_name": "Nortelândia - MT",
+        "period": "2024",
+        "value": 66493.0,
+        "status": "observed",
+        "category_label": "Bovino"
+      },
+      "passed": true
+    },
+    {
+      "id": "ppm-bovine-17",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Cabeças",
+      "rows": 1,
+      "first": {
+        "geography_code": "5106224",
+        "geography_name": "Nova Mutum - MT",
+        "period": "2024",
+        "value": 130855.0,
+        "status": "observed",
+        "category_label": "Bovino"
+      },
+      "passed": true
+    },
+    {
+      "id": "ppm-bovine-18",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Cabeças",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107875",
+        "geography_name": "Sapezal - MT",
+        "period": "2024",
+        "value": 156769.0,
+        "status": "observed",
+        "category_label": "Bovino"
+      },
+      "passed": true
+    },
+    {
+      "id": "ppm-bovine-19",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Cabeças",
+      "rows": 1,
+      "first": {
+        "geography_code": "5102678",
+        "geography_name": "Campo Verde - MT",
+        "period": "2024",
+        "value": 141980.0,
+        "status": "observed",
+        "category_label": "Bovino"
+      },
+      "passed": true
+    },
+    {
+      "id": "ppm-bovine-20",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Cabeças",
+      "rows": 1,
+      "first": {
+        "geography_code": "5103502",
+        "geography_name": "Diamantino - MT",
+        "period": "2024",
+        "value": 124911.0,
+        "status": "observed",
+        "category_label": "Bovino"
+      },
+      "passed": true
+    },
+    {
+      "id": "ppm-bovine-known-sorriso",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Cabeças",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso - MT",
+        "period": "2024",
+        "value": 99790.0,
+        "status": "observed",
+        "category_label": "Bovino"
+      },
+      "expected_first_value": 99790,
+      "passed": true
+    },
+    {
+      "id": "ppm-bovine-rank-2024",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "rank",
+      "unit": "Cabeças",
+      "rows": 10,
+      "first": {
+        "geography_code": "5102504",
+        "geography_name": "Cáceres - MT",
+        "period": "2024",
+        "value": 1365224.0,
+        "status": "observed",
+        "category_label": "Bovino"
+      },
+      "passed": true
+    },
+    {
+      "id": "ppm-swine-1",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Cabeças",
+      "rows": 1,
+      "first": {
+        "geography_code": "5103403",
+        "geography_name": "Cuiabá - MT",
+        "period": "2024",
+        "value": 7499.0,
+        "status": "observed",
+        "category_label": "Suíno - total"
+      },
+      "passed": true
+    },
+    {
+      "id": "ppm-swine-2",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Cabeças",
+      "rows": 1,
+      "first": {
+        "geography_code": "5108402",
+        "geography_name": "Várzea Grande - MT",
+        "period": "2024",
+        "value": 2095.0,
+        "status": "observed",
+        "category_label": "Suíno - total"
+      },
+      "passed": true
+    },
+    {
+      "id": "ppm-swine-3",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Cabeças",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107602",
+        "geography_name": "Rondonópolis - MT",
+        "period": "2024",
+        "value": 51497.0,
+        "status": "observed",
+        "category_label": "Suíno - total"
+      },
+      "passed": true
+    },
+    {
+      "id": "ppm-swine-4",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Cabeças",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107909",
+        "geography_name": "Sinop - MT",
+        "period": "2024",
+        "value": 13971.0,
+        "status": "observed",
+        "category_label": "Suíno - total"
+      },
+      "passed": true
+    },
+    {
+      "id": "ppm-swine-5",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Cabeças",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso - MT",
+        "period": "2024",
+        "value": 215087.0,
+        "status": "observed",
+        "category_label": "Suíno - total"
+      },
+      "passed": true
+    },
+    {
+      "id": "ppm-poultry-1",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Cabeças",
+      "rows": 1,
+      "first": {
+        "geography_code": "5103403",
+        "geography_name": "Cuiabá - MT",
+        "period": "2024",
+        "value": 44750.0,
+        "status": "observed",
+        "category_label": "Galináceos - total"
+      },
+      "passed": true
+    },
+    {
+      "id": "ppm-poultry-2",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Cabeças",
+      "rows": 1,
+      "first": {
+        "geography_code": "5108402",
+        "geography_name": "Várzea Grande - MT",
+        "period": "2024",
+        "value": 18458.0,
+        "status": "observed",
+        "category_label": "Galináceos - total"
+      },
+      "passed": true
+    },
+    {
+      "id": "ppm-poultry-3",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Cabeças",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107602",
+        "geography_name": "Rondonópolis - MT",
+        "period": "2024",
+        "value": 59470.0,
+        "status": "observed",
+        "category_label": "Galináceos - total"
+      },
+      "passed": true
+    },
+    {
+      "id": "ppm-poultry-4",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Cabeças",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107909",
+        "geography_name": "Sinop - MT",
+        "period": "2024",
+        "value": 1044498.0,
+        "status": "observed",
+        "category_label": "Galináceos - total"
+      },
+      "passed": true
+    },
+    {
+      "id": "ppm-poultry-5",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Cabeças",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso - MT",
+        "period": "2024",
+        "value": 4272794.0,
+        "status": "observed",
+        "category_label": "Galináceos - total"
+      },
+      "passed": true
+    },
+    {
+      "id": "lspa-soy-production-trend",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "trend",
+      "unit": "Toneladas",
+      "rows": 3,
+      "first": {
+        "geography_code": "51",
+        "geography_name": "Mato Grosso",
+        "period": "202601",
+        "value": 48532919.0,
+        "status": "observed",
+        "category_label": "1.17 Soja"
+      },
+      "passed": true
+    },
+    {
+      "id": "lspa-soy-production-known-202609",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Toneladas",
+      "rows": 1,
+      "first": {
+        "geography_code": "51",
+        "geography_name": "Mato Grosso",
+        "period": "202609",
+        "value": 50665337.0,
+        "status": "observed",
+        "category_label": "1.17 Soja"
+      },
+      "expected_first_value": 50665337,
+      "passed": true
+    },
+    {
+      "id": "rais-total-1",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Vínculos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5103403",
+        "geography_name": "Cuiabá",
+        "period": "2024",
+        "value": 386418.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "rais-total-2",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Vínculos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5108402",
+        "geography_name": "Várzea Grande",
+        "period": "2024",
+        "value": 58783.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "rais-total-3",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Vínculos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107602",
+        "geography_name": "Rondonópolis",
+        "period": "2024",
+        "value": 81293.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "rais-total-4",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Vínculos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107909",
+        "geography_name": "Sinop",
+        "period": "2024",
+        "value": 57637.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "rais-total-5",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Vínculos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso",
+        "period": "2024",
+        "value": 39482.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "rais-total-6",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Vínculos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107958",
+        "geography_name": "Tangará da Serra",
+        "period": "2024",
+        "value": 29595.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "rais-total-7",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Vínculos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107040",
+        "geography_name": "Primavera do Leste",
+        "period": "2024",
+        "value": 36147.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "rais-total-8",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Vínculos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5105259",
+        "geography_name": "Lucas do Rio Verde",
+        "period": "2024",
+        "value": 33273.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "rais-total-9",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Vínculos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5102504",
+        "geography_name": "Cáceres",
+        "period": "2024",
+        "value": 16627.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "rais-total-10",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Vínculos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5101803",
+        "geography_name": "Barra do Garças",
+        "period": "2024",
+        "value": 17417.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "rais-total-11",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Vínculos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5100250",
+        "geography_name": "Alta Floresta",
+        "period": "2024",
+        "value": 15329.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "rais-total-12",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Vínculos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5103205",
+        "geography_name": "Colíder",
+        "period": "2024",
+        "value": 8312.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "rais-total-13",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Vínculos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5104104",
+        "geography_name": "Guarantã do Norte",
+        "period": "2024",
+        "value": 6320.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "rais-total-14",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Vínculos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5105150",
+        "geography_name": "Juína",
+        "period": "2024",
+        "value": 9742.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "rais-total-15",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Vínculos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5105101",
+        "geography_name": "Juara",
+        "period": "2024",
+        "value": 8694.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "rais-total-16",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Vínculos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5106000",
+        "geography_name": "Nortelândia",
+        "period": "2024",
+        "value": 1031.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "rais-total-17",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Vínculos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5106224",
+        "geography_name": "Nova Mutum",
+        "period": "2024",
+        "value": 24313.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "rais-total-18",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Vínculos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107875",
+        "geography_name": "Sapezal",
+        "period": "2024",
+        "value": 14439.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "rais-total-19",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Vínculos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5102678",
+        "geography_name": "Campo Verde",
+        "period": "2024",
+        "value": 15177.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "rais-total-20",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Vínculos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5103502",
+        "geography_name": "Diamantino",
+        "period": "2024",
+        "value": 10428.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "rais-known-sorriso",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Vínculos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso",
+        "period": "2024",
+        "value": 39482.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "expected_first_value": 39482,
+      "passed": true
+    },
+    {
+      "id": "rais-rank-total-2024",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "rank",
+      "unit": "Vínculos",
+      "rows": 10,
+      "first": {
+        "geography_code": "5103403",
+        "geography_name": "Cuiabá",
+        "period": "2024",
+        "value": 386418.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "rais_emprego_industria-1",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Vínculos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5103403",
+        "geography_name": "Cuiabá",
+        "period": "2024",
+        "value": 20214.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "rais_emprego_industria-2",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Vínculos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5108402",
+        "geography_name": "Várzea Grande",
+        "period": "2024",
+        "value": 14109.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "rais_emprego_industria-3",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Vínculos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107602",
+        "geography_name": "Rondonópolis",
+        "period": "2024",
+        "value": 10427.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "rais_emprego_industria-4",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Vínculos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107909",
+        "geography_name": "Sinop",
+        "period": "2024",
+        "value": 10258.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "rais_emprego_industria-5",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Vínculos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso",
+        "period": "2024",
+        "value": 5718.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "rais_emprego_comercio-1",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Vínculos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5103403",
+        "geography_name": "Cuiabá",
+        "period": "2024",
+        "value": 51644.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "rais_emprego_comercio-2",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Vínculos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5108402",
+        "geography_name": "Várzea Grande",
+        "period": "2024",
+        "value": 21622.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "rais_emprego_comercio-3",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Vínculos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107602",
+        "geography_name": "Rondonópolis",
+        "period": "2024",
+        "value": 20471.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "rais_emprego_comercio-4",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Vínculos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107909",
+        "geography_name": "Sinop",
+        "period": "2024",
+        "value": 19640.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "rais_emprego_comercio-5",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Vínculos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso",
+        "period": "2024",
+        "value": 11904.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "rais_emprego_servicos-1",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Vínculos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5103403",
+        "geography_name": "Cuiabá",
+        "period": "2024",
+        "value": 297453.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "rais_emprego_servicos-2",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Vínculos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5108402",
+        "geography_name": "Várzea Grande",
+        "period": "2024",
+        "value": 20604.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "rais_emprego_servicos-3",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Vínculos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107602",
+        "geography_name": "Rondonópolis",
+        "period": "2024",
+        "value": 40056.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "rais_emprego_servicos-4",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Vínculos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107909",
+        "geography_name": "Sinop",
+        "period": "2024",
+        "value": 23053.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "rais_emprego_servicos-5",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Vínculos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso",
+        "period": "2024",
+        "value": 14268.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "fleet-total-1",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Veículos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5103403",
+        "geography_name": "Cuiabá",
+        "period": "202609",
+        "value": 549062.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "fleet-total-2",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Veículos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5108402",
+        "geography_name": "Várzea Grande",
+        "period": "202609",
+        "value": 235535.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "fleet-total-3",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Veículos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107602",
+        "geography_name": "Rondonópolis",
+        "period": "202609",
+        "value": 242636.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "fleet-total-4",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Veículos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107909",
+        "geography_name": "Sinop",
+        "period": "202609",
+        "value": 191123.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "fleet-total-5",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Veículos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso",
+        "period": "202609",
+        "value": 112951.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "fleet-total-6",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Veículos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107958",
+        "geography_name": "Tangará da Serra",
+        "period": "202609",
+        "value": 94329.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "fleet-total-7",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Veículos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107040",
+        "geography_name": "Primavera do Leste",
+        "period": "202609",
+        "value": 88112.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "fleet-total-8",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Veículos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5105259",
+        "geography_name": "Lucas do Rio Verde",
+        "period": "202609",
+        "value": 77823.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "fleet-total-9",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Veículos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5102504",
+        "geography_name": "Cáceres",
+        "period": "202609",
+        "value": 66504.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "fleet-total-10",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Veículos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5101803",
+        "geography_name": "Barra do Garças",
+        "period": "202609",
+        "value": 65046.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "fleet-total-11",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Veículos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5100250",
+        "geography_name": "Alta Floresta",
+        "period": "202609",
+        "value": 62650.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "fleet-total-12",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Veículos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5103205",
+        "geography_name": "Colíder",
+        "period": "202609",
+        "value": 31902.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "fleet-total-13",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Veículos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5104104",
+        "geography_name": "Guarantã do Norte",
+        "period": "202609",
+        "value": 35060.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "fleet-total-14",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Veículos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5105150",
+        "geography_name": "Juína",
+        "period": "202609",
+        "value": 43105.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "fleet-total-15",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Veículos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5105101",
+        "geography_name": "Juara",
+        "period": "202609",
+        "value": 31511.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "fleet-total-16",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Veículos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5106000",
+        "geography_name": "Nortelândia",
+        "period": "202609",
+        "value": 4259.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "fleet-total-17",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Veículos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5106224",
+        "geography_name": "Nova Mutum",
+        "period": "202609",
+        "value": 48951.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "fleet-total-18",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Veículos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107875",
+        "geography_name": "Sapezal",
+        "period": "202609",
+        "value": 28904.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "fleet-total-19",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Veículos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5102678",
+        "geography_name": "Campo Verde",
+        "period": "202609",
+        "value": 40594.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "fleet-total-20",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Veículos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5103502",
+        "geography_name": "Diamantino",
+        "period": "202609",
+        "value": 20603.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "fleet-known-sorriso-total",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Veículos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso",
+        "period": "202609",
+        "value": 112951.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "expected_first_value": 112951,
+      "passed": true
+    },
+    {
+      "id": "fleet-known-sorriso-trucks",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Veículos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso",
+        "period": "202609",
+        "value": 3794.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "expected_first_value": 3794,
+      "passed": true
+    },
+    {
+      "id": "fleet-truck-rank-202609",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "rank",
+      "unit": "Veículos",
+      "rows": 10,
+      "first": {
+        "geography_code": "5103403",
+        "geography_name": "Cuiabá",
+        "period": "202609",
+        "value": 13912.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "fleet-truck-compare-1",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "compare",
+      "unit": "Veículos",
+      "rows": 2,
+      "first": {
+        "geography_code": "5103403",
+        "geography_name": "Cuiabá",
+        "period": "202609",
+        "value": 13912.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "fleet-truck-compare-2",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "compare",
+      "unit": "Veículos",
+      "rows": 2,
+      "first": {
+        "geography_code": "5108402",
+        "geography_name": "Várzea Grande",
+        "period": "202609",
+        "value": 6634.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "fleet-truck-compare-3",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "compare",
+      "unit": "Veículos",
+      "rows": 2,
+      "first": {
+        "geography_code": "5107602",
+        "geography_name": "Rondonópolis",
+        "period": "202609",
+        "value": 5867.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "fleet-truck-compare-4",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "compare",
+      "unit": "Veículos",
+      "rows": 2,
+      "first": {
+        "geography_code": "5107909",
+        "geography_name": "Sinop",
+        "period": "202609",
+        "value": 5588.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "fleet-truck-compare-5",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "compare",
+      "unit": "Veículos",
+      "rows": 2,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso",
+        "period": "202609",
+        "value": 3794.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-per-capita-1",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "ratio",
+      "unit": "Mil Reais por Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5103403",
+        "geography_name": "Cuiabá - MT",
+        "period": "2021",
+        "value": 47.69572524029287,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-per-capita-2",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "ratio",
+      "unit": "Mil Reais por Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5108402",
+        "geography_name": "Várzea Grande - MT",
+        "period": "2021",
+        "value": 34.148114731234266,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-per-capita-3",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "ratio",
+      "unit": "Mil Reais por Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107602",
+        "geography_name": "Rondonópolis - MT",
+        "period": "2021",
+        "value": 72.1763259923293,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-per-capita-4",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "ratio",
+      "unit": "Mil Reais por Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107909",
+        "geography_name": "Sinop - MT",
+        "period": "2021",
+        "value": 64.60253088077336,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-per-capita-5",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "ratio",
+      "unit": "Mil Reais por Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso - MT",
+        "period": "2021",
+        "value": 131.89351281322084,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-per-capita-6",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "ratio",
+      "unit": "Mil Reais por Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107958",
+        "geography_name": "Tangará da Serra - MT",
+        "period": "2021",
+        "value": 51.888507957744515,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-per-capita-7",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "ratio",
+      "unit": "Mil Reais por Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107040",
+        "geography_name": "Primavera do Leste - MT",
+        "period": "2021",
+        "value": 109.03649257937253,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-per-capita-8",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "ratio",
+      "unit": "Mil Reais por Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5105259",
+        "geography_name": "Lucas do Rio Verde - MT",
+        "period": "2021",
+        "value": 98.9101921890026,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-per-capita-9",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "ratio",
+      "unit": "Mil Reais por Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5102504",
+        "geography_name": "Cáceres - MT",
+        "period": "2021",
+        "value": 23.749965911117172,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-per-capita-10",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "ratio",
+      "unit": "Mil Reais por Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5101803",
+        "geography_name": "Barra do Garças - MT",
+        "period": "2021",
+        "value": 41.797413373958705,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "gdp-per-capita-known-sorriso",
+      "kind": "query",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "ratio",
+      "unit": "Mil Reais por Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso - MT",
+        "period": "2021",
+        "value": 131.89351281322084,
+        "status": "observed",
+        "category_label": ""
+      },
+      "expected_first_value": 131.89351281322084,
+      "passed": true
+    },
+    {
+      "id": "ask-pop-sorriso",
+      "kind": "ask",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso - MT",
+        "period": "2024",
+        "value": 120985.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "ask-pop-cuiaba",
+      "kind": "ask",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5103403",
+        "geography_name": "Cuiabá - MT",
+        "period": "2024",
+        "value": 682932.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "ask-compare-sorriso-sinop",
+      "kind": "ask",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "compare",
+      "unit": "Pessoas",
+      "rows": 2,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso - MT",
+        "period": "2024",
+        "value": 120985.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "ask-rank-pop-mt",
+      "kind": "ask",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "rank",
+      "unit": "Pessoas",
+      "rows": 10,
+      "first": {
+        "geography_code": "5103403",
+        "geography_name": "Cuiabá - MT",
+        "period": "2024",
+        "value": 682932.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "ask-trend-pop-sorriso",
+      "kind": "ask",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "trend",
+      "unit": "Pessoas",
+      "rows": 3,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso - MT",
+        "period": "2020",
+        "value": 92769.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "ask-pib-sorriso",
+      "kind": "ask",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Mil Reais",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso - MT",
+        "period": "2023",
+        "value": 13748757.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "ask-pib-per-capita",
+      "kind": "ask",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "ratio",
+      "unit": "Mil Reais por Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso - MT",
+        "period": "2021",
+        "value": 131.89351281322084,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "ask-soy-production",
+      "kind": "ask",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Toneladas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso - MT",
+        "period": "2024",
+        "value": 2084520.0,
+        "status": "observed",
+        "category_label": "Soja (em grão)"
+      },
+      "passed": true
+    },
+    {
+      "id": "ask-soy-trend",
+      "kind": "ask",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "trend",
+      "unit": "Toneladas",
+      "rows": 5,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso - MT",
+        "period": "2020",
+        "value": 2283300.0,
+        "status": "observed",
+        "category_label": "Soja (em grão)"
+      },
+      "passed": true
+    },
+    {
+      "id": "ask-cattle",
+      "kind": "ask",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Cabeças",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso - MT",
+        "period": "2024",
+        "value": 99790.0,
+        "status": "observed",
+        "category_label": "Bovino"
+      },
+      "passed": true
+    },
+    {
+      "id": "ask-rais",
+      "kind": "ask",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Vínculos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso",
+        "period": "2024",
+        "value": 39482.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "ask-fleet",
+      "kind": "ask",
+      "expected_status": "ok",
+      "exit": 0,
+      "status": "ok",
+      "operation": "lookup",
+      "unit": "Veículos",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso",
+        "period": "202609",
+        "value": 112951.0,
+        "status": "observed",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "ask-refuse-cnpj-headcount",
+      "kind": "ask",
+      "expected_status": "unavailable",
+      "exit": 0,
+      "status": "unavailable",
+      "operation": null,
+      "unit": null,
+      "rows": 0,
+      "passed": true
+    },
+    {
+      "id": "ask-refuse-neighbourhood",
+      "kind": "ask",
+      "expected_status": "unavailable",
+      "exit": 0,
+      "status": "unavailable",
+      "operation": null,
+      "unit": null,
+      "rows": 0,
+      "passed": true
+    },
+    {
+      "id": "ask-refuse-income",
+      "kind": "ask",
+      "expected_status": "unavailable",
+      "exit": 0,
+      "status": "unavailable",
+      "operation": null,
+      "unit": null,
+      "rows": 0,
+      "passed": true
+    },
+    {
+      "id": "ask-clarify-crop",
+      "kind": "ask",
+      "expected_status": "clarification_required",
+      "exit": 0,
+      "status": "clarification_required",
+      "operation": null,
+      "unit": null,
+      "rows": 0,
+      "passed": true
+    },
+    {
+      "id": "ask-unsupported",
+      "kind": "ask",
+      "expected_status": "unsupported",
+      "exit": 0,
+      "status": "unsupported",
+      "operation": null,
+      "unit": null,
+      "rows": 0,
+      "passed": true
+    },
+    {
+      "id": "pop-missing-2023",
+      "kind": "query",
+      "expected_status": "empty",
+      "exit": 0,
+      "status": "empty",
+      "operation": "lookup",
+      "unit": "Pessoas",
+      "rows": 0,
+      "passed": true
+    },
+    {
+      "id": "ratio-missing-2023",
+      "kind": "query",
+      "expected_status": "no_observed_value",
+      "exit": 0,
+      "status": "no_observed_value",
+      "operation": "ratio",
+      "unit": "Mil Reais por Pessoas",
+      "rows": 1,
+      "first": {
+        "geography_code": "5107925",
+        "geography_name": "Sorriso - MT",
+        "period": "2023",
+        "value": null,
+        "status": "missing_denominator",
+        "category_label": ""
+      },
+      "passed": true
+    },
+    {
+      "id": "census-missing-boa-esperanca",
+      "kind": "query",
+      "expected_status": "empty",
+      "exit": 0,
+      "status": "empty",
+      "operation": "lookup",
+      "unit": "Domicílios",
+      "rows": 0,
+      "passed": true
+    },
+    {
+      "id": "gdp-future-2024-empty",
+      "kind": "query",
+      "expected_status": "empty",
+      "exit": 0,
+      "status": "empty",
+      "operation": "lookup",
+      "unit": "Mil Reais",
+      "rows": 0,
+      "passed": true
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+Consulta: Frota registrada total
+Período: 202609.
+Unidade: Veículos.
+Sorriso (5107925) [202609]: 112.951
+Cobertura: Mato Grosso municipalities (202609).
+Fonte: Senatran - frota por município e tipo (setembro/2026) (senatran-frota-2026-09, https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2026-2/Frota_por_municipio_e_tipo_Setembro_2026.xlsx/@@download/file). Licença: Public fleet statistics; resource-level terms not yet verified (review_required).
+Limitação: A municipal fleet total does not identify vehicles owned by an individual CNPJ.
+Limitação: Municipality names were bridged to seven-digit IBGE codes through the versioned catalogue.
+Limitação: Registered fleet is not circulating fleet.
+Limitação: The publication month is not a real-time circulation feed.
+Limitação: Uma estatística municipal não é um fato observado sobre um CNPJ individual.
+---
+Ranking: Frota registrada de caminhões
+Período: 202609.
+Unidade: Veículos.
+Cuiabá (5103403) [202609]: 13.912
+Várzea Grande (5108402) [202609]: 6.634
+Rondonópolis (5107602) [202609]: 5.867
+Sinop (5107909) [202609]: 5.588
+Sorriso (5107925) [202609]: 3.794
+Cálculo: ordenado por valor decrescente; células sem valor observado não entram no ranking.
+Cobertura: Mato Grosso municipalities (202609).
+Fonte: Senatran - frota por município e tipo (setembro/2026) (senatran-frota-2026-09, https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2026-2/Frota_por_municipio_e_tipo_Setembro_2026.xlsx/@@download/file). Licença: Public fleet statistics; resource-level terms not yet verified (review_required).
+Limitação: A municipal fleet total does not identify vehicles owned by an individual CNPJ.
+Limitação: Associação, ranking ou tendência não prova causalidade, demanda ou vínculo comercial.
+Limitação: Municipality names were bridged to seven-digit IBGE codes through the versioned catalogue.
+Limitação: Registered fleet is not circulating fleet.
+Limitação: The publication month is not a real-time circulation feed.
+Limitação: Uma estatística municipal não é um fato observado sobre um CNPJ individual.
+---
+Comparação: Frota registrada de caminhões
+Período: 202609.
+Unidade: Veículos.
+Sorriso (5107925) [202609]: 3.794
+Sinop (5107909) [202609]: 5.588
+Cobertura: Mato Grosso municipalities (202609).
+Fonte: Senatran - frota por município e tipo (setembro/2026) (senatran-frota-2026-09, https://www.gov.br/transportes/pt-br/assuntos/transito/conteudo-Senatran/frota-de-veiculos-2026-2/Frota_por_municipio_e_tipo_Setembro_2026.xlsx/@@download/file). Licença: Public fleet statistics; resource-level terms not yet verified (review_required).
+Limitação: A municipal fleet total does not identify vehicles owned by an individual CNPJ.
+Limitação: Associação, ranking ou tendência não prova causalidade, demanda ou vínculo comercial.
+Limitação: Municipality names were bridged to seven-digit IBGE codes through the versioned catalogue.
+Limitação: Registered fleet is not circulating fleet.
+Limitação: The publication month is not a real-time circulation feed.
+Limitação: Uma estatística municipal não é um fato observado sobre um CNPJ individual.
