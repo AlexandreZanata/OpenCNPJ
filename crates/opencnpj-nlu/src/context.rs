@@ -1,6 +1,6 @@
 //! Explicit conversation state. New self-contained requests never inherit filters.
 
-use opencnpj_query::ir::*;
+use opencnpj_query::{export::Export, ir::*};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -11,6 +11,9 @@ pub struct Conversation {
     pub pending: Vec<Request>,
     #[serde(default)]
     pub result_members: Vec<Member>,
+    /// File delivery of the current thread, refined by follow-ups ("agora em CSV").
+    #[serde(default)]
+    pub export: Option<Export>,
 }
 
 impl Conversation {
