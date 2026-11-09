@@ -1,0 +1,38 @@
+{
+  "categories": {
+    "activity_list": {
+      "items": 72
+    },
+    "bare": {
+      "items": 36
+    },
+    "opener": {
+      "items": 240
+    },
+    "place": {
+      "items": 480
+    },
+    "refusal": {
+      "interpretation_correct": 60,
+      "items": 60
+    },
+    "regional": {
+      "items": 180
+    }
+  },
+  "counts": {
+    "act_correct": 72,
+    "act_items": 1008,
+    "decision_correct": 60,
+    "interpretation_correct": 60,
+    "interpretation_wrong": 1008,
+    "items": 1068
+  },
+  "data_anchor": "2026-10-11",
+  "evidence_score": "Rule evidence is not a calibrated probability.",
+  "human_validation": "Not performed; human validation is deferred to product refinement.",
+  "method": "Actual text-only deterministic interpretation; gold IR used only for canonical scoring and separate backend reference, never as a prediction or conversation seed.",
+  "set": "crates/opencnpj-lab/eval/skills-company-01/questions.jsonl",
+  "set_sha256": "ebdecc179b6fa5eb9b3844fc9fa26a6a95b7bb7f53fedc66c8e40e7dce1e6a33",
+  "snapshot_sha256": null
+}
