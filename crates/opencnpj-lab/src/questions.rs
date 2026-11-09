@@ -311,7 +311,7 @@ pub fn ask(args: AskArgs) -> Result<()> {
 fn increment(counts: &mut BTreeMap<String, u64>, key: &str) {
     *counts.entry(key.into()).or_default() += 1;
 }
-fn interpretation_match(prediction: &Interpretation, gold: &eval::Gold, expected: Option<&ValidRequest>) -> bool {
+pub(crate) fn interpretation_match(prediction: &Interpretation, gold: &eval::Gold, expected: Option<&ValidRequest>) -> bool {
     let export = gold.export.clone().map(serde_json::from_value::<opencnpj_query::export::Export>).transpose();
     let company = gold.company.clone().map(serde_json::from_value::<opencnpj_nlu::policy::CompanySearch>).transpose();
     match gold.decision.as_str() {
@@ -333,7 +333,7 @@ fn interpretation_match(prediction: &Interpretation, gold: &eval::Gold, expected
 }
 
 /// Items of one dialogue share a session id; every other item starts a conversation.
-fn session_of(item: &eval::Item) -> String {
+pub(crate) fn session_of(item: &eval::Item) -> String {
     item.context
         .as_ref()
         .and_then(|c| c.get("session_id"))

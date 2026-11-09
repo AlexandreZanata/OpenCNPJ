@@ -4,6 +4,7 @@ mod aggregate;
 mod assistant;
 mod backfill;
 mod catalog;
+mod contracts;
 mod eval;
 mod official;
 mod oracle;
@@ -51,6 +52,8 @@ enum Command {
     Answer(serve::AnswerArgs),
     /// Serve the chat page and its API with every asset loaded once.
     Serve(serve::ServeArgs),
+    /// Check answer contracts on evaluation sets (and, with data, against the records).
+    Contracts(contracts::ContractArgs),
     /// Interpret every question and audit predictions and backend results.
     EvalQuestions(questions::EvalArgs),
     /// Execute a query written in the intermediate language.
@@ -83,6 +86,7 @@ fn main() -> anyhow::Result<()> {
         Some(Command::Answer(args)) => serve::answer(args),
         Some(Command::Serve(args)) => serve::serve(args),
         Some(Command::EvalQuestions(args)) => questions::evaluate(args),
+        Some(Command::Contracts(args)) => contracts::run(args),
         Some(Command::Catalog { command }) => catalog::run(command),
         Some(Command::Agg { command }) => aggregate::run(command),
         Some(Command::DiffAgg(args)) => aggregate::diff(args),
