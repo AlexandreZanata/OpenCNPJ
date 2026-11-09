@@ -1,0 +1,30 @@
+decision           act           wall_ms engine_ms interp_us  question
+execute            new_query        37.7      35.3       640  Me mande um Excel com todas as empresas que tiveram baixa em Mato Grosso no setor de TI
+  file             xlsx           1402.0                      100557 bytes, 1052 rows -> opencnpj-estabelecimentos-baixados-de-servico-de-tecnologia-da-informacao-em-mato-grosso.xlsx
+execute_with_note  new_query        32.1      30.2       573  Me mande apenas o nome e o número em um Excel com todas as empresas que tiveram baixa em Mato Grosso no setor de TI
+  file             xlsx            261.8                      34891 bytes, 1052 rows -> opencnpj-estabelecimentos-baixados-de-servico-de-tecnologia-da-informacao-em-mato-grosso.xlsx
+execute            new_query        28.3      26.0       359  Quero um CSV das padarias que fecharam em 2025 em Cuiabá/MT
+  file             csv              69.9                      51093 bytes, 185 rows -> opencnpj-estabelecimentos-baixados-de-padaria-em-cuiaba-mt.csv
+execute            new_query        18.6      16.6       346  Gere um TXT com o CNPJ, a razão social e a data de abertura das farmácias abertas em 2025 em Sinop/MT
+  file             txt              16.9                      2014 bytes, 12 rows -> opencnpj-estabelecimentos-em-qualquer-situacao-cadastral-de-farmacia-em-sinop-mt.txt
+execute            new_query        12.8      11.1       313  Planilha com nome, CNPJ, telefone e e-mail dos restaurantes ativos de Rondonópolis/MT
+  file             xlsx            780.5                      34200 bytes, 519 rows -> opencnpj-estabelecimentos-ativos-de-restaurante-em-rondonopolis-mt.xlsx
+execute            new_query         3.0       1.8       264  Exporte em Excel o ranking das 10 cidades de MT com mais padarias ativas
+  file             xlsx              3.6                      4002 bytes, 10 rows -> opencnpj-estabelecimentos-ativos-de-padaria-em-mato-grosso.xlsx
+execute            new_query        40.3      38.4       316  Quantas padarias ativas existem em Cuiabá/MT?
+execute            new_query        42.6      40.5       426  Quantos estabelecimentos de serviços de TI estão ativos em Mato Grosso?
+execute            new_query       435.5     433.4       496  Quantas empresas tiveram baixa em Sorriso/MT em 2025?
+execute            new_query       376.5     375.2       295  Mostre a evolução mensal de registros de empresas em Cuiabá/MT em 2025.
+execute            new_query         5.1       3.7       530  Mostre a evolução mensal das baixas de restaurantes em Mato Grosso em 2025.
+execute            new_query         6.5       4.6       389  Compare a densidade por 10 mil habitantes de farmácias ativas entre Cuiabá/MT e Várzea Grande/MT.
+execute            new_query         3.4       1.9       280  Quais as 10 cidades de MT com mais padarias ativas?
+execute            new_query       101.1      99.4       347  Distribua os estabelecimentos ativos no estado de Mato Grosso por divisão CNAE conforme o cadastro atual.
+execute            new_query        40.2      38.6       340  Quantas padarias ativas existem em Cuiabá/MT?
+execute            add_filter       29.7      27.8       230  E só as matrizes?
+execute            add_filter       28.3      26.0       279  Agora liste esses estabelecimentos
+execute            export           25.9      24.2       189  Me mande isso em Excel
+  file             xlsx           1719.0                      88510 bytes, 1167 rows -> opencnpj-matrizes-ativas-de-padaria-em-cuiaba-mt.xlsx
+execute            export           23.1      21.8       159  Agora em CSV
+  file             csv             272.1                      248321 bytes, 1167 rows -> opencnpj-matrizes-ativas-de-padaria-em-cuiaba-mt.csv
+execute            export           22.2      21.0       155  Só o nome e o CNPJ
+  file             csv             267.2                      67830 bytes, 1167 rows -> opencnpj-matrizes-ativas-de-padaria-em-cuiaba-mt.csv

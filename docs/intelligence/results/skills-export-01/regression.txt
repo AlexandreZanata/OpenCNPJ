@@ -1,0 +1,19 @@
+adv                    items=   304 correct    186 ->    186  changed=0
+commercial-round-01    items=  1000 correct    950 ->    950  changed=0
+commercial-round-02    items=  1000 correct    900 ->    900  changed=0
+commercial-round-03    items=  3000 correct   2694 ->   2694  changed=0
+commercial-round-04    items=  5000 correct   4576 ->   4576  changed=0
+commercial-round-05    items= 10000 correct   9154 ->   9154  changed=0
+commercial-round-06    items= 20000 correct  18312 ->  18312  changed=0
+commercial-round-07    items= 20000 correct  18312 ->  18312  changed=0
+commercial-round-08    items= 50000 correct  45759 ->  45759  changed=0
+commercial-round-09    items= 50000 correct  47975 ->  47975  changed=0
+commercial-round-10    items= 50000 correct  48000 ->  48000  changed=0
+commercial-round-11    items= 50000 correct  48000 ->  48000  changed=0
+commercial-round-12    items= 50000 correct  47500 ->  47500  changed=0
+commercial-round-13    items= 50000 correct  47800 ->  47800  changed=0
+commercial-round-14    items= 50000 correct  47900 ->  47900  changed=0
+dialogues              items=   122 correct     84 ->     84  changed=0
+h-informal             items=   202 correct    118 ->    118  changed=0
+ood                    items=   400 correct    400 ->    400  changed=0
+total changed 0

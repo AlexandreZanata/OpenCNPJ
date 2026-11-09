@@ -54,6 +54,7 @@ outside the domain are declined.
 | 13 | [RESOURCE-ESTIMATES](13-RESOURCE-ESTIMATES.md) | RAM, CPU, storage and cost estimates with their basis |
 | 14 | [ROADMAP](14-ROADMAP.md) | **Execution plan**: phases, work packages, acceptance criteria, rules for the executing agent |
 | 15 | [DECISIONS](15-DECISIONS.md) | Decision log (ADR) and justification of the recommended architecture |
+| 16 | [SKILLS](16-SKILLS.md) | Delivery skills: Excel/CSV/TXT exports, chat answers with charts and records, follow-ups, local service |
 | — | [results/](results/) | Measured results with commands and raw output |
 
 ## The brief's deliverables (§15) and where they are
