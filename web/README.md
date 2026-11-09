@@ -65,3 +65,26 @@ O layout implementa exatamente a interface de inteligência empresarial:
 - **Gráficos em CSS/SVG**: Gráfico de aberturas mensais com eixos e gráfico donut de distribuição por porte (ME, EPP, Demais).
 - **Tabela de Empresas**: Tabela com ordenação por colunas, menu para exibir/ocultar colunas, exportação (CSV / NDJSON) e paginação completa.
 - **Design Responsivo**: Adaptável para desktop (1536px), notebooks e dispositivos móveis.
+
+## Local search with official data
+
+The static server shows the original demo. To test natural-language queries
+against the real aggregate engine, build the frontend and run the local adapter
+with a compatible `opencnpj-intel` binary, its catalogues and the aggregate file.
+
+```sh
+sh scripts/build.sh
+python3 scripts/local-search.py --port 5173 \
+  --engine "$ENGINE" --catalog "$MUNICIPALITIES" --sectors "$SECTORS" \
+  --agg "$AGGREGATE"
+```
+
+Open [Consulta com IA](http://127.0.0.1:5173/?local=1#/consulta) and select one of
+the five examples or enter a question. Each request starts a new conversation.
+The adapter defaults to loopback and uses aggregate data for counts, comparisons
+and series. Record lists and other snapshot-backed operations need a separate
+snapshot-enabled engine service.
+
+To share a local preview, pass `--bind` with the computer's LAN IPv4 address
+and `--allow-network` with its subnet in CIDR notation. The adapter accepts
+connections from that subnet. Share the URL printed on startup.

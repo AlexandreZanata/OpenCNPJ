@@ -108,3 +108,23 @@
     flex-direction: column;
   }
 }
+
+.page--local-consulta .query-box__chips {
+  min-width: 0;
+}
+
+.page--local-consulta .chip {
+  min-height: 25px;
+  height: auto;
+  max-width: 100%;
+  padding-block: 4px;
+  text-align: left;
+  white-space: normal;
+}
+
+.local-query-details {
+  overflow: auto;
+  max-height: 24rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
