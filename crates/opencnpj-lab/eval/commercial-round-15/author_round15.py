@@ -83,7 +83,7 @@ COLLOQUIAL = {
     "supermarket": [("atacarejo", "atacarejos")],
     "tobacco_shop": [("charutaria", "charutarias")],
     "variety_store": [("lojinha", "lojinhas")],
-    "candy_store": [("doceria", "docerias"), ("confeiteiro", "confeiteiros"), ("confeitaria", "confeitarias"), ("doceiro", "doceiros")],
+    "candy_store": [("doceria", "docerias"), ("confeiteiro", "confeiteiros"), ("doceiro", "doceiros")],
     "bar": [("choperia", "choperias")],
     "grocery": [("empório", "empórios")],
     "landscaping": [("jardineiro", "jardineiros")],

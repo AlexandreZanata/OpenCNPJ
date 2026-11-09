@@ -265,7 +265,7 @@ since = "v1"
 [[sector]]
 id = "candy_store"
 display = { sing = "loja de doces", plural = "lojas de doces", gender = "f" }
-aliases = ["bomboniere", "bombonieres", "doceria", "docerias", "confeiteiro", "confeiteiros", "confeitaria", "confeitarias", "doceiro", "doceiros"]
+aliases = ["bomboniere", "bombonieres", "doceria", "docerias", "confeiteiro", "confeiteiros", "doceiro", "doceiros"]
 cnae_core = ["4721104"]
 cnae_extended = []
 scope = "main"
