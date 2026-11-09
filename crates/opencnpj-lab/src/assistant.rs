@@ -122,6 +122,10 @@ impl Assistant {
             .enumerate()
             .map(|(i, name)| (i as u16 + 1, (*name).to_owned()))
             .collect();
+        // Questions over every activity read per-table rollups; build them before serving.
+        if let Some(aggregates) = &assets.aggregates {
+            aggregates.current().warm()?;
+        }
         let (competence, aggregate_sha) = match &assets.aggregates {
             Some(set) => (set.current().manifest().competence, Some(set.current().manifest().snapshot_sha256.clone())),
             None => {

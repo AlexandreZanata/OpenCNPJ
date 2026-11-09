@@ -83,3 +83,31 @@ Observations from the raw output:
   decoded-block cache in `opencnpj-insights::agg` is the next performance item.
 * Files: 3.6 ms (10-row ranking) to 1.7 s (1,167-row workbook, first read of those
   records); the same records as CSV right after took 272 ms.
+
+## 5. Activity rollup (all-activity questions)
+
+`Aggregate::activity_rollup` sums each table's cells over every CNAE (keys are
+CNAE-major, so a question without an activity used to decode the whole table). Readers
+use it only when no CNAE filter or exclusion applies and the grouping is not by sector
+or CNAE; counts are additive, so totals are unchanged. The service builds the rollups
+at start-up (`assets loaded in 13542 ms`, warm page cache).
+
+Equality, old (`150d55e`+skills) vs new binary, aggregates only:
+
+```sh
+opencnpj-intel eval-questions --set crates/opencnpj-lab/eval/commercial-round-0{1,2}/questions.jsonl \
+  --agg $AGG --history $HISTORY --out <dir>     # both binaries; compare status/value/total per item
+# round 01: executions compared=1790 different=0
+# round 02: executions compared=1740 different=0
+```
+
+A battery of 14 all-activity questions (closures, registrations, trends, net
+registrations, density, rankings by city and UF, porte/status/CNAE breakdowns) through
+`ask --agg … --history …` returned identical values on both binaries (`different=0`).
+
+Latency after the change, same command as §4: [latency-rollup.txt](latency-rollup.txt).
+
+| Question | Before (`engine_ms`) | After |
+|---|---|---|
+| Quantas empresas tiveram baixa em Sorriso/MT em 2025? | 433.4 | 19.0 |
+| Mostre a evolução mensal de registros de empresas em Cuiabá/MT em 2025. | 375.2 | 3.5 |

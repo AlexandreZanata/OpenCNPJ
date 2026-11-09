@@ -1,4 +1,10 @@
-use std::{collections::BTreeMap, fs::File, io::Write, path::Path};
+use std::{
+    collections::{BTreeMap, HashMap},
+    fs::File,
+    io::Write,
+    path::Path,
+    sync::OnceLock,
+};
 
 use anyhow::{Context, Result, ensure};
 use memmap2::{Mmap, MmapOptions};
@@ -6,6 +12,9 @@ use opencnpj_core::varint::{self, Reader};
 use xxhash_rust::xxh3::xxh3_64;
 
 use super::{BLOCK_CELLS, Cell, Key, Manifest, Section, Table};
+
+/// Tables that can have an activity rollup, indexed by `Table as usize - 1`.
+const TABLES: usize = Table::ALL.len();
 
 const MAGIC: &[u8; 8] = b"OCAGG\0\0\0";
 const FOOTER: &[u8; 8] = b"OCAGEND!";
@@ -123,6 +132,8 @@ pub struct Aggregate {
     data: Mmap,
     manifest: Manifest,
     sections: BTreeMap<Section, Vec<Block>>,
+    /// Cells summed over every CNAE, built on first use (see [`Aggregate::activity_rollup`]).
+    rollups: [OnceLock<Result<Vec<Cell>, String>>; TABLES],
 }
 
 impl Aggregate {
@@ -168,7 +179,7 @@ impl Aggregate {
             previous = Some(block);
         }
         ensure!(position == directory, "unused bytes before aggregate directory");
-        Ok(Self { data, manifest, sections })
+        Ok(Self { data, manifest, sections, rollups: Default::default() })
     }
 
     pub fn manifest(&self) -> &Manifest {
@@ -177,6 +188,34 @@ impl Aggregate {
 
     pub fn cells(&self, section: Section) -> impl Iterator<Item = Result<Cell>> + '_ {
         self.decode_cells(self.sections.get(&section).map_or(&[], Vec::as_slice))
+    }
+
+    /// The cells of `table` with the CNAE set to zero and equal keys summed, in key order.
+    /// A question over every activity reads this instead of the whole CNAE-major table;
+    /// counts are additive, so any reader that ignores the CNAE gets the same totals.
+    pub fn activity_rollup(&self, table: Table) -> Result<&[Cell]> {
+        let built = self.rollups[table as usize - 1].get_or_init(|| {
+            let mut sums: HashMap<u64, u64> = HashMap::new();
+            for cell in self.cells(Section::Cells(table)) {
+                let cell = cell.map_err(|error| error.to_string())?;
+                let key = Key { cnae: 0, ..Key::unpack(cell.key) }.pack().ok_or("invalid aggregate key")?;
+                let sum = sums.entry(key).or_default();
+                *sum = sum.checked_add(cell.count).ok_or("aggregate rollup overflow")?;
+            }
+            let mut cells: Vec<Cell> = sums.into_iter().map(|(key, count)| Cell { key, count }).collect();
+            cells.sort_unstable_by_key(|cell| cell.key);
+            Ok(cells)
+        });
+        built.as_deref().map_err(|error| anyhow::anyhow!("{error}"))
+    }
+
+    /// Build the activity rollups of every table in the artifact (a service calls this at
+    /// start-up so the first question over all activities is as fast as the next).
+    pub fn warm(&self) -> Result<()> {
+        for table in self.manifest.tables.clone() {
+            self.activity_rollup(table)?;
+        }
+        Ok(())
     }
 
     pub fn cells_for_cnae(&self, table: Table, cnae: u32) -> Result<impl Iterator<Item = Result<Cell>> + '_> {
@@ -298,6 +337,47 @@ mod tests {
 
     use super::*;
     use crate::agg::Table;
+
+    #[test]
+    fn activity_rollup_sums_every_cnae_per_place_and_detail() {
+        use opencnpj_query::ir::{MunicipalityId, UfId};
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("rollup.ocagg");
+        let manifest = Manifest {
+            competence: Competence(321),
+            snapshot_sha256: "1".repeat(64),
+            municipality_sha256: "2".repeat(64),
+            tables: vec![Table::T3],
+            establishments: 10000,
+            missing_registration_date: 0,
+            missing_closure_date: 0,
+        };
+        let key =
+            |cnae, municipality, detail| Key { cnae, municipality: MunicipalityId(municipality), uf: UfId(12), detail }.pack().unwrap();
+        // Several CNAE blocks share places and months; the rollup must add them up.
+        let mut cells = Vec::new();
+        for cnae in [1091102, 4721102, 4771701, 6201501] {
+            for municipality in 0..1500 {
+                cells.push(Cell { key: key(cnae, municipality, 300 + u32::from(municipality % 3)), count: u64::from(cnae % 7 + 1) });
+            }
+        }
+        cells.sort_by_key(|cell| cell.key);
+        let section = Section::Cells(Table::T3);
+        let sections = BTreeMap::from([(section, cells.clone()), (Section::CnaeOffset(Table::T3), vec![Cell { key: 0, count: 1 }])]);
+        let mut data = Vec::new();
+        write(&mut data, &manifest, &sections).unwrap();
+        fs::write(&path, &data).unwrap();
+        let agg = Aggregate::open(&path).unwrap();
+        agg.warm().unwrap();
+        let rollup = agg.activity_rollup(Table::T3).unwrap();
+        let mut expected = BTreeMap::<u64, u64>::new();
+        for cell in &cells {
+            *expected.entry(Key { cnae: 0, ..Key::unpack(cell.key) }.pack().unwrap()).or_default() += cell.count;
+        }
+        assert_eq!(rollup, expected.into_iter().map(|(key, count)| Cell { key, count }).collect::<Vec<_>>());
+        assert_eq!(rollup.len(), 1500);
+        assert_eq!(rollup.iter().map(|c| c.count).sum::<u64>(), cells.iter().map(|c| c.count).sum::<u64>());
+    }
 
     #[test]
     fn maps_cells_across_blocks_and_rejects_corruption() {
