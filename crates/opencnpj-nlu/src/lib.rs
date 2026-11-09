@@ -40,6 +40,12 @@ impl Interpreter {
         }
     }
 
+    /// Catalogue entities spotted in `text` as `(start, end, readings)` over
+    /// [`normalize::words`]; homonym cities share a span. Read-only, for audits and contracts.
+    pub fn entities(&self, text: &str) -> Vec<(usize, usize, Vec<Entity>)> {
+        self.pack.lexicon.scan(&normalize::words(text)).into_iter().map(|hit| (hit.start, hit.end, hit.values)).collect()
+    }
+
     pub fn interpret(&self, text: &str, state: &mut Conversation) -> Interpretation {
         if text.trim().is_empty() || text.chars().count() > 500 || text.chars().any(|c| c.is_control() && !c.is_whitespace()) {
             return Interpretation::stop(Decision::Reject, "Envie uma pergunta de até 500 caracteres, sem caracteres de controle.");

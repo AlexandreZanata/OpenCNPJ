@@ -855,3 +855,42 @@ fn an_unknown_kind_of_company_is_asked_not_dropped() {
         assert!(parse(text).request.is_some(), "{text}");
     }
 }
+
+#[test]
+fn status_words_are_never_read_as_their_opposite() {
+    assert_eq!(req("liste as padarias fechadas em Sorriso").scope.status, Some(StatusSet::only(Status::Closed)));
+    assert_eq!(req("quantas padarias encerradas existem em Sorriso").scope.status, Some(StatusSet::only(Status::Closed)));
+    let inactive = parse("quantas padarias inativas existem em Sorriso");
+    assert_eq!(inactive.request.unwrap().scope.status, Some(StatusSet::new([Status::Suspended, Status::Unfit, Status::Closed])));
+    assert!(!inactive.notes.is_empty());
+    // A legal form, not a status.
+    assert_eq!(
+        req("quantas padarias ativas de sociedade anonima fechada existem em Sorriso").scope.status,
+        Some(StatusSet::only(Status::Active))
+    );
+}
+
+#[test]
+fn a_list_period_without_an_event_is_asked() {
+    for text in ["liste as padarias de 2025 em Sorriso", "liste as farmacias em Sorriso desde 2020"] {
+        assert_eq!(parse(text).decision, Decision::Clarify, "{text}");
+    }
+    assert!(req("liste as padarias abertas em 2025 em Sorriso").scope.opened.is_some());
+}
+
+#[test]
+fn explicit_row_counts_are_kept_or_refused_not_truncated() {
+    let out = interpreter().interpret("me mande um excel com as 5000 padarias de Sorriso", &mut Conversation::default());
+    assert_eq!(out.export.unwrap().rows, Some(5000));
+    // A chat list above the plan limit is refused with a clamped option.
+    let out = parse("liste 5000 padarias de Sorriso");
+    assert!(out.request.is_none());
+    assert!(!out.options.is_empty());
+}
+
+#[test]
+fn a_state_after_do_qualifies_the_city() {
+    // "Bom Jesus" is id 3 in PI and id 4 in RS in the test pack.
+    let r = req("quantas padarias tem Bom Jesus do Piauí");
+    assert_eq!(r.scope.place, PlaceFilter::Municipalities(SmallSet::new([MunicipalityId(3)])));
+}
