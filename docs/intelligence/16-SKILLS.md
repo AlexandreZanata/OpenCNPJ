@@ -183,7 +183,82 @@ general cause in the skill or grammar, add a regression test, and re-run every e
 round to confirm no prediction changed. Results of this round, with commands and raw
 output, are in [results/skills-export-01](results/skills-export-01/REPORT.md).
 
-## 8. Next skills
+## 8. Company search
+
+Questions like "encontre a empresa zaflas", "zaflas", "dados da empresa X" or
+"qual o CNPJ da Padaria Pão Quente em Cuiabá/MT?" look up companies by name (razão social
+or nome fantasia) directly against the snapshot index, instead of rejecting with
+"Não identifiquei uma pesquisa cadastral".
+
+### 8.1 Flow and NLU
+
+```
+question ──► delivery.company_name(text, bare) ──► place_suffix (strip municipality/UF)
+               │                                       │
+               ├─► if 8+ digits ──► Op::Lookup         ├─► if only sectors ──► Op::List
+               ├─► privacy/unavailable ──► Reject      └─► Interpretation.company = Some(CompanySearch)
+               ▼
+   assistant.ask() ──► opencnpj_store::search::search (exact: fuzzy=false)
+                         │ total == 0? ──► retry with fuzzy=true
+                         ▼
+        ┌────────────────┴────────────────┐
+        ▼ single root                     ▼ multiple roots
+ company block + full fields        summary sentence + records table (preview)
+ + records table if >1 branch       + up to 5 "Dados do CNPJ <cnpj>" suggestions
+```
+
+1. **Extraction**: `Vocabulary::company_name(text, bare)` checks for search openers
+   (`delivery.toml` lists `busca` and `empresa`) or bare short names (`end - start <= 5`).
+   Interrogative words, dialogue connectives, request prefixes, and conversational OOD words
+   are rejected.
+2. **Disambiguation**:
+   - Numeric tokens with 8 or more digits route to CNPJ lookup rules (`Op::Lookup`).
+   - Pure sector names ("busque padarias em Cuiabá") route to cadastral record lists (`Op::List`).
+   - Mixed sector + cadastral filters ("padarias com telefone", "farmácias abertas") remain cadastral queries.
+   - Privacy cues (`dono`, `cpf`, `socio`) and unavailable metrics (`faturamento`) remain refusals.
+3. **Execution (`assistant.rs`)**:
+   - Queries the snapshot via `opencnpj_store::search::search` with `q`, `field: "any"`, `fuzzy: false`,
+     bounded by TOM municipality codes and UF codes if extracted by `place_suffix`.
+   - If total is 0, retries with `fuzzy: true` and appends a note:
+     *"Não achei esse nome exato; mostrei nomes parecidos."*
+   - Single company root: returns a `"company"` block with all cadastral fields (respecting `--hide-contacts`),
+     a lead sentence (`"Encontrei <razão> (<CNPJ>), situação X, em <município>/<UF>."`), and a `"records"`
+     table if the company has multiple establishments.
+   - Multiple company roots: returns a summary sentence with total count, a `"records"` preview table,
+     and up to 5 `"Dados do CNPJ <cnpj>"` suggestions that route directly to `Op::Lookup`.
+   - Zero results: returns a polite message:
+     *"Não encontrei empresas com o nome “X”. Confira a grafia ou informe o CNPJ."*
+4. **Extras for Lookup**:
+   - When executing `Op::Lookup`, `assistant.extras()` queries the snapshot for other establishments
+     sharing the same 8-digit root prefix (`Query.cnpj_prefixes`) and attaches them as an extra
+     `"records"` table titled *"Estabelecimentos desta empresa"*.
+
+Results: [results/skills-company-01](results/skills-company-01/REPORT.md).
+
+## 9. Broad activities and unknown descriptors
+
+"Lista de empresas agrícolas em Sorriso/MT" once listed every active establishment of the
+city (banks included): the catalogue had only specific farm sectors (soja, milho, gado…),
+and an unrecognized word describing the companies was dropped. Two changes:
+
+* The sector `agriculture_livestock` (appended, so earlier sector ids are unchanged) holds
+  every subclass of CNAE division 01 under the words users say: agrícola(s), agricultura,
+  agropecuária, fazenda(s), lavoura(s), produtor(es) rural(is), pecuária, agricultor,
+  fazendeiro. Longer aliases still win ("fazendas de soja" stays soybean); "agronegócio" and
+  "empresas do agro" keep asking for an activity.
+* Fail closed: a word right after a plural "empresas / estabelecimentos / negócios / firmas
+  / companhias" that is no catalogue entity and no known status, size or connective
+  ("empresas xyzolicas") gets "Qual atividade você quer pesquisar?" instead of answering
+  every company. The singular "a empresa Zaflas" names one company and is left to §8.
+
+## 10. Repeated lines in a file
+
+Rows are establishments. When the chosen columns leave out the CNPJ ("apenas o nome e o
+telefone"), the branches of one company look like repeated lines. They are never removed
+(that would drop establishments); the answer and the "Sobre" sheet say how many lines
+repeat and suggest including the CNPJ or asking "só as matrizes" for one line per company.
+
+## 11. Next skills
 
 | Skill | Sketch |
 |---|---|
@@ -191,3 +266,4 @@ output, are in [results/skills-export-01](results/skills-export-01/REPORT.md).
 | Comparison of periods ("2025 contra 2024") | Two flow counts with the same scope and a difference block |
 | Saved lists | Name an export and refresh it on the next snapshot |
 | More formats | JSON and Parquet for analysts, through the same `Sheet` |
+

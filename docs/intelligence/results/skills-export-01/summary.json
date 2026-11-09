@@ -1,5 +1,9 @@
 {
   "categories": {
+    "agro": {
+      "interpretation_correct": 75,
+      "items": 75
+    },
     "analytical": {
       "interpretation_correct": 12,
       "items": 12
@@ -25,8 +29,8 @@
       "items": 126
     },
     "stop": {
-      "interpretation_correct": 9,
-      "items": 9
+      "interpretation_correct": 12,
+      "items": 12
     },
     "with_fields": {
       "interpretation_correct": 354,
@@ -34,17 +38,17 @@
     }
   },
   "counts": {
-    "act_correct": 1743,
-    "act_items": 1743,
-    "decision_correct": 1803,
-    "interpretation_correct": 1803,
-    "items": 1803
+    "act_correct": 1821,
+    "act_items": 1821,
+    "decision_correct": 1881,
+    "interpretation_correct": 1881,
+    "items": 1881
   },
   "data_anchor": "2026-10-11",
   "evidence_score": "Rule evidence is not a calibrated probability.",
   "human_validation": "Not performed; human validation is deferred to product refinement.",
   "method": "Actual text-only deterministic interpretation; gold IR used only for canonical scoring and separate backend reference, never as a prediction or conversation seed.",
   "set": "crates/opencnpj-lab/eval/skills-export-01/questions.jsonl",
-  "set_sha256": "fff35f2d76ebde478d13558e7ab3088a878b417ad9e4334fddfbd70bf1e6fc20",
+  "set_sha256": "84359bb0b38d5425b50d164e6c6522b859724bba06e42bbad6aed89d5b1e6a56",
   "snapshot_sha256": null
 }
