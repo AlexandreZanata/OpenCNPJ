@@ -792,3 +792,66 @@ fn analytical_answers_export_their_table_and_rows_are_kept() {
     let out = interpreter().interpret("me mande um excel", &mut Conversation::default());
     assert_eq!(out.decision, Decision::Clarify);
 }
+
+#[test]
+fn companies_are_found_by_name() {
+    use crate::policy::CompanySearch;
+    let company = |text: &str| parse(text).company;
+    let named = |name: &str, municipalities: &[u16]| {
+        Some(CompanySearch {
+            name: name.into(),
+            municipalities: municipalities.iter().map(|id| MunicipalityId(*id)).collect(),
+            ufs: Vec::new(),
+        })
+    };
+    assert_eq!(company("encontre a empresa zaflas"), named("zaflas", &[]));
+    assert_eq!(company("dados da empresa Zaflas"), named("Zaflas", &[]));
+    assert_eq!(company("zaflas"), named("zaflas", &[]));
+    assert_eq!(company("Qual o CNPJ da Padaria Pão Quente em Sorriso?"), named("Padaria Pão Quente", &[1]));
+    assert_eq!(
+        company("Bah, me fala sobre a firma Zaflas em MT"),
+        Some(CompanySearch { name: "Zaflas".into(), municipalities: Vec::new(), ufs: vec![UfId(12)] })
+    );
+    let found = parse("encontre a empresa zaflas");
+    assert_eq!((found.decision, found.act.as_str()), (Decision::Execute, "company_search"));
+    assert!(found.request.is_none());
+    assert!(matches!(req("Dados do CNPJ 11.739.229/0001-69").op, Op::Lookup { ref id } if id.as_str() == "11739229000169"));
+}
+
+#[test]
+fn company_search_keeps_refusals_and_activity_lists() {
+    // An activity is listed, not looked up as a name.
+    assert!(matches!(req("busque padarias em Sorriso").op, Op::List { .. }));
+    for text in ["encontre o dono da zaflas", "qual o faturamento da zaflas", "bom dia", "Consulte o CNPJ 33.000.167/0001-00"] {
+        let out = parse(text);
+        assert!(out.company.is_none() && out.request.is_none(), "{text}: {out:?}");
+    }
+    // Data questions the grammar cannot read yet are not company names either.
+    for text in ["empresas ativas em Sorriso", "nr de padarias em Sorriso"] {
+        assert!(parse(text).company.is_none(), "{text}");
+    }
+    // Cadastral questions are unchanged.
+    assert!(parse("quantas padarias ativas existem em Sorriso").company.is_none());
+}
+
+#[test]
+fn an_unknown_kind_of_company_is_asked_not_dropped() {
+    // "agricolas" was once ignored and every company of the city was listed.
+    for text in [
+        "liste as empresas xyzolicas de Sorriso",
+        "quantas empresas xyzolicas existem em Sorriso",
+        "me mande um excel das empresas xyzolicas de Sorriso",
+    ] {
+        let out = parse(text);
+        assert_eq!(out.decision, Decision::Clarify, "{text}: {out:?}");
+        assert!(out.request.is_none());
+    }
+    for text in [
+        "liste as empresas ativas de Sorriso",
+        "quantas empresas abertas em 2025 em Sorriso",
+        "liste as empresas de padaria de Sorriso",
+        "quantas empresa abriu em Sorriso esse ano",
+    ] {
+        assert!(parse(text).request.is_some(), "{text}");
+    }
+}

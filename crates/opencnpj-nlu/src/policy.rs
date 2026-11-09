@@ -1,6 +1,10 @@
 //! Selective decisions: uncertain semantics never become executable requests.
 
-use opencnpj_query::{export::Export, ir::Request, validate::ValidRequest};
+use opencnpj_query::{
+    export::Export,
+    ir::{MunicipalityId, Request, UfId},
+    validate::ValidRequest,
+};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -24,6 +28,18 @@ pub struct Interpretation {
     pub options: Vec<Request>,
     /// File requested with the question; the request supplies its rows.
     pub export: Option<Export>,
+    /// A company looked up by its name instead of a cadastral query.
+    pub company: Option<CompanySearch>,
+}
+
+/// Companies whose razão social or nome fantasia contains `name`, optionally in a place.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CompanySearch {
+    pub name: String,
+    #[serde(default)]
+    pub municipalities: Vec<MunicipalityId>,
+    #[serde(default)]
+    pub ufs: Vec<UfId>,
 }
 
 impl Interpretation {
@@ -37,6 +53,7 @@ impl Interpretation {
             evidence: 0.0,
             options: Vec::new(),
             export: None,
+            company: None,
         }
     }
 }
