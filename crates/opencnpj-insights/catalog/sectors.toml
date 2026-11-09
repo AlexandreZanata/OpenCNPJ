@@ -1952,3 +1952,13 @@ cnae_core = ["1011201", "1011202", "1011203", "1011204", "1011205", "1012101", "
 cnae_extended = []
 scope = "main"
 since = "v1"
+
+[[sector]]
+id = "agriculture_livestock"
+display = { sing = "atividade agropecuária", plural = "atividades agropecuárias", gender = "f" }
+aliases = ["agrícola", "agrícolas", "empresa agrícola", "empresas agrícolas", "agricultura", "agropecuária", "agropecuárias", "agropecuário", "agropecuários", "fazenda", "fazendas", "lavoura", "lavouras", "produtor rural", "produtores rurais", "propriedade rural", "propriedades rurais", "pecuária", "agricultor", "agricultores", "fazendeiro", "fazendeiros"]
+cnae_core = ["0111301", "0111302", "0111303", "0111399", "0112101", "0112102", "0112199", "0113000", "0114800", "0115600", "0116401", "0116402", "0116403", "0116499", "0119901", "0119902", "0119903", "0119904", "0119905", "0119906", "0119907", "0119908", "0119909", "0119999", "0121101", "0121102", "0122900", "0131800", "0132600", "0133401", "0133402", "0133403", "0133404", "0133405", "0133406", "0133407", "0133408", "0133409", "0133410", "0133411", "0133499", "0134200", "0135100", "0139301", "0139302", "0139303", "0139304", "0139305", "0139306", "0139399", "0141501", "0141502", "0142300", "0151201", "0151202", "0151203", "0152101", "0152102", "0152103", "0153901", "0153902", "0154700", "0155501", "0155502", "0155503", "0155504", "0155505", "0159801", "0159802", "0159803", "0159804", "0159899", "0161001", "0161002", "0161003", "0161099", "0162801", "0162802", "0162803", "0162899", "0163600", "0170900"]
+cnae_extended = []
+scope = "main"
+since = "v1"
+notes = "Every subclass of CNAE division 01 (agriculture, livestock and related services). Broad agro words map here; agronegócio and empresas do agro still ask for an activity."
