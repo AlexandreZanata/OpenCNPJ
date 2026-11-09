@@ -226,6 +226,30 @@ def regional():
     return out
 
 
+# Broad agro words name CNAE division 01; an unknown descriptor is asked, never dropped.
+AGRO_SURFACES = ["empresas agrícolas", "empresas agropecuárias", "fazendas", "produtores rurais", "empresas de agricultura"]
+AGRO_PLACES = [("Sorriso", "MT"), ("Sinop", "MT"), ("Lucas do Rio Verde", "MT"), ("Rondonópolis", "MT"), ("Goiânia", "GO")]
+
+
+def agro():
+    out = []
+    for n, (surface, (city, code)) in enumerate(itertools.product(AGRO_SURFACES, AGRO_PLACES)):
+        gold = ir(LIST, muni(city, code), "agriculture_livestock", ["active"])
+        out.append((f"Lista de {surface} em {city} {code.lower()}, e um exel com todas", gold, export("xlsx"), "execute", "agro/export"))
+        out.append((f"quero a lista de {surface} de {city} {code.lower()}", gold, None, "execute", "agro/list"))
+        fmt = ["csv", "txt", "xlsx"][n % 3]
+        article, active = ("os", "ativos") if surface.startswith("produtores") else ("as", "ativas")
+        out.append((f"Me mande um {fmt.upper()} com {article} {surface} {active} de {city}/{code}", gold, export(fmt), "execute", "agro/export"))
+    return out
+
+
+UNKNOWN_KINDS = [
+    "Lista de empresas xyzolicas em Sorriso mt",
+    "quantas empresas quantiquicas existem em Sinop/MT?",
+    "Me mande um Excel com as empresas blorpianas de Cuiabá/MT",
+]
+
+
 def dialogues():
     sessions = []
     for i, ((key, plural, art, setor), (city, code)) in enumerate(itertools.product(SECTORS, PLACES[:5])):
@@ -289,6 +313,10 @@ def main():
         add(f"skills-export-01-{n:05d}", text, gold_ir, gold_export, decision, family)
     for n, (text, gold_ir, gold_export, decision, family) in enumerate(regional()):
         add(f"skills-export-01-r{n:04d}", text, gold_ir, gold_export, decision, family)
+    for n, (text, gold_ir, gold_export, decision, family) in enumerate(agro()):
+        add(f"skills-export-01-a{n:04d}", text, gold_ir, gold_export, decision, family)
+    for n, text in enumerate(UNKNOWN_KINDS):
+        add(f"skills-export-01-u{n:03d}", text, None, None, "clarify", "stop/unknown_kind")
     for session in dialogues():
         for turn, (sid, text, gold_ir, gold_export, decision, act) in enumerate(session):
             add(f"{sid}#{turn}", text, gold_ir, gold_export, decision, "dialogue/" + ("export" if gold_export else "data"), act, sid)
