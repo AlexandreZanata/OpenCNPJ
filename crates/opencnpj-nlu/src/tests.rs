@@ -2,6 +2,11 @@ use super::*;
 use crate::lang::LanguagePack;
 
 fn interpreter() -> Interpreter {
+    interpreter_with(&[])
+}
+
+/// The shared test pack plus `extra` sectors, numbered after the three fixed ones.
+fn interpreter_with(extra: &[(&[&str], u32)]) -> Interpreter {
     let mut pack = LanguagePack::new();
     pack.municipality(MunicipalityId(1), UfId(12), "Sorriso", &[]);
     pack.municipality(MunicipalityId(2), UfId(12), "Sinop", &[]);
@@ -18,6 +23,10 @@ fn interpreter() -> Interpreter {
     pack.sector(SectorId(0), &["padaria".into(), "padarias".into()], SmallSet::new([CnaeCode::Subclass(4721102)]));
     pack.sector(SectorId(1), &["farmacia".into(), "farmacias".into()], SmallSet::new([CnaeCode::Subclass(4771701)]));
     pack.sector(SectorId(2), &["serraria".into(), "serrarias".into()], SmallSet::new([CnaeCode::Subclass(1610203)]));
+    for (i, (aliases, cnae)) in extra.iter().enumerate() {
+        let aliases: Vec<String> = aliases.iter().map(|a| (*a).to_owned()).collect();
+        pack.sector(SectorId(3 + i as u16), &aliases, SmallSet::new([CnaeCode::Subclass(*cnae)]));
+    }
     let anchor = Day::from_ymd(2026, 10, 11).unwrap();
     let caps = Capabilities {
         current: Competence(321),
@@ -25,7 +34,7 @@ fn interpreter() -> Interpreter {
         flow_days: Day::from_ymd(2025, 1, 1).unwrap()..=anchor,
         populations: vec![PopulationRef::IbgeEstimate(2026), PopulationRef::IbgeCensus(2022)],
         catalogue_versions: CatalogueVersions { municipalities: 202610, sectors: 1 },
-        sector_count: 3,
+        sector_count: 3 + extra.len() as u16,
         geography: true,
         list_limit: 100,
     };
@@ -689,4 +698,97 @@ fn round13_compound_edit_can_clear_capital_ceiling() {
 fn round15_cnae_group_breakdown_is_supported() {
     let r = req("Distribua as padarias ativas em Sorriso/MT por grupo CNAE.");
     assert!(matches!(r.op, Op::Breakdown { dim: Dim::Cnae(CnaeLevel::Group), .. }));
+}
+
+fn it_interpreter() -> Interpreter {
+    interpreter_with(&[(&["ti", "tecnologia", "tecnologia da informacao", "servicos de ti"], 6201501)])
+}
+
+fn year(y: u16) -> DayRange {
+    Range { from: Day::from_ymd(y, 1, 1), to: Day::from_ymd(y, 12, 31) }
+}
+
+#[test]
+fn export_skill_lists_every_closed_company_of_the_question() {
+    use opencnpj_query::export::{ExportField, ExportFormat};
+    let engine = it_interpreter();
+    let text = "me mande um exel com todas as empresas que tiveram baixa em mato grosso no setor de TI";
+    let out = engine.interpret(text, &mut Conversation::default());
+    let r = out.request.clone().unwrap_or_else(|| panic!("{out:?}")).into_request();
+    assert_eq!(r.op, Op::List { order: ListOrder::Cnpj, limit: 20 });
+    assert_eq!(r.scope.place, PlaceFilter::Ufs(SmallSet::new([UfId(12)])));
+    assert!(matches!(&r.scope.activity, ActivityFilter::Sectors { ids, .. } if ids[..] == [SectorId(3)]));
+    assert_eq!(r.scope.status, Some(StatusSet::only(Status::Closed)));
+    // No period was named: every closed company, not only this year's closures.
+    assert_eq!(r.scope.status_date, None);
+    let export = out.export.unwrap();
+    assert_eq!(export.format, ExportFormat::Xlsx);
+    assert!(export.fields.is_empty());
+
+    let text = "me mande apenas o nome e o numero em um exel com todas as empresas que tiveram baixa em mato grosso no setor de TI";
+    let out = engine.interpret(text, &mut Conversation::default());
+    assert_eq!(out.request.unwrap().into_request(), r);
+    assert_eq!(out.export.unwrap().fields, [ExportField::RazaoSocial, ExportField::Cnpj]);
+    assert_eq!(out.decision, Decision::ExecuteWithNote);
+    assert!(out.notes.iter().any(|n| n.contains("CNPJ")));
+}
+
+#[test]
+fn listed_events_become_record_filters() {
+    use opencnpj_query::export::ExportFormat;
+    let r = req("liste as padarias que fecharam em 2025 em Sorriso");
+    assert_eq!(r.scope.status, Some(StatusSet::only(Status::Closed)));
+    assert_eq!(r.scope.status_date, Some(year(2025)));
+    let out = interpreter().interpret("Quero um CSV das padarias que fecharam em 2025 em Sorriso MT", &mut Conversation::default());
+    let r = out.request.unwrap().into_request();
+    assert!(matches!(r.op, Op::List { .. }));
+    assert_eq!(r.scope.status_date, Some(year(2025)));
+    assert_eq!(out.export.unwrap().format, ExportFormat::Csv);
+    let out = interpreter().interpret("Liste as padarias abertas em 2025 em Sorriso MT em txt", &mut Conversation::default());
+    let r = out.request.unwrap().into_request();
+    assert_eq!(r.scope.opened, Some(year(2025)));
+    assert_eq!(r.scope.status, Some(StatusSet::ALL));
+    assert_eq!(out.export.unwrap().format, ExportFormat::Txt);
+}
+
+#[test]
+fn export_follow_ups_reuse_the_previous_answer() {
+    use opencnpj_query::export::{ExportField, ExportFormat};
+    let engine = interpreter();
+    let mut state = Conversation::default();
+    let count = engine.interpret("Quantas padarias tiveram baixa em Sorriso em 2025?", &mut state).request.unwrap().into_request();
+    assert!(matches!(count.op, Op::Count { metric: Metric::Flow(FlowMetric::Closures) }));
+    let out = engine.interpret("agora me mande isso em excel", &mut state);
+    assert_eq!(out.act, "export");
+    let list = out.request.unwrap().into_request();
+    assert!(matches!(list.op, Op::List { .. }));
+    assert_eq!(list.scope.place, count.scope.place);
+    assert_eq!(list.scope.status_date, Some(Range { from: Day::from_ymd(2025, 1, 1), to: Day::from_ymd(2025, 12, 31) }));
+    assert_eq!(out.export.as_ref().unwrap().format, ExportFormat::Xlsx);
+    let out = engine.interpret("só o nome e o CNPJ", &mut state);
+    assert_eq!(out.request.unwrap().into_request(), list);
+    let export = out.export.unwrap();
+    assert_eq!(export.format, ExportFormat::Xlsx);
+    assert_eq!(export.fields, [ExportField::RazaoSocial, ExportField::Cnpj]);
+    let out = engine.interpret("e em csv", &mut state);
+    let export = out.export.unwrap();
+    assert_eq!(export.format, ExportFormat::Csv);
+    assert_eq!(export.fields, [ExportField::RazaoSocial, ExportField::Cnpj]);
+    let masculine = engine.interpret("liste os estabelecimentos baixados em 2025 em Sorriso", &mut Conversation::default());
+    assert_eq!(masculine.request.unwrap().scope.status_date, Some(year(2025)));
+    // A new question starts without a file.
+    assert!(engine.interpret("Quantas farmacias ativas existem em Sinop?", &mut state).export.is_none());
+}
+
+#[test]
+fn analytical_answers_export_their_table_and_rows_are_kept() {
+    use opencnpj_query::export::ExportFormat;
+    let out = interpreter().interpret("Exporte em excel o ranking das cidades de MT com mais padarias", &mut Conversation::default());
+    assert!(matches!(out.request.unwrap().into_request().op, Op::Rank { dim: Dim::Municipality, .. }));
+    assert_eq!(out.export.unwrap().format, ExportFormat::Xlsx);
+    let out = interpreter().interpret("planilha com as 300 padarias mais recentes de Sorriso MT", &mut Conversation::default());
+    assert_eq!(out.request.unwrap().into_request().op, Op::List { order: ListOrder::NewestFirst, limit: 100 });
+    assert_eq!(out.export.unwrap().rows, Some(300));
+    let out = interpreter().interpret("me mande um excel", &mut Conversation::default());
+    assert_eq!(out.decision, Decision::Clarify);
 }

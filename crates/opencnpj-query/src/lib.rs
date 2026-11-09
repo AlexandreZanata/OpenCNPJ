@@ -11,3 +11,6 @@ pub mod validate;
 
 /// Textual representation of requests.
 pub mod print;
+
+/// File delivery requested with a query.
+pub mod export;

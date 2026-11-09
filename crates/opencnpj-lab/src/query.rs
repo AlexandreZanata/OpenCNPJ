@@ -237,6 +237,12 @@ impl EngineExecutor<'_> {
     /// Lists use the same complete filter set as counts before sorting or pagination.
     /// Lowering alone cannot express exclusions or population predicates.
     pub fn records(&self, request: &ValidRequest) -> Result<search::SearchResult> {
+        let query = parse(&lower(request, self.context.municipalities)?)?;
+        self.records_window(request, query.offset, query.limit)
+    }
+
+    /// Up to `limit` records from `offset` in the list order, e.g. every row of an export.
+    pub fn records_window(&self, request: &ValidRequest, offset: usize, limit: usize) -> Result<search::SearchResult> {
         ensure!(matches!(request.op, Op::List { .. } | Op::Lookup { .. }), "records needs a list or lookup");
         let mut set = self.set(request)?;
         if let Some(range) = request.scope.place_population
@@ -260,13 +266,9 @@ impl EngineExecutor<'_> {
         let total = set.len();
         let docs = if let Some((field, desc)) = query.sort {
             let column = self.snapshot.numeric(field).context("missing sort column")?;
-            column
-                .top_k(self.snapshot.bytes(), &set, query.offset.saturating_add(query.limit), desc)
-                .into_iter()
-                .skip(query.offset)
-                .collect()
+            column.top_k(self.snapshot.bytes(), &set, offset.saturating_add(limit), desc).into_iter().skip(offset).collect()
         } else {
-            set.iter().skip(query.offset).take(query.limit).collect()
+            set.iter().skip(offset).take(limit).collect()
         };
         Ok(search::SearchResult { total, docs, ..Default::default() })
     }

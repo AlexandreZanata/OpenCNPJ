@@ -505,7 +505,16 @@ fn stock_matches(table: Table, key: Key, filters: &Filters, context: &ExecContex
     }
 }
 
-fn for_each_cell(aggregate: &Aggregate, table: Table, filters: &Filters, mut visit: impl FnMut(Key, u64) -> Result<()>) -> Result<()> {
+/// Visit the cells a filter may match. `by_cnae` says whether the visitor reads the CNAE
+/// (a sector or CNAE grouping); otherwise a question over every activity reads the
+/// activity rollup, whose CNAE is zero and whose counts are summed over all codes.
+fn for_each_cell(
+    aggregate: &Aggregate,
+    table: Table,
+    filters: &Filters,
+    by_cnae: bool,
+    mut visit: impl FnMut(Key, u64) -> Result<()>,
+) -> Result<()> {
     // A table missing from the artifact must fail, not read as zero (a current artifact
     // built with `--tables T1,T2` made every flow answer 0).
     if !aggregate.manifest().tables.contains(&table) {
@@ -515,7 +524,11 @@ fn for_each_cell(aggregate: &Aggregate, table: Table, filters: &Filters, mut vis
         .cnaes
         .as_ref()
         .filter(|patterns| patterns.len() <= 8 && patterns.iter().all(|pattern| matches!(pattern, CnaePattern::Exact { divisor: 1, .. })));
-    if let Some(patterns) = exact {
+    if filters.cnaes.is_none() && filters.exclude_cnaes.is_empty() && !by_cnae {
+        for cell in aggregate.activity_rollup(table)? {
+            visit(Key::unpack(cell.key), cell.count)?;
+        }
+    } else if let Some(patterns) = exact {
         for pattern in patterns {
             let CnaePattern::Exact { value, .. } = pattern else { unreachable!() };
             for cell in aggregate.cells_for_cnae(table, *value)? {
@@ -535,7 +548,7 @@ fn for_each_cell(aggregate: &Aggregate, table: Table, filters: &Filters, mut vis
 fn stock_count(aggregate: &Aggregate, filters: &Filters, context: &ExecContext<'_>) -> Result<u64> {
     let table = stock_table(filters);
     let mut total = 0;
-    for_each_cell(aggregate, table, filters, |key, count| {
+    for_each_cell(aggregate, table, filters, false, |key, count| {
         if stock_matches(table, key, filters, context) {
             total += count;
         }
@@ -553,7 +566,7 @@ fn flow_count(
 ) -> Result<i64> {
     let mut total = 0;
     for (table, sign) in flow_tables(flow) {
-        for_each_cell(aggregate, table, filters, |key, count| {
+        for_each_cell(aggregate, table, filters, false, |key, count| {
             if filters.matches(key, context) && bucket_in(key.detail, period) {
                 total += sign * i64::try_from(count)?;
             }
@@ -633,6 +646,11 @@ fn scalar(
 
 /// Group keys of one cell. A dimension the table does not carry is an error, never a guess:
 /// the flow tables' detail field is a month bucket, not a status or head-office code.
+/// Groupings that read the CNAE of a cell.
+fn reads_cnae(dim: Dim) -> bool {
+    matches!(dim, Dim::Sector | Dim::Cnae(_))
+}
+
 fn group_keys(dim: Dim, table: Table, key: Key, context: &ExecContext<'_>) -> Result<Vec<u64>> {
     let stock = matches!(table, Table::T1 | Table::T2);
     match dim {
@@ -688,7 +706,7 @@ fn group_keys(dim: Dim, table: Table, key: Key, context: &ExecContext<'_>) -> Re
 fn group_stock(aggregate: &Aggregate, filters: &Filters, dim: Dim, context: &ExecContext<'_>) -> Result<BTreeMap<u64, i64>> {
     let table = stock_table(filters);
     let mut map = BTreeMap::new();
-    for_each_cell(aggregate, table, filters, |key, count| {
+    for_each_cell(aggregate, table, filters, reads_cnae(dim), |key, count| {
         if stock_matches(table, key, filters, context) {
             for group in group_keys(dim, table, key, context)? {
                 *map.entry(group).or_default() += i64::try_from(count)?;
@@ -710,7 +728,7 @@ fn group_flow(
 ) -> Result<BTreeMap<u64, i64>> {
     let mut map = BTreeMap::new();
     for (table, sign) in flow_tables(flow) {
-        for_each_cell(aggregate, table, filters, |key, count| {
+        for_each_cell(aggregate, table, filters, grain.is_none() && reads_cnae(dim), |key, count| {
             if !filters.matches(key, context) || !bucket_in(key.detail, period) {
                 return Ok(());
             }

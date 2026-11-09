@@ -1,0 +1,134 @@
+/* App frame: sidebar + workspace. */
+.app {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.workspace {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(760px 280px at 88% -40px, rgba(226, 234, 240, 0.55), transparent 70%),
+    var(--canvas);
+}
+
+.workspace__main {
+  position: relative;
+  z-index: 1;
+  padding: 26px var(--workspace-pad-right) 40px var(--workspace-pad-left);
+  outline: none;
+}
+
+.hero-art {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 520px;
+  height: 225px;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 34%);
+  mask-image: linear-gradient(to right, transparent 0, #000 34%);
+}
+
+.hero-art svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.topbar {
+  position: absolute;
+  top: 15px;
+  right: 21px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+}
+
+.page--consulta > .query-box {
+  margin-top: 24px;
+}
+
+.page--consulta > .interpretation {
+  margin-top: 11px;
+}
+
+.page--consulta > .alert {
+  margin-top: 11px;
+}
+
+.page--consulta > .insights {
+  margin-top: 18px;
+}
+
+.page--consulta > .companies {
+  margin-top: 23px;
+}
+
+.alert {
+  padding: 10px 14px;
+  border: 1px solid #f3c7c1;
+  border-radius: var(--radius-md);
+  background: var(--danger-bg);
+  color: var(--danger-ink);
+  font-weight: 500;
+}
+
+/* Tablet: stack the KPI row, keep the sidebar. */
+@media (max-width: 1280px) {
+  .insights {
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  }
+  .insights > .metric {
+    grid-column: span 2;
+  }
+  .insights > .chart-card:nth-of-type(4) {
+    grid-column: span 3;
+  }
+  .insights > .chart-card:nth-of-type(5) {
+    grid-column: span 3;
+  }
+}
+
+/* Small laptop / tablet: icon rail. */
+@media (max-width: 980px) {
+  :root {
+    --sidebar-width: 76px;
+  }
+  .hero-art {
+    opacity: 0.55;
+  }
+}
+
+/* Phone: sidebar becomes a horizontal strip. */
+@media (max-width: 640px) {
+  .app {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .workspace__main {
+    padding-inline: 14px;
+  }
+  .topbar {
+    position: static;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 10px 14px 0;
+  }
+  .hero-art {
+    display: none;
+  }
+  .insights {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  .insights > * {
+    grid-column: auto !important;
+  }
+}

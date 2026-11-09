@@ -5,6 +5,7 @@ pub mod grammar;
 pub mod lang;
 pub mod normalize;
 pub mod policy;
+mod skills;
 pub mod spotter;
 pub mod time;
 
@@ -23,6 +24,7 @@ pub struct Interpreter {
     anchor: Day,
     cues: grammar::Cues,
     policy: grammar::Policy,
+    delivery: skills::Vocabulary,
 }
 
 impl Interpreter {
@@ -33,6 +35,7 @@ impl Interpreter {
             anchor,
             cues: toml::from_str(include_str!("../lang/pt-BR/cues.toml")).expect("embedded grammar cues"),
             policy: toml::from_str(include_str!("../lang/pt-BR/policy.toml")).expect("embedded policy"),
+            delivery: skills::Vocabulary::embedded(),
         }
     }
 
@@ -47,6 +50,56 @@ impl Interpreter {
                 "O contexto pertence a outra versão dos dados. Refaça a pesquisa com a base atual.",
             );
         }
+        // A delivery phrase is cut before the grammar; a bare column list refines the
+        // export of the current thread.
+        let Some(delivery) = self.delivery.delivery(text, state.export.as_ref().filter(|_| state.last.is_some())) else {
+            let (result, _) = self.answer(text, state, false);
+            // Refinements and clarification answers keep the file of the thread; a new
+            // question starts without one.
+            state.export = if matches!(result.act.as_str(), "new_query" | "meta_question") { None } else { state.export.take() };
+            return Interpretation { export: state.export.clone(), ..result };
+        };
+        if let Some(format) = &delivery.unsupported {
+            return Interpretation::stop(
+                Decision::Clarify,
+                format!("Ainda não gero arquivos {format}. Posso entregar em Excel, CSV ou TXT: qual prefere?"),
+            );
+        }
+        if state.last.is_none() && normalize::words(&delivery.rest).is_empty() {
+            return Interpretation::stop(
+                Decision::Clarify,
+                "Quais empresas devo colocar no arquivo? Informe a atividade, o local ou a situação cadastral.",
+            );
+        }
+        // "Agora em CSV", "manda essa lista": the file of the previous answer.
+        let previous = state.last.is_some() && self.delivery.refers_to_previous(&delivery.rest);
+        let (mut result, rows) = self.answer(if previous { "" } else { &delivery.rest }, state, true);
+        if previous && result.request.is_some() {
+            result.act = "export".into();
+        }
+        let mut export = delivery.export;
+        if let Some(request) = &result.request {
+            if matches!(request.op, Op::Meta { .. }) {
+                result.notes.push("Essa resposta não gera arquivo.".into());
+                state.export = None;
+                return result;
+            }
+            if matches!(request.op, Op::List { .. }) {
+                export.rows = rows;
+            }
+            result.notes.extend(delivery.notes);
+            if result.decision == Decision::Execute && !result.notes.is_empty() {
+                result.decision = Decision::ExecuteWithNote;
+            }
+        }
+        state.export = Some(export.clone());
+        result.export = Some(export);
+        result
+    }
+
+    /// Interpret the data question. `export` makes a record count a record list; the
+    /// second value is an explicit row count ("as 50 primeiras").
+    fn answer(&self, text: &str, state: &mut Conversation, export: bool) -> (Interpretation, Option<u32>) {
         let population = self
             .capabilities
             .populations
@@ -94,7 +147,7 @@ impl Interpreter {
                 && let Ok(valid) = validate::validate(state.pending[i].clone(), &self.capabilities)
             {
                 state.remember(valid.as_request());
-                return Interpretation {
+                let result = Interpretation {
                     decision: Decision::Execute,
                     request: Some(valid),
                     act: "answer_clarification".into(),
@@ -102,18 +155,20 @@ impl Interpreter {
                     notes: Vec::new(),
                     evidence: 1.0,
                     options: Vec::new(),
+                    export: None,
                 };
+                return (result, None);
             }
             // A new complete question discards a pending clarification.
             state.pending.clear();
         }
-        let frame = match grammar::resolve(&env, text, state) {
+        let frame = match grammar::resolve(&env, text, state, export) {
             Ok(f) => f,
             Err(result) => {
                 let mut result = *result;
                 if result.decision == Decision::Clarify && result.reason.contains("UF do município") {
                     for uf in lang::UFS {
-                        if let Ok(frame) = grammar::resolve(&env, &format!("{text} {uf}"), state) {
+                        if let Ok(frame) = grammar::resolve(&env, &format!("{text} {uf}"), state, export) {
                             let ctx = CanonicalContext {
                                 first_day: Day(1),
                                 last_day: self.anchor,
@@ -133,7 +188,7 @@ impl Interpreter {
                     }
                 }
                 state.pending = result.options.clone();
-                return result;
+                return (result, None);
             }
         };
         let context = CanonicalContext {
@@ -145,13 +200,11 @@ impl Interpreter {
         let request = match frame.request.canonicalize(&context) {
             Ok((r, _)) => r,
             Err(error) => {
-                return Interpretation::stop(
-                    Decision::Clarify,
-                    format!("Os filtros não são compatíveis: {error}. Confira município, UF e período."),
-                );
+                let reason = format!("Os filtros não são compatíveis: {error}. Confira município, UF e período.");
+                return (Interpretation::stop(Decision::Clarify, reason), None);
             }
         };
-        match validate::validate(request, &self.capabilities) {
+        let result = match validate::validate(request, &self.capabilities) {
             Ok(valid) => {
                 state.remember(valid.as_request());
                 Interpretation {
@@ -162,6 +215,7 @@ impl Interpreter {
                     notes: frame.notes,
                     evidence: 1.0,
                     options: Vec::new(),
+                    export: None,
                 }
             }
             Err(issues) => {
@@ -175,7 +229,8 @@ impl Interpreter {
                 state.pending = result.options.clone();
                 result
             }
-        }
+        };
+        (result, frame.rows)
     }
 }
 

@@ -1,6 +1,6 @@
 //! Selective decisions: uncertain semantics never become executable requests.
 
-use opencnpj_query::{ir::Request, validate::ValidRequest};
+use opencnpj_query::{export::Export, ir::Request, validate::ValidRequest};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -22,6 +22,8 @@ pub struct Interpretation {
     /// Rule evidence, not a calibrated probability.
     pub evidence: f64,
     pub options: Vec<Request>,
+    /// File requested with the question; the request supplies its rows.
+    pub export: Option<Export>,
 }
 
 impl Interpretation {
@@ -34,6 +36,7 @@ impl Interpretation {
             notes: Vec::new(),
             evidence: 0.0,
             options: Vec::new(),
+            export: None,
         }
     }
 }

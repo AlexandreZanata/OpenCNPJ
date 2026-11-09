@@ -14,3 +14,6 @@ pub mod execute;
 
 /// Answer blocks, provenance and templates.
 pub mod render;
+
+/// Excel, CSV and plain-text files delivered with an answer.
+pub mod export;

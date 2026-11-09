@@ -14,6 +14,7 @@ path = "src/main.rs"
 
 [dependencies]
 anyhow.workspace = true
+axum.workspace = true
 clap.workspace = true
 opencnpj = { path = "../opencnpj" }
 opencnpj-core.workspace = true
@@ -39,5 +40,4 @@ tempfile.workspace = true
 zip.workspace = true
 
 [dev-dependencies]
-axum.workspace = true
 tower.workspace = true
