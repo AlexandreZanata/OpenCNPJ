@@ -24,6 +24,20 @@ Common `.ocrec` identity columns: `record_id`, `geography_level`,
 `data_json`. The manifest records source/licence/URL, raw hash, schema, row
 accounting and limitations.
 
+ANEEL uses `SigTipoConsumidor = PJ`, as defined in the
+[ANEEL data dictionary](https://dadosabertos.aneel.gov.br/dataset/5e0fafd2-21b9-4d5b-b622-40438d40aba2/resource/3fabb9e8-668a-4f94-8f0e-ed9cd2682979/download/dm-geracao-distribuida-relacao-de-empreendimentos.pdf).
+PGFN uses `TIPO_PESSOA = Pessoa jurídica`. For both sources, in-scope
+business records with missing, masked or invalid documents retain their raw
+document field and empty CNPJ join keys. The manifest counts those rows.
+Verified CNPJ keys can be numeric or alphanumeric. The record audit checks
+distinct linked CNPJs against the snapshot up to its configured sample size.
+
+ANEEL validates the CSV header and fails before publication if a quoted field
+is left open at EOF or a record exceeds the parser's 8 MiB limit. The reader
+retains the buffered parser's handling of unquoted suffixes after closing
+quotes, which occur in the published resource.
+`--limit` parses a preview and does not validate the remainder of the ZIP entry.
+
 ## Commands
 
 ```bash
@@ -53,16 +67,22 @@ opencnpj-intel official audit-records \
 `RecordWriter` inserts each parsed record directly into the temporary SQLite
 store inside one transaction. The adapters no longer materialize a record vector,
 so full national runs stay bounded by the source buffer plus the current row.
-Measured full national runs:
+Stage 14 measurements below describe the historical runs. The ANEEL
+measurement covers the complete national input with MT output.
 
 | Dataset | Records | Max RSS before | Max RSS with sink |
 |---|---:|---:|---:|
 | INEP 2024 | 215,545 | ~10.5 GB | 238 MB |
 | PGFN Previdenciário | 3,287,586 | ~10.7 GB | 198 MB |
 | PGFN FGTS | 549,458 | ~1.9 GB | 66 MB |
-| ANEEL GD (raw CSV now streamed) | 15,651 MT | ~1.5 GB | 25 MB |
+| ANEEL GD | 15,651 MT | Not measured | 25 MB |
 
-## MT runs
+The ANEEL raw output is in `logs/stage-14-ingest-aneel-stream.log`. The
+1.5 GB figure is the uncompressed CSV entry size.
+
+## Stage 14 MT runs
+
+These counts and hashes refer to the original Stage 14 outputs.
 
 | Dataset | Records | Source rows | Out of scope | Rejected | Store bytes | Store SHA-256 |
 |---|---:|---:|---:|---:|---:|---|
@@ -76,7 +96,7 @@ Measured full national runs:
 | `comex-exp-2025-mun` | 13,271 | 1,207,088 | 1,193,817 | 0 | 4,296,704 | `25fa3903acb29e7327325e3f4951f0304caf73ccb90fedb2ae0985e533d43620` |
 | `mt-convenios-2024` | 79 | 79 | 0 | 0 | 114,688 | `f075bb13b29ea8e062064d4616976da495c29705c0de9fcde3e8a21ef908370b` |
 
-## Full national runs
+## Stage 14 national runs
 
 | Dataset | Records | Source rows | Out of scope | Rejected | Store bytes | Store SHA-256 |
 |---|---:|---:|---:|---:|---:|---|
@@ -98,15 +118,11 @@ are 6.1 GB and remain outside Git.
 
 - CNES: 345,326 unique CNPJs; sampled CNPJs all present in the 2026-10 snapshot.
 - INEP: 35,385 unique CNPJs; 2 sampled CNPJs absent from the snapshot.
-- PGFN FGTS: 309,267 unique CNPJs; invalid check-digit rows are stored without
-  CNPJ identity and counted in the manifest (1 in the national sample).
-- PGFN Previdenciário: 824,940 unique CNPJs; invalid check-digit rows are stored
-  without CNPJ identity (20 in the national sample).
-- ANEEL: invalid check-digit rows are stored without CNPJ identity; 1 valid CNPJ
-  in the MT sample is absent from the 2026-10 snapshot and remains an explicit
-  crosswalk exception.
+- PGFN FGTS and Previdenciário: 309,267 and 824,940 unique linked CNPJs
+  respectively in the Stage 14 national stores.
+- ANEEL: 1 linked CNPJ in the MT sample was absent from the 2026-10 snapshot.
+  The national audit did not include an ANEEL store.
 - ANTT: no CNPJ identity in this aggregate resource.
-- ANEEL: 1 invalid check-digit CNPJ and 1 CNPJ absent from the snapshot in the MT sample.
 - ANP: all 126 unique MT CNPJs sampled were present; no invalid CNPJ found.
 - MT convenios: all 68 unique CNPJs sampled were present.
 - Comex Stat: no CNPJ identity; municipal export totals only.
@@ -116,15 +132,31 @@ are 6.1 GB and remain outside Git.
   in the manifest limitations.
 - INEP `99999999999999` sentinels are normalized to missing and are not joined.
 
-Invalid or absent source CNPJs are kept flagged in the audit, not silently
-repaired. They require source-side or crosswalk normalization before any join.
+The audit tests linked CNPJ keys. See the store manifest for source rows kept
+without a link. A sampled key missing from the snapshot requires separate
+source and reference-period verification before any join.
+
+## Review of the Stage 14 changes
+
+The original ZIPs were reprocessed into separate stores and checked with
+`official verify-records`. ANEEL read 4,735,908 source rows and kept 15,651 MT
+records, with one unlinked CNPJ. The two PGFN resources kept 7,598 FGTS and
+81,870 Previdenciário records in MT. The three MT stores matched the prior
+stores on record IDs, CNPJ keys and source JSON. The CNES DF run accounted for
+642,268 source rows and retained 12,704 DF records, including 340 with their
+original administrative-region codes preserved. The four reprocessed stores
+had zero rejected rows and zero duplicates.
+
+The updated audit checked 5,000 distinct ANEEL CNPJs against the 2026-10
+snapshot and found two absent from it. The PGFN audit checked 4,161 distinct
+FGTS CNPJs and 5,000 Previdenciário CNPJs, all present in that snapshot.
 
 ## Limitations
 
 - The record writer is streaming. ANEEL now streams its 1.5 GB CSV entry with a
   chunked CSV reader (25 MB RSS). CNES/INEP still buffer the compressed entry
   (under 250 MB); PGFN buffers one CSV entry at a time (under 25 MB).
-- `--scope MT` still reads every source row; out-of-scope rows are counted.
+- A full `--scope MT` run reads every source row and counts out-of-scope rows.
 - PGFN natural-person records are excluded from this business slice.
 - ANTT records are aggregate, not identified company fleets.
 - CNES/INEP IDs are not CNPJs.

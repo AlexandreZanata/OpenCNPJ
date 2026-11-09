@@ -236,17 +236,16 @@ fn audit_records(args: AuditRecordsArgs) -> Result<()> {
             if level == "N6" && code.len() == 7 && code.parse::<u32>().ok().is_none_or(|code| catalogue.by_ibge(code).is_none()) {
                 unmatched_geography.push(json!({"code": code, "name": name}));
             }
-            if cnpj.len() != 14 {
+            if cnpj.is_empty() {
                 return Ok(());
             }
-            if !valid_cnpj(cnpj) {
+            if !adapters::verified_cnpj(cnpj).is_some_and(|parsed| parsed.as_str() == cnpj) {
                 if invalid_cnpj.len() < 20 {
                     invalid_cnpj.push(cnpj.to_string());
                 }
                 return Ok(());
             }
-            cnpjs.insert(cnpj.to_string());
-            if checked < args.sample {
+            if cnpjs.insert(cnpj.to_string()) && checked < args.sample {
                 checked += 1;
                 if snapshot.cnpj_prefix_docs(cnpj)?.is_empty() && absent_cnpj.len() < 50 {
                     absent_cnpj.push(cnpj.to_string());
@@ -311,29 +310,6 @@ fn audit_records(args: AuditRecordsArgs) -> Result<()> {
         report["inconsistencies"].as_array().map(Vec::len).unwrap_or(0)
     );
     Ok(())
-}
-
-fn valid_cnpj(cnpj: &str) -> bool {
-    if cnpj.len() != 14 || !cnpj.chars().all(|character| character.is_ascii_digit()) {
-        return false;
-    }
-    let digits = cnpj.bytes().map(|byte| u32::from(byte - b'0')).collect::<Vec<_>>();
-    let weights1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
-    let sum1 = weights1.iter().zip(&digits[..12]).map(|(weight, digit)| weight * digit).sum::<u32>();
-    let dv1 = {
-        let remainder = sum1 % 11;
-        if remainder < 2 { 0 } else { 11 - remainder }
-    };
-    if dv1 != digits[12] {
-        return false;
-    }
-    let weights2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
-    let sum2 = weights2.iter().zip(&digits[..13]).map(|(weight, digit)| weight * digit).sum::<u32>();
-    let dv2 = {
-        let remainder = sum2 % 11;
-        if remainder < 2 { 0 } else { 11 - remainder }
-    };
-    dv2 == digits[13]
 }
 
 fn verify_records(dir: &Path) -> Result<()> {

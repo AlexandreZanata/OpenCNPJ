@@ -57,18 +57,19 @@ Nine record-level adapters ingest complete published resources into immutable
 generation (CSV/ZIP), ANP fuel prices (CSV), Comex Stat municipal exports (CSV)
 and MT state convenios (CSV). Each row is accounted for as accepted, out of
 scope, rejected or duplicate; `--scope MT` and `--scope all` are supported.
-Full national runs produced 98,119 ANTT, 641,928 CNES, 215,545 INEP and
+Full national runs produced 98,119 ANTT, 642,268 CNES, 215,545 INEP and
 3,837,044 PGFN records. The stores are outside Git.
 
 The record writer is now a true streaming sink: full national INEP dropped from
 ~10.5 GB to 238 MB RSS and PGFN Previdenciário from ~10.7 GB to 198 MB. ANEEL
 now streams its 1.5 GB CSV entry with a chunked reader (25 MB RSS).
 
-Record-level CNPJ audit: invalid check-digit CNPJs from PGFN and ANEEL are now
-stored without CNPJ identity and counted in the manifest limitations. CNES DF
-administrative-region codes are collapsed explicitly to Brasília (5300108).
-National audit is clean; the only remaining crosswalk exception is one valid
-ANEEL CNPJ absent from the 2026-10 snapshot. See `ADAPTERS.md`.
+The Stage 14 record audit found one sampled linked ANEEL CNPJ absent from the
+2026-10 snapshot in the MT run. The national sample reported no findings across
+its seven stores and did not include ANEEL. These results describe the checked
+sample. See `ADAPTERS.md` for the current business-record and CNPJ linkage rules.
+CNES retains the raw DF administrative code when using Brasília (5300108) as
+the common IBGE municipality key.
 
 ## Additional source and CNPJ crosswalk audit
 

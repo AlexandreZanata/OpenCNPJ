@@ -7,15 +7,15 @@
 //! duplicate.
 
 use std::{
-    collections::BTreeMap,
+    collections::{BTreeMap, BTreeSet},
     fs::{self, File},
-    io::{Read, Write},
+    io::{Cursor, Read, Write},
     path::{Path, PathBuf},
 };
 
 use anyhow::{Context, Result, bail, ensure};
 use clap::Args;
-use opencnpj_core::text::latin1_to_string;
+use opencnpj_core::{Cnpj, text::latin1_to_string};
 use opencnpj_insights::{
     catalog::municipalities::{MunicipalityCatalogue, Place},
     official::{
@@ -318,7 +318,7 @@ fn parse_cnes(
         };
         let (code7, df_region) = match bridge.get(&code6).copied() {
             Some(code) => (code, false),
-            None if (530_000..=539_999).contains(&code6) => (5_300_108, true),
+            None if scope_matches(uf, "DF") && (530_000..=539_999).contains(&code6) => (5_300_108, true),
             None => {
                 rejected += 1;
                 if rejected_samples.len() < 20 {
@@ -459,7 +459,7 @@ fn parse_pgfn(input: &Path, scope: &str, period: Option<&str>, limit: Option<usi
     let mut out_of_scope = 0_u64;
     let mut rejected = 0_u64;
     let rejected_samples = Vec::new();
-    let mut invalid_cnpj_rows = 0_u64;
+    let mut unlinked_cnpj_rows = 0_u64;
     let mut header: Vec<String> = Vec::new();
     let mut expected = 0;
     'entries: for name in names {
@@ -489,26 +489,18 @@ fn parse_pgfn(input: &Path, scope: &str, period: Option<&str>, limit: Option<usi
                 return Ok(());
             }
             let person_type = row.get("TIPO_PESSOA").map(|value| fold(value)).unwrap_or_default();
-            if !person_type.contains("juridica") {
+            if person_type.trim() != "pessoa juridica" {
                 out_of_scope += 1;
                 return Ok(());
             }
-            let digits = normalize_cnpj(row.get("CPF_CNPJ").map(String::as_str).unwrap_or(""));
-            if digits.len() != 14 {
-                out_of_scope += 1;
-                return Ok(());
-            }
-            let (cnpj, root) = if valid_cnpj(&digits) {
-                (digits.clone(), digits[..8].to_string())
-            } else {
-                invalid_cnpj_rows += 1;
-                (String::new(), String::new())
-            };
+            let raw_cnpj = row.get("CPF_CNPJ").map(String::as_str).unwrap_or("");
+            let (cnpj, root) = verified_cnpj(raw_cnpj).map(|cnpj| (cnpj.as_str().to_owned(), cnpj.basico().to_owned())).unwrap_or_default();
+            unlinked_cnpj_rows += u64::from(cnpj.is_empty());
             let record_id = format!(
                 "pgfn:{}:{}:{}",
                 row.get("TIPO_DEVEDOR").map(String::as_str).unwrap_or(""),
                 row.get("NUMERO_INSCRICAO").map(String::as_str).unwrap_or(""),
-                cnpj
+                if cnpj.is_empty() { raw_cnpj } else { &cnpj }
             );
             writer.push(Record {
                 record_id,
@@ -539,8 +531,10 @@ fn parse_pgfn(input: &Path, scope: &str, period: Option<&str>, limit: Option<usi
                 "Natural-person records are excluded from this business-prospecting slice.".into(),
                 "Repeated-digit CNPJ sentinels are treated as missing.".into(),
             ];
-            if invalid_cnpj_rows > 0 {
-                limitations.push(format!("{invalid_cnpj_rows} rows had invalid CNPJ check digits and were stored without CNPJ identity."));
+            if unlinked_cnpj_rows > 0 {
+                limitations.push(format!(
+                    "{unlinked_cnpj_rows} in-scope rows had a missing, masked or invalid CNPJ and were kept without a CNPJ link."
+                ));
             }
             limitations
         },
@@ -613,50 +607,41 @@ fn parse_aneel(
         .find(|name| name.ends_with("empreendimento-geracao-distribuida.csv"))
         .with_context(|| format!("no ANEEL CSV entry in {}", input.display()))?;
     let mut reader = zip.by_name(&entry)?;
-    let mut header = Vec::new();
-    let mut expected = 0;
+    let mut prefix = Vec::new();
+    reader.by_ref().take(3).read_to_end(&mut prefix)?;
+    let prefix = prefix.strip_prefix(b"\xef\xbb\xbf").unwrap_or(&prefix);
+    let mut reader = CsvReader::new(Cursor::new(prefix).chain(reader), b';');
+    let (_, header) = reader.next_record()?.context("empty ANEEL CSV header")?;
+    let expected = header.len();
+    let distinct = header.iter().collect::<BTreeSet<_>>();
+    ensure!(distinct.len() == expected && !header.iter().any(String::is_empty), "invalid ANEEL CSV column names");
+    for required in ["SigUF", "SigTipoConsumidor", "NumCPFCNPJ", "CodMunicipioIbge", "CodEmpreendimento"] {
+        ensure!(header.iter().any(|column| column == required), "missing ANEEL CSV column {required}");
+    }
     let mut total = 0_u64;
     let mut out_of_scope = 0_u64;
     let mut rejected = 0_u64;
     let mut rejected_samples = Vec::new();
-    let mut invalid_cnpj_rows = 0_u64;
-    let mut stop = false;
-    for_each_csv_reader(&mut reader, b';', |line, fields| {
-        if stop {
-            return Ok(());
-        }
-        if line == 1 {
-            header = fields;
-            expected = header.len();
-            return Ok(());
-        }
-        if limit.is_some_and(|limit| total as usize >= limit) {
-            stop = true;
-            return Ok(());
-        }
+    let mut unlinked_cnpj_rows = 0_u64;
+    while limit.is_none_or(|limit| total < limit as u64) {
+        let Some((_, fields)) = reader.next_record()? else {
+            break;
+        };
         total += 1;
         if fields.len() != expected {
             rejected += 1;
-            return Ok(());
+            continue;
         }
-        let row = row_map(&header, &fields);
+        let row: BTreeMap<_, _> = header.iter().cloned().zip(fields).collect();
         let uf = row.get("SigUF").map(String::as_str).unwrap_or("");
         if !scope_matches(uf, scope) {
             out_of_scope += 1;
-            return Ok(());
+            continue;
         }
-        let raw_cnpj = row.get("NumCPFCNPJ").map(String::as_str).unwrap_or("");
-        let digits = normalize_cnpj(raw_cnpj);
-        if digits.len() != 14 {
+        if !row.get("SigTipoConsumidor").is_some_and(|value| value.trim().eq_ignore_ascii_case("PJ")) {
             out_of_scope += 1;
-            return Ok(());
+            continue;
         }
-        let (cnpj, root) = if valid_cnpj(&digits) {
-            (digits.clone(), digits[..8].to_string())
-        } else {
-            invalid_cnpj_rows += 1;
-            (String::new(), String::new())
-        };
         let Some(code) =
             row.get("CodMunicipioIbge").and_then(|value| value.parse::<u32>().ok()).filter(|code| catalogue.by_ibge(*code).is_some())
         else {
@@ -664,9 +649,16 @@ fn parse_aneel(
             if rejected_samples.len() < 20 {
                 rejected_samples.push(row.get("CodMunicipioIbge").cloned().unwrap_or_default());
             }
-            return Ok(());
+            continue;
         };
-        let record_id = format!("aneel:{}", row.get("CodEmpreendimento").map(String::as_str).unwrap_or(""));
+        let Some(id) = row.get("CodEmpreendimento").filter(|id| !id.trim().is_empty()) else {
+            rejected += 1;
+            continue;
+        };
+        let raw_cnpj = row.get("NumCPFCNPJ").map(String::as_str).unwrap_or("");
+        let (cnpj, root) = verified_cnpj(raw_cnpj).map(|cnpj| (cnpj.as_str().to_owned(), cnpj.basico().to_owned())).unwrap_or_default();
+        unlinked_cnpj_rows += u64::from(cnpj.is_empty());
+        let record_id = format!("aneel:{id}");
         writer.push(Record {
             record_id,
             geography_level: "N6".into(),
@@ -677,15 +669,15 @@ fn parse_aneel(
             period: period.map(str::to_string).or_else(|| row.get("AnmPeriodoReferencia").cloned()).unwrap_or_else(|| "current".into()),
             data: json_row(row),
         })?;
-        Ok(())
-    })?;
+    }
     let mut limitations = vec![
         "ODbL adapted-database obligations require assessment before commercial enablement.".into(),
         "A generator register does not identify every installer or prove consumption.".into(),
-        "Natural-person CPF records are excluded.".into(),
+        "Only holders explicitly classified as legal entities (PJ) are included.".into(),
     ];
-    if invalid_cnpj_rows > 0 {
-        limitations.push(format!("{invalid_cnpj_rows} rows had invalid CNPJ check digits and were stored without CNPJ identity."));
+    if unlinked_cnpj_rows > 0 {
+        limitations
+            .push(format!("{unlinked_cnpj_rows} in-scope rows had a missing, masked or invalid CNPJ and were kept without a CNPJ link."));
     }
     Ok(AdapterOutput {
         total_rows: total,
@@ -1003,9 +995,12 @@ impl<R: Read> CsvReader<R> {
     }
 
     fn next_record(&mut self) -> Result<Option<(u64, Vec<String>)>> {
-        loop {
+        // Bound memory if an open quote absorbs the rest of a damaged archive.
+        const MAX_RECORD_BYTES: usize = 8 * 1024 * 1024;
+        for _ in 0..MAX_RECORD_BYTES {
             let Some(byte) = self.next_byte()? else {
-                if self.started || !self.field.is_empty() || !self.fields.is_empty() {
+                ensure!(!self.in_quotes || self.quote_pending, "unterminated quoted field in CSV record {}", self.line);
+                if self.started {
                     self.fields.push(decode(&self.field));
                     self.field.clear();
                     let fields = std::mem::take(&mut self.fields);
@@ -1023,6 +1018,8 @@ impl<R: Read> CsvReader<R> {
                         self.quote_pending = false;
                         continue;
                     }
+                    // ANEEL publishes some fields with a suffix after a closing quote.
+                    // Keep reading the suffix as unquoted text, as in the buffered parser.
                     self.in_quotes = false;
                     self.quote_pending = false;
                 } else if byte == b'"' {
@@ -1049,8 +1046,7 @@ impl<R: Read> CsvReader<R> {
                     let line = self.line;
                     self.line += 1;
                     let fields = std::mem::take(&mut self.fields);
-                    self.started = false;
-                    if fields.iter().any(|field| !field.is_empty()) {
+                    if std::mem::take(&mut self.started) {
                         return Ok(Some((line, fields)));
                     }
                 }
@@ -1061,15 +1057,8 @@ impl<R: Read> CsvReader<R> {
                 }
             }
         }
+        bail!("CSV record {} exceeds {MAX_RECORD_BYTES} bytes", self.line)
     }
-}
-
-fn for_each_csv_reader<R: Read>(reader: R, delimiter: u8, mut callback: impl FnMut(u64, Vec<String>) -> Result<()>) -> Result<()> {
-    let mut reader = CsvReader::new(reader, delimiter);
-    while let Some((line, fields)) = reader.next_record()? {
-        callback(line, fields)?;
-    }
-    Ok(())
 }
 
 fn csv_header(bytes: &[u8], delimiter: u8) -> Result<(Vec<String>, usize)> {
@@ -1198,27 +1187,13 @@ fn normalize_cnpj(value: &str) -> String {
     if digits.len() == 14 && digits.bytes().all(|byte| byte == digits.as_bytes()[0]) { String::new() } else { digits }
 }
 
-fn valid_cnpj(cnpj: &str) -> bool {
-    if cnpj.len() != 14 || !cnpj.chars().all(|character| character.is_ascii_digit()) {
-        return false;
+pub(super) fn verified_cnpj(value: &str) -> Option<Cnpj> {
+    let cnpj = Cnpj::parse(value.trim()).ok()?;
+    let id = cnpj.as_str();
+    if id.bytes().all(|byte| byte == id.as_bytes()[0]) {
+        return None;
     }
-    let digits = cnpj.bytes().map(|byte| u32::from(byte - b'0')).collect::<Vec<_>>();
-    let weights1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
-    let sum1 = weights1.iter().zip(&digits[..12]).map(|(weight, digit)| weight * digit).sum::<u32>();
-    let dv1 = {
-        let remainder = sum1 % 11;
-        if remainder < 2 { 0 } else { 11 - remainder }
-    };
-    if dv1 != digits[12] {
-        return false;
-    }
-    let weights2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
-    let sum2 = weights2.iter().zip(&digits[..13]).map(|(weight, digit)| weight * digit).sum::<u32>();
-    let dv2 = {
-        let remainder = sum2 % 11;
-        if remainder < 2 { 0 } else { 11 - remainder }
-    };
-    dv2 == digits[13]
+    Some(cnpj)
 }
 
 fn split_cnpj(value: &str) -> (String, String) {
@@ -1282,23 +1257,30 @@ mod tests {
     fn csv_reader_streams_records_across_chunks() {
         let mut data = Vec::new();
         data.extend_from_slice(b"a;b;c\n1;;\"x;y\"\n");
-        data.extend_from_slice(&vec![b'z'; 70_000]);
+        data.push(b'"');
+        let field_start = data.len();
+        data.resize(64 * 1024 - 1, b'z');
+        let padding = data.len() - field_start;
+        data.extend_from_slice(b"\"\"x\"");
         let mut rows = Vec::new();
-        for_each_csv_reader(std::io::Cursor::new(data), b';', |line, fields| {
+        let mut reader = CsvReader::new(data.as_slice(), b';');
+        while let Some((line, fields)) = reader.next_record().unwrap() {
             rows.push((line, fields));
-            Ok(())
-        })
-        .unwrap();
+        }
         assert_eq!(rows[0].1, ["a", "b", "c"]);
         assert_eq!(rows[1].1, ["1", "", "x;y"]);
-        assert_eq!(rows[2].1[0].len(), 70_000);
+        assert_eq!(rows[2].1[0].len(), padding + 2);
+        assert!(rows[2].1[0].ends_with("\"x"));
     }
 
     #[test]
     fn cnpj_check_digits() {
-        assert!(valid_cnpj("11294402000162"));
-        assert!(!valid_cnpj("01367173400014"));
-        assert!(!valid_cnpj("99999999999999"));
+        assert_eq!(verified_cnpj("11.294.402/0001-62").unwrap().as_str(), "11294402000162");
+        assert_eq!(verified_cnpj("12.abc.345/01de-35").unwrap().basico(), "12ABC345");
+        assert_eq!(verified_cnpj("01367173400014"), None);
+        assert_eq!(verified_cnpj("00000000000000"), None);
+        assert_eq!(verified_cnpj("99999999999999"), None);
+        assert_eq!(verified_cnpj("***123456**"), None);
     }
 
     #[test]
