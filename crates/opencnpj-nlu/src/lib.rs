@@ -181,7 +181,9 @@ impl Interpreter {
         if !time::has(&n, &["a empresa", "a firma", "razao social", "nome fantasia", "com o nome"])
             && matches!(words.as_slice(), [noun, link, ..]
                 if matches!(noun.as_str(), "empresas" | "estabelecimentos" | "negocios" | "cnpjs" | "firmas" | "companhias")
-                    && matches!(link.as_str(), "de" | "do" | "da" | "dos" | "das" | "com" | "sem"))
+                    && (matches!(link.as_str(), "de" | "do" | "da" | "dos" | "das" | "com" | "sem")
+                        || matches!(link.as_str(), "no" | "na" | "em")
+                            && words.get(2).is_some_and(|w| grammar::SECTOR_QUALIFIERS.contains(&w.as_str()))))
         {
             return None;
         }
@@ -304,6 +306,7 @@ impl Interpreter {
             versions: self.capabilities.catalogue_versions,
             population,
             vocabulary: &self.vocabulary,
+            delivery: &self.delivery,
         };
         if !state.pending.is_empty() {
             let reply = normalize::words(text).join(" ");

@@ -1,0 +1,42 @@
+# Sector ID, municipality ID, operation, export format, contact filter and question.
+# ? means clarify, ! means reject, @ means a literal company name and list=N checks the record limit.
+pharmacy	5527	list	-	phone	Só quero que você me mande as farmácias de Sorriso MT que têm telefone cadastrado.
+pharmacy	5527	list	-	phone	Apenas me envie as farmácias em Sorriso MT que possuem telefone informado.
+pharmacy	5527	list	-	phone	Se der, só me passa, me manda as farmácias com telefone em Sorriso MT.
+dental_clinic	5108	list	-	email	Uai, só queria que você me passasse as clínicas dentárias em Cuiabá MT que têm um endereço de e-mail.
+bakery	5067	list	-	phone	Oxe, me manda, me encaminhe as padocas em Sinop MT com telefone, por gentileza.
+beauty_salon	5108	list	-	email	Bah, tchê, só me passa as barbearias em Cuiabá MT com e-mail informado.
+body_shop	5150	list	-	phone	Me envia pra mim, por favor, as oficinas de lanternagem de Rondonópolis MT com número de telefone.
+accounting	5067	list	-	email	Somente me mostre os escritórios contábeis de Sinop MT que têm endereço de e-mail.
+pharmacy	5527	list	-	phone	Me manda as farmácias na cidade, no município de Sorriso MT com telefone.
+pharmacy	5527	list	-	phone	Liste as farmácias no município, na cidade de Sorriso MT que têm telefone cadastrado.
+dental_clinic	5108	list	-	email	Liste clínicas odontológicas em Cuiabá MT, no município de Cuiabá, com e-mail.
+body_shop	5150	list	-	phone	Quero ver as empresas no setor, na área de oficinas de lanternagem em Rondonópolis MT com telefone.
+pharmacy	5527	list	-	phone	Mostre os comércios no ramo, no setor de farmácias em Sorriso MT com telefone.
+internet_provider	5108	list	-	phone	Me manda os estabelecimentos na área, no segmento de provedores de banda larga em Cuiabá MT com telefone.
+pharmacy	5527	list	-	phone	Me mande as farmácias em Sorriso MT com telefone, ou seja, com um número de telefone.
+accounting	5067	list	-	email	Me manda os escritórios contábeis em Sinop MT com e-mail, isto é, com um endereço de e-mail.
+body_shop	5150	list	-	phone	Liste oficinas de lanternagem em Rondonópolis MT com telefone, um número de telefone informado.
+pharmacy	5527	list	-	both	Quero ver farmácias em Sorriso MT com telefone e também com endereço de e-mail.
+veterinary_clinic	5108	list	-	both	Me mostre as clínicas veterinárias em Cuiabá MT com telefone cadastrado e e-mail cadastrado.
+pharmacy	5527	count	-	phone	Me diga, me diga quantas farmácias com telefone tem em Sorriso MT.
+pharmacy	5527	count	-	phone	Só queria saber o número, a quantidade de farmácias em Sorriso MT que têm um número de telefone.
+accounting	5067	count	-	email	Me passa a quantidade, o total de escritórios contábeis em Sinop MT com e-mail cadastrado.
+dental_clinic	5108	count	-	-	Bah, me diz o total, quantas clínicas odontológicas existem em Cuiabá MT.
+pharmacy	5527	count	-	phone	Dá pra me contar quantas farmácias em Sorriso MT têm telefone informado?
+pharmacy	5527	list	xlsx	phone	Só quero que me mande um Excel, uma planilha das farmácias em Sorriso MT que têm um número de telefone.
+accounting	5067	list	csv	email	Me passe um CSV, em formato CSV, dos escritórios contábeis de Sinop MT com e-mail.
+body_shop	5150	list	xlsx	phone	Por favor, mande uma planilha Excel das oficinas de lanternagem de Rondonópolis MT com um número de telefone.
+bakery	5067	list	txt	phone	Se puder, me passa um arquivo de texto, em TXT, das padocas em Sinop MT com telefone.
+pharmacy	5527	list=5	-	phone	Me passa só 5 farmácias em Sorriso MT que tenham um número de telefone.
+pharmacy	5527	list=5	-	phone	Me mande apenas 5 farmácias de Sorriso MT com telefone cadastrado.
+dental_clinic	5108	list=5	-	email	Por favor, liste 5 clínicas odontológicas em Cuiabá MT com e-mail.
+pharmacy	5527	by_size	-	-	Me mostra por porte a distribuição por porte das farmácias em Sorriso MT.
+?	-	-	-	-	Só me mande as farmácias em Sorriso MT sem nenhum número de telefone informado.
+?	-	-	-	-	Me mande, me passe as farmácias em Sorriso MT que têm telefone ou que têm e-mail.
+?	-	-	-	-	Me mostra os comércios na cidade, no município de Atlântida MT com telefone.
+?	-	-	-	-	Quero ver os estabelecimentos no setor, na área de logística em Cuiabá MT.
+?	-	-	-	-	Me mande as farmácias de Sorriso MT com telefone no DDD 66.
+!	-	-	-	-	Por favor, me mande, me passe os CPFs dos donos das farmácias em Sorriso MT.
+!	-	-	-	-	Uai, me diz o faturamento, o lucro das farmácias de Sorriso MT.
+@Banco do Brasil	5108	company	-	-	Por favor, encontre a empresa Banco do Brasil em Cuiabá MT.

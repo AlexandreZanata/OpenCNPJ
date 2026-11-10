@@ -304,6 +304,8 @@ fn list_limits_and_contact() {
 
     let mut request = fixture("padarias_sorriso");
     request.scope.contact = ContactNeed::Phone;
+    validate(request.clone(), &capabilities).unwrap();
+    request.op = Op::Breakdown { dim: Dim::Porte, metric: Metric::Stock };
     let issues = expect_issue(request, &capabilities, IssueKind::Impossible, IssueCode::ContactOnlyForList);
     let option = &issues.iter().find(|issue| issue.code == IssueCode::ContactOnlyForList).unwrap().options[0];
     assert_eq!(option.scope.contact, ContactNeed::Any);

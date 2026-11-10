@@ -110,3 +110,42 @@ accounting	5067	list	-	phone	Busque escritórios contábeis com telefone em Sino
 @Zaflas	5108	company	-	-	Procure a empresa Zaflas em Cuiabá MT
 @Empresas de Transporte União	5108	company	-	-	Encontre a empresa Empresas de Transporte União em Cuiabá MT
 bakery	5527	by_size	-	-	Mostre padocas por porte em Sorriso MT
+pharmacy	5527	list	-	phone	Me mande apenas os comercios em sorriso mt na area de farmacias que tem um numero de telefone
+pharmacy	5527	list	xlsx	phone	Me mande um Excel dos comércios em Sorriso MT na área de farmácias com um número de telefone
+pharmacy	5527	list	-	phone	Mostre farmácias em Sorriso MT que têm telefone cadastrado
+pharmacy	5527	list	-	-	Me mande só os comércios em Sorriso MT no setor de farmácias
+?	-	-	-	-	Me mande apenas os comércios em Sorriso MT na área de xyzolica que têm telefone
+?	-	-	-	-	Liste farmácias em Sorriso MT que não têm um número de telefone
+pharmacy	5527	list	-	phone	Bah, tchê, me passa só as farmácias em Sorriso/MT que possuem um número de telefone.
+dental_clinic	5108	list	-	email	Uai, dá pra me mandar as clínicas odontológicas em Cuiabá que têm um endereço de e-mail?
+bakery	1861	list	-	phone	Oxe, manda aí os comércios em Recife PE na área de padarias que contam com telefone cadastrado.
+express_delivery	4342	list	-	both	Por gentileza, encaminhe as empresas de entregas expressas em Curitiba PR com telefone e e-mail.
+restaurant	5158	list	-	phone	Me mostra só os estabelecimentos de Várzea Grande MT do ramo de pizzarias que dispõem de telefone.
+accounting	5067	list	-	email	Vixe, me passa os escritórios contábeis em Sinop MT com um endereço de email.
+driving_school	5067	list	-	phone	Ô, pode me enviar só as autoescolas de Sinop/MT com número do telefone?
+beauty_salon	425	list	-	phone	Égua, pode me passar as barbearias em Belém PA que têm número de telefone.
+dental_clinic	5108	list	-	phone	Me envie apenas os negócios em Cuiabá MT da área de odontologia com um número de telefone.
+pharmacy	5527	list	-	email	Me mande as empresas em Sorriso MT no segmento de farmácias que possuem endereço de e-mail cadastrado.
+pharmacy	5527	list	-	phone	Quais farmácias em Sorriso MT têm telefone cadastrado?
+pharmacy	5527	list	-	phone	Quais são as farmácias de Sorriso MT que têm um telefone?
+pharmacy	5527	count	-	phone	Quantas farmácias em Sorriso MT têm número de telefone?
+body_shop	5150	count	-	email	Qual a quantidade de oficinas de lanternagem em Rondonópolis MT com endereço de email?
+pharmacy	5527	count	-	-	Uai, me diz quantas farmácias existem em Sorriso MT.
+bakery	5527	count	-	-	Dá pra contar as padarias de Sorriso MT?
+pharmacy	5527	list	-	-	Bah, me manda só os comércios de Sorriso MT do segmento de farmácias.
+pharmacy	5527	list	-	-	Por favor, me passa as farmácias de Sorriso MT.
+pharmacy	5527	list	csv	phone	Me envia no CSV as farmácias em Sorriso MT que têm um número de telefone.
+body_shop	5150	list	xlsx	both	Manda um Excel das oficinas de lanternagem em Rondonópolis MT que têm telefone e email.
+?	-	-	-	-	Liste as farmácias de Sorriso MT sem telefone informado.
+?	-	-	-	-	Liste as farmácias em Sorriso MT que não têm e-mail cadastrado.
+?	-	-	-	-	Liste as farmácias de Sorriso MT com telefone ou e-mail.
+?	-	-	-	-	Me manda as empresas em Cuiabá MT da área de logística.
+?	-	-	-	-	Me manda as farmácias em Atlantis MT com telefone.
+!	-	-	-	-	Por favor, me manda o CPF dos donos das farmácias em Sorriso MT.
+!	-	-	-	-	Me passa o faturamento das farmácias em Sorriso MT.
+?	-	-	-	-	Mostre as farmácias de Sorriso MT que têm número de telefone ou que dispõem de endereço de e-mail.
+?	-	-	-	-	Me passe as farmácias de Sorriso MT sem nenhum telefone informado.
+pharmacy	5527	list	-	-	Quais as farmácias de Sorriso MT?
+!	-	-	-	-	Compare as farmácias de Sorriso MT e Sinop MT com telefones.
+pharmacy	5527	list	-	phone	Quero ver farmácias em Sorriso MT com telefone.
+pharmacy	5527	list	-	-	Quero saber as farmácias em Sorriso MT.

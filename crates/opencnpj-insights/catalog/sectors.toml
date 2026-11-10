@@ -629,7 +629,7 @@ since = "v1"
 [[sector]]
 id = "express_delivery"
 display = { sing = "serviço de entrega rápida", plural = "serviços de entrega rápida", gender = "m" }
-aliases = ["motofrete", "motoboy", "motogirl", "entrega expressa", "serviço de entrega expressa", "serviços de entrega expressa"]
+aliases = ["motofrete", "motoboy", "motogirl", "entrega expressa", "entregas expressas", "serviço de entrega expressa", "serviços de entrega expressa"]
 cnae_core = ["5320202"]
 cnae_extended = []
 scope = "main"

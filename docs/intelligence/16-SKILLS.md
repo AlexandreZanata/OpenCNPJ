@@ -93,7 +93,15 @@ A column list after `com` needs two names unless it follows the format directly
 * Lists no longer drop the event they name: "padarias que fecharam em 2025" lists
   status 08 with `status_date` in 2025; "abertas em 2025" sets `opened` and every status.
   Without a period, "todas as empresas que tiveram baixa" lists every closed company.
-* "no setor de TI", "no ramo de", "no segmento de" are accepted before a recognized activity.
+* Repeated qualifiers such as "na cidade, no município de Sorriso" and "no ramo, no
+  setor de farmácias" resolve to one filter. Unknown activities and places still require
+  clarification.
+* Record commands allow regional and courteous wording, repeated verbs and limits such as
+  "me passa só 5 farmácias". Restating the same contact condition keeps the filter.
+* Repeated aliases for one file format, such as "um CSV, em formato CSV", produce one
+  export. The [redundant phrasing fixture](../../crates/opencnpj-lab/tests/fixtures/redundant-phrases.tsv)
+  checks the operation, scope, contact filter, limit and format against the production
+  catalogue.
 * "baixados em" and "encerrados em" join the closure cues (masculine nouns).
 
 ### Conversation
@@ -265,6 +273,13 @@ phrase such as "empresas de produção de soja" identifies an activity, while a 
 for the volume of soybean production needs a different source. The
 [sector phrase fixture](../../crates/opencnpj-lab/tests/fixtures/sector-phrases.tsv)
 checks the expected CNAEs, municipality, operation, contact filter and export format.
+
+Record searches reuse the courtesy, regional and delivery phrases used for files.
+A recognized activity can follow qualifiers such as "na área de" or "do ramo de".
+Contact clauses such as "que têm um número de telefone" and "com endereço de e-mail"
+apply to both lists and exact counts of establishments in the served snapshot. An
+explicit count remains a count. Missing-contact and either-contact conditions prompt
+for clarification, while "telefone e e-mail" requires both fields.
 
 ## 10. Repeated lines in a file
 

@@ -368,7 +368,7 @@ mod tests {
     }
 
     #[test]
-    fn sector_phrases_keep_the_expected_activity_and_intent() {
+    fn search_phrases_keep_the_expected_activity_and_intent() {
         use opencnpj_nlu::policy::Decision;
 
         #[derive(serde::Deserialize)]
@@ -395,11 +395,13 @@ mod tests {
         let sectors: BTreeMap<_, _> =
             sector_ids.sector.iter().enumerate().map(|(id, entry)| (entry.id.as_str(), u16::try_from(id).unwrap())).collect();
 
-        let fixture = include_str!("../tests/fixtures/sector-phrases.tsv");
-        for line in fixture.lines().filter(|line| !line.starts_with('#') && !line.is_empty()) {
+        let cases = include_str!("../tests/fixtures/sector-phrases.tsv")
+            .lines()
+            .chain(include_str!("../tests/fixtures/redundant-phrases.tsv").lines());
+        for line in cases.filter(|line| !line.starts_with('#') && !line.is_empty()) {
             let columns: Vec<_> = line.splitn(6, '\t').collect();
             let [expected, city, op, format, contact, question] = columns.as_slice() else {
-                panic!("invalid sector test fixture: {line}");
+                panic!("invalid search test fixture: {line}");
             };
             let result = assets.interpreter.interpret(question, &mut Conversation::default());
 
@@ -427,11 +429,22 @@ mod tests {
             );
             assert_eq!(request.scope.place, PlaceFilter::Municipalities(SmallSet::new([city])), "{question}");
             assert_eq!(request.scope.status, Some(StatusSet::only(Status::Active)), "{question}");
-            assert_eq!(request.scope.contact, if *contact == "phone" { ContactNeed::Phone } else { ContactNeed::Any }, "{question}");
+            let contact = match *contact {
+                "phone" => ContactNeed::Phone,
+                "email" => ContactNeed::Email,
+                "both" => ContactNeed::Both,
+                "-" => ContactNeed::Any,
+                _ => panic!("invalid contact in fixture: {contact}"),
+            };
+            assert_eq!(request.scope.contact, contact, "{question}");
             match *op {
                 "list" => assert!(matches!(request.op, Op::List { .. }), "{question}: {:?}", request.op),
                 "count" => assert!(matches!(request.op, Op::Count { .. }), "{question}: {:?}", request.op),
                 "by_size" => assert!(matches!(request.op, Op::Breakdown { dim: Dim::Porte, .. }), "{question}: {:?}", request.op),
+                limit if limit.starts_with("list=") => {
+                    let expected_limit = limit["list=".len()..].parse::<u16>().unwrap();
+                    assert!(matches!(request.op, Op::List { limit, .. } if limit == expected_limit), "{question}: {:?}", request.op);
+                }
                 _ => panic!("unknown operation: {op}"),
             }
             if *format == "-" {
@@ -442,6 +455,15 @@ mod tests {
                 assert_eq!(export.rows, None, "{question}");
             }
         }
+
+        let mut conversation = Conversation::default();
+        let original = assets.interpreter.interpret("Me passe as farmácias de Sorriso MT", &mut conversation).request.unwrap();
+        let followup =
+            assets.interpreter.interpret("Dessas, só as que têm um endereço de e-mail cadastrado", &mut conversation).request.unwrap();
+        assert_eq!(followup.op, original.op);
+        assert_eq!(followup.scope.place, original.scope.place);
+        assert_eq!(followup.scope.activity, original.scope.activity);
+        assert_eq!(followup.scope.contact, ContactNeed::Email);
     }
 
     /// Every file request of the skills round, dialogues included, is interpreted to its

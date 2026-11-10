@@ -93,7 +93,7 @@ impl IssueCode {
             Self::SectorCatalogueTooSmall => "sector ranking or comparison needs at least two catalogue sectors",
             Self::ClosedFlowStatus => "closure flows require status closed",
             Self::MeiPorteContradiction => "MEI contradicts the selected porte",
-            Self::ContactOnlyForList => "contact filter is only available for lists",
+            Self::ContactOnlyForList => "contact filters require a list or a count of establishments",
             Self::ListLimit => "list limit exceeds the caller plan",
             Self::InvalidPage => "page is not valid for this operation",
             Self::InvalidRange => "range is empty",
@@ -259,7 +259,7 @@ fn check_scope(request: &Request, capabilities: &Capabilities, issues: &mut Vec<
         let option = option(request, capabilities, |candidate| candidate.scope.porte = PorteSet::ALL);
         push_issue(issues, Issue::impossible(IssueCode::MeiPorteContradiction).with(option));
     }
-    if scope.contact != ContactNeed::Any && !matches!(&request.op, Op::List { .. }) {
+    if scope.contact != ContactNeed::Any && !matches!(&request.op, Op::List { .. } | Op::Count { metric: Metric::Stock }) {
         let option = option(request, capabilities, |candidate| candidate.scope.contact = ContactNeed::Any);
         push_issue(issues, Issue::impossible(IssueCode::ContactOnlyForList).with(option));
     }

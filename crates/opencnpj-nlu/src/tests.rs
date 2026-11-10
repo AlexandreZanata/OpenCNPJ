@@ -592,7 +592,9 @@ fn commercial_round_10_prefix_and_scope_edit_regressions() {
     assert_eq!(r.scope.place, PlaceFilter::Municipalities(SmallSet::new([MunicipalityId(35)])));
 
     // Abbreviated list imperative keeps the explicit limit and head-office filter.
-    let r = engine.interpret("Mostre as matrizes de transportadora em Sorriso", &mut Conversation::default()).request.unwrap();
+    let interpret_list = |question| engine.interpret(question, &mut Conversation::default()).request.unwrap();
+    let r = interpret_list("Mostre as matrizes de transportadora em Sorriso");
+    assert_eq!(interpret_list("Me mande apenas as matrizes de transportadora em Sorriso"), r);
     assert_eq!(r.op, Op::List { order: ListOrder::Cnpj, limit: 20 });
     assert_eq!(r.scope.head_office, Tri::Yes);
     assert_eq!(

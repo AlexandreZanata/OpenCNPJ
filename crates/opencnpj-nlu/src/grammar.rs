@@ -60,17 +60,162 @@ pub(crate) struct ResolveContext<'a> {
     pub versions: CatalogueVersions,
     pub population: PopulationRef,
     pub vocabulary: &'a crate::vocabulary::Known,
+    pub delivery: &'a crate::skills::Vocabulary,
+}
+
+const PHONE_WORDS: &[&str] = &["telefone", "telefones", "fone", "celular", "whatsapp", "zap"];
+const EMAIL_WORDS: &[&str] = &["email", "emails", "e mail", "e mails"];
+
+pub(crate) const SECTOR_QUALIFIERS: &[&str] = &["area", "atividade", "setor", "ramo", "segmento"];
+const PLACE_QUALIFIERS: &[&str] = &["cidade", "municipio", "cidades", "municipios", "estado"];
+
+/// Use the same grammar for each sector qualifier, provided it points to a known activity.
+fn normalize_sector_qualifier(words: &mut [String], hits: &[Hit]) {
+    let mut qualified = false;
+    for hit in hits.iter().filter(|hit| hit.values.iter().any(|entity| matches!(entity, Entity::Sector(_)))) {
+        let mut end = hit.start;
+        loop {
+            let genitive = end > 0 && matches!(words[end - 1].as_str(), "de" | "da" | "do" | "das" | "dos");
+            let Some(start) = end.checked_sub(2 + usize::from(genitive)) else { break };
+            if !(end < hit.start || genitive)
+                || !matches!(words[start].as_str(), "na" | "no" | "da" | "do" | "em")
+                || !SECTOR_QUALIFIERS.contains(&words[start + 1].as_str())
+                || hits.iter().any(|other| other.start < end && start < other.end)
+            {
+                break;
+            }
+            words[start] = "no".into();
+            words[start + 1] = "setor".into();
+            if genitive {
+                words[start + 2] = "de".into();
+            }
+            qualified = true;
+            end = start;
+        }
+    }
+    if qualified {
+        for (at, word) in words.iter_mut().enumerate() {
+            if word == "comercios" && !hits.iter().any(|hit| hit.start <= at && at < hit.end) {
+                *word = "estabelecimentos".into();
+            }
+        }
+    }
+}
+
+/// Read a contact noun phrase and return its end and any word that can read as a count
+/// or address instead of a contact qualifier.
+fn contact_phrase(words: &[String], start: usize) -> Option<(usize, Option<usize>)> {
+    let start =
+        start + usize::from(words.get(start).is_some_and(|word| matches!(word.as_str(), "um" | "uma" | "o" | "a" | "nenhum" | "nenhuma")));
+    let name = match words.get(start..)? {
+        [noun, link, ..]
+            if matches!(noun.as_str(), "numero" | "numeros" | "endereco" | "enderecos") && matches!(link.as_str(), "de" | "do" | "da") =>
+        {
+            start + 2
+        }
+        _ => start,
+    };
+    let end = match words.get(name..)? {
+        [word, ..] if PHONE_WORDS.contains(&word.as_str()) || matches!(word.as_str(), "email" | "emails") => name + 1,
+        [prefix, word, ..] if prefix == "e" && matches!(word.as_str(), "mail" | "mails") => name + 2,
+        _ => return None,
+    };
+    Some((end, (name != start).then_some(start)))
+}
+
+fn contact_qualifier_end(words: &[String], end: usize) -> usize {
+    match &words[end..] {
+        [qualifier, ..]
+            if matches!(qualifier.as_str(), "cadastrado" | "cadastrada" | "informado" | "informada" | "publicado" | "publicada") =>
+        {
+            end + 1
+        }
+        [link, qualifier, ..] if link == "de" && qualifier == "contato" || link == "no" && qualifier == "cadastro" => end + 2,
+        _ => end,
+    }
+}
+
+fn contact_predicate_end(words: &[String], verb: usize) -> Option<usize> {
+    match words.get(verb)?.as_str() {
+        "com" | "sem" | "tem" | "tenha" | "tenham" | "possui" | "possuem" => Some(verb + 1),
+        "dispoe" | "dispoem" if words.get(verb + 1).is_some_and(|word| word == "de") => Some(verb + 2),
+        "conta" | "contam" if words.get(verb + 1).is_some_and(|word| word == "com") => Some(verb + 2),
+        _ => None,
+    }
+}
+
+/// Read contact clauses independently of the request operation. Keep word positions
+/// aligned with the original text and refuse conditions the contact filter cannot express.
+fn normalize_contact_filters(words: &mut [String], hits: &[Hit]) -> Result<(), Box<Interpretation>> {
+    let covered = |start, end| hits.iter().any(|hit| hit.start < end && start < hit.end);
+    for at in 0..words.len() {
+        if let Some((end, _)) = contact_phrase(words, at)
+            && !covered(at, end)
+        {
+            let end = contact_qualifier_end(words, end);
+            if words.get(end).is_some_and(|word| word == "ou") {
+                let next = end + 1 + usize::from(words.get(end + 1).is_some_and(|word| word == "que"));
+                let name = contact_predicate_end(words, next).unwrap_or(next);
+                if let Some((other_end, _)) = contact_phrase(words, name)
+                    && !covered(next, other_end)
+                {
+                    return Err(clarify("Você quer filtrar por telefone, por e-mail ou exigir os dois?"));
+                }
+            }
+        }
+    }
+    for at in 0..words.len() {
+        let (verb, negated) = if words[at] == "nao" { (at + 1, true) } else { (at, words[at] == "sem") };
+        let Some(name) = contact_predicate_end(words, verb) else { continue };
+        let Some((end, descriptor)) = contact_phrase(words, name) else { continue };
+        if covered(at, end) {
+            continue;
+        }
+        if negated {
+            return Err(clarify(
+                "O filtro de contato busca dados informados no cadastro. Você quer estabelecimentos com telefone, e-mail ou ambos?",
+            ));
+        }
+        if matches!(words[verb].as_str(), "tem" | "tenha" | "tenham" | "possui" | "possuem")
+            && !(at > 0 && (words[at - 1] == "que" || hits.iter().any(|hit| hit.end <= at)))
+        {
+            continue;
+        }
+        let after_contact = contact_qualifier_end(words, end);
+        if let [first, second, ..] = &words[after_contact..]
+            && matches!((first.as_str(), second.as_str()), ("isto", "e") | ("ou", "seja"))
+        {
+            let next = after_contact + 2;
+            let other_name = contact_predicate_end(words, next).unwrap_or(next);
+            if let Some((other_end, _)) = contact_phrase(words, other_name)
+                && !covered(after_contact, other_end)
+            {
+                let phone = |end: usize| PHONE_WORDS.contains(&words[end - 1].as_str());
+                if phone(end) != phone(other_end) {
+                    return Err(clarify("Você quer filtrar por telefone, por e-mail ou exigir os dois?"));
+                }
+                words[after_contact] = "e".into();
+                words[after_contact + 1] = if other_name == next { "com" } else { "e" }.into();
+            }
+        }
+        if words[verb] != "com" {
+            words[verb] = "possui".into();
+        }
+        if let Some(descriptor) = descriptor {
+            words[descriptor] = "contato".into();
+        }
+    }
+    Ok(())
 }
 
 /// `export` marks a question whose answer is delivered as a file: a count of companies
 /// becomes the list of those companies.
 pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation, export: bool) -> Result<Frame, Box<Interpretation>> {
-    let ResolveContext { pack, cues, policy, anchor, current, competences, versions, population, vocabulary } = *env;
+    let ResolveContext { pack, cues, policy, anchor, current, competences, versions, population, vocabulary, delivery } = *env;
     let raw = normalize::fold(text);
-    let words = normalize::words(text);
-    let normalized = words.join(" ");
-    let n = normalized.as_str();
-    if cue(n, &policy.privacy) {
+    let mut words = normalize::words(text);
+    let mut normalized = words.join(" ");
+    if cue(&normalized, &policy.privacy) {
         return Err(reject(
             "A pesquisa de pessoas, CPFs e sócios não está disponível no chat. Posso pesquisar estabelecimentos por município e atividade.",
         ));
@@ -78,7 +223,7 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
     let mut preliminary = pack.lexicon.scan(&words);
     // A complete sector alias can contain the name of an unavailable metric.
     // "Empresas de produção de soja" names an activity. "Qual a produção de soja" asks for output.
-    let unavailable = policy.unavailable.iter().filter(|phrase| has(n, &[phrase])).any(|phrase| {
+    let unavailable = policy.unavailable.iter().filter(|phrase| has(&normalized, &[phrase])).any(|phrase| {
         let needle = normalize::words(phrase);
         !needle.is_empty()
             && words.windows(needle.len()).enumerate().any(|(at, window)| {
@@ -108,8 +253,30 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
         }
     }
     preliminary.sort_by_key(|h| h.start);
-    let masked = masked_text(&words, &preliminary);
-    let m = masked.as_str();
+    // A normalized opener such as "dá pra" can contain the word "para". Ignore
+    // UF readings entirely inside a recognized opener, never a named entity.
+    let first_name = preliminary
+        .iter()
+        .find(|hit| hit.values.iter().any(|entity| !matches!(entity, Entity::Uf(_))))
+        .map_or(words.len(), |hit| hit.start);
+    let (opening, list_command) = delivery.record_opening(&words[..first_name]);
+    preliminary.retain(|hit| hit.end > opening);
+    let closing = delivery.record_closing(&words, words.len()).max(preliminary.last().map_or(opening, |hit| hit.end));
+    if words.iter().any(|word| {
+        matches!(word.as_str(), "area" | "atividade" | "ramo" | "setor" | "segmento" | "comercios")
+            || PHONE_WORDS.contains(&word.as_str())
+            || matches!(word.as_str(), "email" | "emails" | "mail" | "mails")
+    }) {
+        normalize_sector_qualifier(&mut words, &preliminary);
+        normalize_contact_filters(&mut words, &preliminary)?;
+        normalized = words.join(" ");
+    }
+    let n = normalized.as_str();
+    let masked = masked_words(&words, &preliminary);
+    let body = masked[opening..].join(" ");
+    let m = body.as_str();
+    // An opener can be the first word of a list cue, as in "mostre as matrizes".
+    let list_cue = cue(m, &cues.list) || opening > 0 && cue(&masked.join(" "), &cues.list);
     let uncovered = |phrases: &[String]| {
         phrases.iter().any(|phrase| {
             let needle = normalize::words(phrase);
@@ -139,6 +306,7 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
             &[
                 "empresa",
                 "empresas",
+                "comercios",
                 "estabelecimento",
                 "estabelecimentos",
                 "cnpj",
@@ -189,11 +357,11 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
         let strange: Vec<&str> = words
             .iter()
             .enumerate()
-            .filter(|(at, w)| !preliminary.iter().any(|h| h.start <= *at && *at < h.end) && !vocabulary.knows(w))
+            .filter(|(at, w)| *at >= opening && !preliminary.iter().any(|h| h.start <= *at && *at < h.end) && !vocabulary.knows(w))
             .map(|(_, w)| w.as_str())
             .collect();
         let placed = preliminary.iter().any(|h| h.values.iter().any(|e| matches!(e, Entity::Municipality { .. } | Entity::Uf(_))));
-        if cue(m, &cues.list) && placed && !strange.is_empty() {
+        if (list_command || list_cue) && placed && !strange.is_empty() {
             return Err(clarify(&unrecognized(&strange)));
         }
         return Err(reject("Esse pedido não é uma pesquisa cadastral de empresas. Posso contar, listar e comparar estabelecimentos."));
@@ -270,28 +438,40 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
         }
         if matches!(word.as_str(), "em" | "no" | "na") {
             let mut at = i + 1;
-            while words.get(at).is_some_and(|w| {
-                matches!(
-                    w.as_str(),
-                    "cidade"
-                            | "municipio"
-                            | "municipios"
-                            | "cidades"
-                            | "estado"
-                            | "de"
-                            | "do"
-                            | "da"
-                            // "no setor de TI": the activity after it must be recognized.
-                            | "setor"
-                            | "setores"
-                            | "ramo"
-                            | "segmento"
-                )
-            }) {
+            let first = words.get(at).map(String::as_str).unwrap_or("");
+            let sector = SECTOR_QUALIFIERS.contains(&first) || first == "setores";
+            let labels = if sector { SECTOR_QUALIFIERS } else { PLACE_QUALIFIERS };
+            let repeated = |at: usize| {
+                at > i + 1
+                    && labels.contains(&first)
+                    && matches!(words.get(at..), Some([prep, noun, ..])
+                        if matches!(prep.as_str(), "em" | "no" | "na") && labels.contains(&noun.as_str()))
+            };
+            let mut restated = false;
+            while let Some(w) = words.get(at) {
+                if repeated(at) {
+                    restated = true;
+                } else if !(PLACE_QUALIFIERS.contains(&w.as_str())
+                    || SECTOR_QUALIFIERS.contains(&w.as_str())
+                    || matches!(w.as_str(), "setores" | "de" | "do" | "da"))
+                {
+                    break;
+                }
                 at += 1;
             }
             if let Some(next) = words.get(at) {
-                let recognized = hits.iter().any(|h| h.start <= at && at < h.end);
+                let recognized = hits.iter().any(|h| {
+                    h.start <= at
+                        && at < h.end
+                        && (!restated
+                            || h.values.iter().any(|entity| {
+                                if sector {
+                                    matches!(entity, Entity::Sector(_))
+                                } else {
+                                    matches!(entity, Entity::Municipality { .. } | Entity::Uf(_))
+                                }
+                            }))
+                });
                 let grammatical = next == "com"
                     || next == "menos"
                     || next == "mais"
@@ -365,7 +545,7 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
                     "dezembro",
                 ]
                 .contains(&next.as_str());
-                if !recognized && !grammatical && !numeric && !month {
+                if !recognized && (restated || !grammatical && !numeric && !month) {
                     return Err(clarify("Não reconheci o local ou a restrição. Informe o município e a UF, ou reformule esse filtro."));
                 }
                 // A multi-word place must be fully recognized up to its UF.
@@ -757,11 +937,27 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
     );
     let named_place = !municipalities.is_empty() || !ufs.is_empty() || !regions.is_empty();
     let covered = |at: usize| hits.iter().any(|h| h.start <= at && at < h.end);
+    let plural_noun = |w: &str| {
+        matches!(
+            w,
+            "empresas"
+                | "estabelecimentos"
+                | "negocios"
+                | "cnpjs"
+                | "firmas"
+                | "companhias"
+                | "microempresas"
+                | "cooperativas"
+                | "associacoes"
+                | "fundacoes"
+                | "sociedades"
+        )
+    };
     // The phrase is headed by what is searched for, after articles and a plain request.
-    const SEARCH_COMMANDS: &[&str] = &["procure", "busque", "mostre", "pesquise", "encontre", "ache"];
-    let head = words.iter().position(|w| {
-        !SEARCH_COMMANDS.contains(&w.as_str())
-            && !matches!(
+    let head = words[opening..]
+        .iter()
+        .position(|w| {
+            !matches!(
                 w.as_str(),
                 "a" | "o"
                     | "as"
@@ -772,6 +968,10 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
                     | "umas"
                     | "todas"
                     | "todos"
+                    | "me"
+                    | "apenas"
+                    | "somente"
+                    | "so"
                     | "novas"
                     | "novos"
                     | "quero"
@@ -796,47 +996,46 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
                     | "para"
                     | "clientes"
                     | "gostaria"
+                    | "quais"
+                    | "sao"
             )
+        })
+        .map(|at| at + opening);
+    // A row limit can come between a hand-over command and the target noun.
+    let leading_limit = head.filter(|_| list_command).and_then(|at| {
+        let (quantity, end) = time::quantity(&words, at)?;
+        let target = words.get(end)?;
+        let sector = hits.iter().any(|h| h.start == end && h.values.iter().any(|e| matches!(e, Entity::Sector(_))));
+        (quantity <= 1_000_000 && !(1900..=2100).contains(&quantity) && (plural_noun(target) || sector)).then_some((quantity as u32, end))
     });
-    let plural_noun = |w: &str| {
-        matches!(
-            w,
-            "empresas"
-                | "estabelecimentos"
-                | "negocios"
-                | "cnpjs"
-                | "firmas"
-                | "companhias"
-                | "microempresas"
-                | "cooperativas"
-                | "associacoes"
-                | "fundacoes"
-                | "sociedades"
-        )
-    };
+    let head = leading_limit.map(|(_, end)| end).or(head);
     let headed_by_sector =
         head.is_some_and(|at| hits.iter().any(|h| h.start == at && h.values.iter().any(|e| matches!(e, Entity::Sector(_)))));
-    let headed_by_companies = head.is_some_and(|at| plural_noun(&words[at]) || words[at] == "mei");
+    let headed_by_companies = head.is_some_and(|at| {
+        plural_noun(&words[at]) || words[at] == "mei" || list_command && matches!(words[at].as_str(), "matrizes" | "filiais")
+    });
     // Words before the head are the request itself; the rest must be read by a filter.
     let foreign: Vec<&str> = words
         .iter()
         .enumerate()
-        .filter(|(at, w)| head.is_some_and(|head| *at >= head) && !covered(*at) && !vocabulary.searches(w))
+        .filter(|(at, w)| head.is_some_and(|head| *at >= head) && *at < closing && !covered(*at) && !vocabulary.searches(w))
         .map(|(_, w)| w.as_str())
         .collect();
     let search_shape = (headed_by_sector || headed_by_companies) && (named_place || state.last.is_none());
     let search_style = search_shape && foreign.is_empty();
-    let analytical_cue =
-        [&cues.count, &cues.compare, &cues.rank, &cues.trend, &cues.breakdown, &cues.growth].into_iter().any(|phrases| cue(m, phrases));
+    let rank_cue = cue(m, &cues.rank);
+    let rank_intent = rank_cue && has(n, &["mais", "menos", "maior", "menor", "variacao", "top", "ranking"]);
+    let analytical_intent =
+        rank_intent || [&cues.count, &cues.compare, &cues.trend, &cues.breakdown, &cues.growth].into_iter().any(|phrases| cue(m, phrases));
+    let analytical_cue = analytical_intent || rank_cue;
     // Imperatives select a list only when no explicit analytical operation was requested.
     let search_list = search_style
-        && !analytical_cue
-        && (head.is_some_and(|at| words[..at].iter().any(|word| SEARCH_COMMANDS.contains(&word.as_str())))
-            || has(m, &["quero todos", "quero todas"]));
+        && !analytical_intent
+        && (list_command || has(n, &["quero todos", "quero todas"]) || headed_by_sector && has(m, &["quais"]));
     // Contacts and leads are asked for as a list of companies.
     let wants_contacts = (has(n, &["contatos", "telefones", "emails", "e mails", "leads", "prospects", "mailing"])
         || search_style && has(n, &["telefone", "fone", "celular", "whatsapp", "zap", "email", "e mail", "contato"]))
-        && !cue(m, &cues.count);
+        && !analytical_intent;
     // "os maiores supermercados de Sinop": companies ordered by the only size the registry
     // holds, the declared capital. "As maiores cidades" ranks a dimension instead.
     let biggest = has(n, &["maiores"]) && dimension(n).is_none() && (!sectors.is_empty() || company_noun);
@@ -844,7 +1043,7 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
         || search_style
         || wants_contacts
         || analytical_cue
-        || cue(m, &cues.list)
+        || list_cue
         || meta.is_some()
         || lookup(&raw).is_some()
         || has(n, &["densidade", "habitantes por estabelecimento"])
@@ -918,7 +1117,7 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
     );
     let explicit_intent = search_list
         || analytical_cue
-        || cue(m, &cues.list)
+        || list_cue
         || cue(m, &cues.closures)
         || wants_contacts
         || biggest
@@ -1113,7 +1312,7 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
             };
         let iscompare = (cue(m, &cues.compare) && !has(n, &["antes de", "quero comparar com"]))
             || followup && (n.starts_with("e com ") || has(n, &["qual tem mais", "qual tem menos", "qual das duas", "compare com"]));
-        let isrank = cue(m, &cues.rank) && has(n, &["mais", "menos", "maior", "menor", "variacao", "top", "ranking"]);
+        let isrank = rank_intent;
         let istrend = cue(m, &cues.trend) || has(n, &["evolucao mensal", "evolucao anual"]);
         let isbreakdown = cue(m, &cues.breakdown);
         // A file of companies lists the records a count would measure. Rankings, series,
@@ -1126,14 +1325,11 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
             && !analytical
             && !matches!(request.op, Op::List { .. } if inherited)
             && matches!(measured, Some(Metric::Stock | Metric::Flow(FlowMetric::Closures | FlowMetric::Registrations)));
-        let islist = (search_list
-            || cue(m, &cues.list)
-            || wants_contacts
-            || biggest
-            || has(n, &["quais"]) && has(n, &["maior capital", "mais capital"]))
-            && !has(n, &["evolucao", "distribua", "distribuicao"])
-            && !cue(m, &cues.trend)
-            || records;
+        let islist =
+            (search_list || list_cue || wants_contacts || biggest || has(n, &["quais"]) && has(n, &["maior capital", "mais capital"]))
+                && !has(n, &["evolucao", "distribua", "distribuicao"])
+                && !cue(m, &cues.trend)
+                || records;
         if let Some((event_text, opened_text)) =
             ["com inicio de atividade", "com data de inicio de atividade"].iter().find_map(|phrase| temporal_raw.split_once(phrase))
         {
@@ -1153,7 +1349,7 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
         }
         let dim = dimension(n);
         if islist {
-            let explicit = list_limit(n);
+            let explicit = leading_limit.map(|(limit, _)| limit).or_else(|| list_limit(n));
             // An exported list shows one page and writes the requested rows to the file.
             // Above 100 rows a chat list is refused with a clamped option, never truncated.
             let limit = match explicit {
@@ -1327,13 +1523,13 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
     if !matches!(request.op, Op::Lookup { .. } | Op::Meta { .. }) {
         // A preamble closed by a comma or colon ("Para vender meu software, quantas…") sets
         // the scene and is not part of the question.
-        let question_start = preamble_end(text);
+        let question_start = preamble_end(text).max(opening);
         // An explicit CNAE code pins the activity; words after it describe the code.
         let coded = matches!(request.scope.activity, ActivityFilter::Cnae { .. });
         let unknown: Vec<&str> = words
             .iter()
             .enumerate()
-            .filter(|(i, word)| *i >= question_start && !covered(*i) && !vocabulary.knows(word))
+            .filter(|(i, word)| (question_start..closing).contains(i) && !covered(*i) && !vocabulary.knows(word))
             .map(|(_, word)| word.as_str())
             .collect();
         if !unknown.is_empty() && !coded {
@@ -1576,7 +1772,7 @@ fn temporal_text(text: &str, hits: &[Hit]) -> String {
 
 /// Replace entity words with a sentinel so command cues inside place or sector
 /// names ("Itaporanga d'Ajuda", "Contagem") do not change the intent.
-fn masked_text(words: &[String], hits: &[Hit]) -> String {
+fn masked_words(words: &[String], hits: &[Hit]) -> Vec<String> {
     let mut masked = words.to_vec();
     for hit in hits {
         let end = hit.end.min(masked.len());
@@ -1584,7 +1780,7 @@ fn masked_text(words: &[String], hits: &[Hit]) -> String {
             *word = "entidade".into();
         }
     }
-    masked.join(" ")
+    masked
 }
 
 fn hits_adjacent_place(pack: &LanguagePack, words: &[String], at: usize) -> bool {
@@ -1950,8 +2146,8 @@ fn filters(
         }
     }
     let t = normalize::tokens(raw);
-    let phone = has(n, &["telefone", "telefones", "fone", "celular", "whatsapp", "zap"]);
-    let email = has(n, &["email", "emails", "e mail", "e mails"]);
+    let phone = has(n, PHONE_WORDS);
+    let email = has(n, EMAIL_WORDS);
     if phone || email {
         r.scope.contact = match (phone, email) {
             (true, true) => ContactNeed::Both,

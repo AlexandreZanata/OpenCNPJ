@@ -53,7 +53,7 @@ amounts = [
 ]
 contacts = [
     "celular", "contato", "contatos", "email", "emails", "fone", "leads", "mail", "mailing", "prospects", "telefone",
-    "telefones", "whatsapp", "zap",
+    "telefones", "whatsapp", "zap", "informado", "informada", "publicado", "publicada", "cadastro", "mails",
 ]
 time = [
     "abril", "agosto", "ano", "anos", "atual", "desde", "dezembro", "dia", "dias", "fevereiro", "hoje", "janeiro",
