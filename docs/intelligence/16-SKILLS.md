@@ -106,7 +106,8 @@ A column list after `com` needs two names unless it follows the format directly
   and scoped contact expressions. When a delivery phrase names two different supported
   formats, the assistant asks the user to choose one. Run the fixtures with
   `cargo test -p opencnpj-lab search_phrases_keep_the_expected_activity_and_intent`.
-* "baixados em" and "encerrados em" join the closure cues (masculine nouns).
+* "baixados em Florianópolis" filters by current registration status. "baixados em 2025"
+  counts closure events during that period.
 
 ### Conversation
 

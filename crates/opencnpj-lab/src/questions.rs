@@ -456,7 +456,10 @@ mod tests {
             let requested_rows = op.strip_prefix("list=").map(|limit| limit.parse::<u16>().unwrap());
             match op {
                 "list" => assert!(matches!(request.op, Op::List { .. }), "{question}: {:?}", request.op),
-                "count" => assert!(matches!(request.op, Op::Count { .. }), "{question}: {:?}", request.op),
+                "count" => {
+                    assert_eq!(request.op, Op::Count { metric: Metric::Stock }, "{question}");
+                    assert_eq!(request.time.period, None, "{question}");
+                }
                 "by_size" => assert!(matches!(request.op, Op::Breakdown { dim: Dim::Porte, .. }), "{question}: {:?}", request.op),
                 "by_status" => assert!(matches!(request.op, Op::Breakdown { dim: Dim::Status, .. }), "{question}: {:?}", request.op),
                 _ if requested_rows.is_some() => {

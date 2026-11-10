@@ -22,6 +22,7 @@ pub(crate) struct Cues {
     pub breakdown: Vec<String>,
     pub registrations: Vec<String>,
     pub closures: Vec<String>,
+    pub dated_closures: Vec<String>,
     pub growth: Vec<String>,
 }
 #[derive(Deserialize)]
@@ -1232,14 +1233,10 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
             "novos",
         ],
     );
-    let explicit_intent = search_list
-        || analytical_cue
-        || list_cue
-        || cue(m, &cues.closures)
-        || wants_contacts
-        || biggest
-        || meta.is_some()
-        || lookup(&raw).is_some();
+    let period = time::period(&temporal_raw, anchor);
+    let closed = cue(m, &cues.closures) || period.is_some() && cue(m, &cues.dated_closures);
+    let explicit_intent =
+        search_list || analytical_cue || list_cue || closed || wants_contacts || biggest || meta.is_some() || lookup(&raw).is_some();
     let assumed_stock = search_style && !bare_topic && !explicit_intent && !states_status && !followup && !export;
     if bare_topic {
         notes.push("Considerei o estoque de estabelecimentos ativos.".into());
@@ -1376,13 +1373,13 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
         request.scope = Filters::default();
         request.time.period = None;
     } else {
-        let mut temporal = time::period(&temporal_raw, anchor);
+        let mut temporal = period;
         if temporal.is_some() && time::relative(&temporal_raw) {
             notes.push(format!("Períodos relativos contam até a data de referência da base, {}.", date_br(anchor)));
         }
         // "novas empresas", "recém-abertas" with no period: the last ninety days of the data.
         if temporal.is_none()
-            && !cue(m, &cues.closures)
+            && !closed
             // Masked text: "Currais Novos" is a place; "mais novos" orders a list.
             && has(m, &["novas", "novos", "recem abertas", "recem abertos", "recem criadas", "recem criados", "recem registradas"])
             && !has(m, &["mais novas", "mais novos"])
@@ -1398,7 +1395,6 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
         if has(n, &["ultimos", "ultimas", "desde", "a partir"]) && temporal.is_none() {
             return Err(clarify("Não consegui resolver o período. Informe datas válidas ou uma quantidade de meses ou dias."));
         }
-        let closed = cue(m, &cues.closures);
         let registered = (cue(m, &cues.registrations)
             && (temporal.is_some()
                 || has(n, &["abriram", "surgiram", "comecaram", "criadas", "criados", "foram registrados", "registros de inicio"])))
