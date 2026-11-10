@@ -355,7 +355,7 @@ since = "v1"
 [[sector]]
 id = "computer_repair"
 display = { sing = "assistência técnica de computadores", plural = "assistências técnicas de computadores", gender = "f" }
-aliases = ["conserto de computadores", "manutenção de computadores", "assistência técnica de notebook", "assistência técnica de notebooks", "conserto de notebooks"]
+aliases = ["conserto de computadores", "manutenção de computadores", "assistência técnica de notebook", "assistência técnica de notebooks", "conserto de notebooks", "assistências técnicas de notebooks"]
 cnae_core = ["9511800"]
 cnae_extended = []
 scope = "main"
@@ -602,7 +602,7 @@ since = "v1"
 [[sector]]
 id = "event_planning"
 display = { sing = "organizadora de eventos", plural = "organizadoras de eventos", gender = "f" }
-aliases = ["organizador de eventos", "produção de feiras"]
+aliases = ["organizador de eventos", "produção de feiras", "produtoras de feiras"]
 cnae_core = ["8230001"]
 cnae_extended = []
 scope = "main"
@@ -1053,7 +1053,7 @@ since = "v1"
 [[sector]]
 id = "management_consulting"
 display = { sing = "consultoria de gestão", plural = "consultorias de gestão", gender = "f" }
-aliases = ["consultoria empresarial", "consultoria em gestão empresarial", "consultorias de gestão empresarial"]
+aliases = ["consultoria empresarial", "consultoria em gestão empresarial", "consultorias de gestão empresarial", "consultorias empresariais"]
 cnae_core = ["7020400"]
 cnae_extended = []
 scope = "main"
@@ -1116,7 +1116,7 @@ since = "v1"
 [[sector]]
 id = "metal_frames"
 display = { sing = "fábrica de esquadrias metálicas", plural = "fábricas de esquadrias metálicas", gender = "f" }
-aliases = ["fabricação de esquadrias de metal"]
+aliases = ["fabricação de esquadrias de metal", "fábricas de esquadrias de metal", "fábrica de esquadrias de metal"]
 cnae_core = ["2512800"]
 cnae_extended = []
 scope = "main"
@@ -1161,7 +1161,7 @@ since = "v1"
 [[sector]]
 id = "motorcycle_repair"
 display = { sing = "oficina de motocicletas", plural = "oficinas de motocicletas", gender = "f" }
-aliases = ["oficina de motos", "mecânico de motos", "mecânica de motos", "oficina de conserto de motos", "oficinas de conserto de motos", "conserto de motos"]
+aliases = ["oficina de motos", "oficinas de motos", "mecânico de motos", "mecânica de motos", "oficina de conserto de motos", "oficinas de conserto de motos", "conserto de motos"]
 cnae_core = ["4543900"]
 cnae_extended = []
 scope = "main"
@@ -1539,7 +1539,7 @@ since = "v1"
 [[sector]]
 id = "school_transport"
 display = { sing = "serviço de transporte escolar", plural = "serviços de transporte escolar", gender = "m" }
-aliases = ["van escolar", "vans escolares", "van de escola", "vans de escola"]
+aliases = ["van escolar", "vans escolares", "van de escola", "vans de escola", "transporte escolar", "empresas de transporte escolar"]
 cnae_core = ["4924800"]
 cnae_extended = []
 scope = "main"

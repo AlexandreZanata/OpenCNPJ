@@ -11,19 +11,19 @@
 [lists]
 # Courtesy and hedges around a request.
 cortesia = [
-    "por favor", "por gentileza", "faz favor", "faz o favor", "fazendo favor", "se possivel", "se puder", "se der",
+    "por favor", "por gentileza", "por obsequio", "faz favor", "faz o favor", "fazendo favor", "se possivel", "se puder", "se der",
     "pf", "pfv", "pfvr", "obrigado", "obrigada", "obg", "valeu", "agradeco", "desde ja", "grato", "grata",
 ]
-pronome = ["me", "mim", "para mim", "nos", "a gente", "para a gente", "para nos", "voce", "ocê", "tu"]
+pronome = ["me", "mim", "para mim", "nos", "eu", "a gente", "para gente", "para a gente", "para nos", "voce", "ocê", "tu"]
 # Modal openers: "dá pra", "tem como", "consegue", "você pode".
 modal = [
-    "pode", "poderia", "podes", "consegue", "conseguiria", "da para", "daria para", "tem como", "teria como", "seria possivel",
-    "e possivel", "gostaria", "gostaria de", "queria", "queria que", "quero", "quero que", "preciso", "preciso de", "precisava", "precisava de",
+    "pode", "poderia", "podes", "consegue", "me ajuda a", "me ajude a", "conseguiria", "da para", "daria para", "tem como", "teria como", "seria possivel",
+    "e possivel", "gostaria", "gostaria de", "gostaria que", "queria", "queria que", "quero", "quero que", "preciso", "preciso de", "precisava", "precisava de",
     "necessito", "to precisando", "estou precisando", "to querendo", "estou querendo", "manda ver", "manda bala",
 ]
 # Verbs that hand something over.
 envio = [
-    "mande", "manda", "mandar", "mandem", "mandasse", "manda ai", "manda para", "envie", "envia", "enviar", "enviem", "encaminhe", "encaminha",
+    "mande", "manda", "mandar", "mandem", "mandasse", "manda ai", "envie", "envia", "enviar", "enviem", "encaminhe", "encaminha", "encaminhasse",
     "passe", "passa", "passar", "passasse", "repasse", "repassa", "joga", "joga ai", "jogue", "bota", "bote", "botar", "coloque", "coloca",
     "colocar", "solta", "solte", "solta ai", "devolva", "devolve", "retorne", "retorna", "entregue", "entrega", "me alcanca",
     "alcanca", "arruma", "arrume", "arranja", "arranje", "descola", "providencia", "providencie",
@@ -83,8 +83,10 @@ request = ["@pedido"]
 # Openers and commands shared by structured record requests.
 record_openers = ["@cortesia", "@pronome", "@modal", "@regional", "@interjeicao", "o", "so", "apenas", "somente"]
 record_commands = [
-    "@envio", "procure", "procura", "busque", "busca", "mostre", "mostra", "pesquise", "encontre", "ache", "puxe", "puxa",
-    "quero ver", "quero saber as", "quero saber os",
+    "@envio", "procure", "procura", "procurar", "busque", "busca", "buscar", "mostre", "mostra", "mostrar", "pesquise",
+    "encontre", "encontrar", "ache", "achar", "puxe", "puxa", "liste", "listar", "lista", "traz", "traga",
+    "so os", "so as", "apenas os", "apenas as", "somente os", "somente as",
+    "quero ver", "queria ver", "quero saber as", "quero saber os",
 ]
 # Verbs that hand over or make something: with one before "uma tabela", "um relatório" or
 # "um arquivo", the question asks for a file.

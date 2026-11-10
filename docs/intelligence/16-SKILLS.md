@@ -101,7 +101,11 @@ A column list after `com` needs two names unless it follows the format directly
 * Repeated aliases for one file format, such as "um CSV, em formato CSV", produce one
   export. The [redundant phrasing fixture](../../crates/opencnpj-lab/tests/fixtures/redundant-phrases.tsv)
   checks the operation, scope, contact filter, limit and format against the production
-  catalogue.
+  catalogue. The [regional phrasing fixture](../../crates/opencnpj-lab/tests/fixtures/regional-phrases.tsv)
+  covers all 27 UFs, municipality sets, whole-state queries, stock status, regional vocabulary
+  and scoped contact expressions. When a delivery phrase names two different supported
+  formats, the assistant asks the user to choose one. Run the fixtures with
+  `cargo test -p opencnpj-lab search_phrases_keep_the_expected_activity_and_intent`.
 * "baixados em" and "encerrados em" join the closure cues (masculine nouns).
 
 ### Conversation

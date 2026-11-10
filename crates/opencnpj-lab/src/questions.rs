@@ -397,10 +397,11 @@ mod tests {
 
         let cases = include_str!("../tests/fixtures/sector-phrases.tsv")
             .lines()
-            .chain(include_str!("../tests/fixtures/redundant-phrases.tsv").lines());
+            .chain(include_str!("../tests/fixtures/redundant-phrases.tsv").lines())
+            .chain(include_str!("../tests/fixtures/regional-phrases.tsv").lines());
         for line in cases.filter(|line| !line.starts_with('#') && !line.is_empty()) {
             let columns: Vec<_> = line.splitn(6, '\t').collect();
-            let [expected, city, op, format, contact, question] = columns.as_slice() else {
+            let [expected, place, op, format, contact, question] = columns.as_slice() else {
                 panic!("invalid search test fixture: {line}");
             };
             let result = assets.interpreter.interpret(question, &mut Conversation::default());
@@ -411,12 +412,27 @@ mod tests {
                 assert!(result.request.is_none() && result.company.is_none(), "{question}: {result:?}");
                 continue;
             }
-            let city = MunicipalityId(city.parse().unwrap());
+            let expected_place = if let Some(uf) = place.strip_prefix("uf=") {
+                let id = opencnpj_nlu::lang::UFS.iter().position(|code| *code == uf).unwrap();
+                PlaceFilter::Ufs(SmallSet::new([UfId(u8::try_from(id).unwrap())]))
+            } else {
+                PlaceFilter::Municipalities(SmallSet::new(place.split('+').map(|id| MunicipalityId(id.parse().unwrap()))))
+            };
+            let (op, status) = op.split_once('/').unwrap_or((op, "active"));
+            let expected_status = match status {
+                "active" => StatusSet::only(Status::Active),
+                "closed" => StatusSet::only(Status::Closed),
+                "suspended" => StatusSet::only(Status::Suspended),
+                "unfit" => StatusSet::only(Status::Unfit),
+                "all" => StatusSet::ALL,
+                _ => panic!("unknown status: {status}"),
+            };
             assert!(matches!(result.decision, Decision::Execute | Decision::ExecuteWithNote), "{question}: {result:?}");
             if let Some(expected_name) = expected.strip_prefix('@') {
                 let company = result.company.unwrap_or_else(|| panic!("expected a company search: {question}"));
                 assert_eq!(company.name, expected_name, "{question}");
-                assert_eq!(company.municipalities, [city], "{question}");
+                assert_eq!(PlaceFilter::Municipalities(SmallSet::new(company.municipalities)), expected_place, "{question}");
+                assert!(company.ufs.is_empty(), "{question}");
                 continue;
             }
             let request = result.request.unwrap_or_else(|| panic!("missing cadastral request: {question}"));
@@ -427,8 +443,8 @@ mod tests {
                 ActivityFilter::Sectors { ids: SmallSet::new([SectorId(sector)]), cnaes, scope: CnaeScope::Main },
                 "{question}"
             );
-            assert_eq!(request.scope.place, PlaceFilter::Municipalities(SmallSet::new([city])), "{question}");
-            assert_eq!(request.scope.status, Some(StatusSet::only(Status::Active)), "{question}");
+            assert_eq!(request.scope.place, expected_place, "{question}");
+            assert_eq!(request.scope.status, Some(expected_status), "{question}");
             let contact = match *contact {
                 "phone" => ContactNeed::Phone,
                 "email" => ContactNeed::Email,
@@ -437,13 +453,14 @@ mod tests {
                 _ => panic!("invalid contact in fixture: {contact}"),
             };
             assert_eq!(request.scope.contact, contact, "{question}");
-            match *op {
+            let requested_rows = op.strip_prefix("list=").map(|limit| limit.parse::<u16>().unwrap());
+            match op {
                 "list" => assert!(matches!(request.op, Op::List { .. }), "{question}: {:?}", request.op),
                 "count" => assert!(matches!(request.op, Op::Count { .. }), "{question}: {:?}", request.op),
                 "by_size" => assert!(matches!(request.op, Op::Breakdown { dim: Dim::Porte, .. }), "{question}: {:?}", request.op),
-                limit if limit.starts_with("list=") => {
-                    let expected_limit = limit["list=".len()..].parse::<u16>().unwrap();
-                    assert!(matches!(request.op, Op::List { limit, .. } if limit == expected_limit), "{question}: {:?}", request.op);
+                "by_status" => assert!(matches!(request.op, Op::Breakdown { dim: Dim::Status, .. }), "{question}: {:?}", request.op),
+                _ if requested_rows.is_some() => {
+                    assert!(matches!(request.op, Op::List { limit, .. } if Some(limit) == requested_rows), "{question}: {:?}", request.op);
                 }
                 _ => panic!("unknown operation: {op}"),
             }
@@ -452,7 +469,7 @@ mod tests {
             } else {
                 let export = result.export.unwrap_or_else(|| panic!("missing export: {question}"));
                 assert_eq!(export.format.extension(), *format, "{question}");
-                assert_eq!(export.rows, None, "{question}");
+                assert_eq!(export.rows, requested_rows.map(u32::from), "{question}");
             }
         }
 

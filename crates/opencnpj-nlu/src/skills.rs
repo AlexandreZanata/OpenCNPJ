@@ -18,6 +18,7 @@ pub(crate) struct Delivery {
     pub notes: Vec<String>,
     /// A format the service cannot write (PDF, Word…) was asked for.
     pub unsupported: Option<String>,
+    pub conflicting_formats: bool,
 }
 
 type Phrase = Vec<String>;
@@ -288,15 +289,26 @@ impl Vocabulary {
     /// column list ("só o nome e o CNPJ") refines.
     pub(crate) fn delivery(&self, text: &str, previous: Option<&Export>) -> Option<Delivery> {
         let words = words(text);
+        let mut conflicting_formats = false;
         let format = (0..words.len()).find_map(|start| {
             let (mut end, format) = self.format_at(&words, start)?;
-            // A comma can introduce another name for the same format ("um CSV, em formato CSV").
-            while words[end - 1].comma {
-                let mut next = end;
+            loop {
+                let separator = match &words[end..] {
+                    [a, b, ..] if a.key == "isto" && b.key == "e" || a.key == "ou" && b.key == "seja" => 2,
+                    [a, ..] if matches!(a.key.as_str(), "e" | "ou") => 1,
+                    [a, b, ..] if matches!(a.key.as_str(), "em" | "no") && b.key == "formato" => 0,
+                    _ if words[end - 1].comma => 0,
+                    _ => break,
+                };
+                let mut next = end + separator;
                 while let Some(after_glue) = at(&self.left_glue, &words, next) {
                     next = after_glue;
                 }
-                let Some((after_format, _)) = self.format_at(&words, next).filter(|(_, other)| *other == format) else { break };
+                let Some((after_format, other)) = self.format_at(&words, next) else { break };
+                if other != format {
+                    conflicting_formats = true;
+                    break;
+                }
                 end = after_format;
             }
             Some((start, end, format))
@@ -360,6 +372,24 @@ impl Vocabulary {
                 }
             }
             self.cut_left(&words, start, &mut removed);
+        }
+        // An explicit format at the very end can restate the first delivery ("em TXT …, em arquivo de texto").
+        if let Some((_, end, first)) = format {
+            let mut last = words.len();
+            while let Some(from) = ending(&self.tail, &words, last) {
+                last = from;
+            }
+            for at in end..last {
+                if let Some((after, other)) = self.format_at(&words, at)
+                    && after == last
+                    && let Some(from) = ending(&self.left_glue, &words, at)
+                    && matches!(words[from].key.as_str(), "em" | "no")
+                {
+                    conflicting_formats |= other != first;
+                    removed[from..after].fill(true);
+                    break;
+                }
+            }
         }
         if let Some((start, end)) = verb {
             // "Exporte as farmácias…": the verb and the request words before it.
@@ -431,7 +461,7 @@ impl Vocabulary {
         };
         let unsupported =
             unsupported.map(|(start, end)| words[start..end].iter().map(|w| w.key.to_uppercase()).collect::<Vec<_>>().join(" "));
-        Some(Delivery { export: Export { format, fields, rows: None }, rest, notes, unsupported })
+        Some(Delivery { export: Export { format, fields, rows: None }, rest, notes, unsupported, conflicting_formats })
     }
 
     /// Cut the glue and request words that lead to a file phrase starting at `start`.

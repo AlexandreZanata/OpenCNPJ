@@ -78,6 +78,9 @@ impl Interpreter {
             state.export = if matches!(result.act.as_str(), "new_query" | "meta_question") { None } else { state.export.take() };
             return Interpretation { export: state.export.clone(), ..result };
         };
+        if delivery.conflicting_formats {
+            return Interpretation::stop(Decision::Clarify, "Qual formato você prefere para este arquivo: Excel, CSV ou TXT?");
+        }
         if let Some(format) = &delivery.unsupported {
             return Interpretation::stop(
                 Decision::Clarify,
@@ -263,13 +266,17 @@ impl Interpreter {
             if !covered || hits.iter().any(|h| h.values.iter().any(|e| matches!(e, Entity::Sector(_)))) {
                 continue;
             }
-            let ufs: Vec<UfId> =
+            let mut ufs: Vec<UfId> =
                 hits.iter().flat_map(|h| &h.values).filter_map(|e| if let Entity::Uf(id) = e { Some(*id) } else { None }).collect();
+            ufs.sort_unstable();
+            ufs.dedup();
+            let explicit_uf =
+                hits.last().is_some_and(|h| h.end - h.start == 1 && lang::UFS.iter().any(|uf| uf.eq_ignore_ascii_case(&words[h.start])));
             // A name that is both a state and a city ("Goiás", "São Paulo") reads as the state,
-            // as in the cadastral grammar.
+            // unless a separate UF acronym pins the municipality.
             let municipalities: Vec<MunicipalityId> = hits
                 .iter()
-                .filter(|h| !h.values.iter().any(|e| matches!(e, Entity::Uf(_))))
+                .filter(|h| explicit_uf || !h.values.iter().any(|e| matches!(e, Entity::Uf(_))))
                 .flat_map(|h| &h.values)
                 .filter_map(|e| match e {
                     Entity::Municipality { id, uf } if ufs.is_empty() || ufs.contains(uf) => Some(*id),

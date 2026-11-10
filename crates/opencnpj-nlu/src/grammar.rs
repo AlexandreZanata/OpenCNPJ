@@ -70,8 +70,9 @@ pub(crate) const SECTOR_QUALIFIERS: &[&str] = &["area", "atividade", "setor", "r
 const PLACE_QUALIFIERS: &[&str] = &["cidade", "municipio", "cidades", "municipios", "estado"];
 
 /// Use the same grammar for each sector qualifier, provided it points to a known activity.
-fn normalize_sector_qualifier(words: &mut [String], hits: &[Hit]) {
+fn normalize_sector_qualifier(words: &mut [String], hits: &mut Vec<Hit>) {
     let mut qualified = false;
+    let mut generic_farms = BTreeSet::new();
     for hit in hits.iter().filter(|hit| hit.values.iter().any(|entity| matches!(entity, Entity::Sector(_)))) {
         let mut end = hit.start;
         loop {
@@ -92,7 +93,19 @@ fn normalize_sector_qualifier(words: &mut [String], hits: &[Hit]) {
             qualified = true;
             end = start;
         }
+        if end < hit.start && end > 0 && matches!(words[end - 1].as_str(), "fazenda" | "fazendas") {
+            generic_farms.insert(end - 1);
+        }
     }
+    hits.retain(|hit| {
+        let generic = hit.end - hit.start == 1
+            && generic_farms.contains(&hit.start)
+            && hit.values.iter().all(|entity| matches!(entity, Entity::Sector(_)));
+        if generic {
+            words[hit.start] = "estabelecimentos".into();
+        }
+        !generic
+    });
     if qualified {
         for (at, word) in words.iter_mut().enumerate() {
             if word == "comercios" && !hits.iter().any(|hit| hit.start <= at && at < hit.end) {
@@ -102,11 +115,26 @@ fn normalize_sector_qualifier(words: &mut [String], hits: &[Hit]) {
     }
 }
 
-/// Read a contact noun phrase and return its end and any word that can read as a count
-/// or address instead of a contact qualifier.
-fn contact_phrase(words: &[String], start: usize) -> Option<(usize, Option<usize>)> {
-    let start =
-        start + usize::from(words.get(start).is_some_and(|word| matches!(word.as_str(), "um" | "uma" | "o" | "a" | "nenhum" | "nenhuma")));
+struct ContactPhrase {
+    end: usize,
+    name: usize,
+    descriptor: Option<usize>,
+    alias: Option<&'static str>,
+}
+
+impl ContactPhrase {
+    fn phone(&self, words: &[String]) -> bool {
+        self.alias == Some("telefone") || PHONE_WORDS.contains(&words[self.end - 1].as_str())
+    }
+}
+
+/// Read a contact noun phrase. Keep its span so a conjunction, qualification or
+/// restatement immediately after it can be interpreted before normalization.
+fn contact_phrase(words: &[String], start: usize) -> Option<ContactPhrase> {
+    let start = start
+        + usize::from(
+            words.get(start).is_some_and(|word| matches!(word.as_str(), "um" | "uma" | "o" | "a" | "nenhum" | "nenhuma" | "tanto")),
+        );
     let name = match words.get(start..)? {
         [noun, link, ..]
             if matches!(noun.as_str(), "numero" | "numeros" | "endereco" | "enderecos") && matches!(link.as_str(), "de" | "do" | "da") =>
@@ -115,29 +143,39 @@ fn contact_phrase(words: &[String], start: usize) -> Option<(usize, Option<usize
         }
         _ => start,
     };
-    let end = match words.get(name..)? {
-        [word, ..] if PHONE_WORDS.contains(&word.as_str()) || matches!(word.as_str(), "email" | "emails") => name + 1,
-        [prefix, word, ..] if prefix == "e" && matches!(word.as_str(), "mail" | "mails") => name + 2,
+    let (length, alias) = match words.get(name..)? {
+        [word, ..] if PHONE_WORDS.contains(&word.as_str()) || matches!(word.as_str(), "email" | "emails") => (1, None),
+        [prefix, word, ..] if prefix == "e" && matches!(word.as_str(), "mail" | "mails") => (2, None),
+        [noun, qualifier, ..] if noun == "contato" && qualifier == "telefonico" => (2, Some("telefone")),
+        [noun, link, verb, ..] if noun == "numero" && link == "para" && verb == "ligar" => (3, Some("telefone")),
+        [noun, qualifier, ..] if matches!(noun.as_str(), "correio" | "endereco") && qualifier == "eletronico" => (2, Some("email")),
         _ => return None,
     };
-    Some((end, (name != start).then_some(start)))
+    Some(ContactPhrase { end: name + length, name, descriptor: (name != start).then_some(start), alias })
 }
 
 fn contact_qualifier_end(words: &[String], end: usize) -> usize {
     match &words[end..] {
         [qualifier, ..]
-            if matches!(qualifier.as_str(), "cadastrado" | "cadastrada" | "informado" | "informada" | "publicado" | "publicada") =>
+            if matches!(
+                qualifier.as_str(),
+                "cadastrado" | "cadastrada" | "informado" | "informada" | "publicado" | "publicada" | "disponivel"
+            ) =>
         {
             end + 1
         }
-        [link, qualifier, ..] if link == "de" && qualifier == "contato" || link == "no" && qualifier == "cadastro" => end + 2,
+        [link, qualifier, ..]
+            if matches!(link.as_str(), "de" | "para") && qualifier == "contato" || link == "no" && qualifier == "cadastro" =>
+        {
+            end + 2
+        }
         _ => end,
     }
 }
 
 fn contact_predicate_end(words: &[String], verb: usize) -> Option<usize> {
     match words.get(verb)?.as_str() {
-        "com" | "sem" | "tem" | "tenha" | "tenham" | "possui" | "possuem" => Some(verb + 1),
+        "com" | "sem" | "tem" | "tenha" | "tenham" | "possui" | "possuem" | "informam" | "informaram" | "deixam" => Some(verb + 1),
         "dispoe" | "dispoem" if words.get(verb + 1).is_some_and(|word| word == "de") => Some(verb + 2),
         "conta" | "contam" if words.get(verb + 1).is_some_and(|word| word == "com") => Some(verb + 2),
         _ => None,
@@ -147,19 +185,22 @@ fn contact_predicate_end(words: &[String], verb: usize) -> Option<usize> {
 /// Read contact clauses independently of the request operation. Keep word positions
 /// aligned with the original text and refuse conditions the contact filter cannot express.
 fn normalize_contact_filters(words: &mut [String], hits: &[Hit]) -> Result<(), Box<Interpretation>> {
-    let covered = |start, end| hits.iter().any(|hit| hit.start < end && start < hit.end);
+    let covered = |start, end| {
+        hits.iter().any(|hit| hit.start < end && start < hit.end && hit.values.iter().any(|entity| !matches!(entity, Entity::Uf(_))))
+    };
+    let choice = || clarify("Você quer filtrar por telefone, por e-mail ou exigir os dois?");
     for at in 0..words.len() {
-        if let Some((end, _)) = contact_phrase(words, at)
-            && !covered(at, end)
+        if let Some(contact) = contact_phrase(words, at)
+            && !covered(at, contact.end)
         {
-            let end = contact_qualifier_end(words, end);
+            let end = contact_qualifier_end(words, contact.end);
             if words.get(end).is_some_and(|word| word == "ou") {
                 let next = end + 1 + usize::from(words.get(end + 1).is_some_and(|word| word == "que"));
                 let name = contact_predicate_end(words, next).unwrap_or(next);
-                if let Some((other_end, _)) = contact_phrase(words, name)
-                    && !covered(next, other_end)
+                if let Some(other) = contact_phrase(words, name)
+                    && !covered(next, other.end)
                 {
-                    return Err(clarify("Você quer filtrar por telefone, por e-mail ou exigir os dois?"));
+                    return Err(choice());
                 }
             }
         }
@@ -167,8 +208,8 @@ fn normalize_contact_filters(words: &mut [String], hits: &[Hit]) -> Result<(), B
     for at in 0..words.len() {
         let (verb, negated) = if words[at] == "nao" { (at + 1, true) } else { (at, words[at] == "sem") };
         let Some(name) = contact_predicate_end(words, verb) else { continue };
-        let Some((end, descriptor)) = contact_phrase(words, name) else { continue };
-        if covered(at, end) {
+        let Some(contact) = contact_phrase(words, name) else { continue };
+        if covered(at, contact.end) {
             continue;
         }
         if negated {
@@ -181,28 +222,50 @@ fn normalize_contact_filters(words: &mut [String], hits: &[Hit]) -> Result<(), B
         {
             continue;
         }
-        let after_contact = contact_qualifier_end(words, end);
-        if let [first, second, ..] = &words[after_contact..]
-            && matches!((first.as_str(), second.as_str()), ("isto", "e") | ("ou", "seja"))
-        {
-            let next = after_contact + 2;
+        let after_contact = contact_qualifier_end(words, contact.end);
+        let restatement = match &words[after_contact..] {
+            [first, ..] if first == "digo" => 1,
+            [first, second, ..] if matches!((first.as_str(), second.as_str()), ("isto", "e") | ("ou", "seja")) => 2,
+            [first, second, third, ..] if first == "em" && second == "outras" && third == "palavras" => 3,
+            _ => 0,
+        };
+        let both = words[name] == "tanto" && words.get(after_contact).is_some_and(|word| word == "quanto");
+        if restatement > 0 || both {
+            let next = after_contact + restatement.max(1);
             let other_name = contact_predicate_end(words, next).unwrap_or(next);
-            if let Some((other_end, _)) = contact_phrase(words, other_name)
-                && !covered(after_contact, other_end)
+            if let Some(other) = contact_phrase(words, other_name)
+                && !covered(after_contact, other.end)
             {
-                let phone = |end: usize| PHONE_WORDS.contains(&words[end - 1].as_str());
-                if phone(end) != phone(other_end) {
-                    return Err(clarify("Você quer filtrar por telefone, por e-mail ou exigir os dois?"));
+                if restatement > 0 && contact.phone(words) != other.phone(words) {
+                    return Err(choice());
                 }
-                words[after_contact] = "e".into();
-                words[after_contact + 1] = if other_name == next { "com" } else { "e" }.into();
+                if both {
+                    words[name] = "o".into();
+                }
+                words[after_contact..next].fill("e".into());
+                if other_name == next {
+                    words[next - 1] = "com".into();
+                }
             }
         }
         if words[verb] != "com" {
             words[verb] = "possui".into();
         }
-        if let Some(descriptor) = descriptor {
+        if let Some(descriptor) = contact.descriptor {
             words[descriptor] = "contato".into();
+        }
+    }
+    for at in 0..words.len() {
+        if let Some(contact) = contact_phrase(words, at)
+            && !covered(at, contact.end)
+        {
+            if let Some(alias) = contact.alias {
+                words[contact.name..contact.end].fill("contato".into());
+                words[contact.name] = alias.into();
+            }
+            if words.get(contact.end).is_some_and(|word| word == "disponivel") {
+                words[contact.end] = "informado".into();
+            }
         }
     }
     Ok(())
@@ -259,18 +322,56 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
         .iter()
         .find(|hit| hit.values.iter().any(|entity| !matches!(entity, Entity::Uf(_))))
         .map_or(words.len(), |hit| hit.start);
-    let (opening, list_command) = delivery.record_opening(&words[..first_name]);
+    let (mut opening, mut list_command) = delivery.record_opening(&words[..first_name]);
     preliminary.retain(|hit| hit.end > opening);
+    let first_comma = text.split_once(',').map(|(prefix, _)| normalize::words(prefix).len());
+    if let Some(end) = first_comma {
+        let places = preliminary.iter().take_while(|hit| hit.end <= end);
+        if end > 0
+            && places.clone().all(|hit| hit.values.iter().all(|entity| matches!(entity, Entity::Municipality { .. } | Entity::Uf(_))))
+            && places.map(|hit| hit.end - hit.start).sum::<usize>() == end
+        {
+            let next_name = preliminary
+                .iter()
+                .find(|hit| hit.start >= end && hit.values.iter().any(|entity| !matches!(entity, Entity::Uf(_))))
+                .map_or(words.len(), |hit| hit.start);
+            let (after_place, command) = delivery.record_opening(&words[end..next_name]);
+            if after_place > 0 {
+                opening = end + after_place;
+                list_command = command;
+            }
+        }
+    }
+    // A place name before "em" followed immediately by another municipality is not
+    // a coordinated list. "Flores em Fortaleza CE" can also mean flowers in Fortaleza.
+    if let [first, second, ..] = preliminary.as_slice()
+        && first.start == 0
+        && first.end + 1 == second.start
+        && words[first.end] == "em"
+        && [first, second].iter().all(|hit| hit.values.iter().any(|entity| matches!(entity, Entity::Municipality { .. })))
+        && first_comma.is_none_or(|end| end >= second.end)
+    {
+        return Err(clarify("Qual município você quer pesquisar? Separe locais diferentes por “e” ou por vírgula."));
+    }
     let closing = delivery.record_closing(&words, words.len()).max(preliminary.last().map_or(opening, |hit| hit.end));
     if words.iter().any(|word| {
         matches!(word.as_str(), "area" | "atividade" | "ramo" | "setor" | "segmento" | "comercios")
             || PHONE_WORDS.contains(&word.as_str())
-            || matches!(word.as_str(), "email" | "emails" | "mail" | "mails")
+            || matches!(word.as_str(), "email" | "emails" | "mail" | "mails" | "eletronico" | "telefonico" | "ligar")
     }) {
-        normalize_sector_qualifier(&mut words, &preliminary);
+        normalize_sector_qualifier(&mut words, &mut preliminary);
         normalize_contact_filters(&mut words, &preliminary)?;
-        normalized = words.join(" ");
     }
+    for hit in &preliminary {
+        if hit.start >= 2
+            && hit.values.iter().any(|entity| matches!(entity, Entity::Municipality { .. } | Entity::Uf(_)))
+            && words[hit.start - 2] == "la"
+            && words[hit.start - 1] == "em"
+        {
+            words[hit.start - 2] = "e".into();
+        }
+    }
+    normalized = words.join(" ");
     let n = normalized.as_str();
     let masked = masked_words(&words, &preliminary);
     let body = masked[opening..].join(" ");
@@ -438,6 +539,9 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
         }
         if matches!(word.as_str(), "em" | "no" | "na") {
             let mut at = i + 1;
+            if matches!(&words[at..], [todo, article, state, ..] if todo == "todo" && article == "o" && state == "estado") {
+                at += 2;
+            }
             let first = words.get(at).map(String::as_str).unwrap_or("");
             let sector = SECTOR_QUALIFIERS.contains(&first) || first == "setores";
             let labels = if sector { SECTOR_QUALIFIERS } else { PLACE_QUALIFIERS };
@@ -1009,6 +1113,19 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
         (quantity <= 1_000_000 && !(1900..=2100).contains(&quantity) && (plural_noun(target) || sector)).then_some((quantity as u32, end))
     });
     let head = leading_limit.map(|(_, end)| end).or(head);
+    let tokens = normalize::tokens(text);
+    let tail = delivery.record_closing(&tokens, tokens.len());
+    let trailing_limit = (export || list_command || list_cue)
+        .then(|| {
+            (tail.saturating_sub(2).max(1)..tail).find_map(|at| {
+                if !matches!(tokens[at - 1].as_str(), "so" | "apenas" | "somente") {
+                    return None;
+                }
+                let (limit, end) = time::quantity(&tokens, at)?;
+                (end == tail && limit <= 1_000_000 && !(1900..=2100).contains(&limit)).then_some((limit as u32, at..end))
+            })
+        })
+        .flatten();
     let headed_by_sector =
         head.is_some_and(|at| hits.iter().any(|h| h.start == at && h.values.iter().any(|e| matches!(e, Entity::Sector(_)))));
     let headed_by_companies = head.is_some_and(|at| {
@@ -1349,7 +1466,10 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
         }
         let dim = dimension(n);
         if islist {
-            let explicit = leading_limit.map(|(limit, _)| limit).or_else(|| list_limit(n));
+            let explicit = leading_limit
+                .map(|(limit, _)| limit)
+                .or_else(|| trailing_limit.as_ref().map(|(limit, _)| *limit))
+                .or_else(|| list_limit(n));
             // An exported list shows one page and writes the requested rows to the file.
             // Above 100 rows a chat list is refused with a clamped option, never truncated.
             let limit = match explicit {
@@ -1535,7 +1655,8 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
         if !unknown.is_empty() && !coded {
             return Err(clarify(&unrecognized(&unknown)));
         }
-        if let Some(number) = unexplained_number(&normalize::tokens(text), &words, &hits) {
+        let limit_span = trailing_limit.as_ref().map(|(_, span)| span).filter(|_| matches!(request.op, Op::List { .. }));
+        if let Some(number) = unexplained_number(&tokens, &words, &hits, limit_span) {
             return Err(clarify(&format!(
                 "Não consegui aplicar o número “{number}” a um filtro. Diga o que ele representa: ano, capital social ou quantidade de linhas."
             )));
@@ -1598,14 +1719,22 @@ fn preamble_end(text: &str) -> usize {
 
 /// A number no rule reads: neither a date, a row count, an amount, a population, a code nor
 /// part of a catalogue name. Like an unknown word, it must not be dropped.
-fn unexplained_number<'a>(tokens: &'a [String], words: &[String], hits: &[Hit]) -> Option<&'a str> {
+fn unexplained_number<'a>(
+    tokens: &'a [String],
+    words: &[String],
+    hits: &[Hit],
+    limit_span: Option<&std::ops::Range<usize>>,
+) -> Option<&'a str> {
     // Digits inside entity names ("Dois Irmãos", "4 de Julho") are part of the entity.
     let entity_words: Vec<&str> = hits.iter().flat_map(|h| words[h.start..h.end.min(words.len())].iter().map(String::as_str)).collect();
     let near = |at: usize, back: usize, ahead: usize, list: &[&str]| {
         tokens[at.saturating_sub(back)..(at + 1 + ahead).min(tokens.len())].iter().any(|t| list.contains(&t.as_str()))
     };
     for (at, token) in tokens.iter().enumerate() {
-        if !token.chars().any(|c| c.is_ascii_digit()) || entity_words.contains(&token.as_str()) {
+        if !token.chars().any(|c| c.is_ascii_digit())
+            || entity_words.contains(&token.as_str())
+            || limit_span.is_some_and(|span| span.contains(&at))
+        {
             continue;
         }
         let digits: String = token.chars().filter(char::is_ascii_digit).collect();
