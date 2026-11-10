@@ -122,6 +122,11 @@ previous answer ("agora me mande isso em Excel", "e em CSV") reuses the previous
 a count of closures becomes the list of those closures over the same period. A bare column
 list ("só o nome e o CNPJ") changes the columns, and a new format keeps them.
 
+A filter-only turn such as "dessas só as de Sinop" edits the previous query. A change of
+scope starts at the first page. The next delivery retains the filters, sort order, and
+any explicitly requested row count. The default preview size leaves the file uncapped by
+that preview. A clarification leaves the last successful query and its delivery intact.
+
 ## 4. Files
 
 | Format | Dialect |

@@ -14,6 +14,9 @@ pub struct Conversation {
     /// File delivery of the current thread, refined by follow-ups ("agora em CSV").
     #[serde(default)]
     pub export: Option<Export>,
+    /// Explicit row selection for the last list, distinct from its preview size.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub list_rows: Option<u32>,
 }
 
 impl Conversation {
@@ -22,7 +25,7 @@ impl Conversation {
         self.result_members = members;
     }
 
-    pub(crate) fn remember(&mut self, request: &Request) {
+    pub(crate) fn remember(&mut self, request: &Request, rows: Option<u32>) {
         let members: Vec<Member> = match &request.op {
             Op::Compare { members, .. } => members.iter().copied().collect(),
             _ => match &request.scope.place {
@@ -37,6 +40,7 @@ impl Conversation {
         }
         self.focus.truncate(4);
         self.last = Some(request.clone());
+        self.list_rows = rows;
         self.pending.clear();
         self.result_members.clear();
     }

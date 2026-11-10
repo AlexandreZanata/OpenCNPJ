@@ -47,7 +47,7 @@ pub(crate) struct Frame {
     pub request: Request,
     pub act: String,
     pub notes: Vec<String>,
-    /// Explicit row count of an exported list ("as 50 primeiras").
+    /// Explicit row count of a list ("as 50 primeiras").
     pub rows: Option<u32>,
 }
 
@@ -393,6 +393,9 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
     let ResolveContext { pack, cues, policy, anchor, current, competences, versions, population, vocabulary, delivery } = *env;
     let raw = normalize::fold(text);
     let mut words = normalize::words(text);
+    if state.last.is_none() && words.first().is_some_and(|word| matches!(word.as_str(), "dessas" | "desses" | "delas" | "deles")) {
+        return Err(clarify("A qual pesquisa você se refere? Informe a atividade e o local para começar."));
+    }
     let mut normalized = words.join(" ");
     if cue(&normalized, &policy.privacy) {
         return Err(reject(
@@ -1217,7 +1220,7 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
     let head = leading_limit.as_ref().map(|(_, span)| span.end).or(head);
     let tokens = normalize::tokens(text);
     let tail = delivery.record_closing(&tokens, tokens.len());
-    let trailing_limit = (export || list_command || list_cue)
+    let trailing_limit = (export || list_command || list_cue || state.last.as_ref().is_some_and(|last| matches!(last.op, Op::List { .. })))
         .then(|| {
             (tail.saturating_sub(2).max(1)..tail).find_map(|at| {
                 if !matches!(tokens[at - 1].as_str(), "so" | "apenas" | "somente") {
@@ -1258,7 +1261,7 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
     // "os maiores supermercados de Sinop": companies ordered by the only size the registry
     // holds, the declared capital. "As maiores cidades" ranks a dimension instead.
     let biggest = has(n, &["maiores"]) && dimension(n).is_none() && (!sectors.is_empty() || company_noun);
-    let full_query = bare_topic
+    let standalone = bare_topic
         || search_style
         || search_shape && list_command && has(m, &["capital social"])
         || wants_contacts
@@ -1266,7 +1269,8 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
         || list_cue
         || meta.is_some()
         || lookup(&raw).is_some()
-        || has(n, &["densidade", "habitantes por estabelecimento"])
+        || has(n, &["densidade", "habitantes por estabelecimento"]);
+    let full_query = standalone
         || export && (!hits.is_empty() || has(n, &["empresas", "empresa", "estabelecimentos", "estabelecimento", "cnpjs", "negocios"]));
     let followup = state.last.is_some()
         && !has(n, &["nova pesquisa", "nova pergunta", "novo assunto"])
@@ -1310,6 +1314,7 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
             || export && has(n, &["essas", "esses", "isso", "dessas", "desses", "mesmas", "mesmos"])
             || !full_query
             || municipalities.is_empty() && sectors.is_empty() && has(n, &["apenas", "somente", "so"]));
+    let inherited = followup && !standalone;
     let states_status = has(
         n,
         &[
@@ -1454,7 +1459,16 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
     {
         return Err(clarify("Qual atividade e município você quer pesquisar?"));
     }
+    let previous_contact = request.scope.contact;
     filters(n, m, &raw, &mut request, &mut act, population, &mut notes)?;
+    if inherited
+        && act != "correction"
+        && previous_contact != ContactNeed::Any
+        && request.scope.contact != ContactNeed::Any
+        && request.scope.contact != previous_contact
+    {
+        request.scope.contact = ContactNeed::Both;
+    }
     if has(n, &["nao estao ativas", "nao estao ativos", "nao tao ativas", "nao tao ativos", "inativas", "inativos", "inativa", "inativo"]) {
         notes.push("Considerei suspensas, inaptas e baixadas; situação nula não foi incluída.".into());
     }
@@ -1527,13 +1541,18 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
                 Metric::Stock
             };
         let iscompare = (cue(m, &cues.compare) && !has(n, &["antes de", "quero comparar com"]))
-            || followup && (n.starts_with("e com ") || has(n, &["qual tem mais", "qual tem menos", "qual das duas", "compare com"]));
+            || followup
+                && (n.starts_with("e com ") && (named_place || !sectors.is_empty())
+                    || has(n, &["qual tem mais", "qual tem menos", "qual das duas", "compare com"]));
         let isrank = rank_intent;
         let istrend = cue(m, &cues.trend) || has(n, &["evolucao mensal", "evolucao anual"]);
         let isbreakdown = cue(m, &cues.breakdown);
         // A file of companies lists the records a count would measure. Rankings, series,
         // comparisons and distributions are exported as their own table instead.
-        let inherited = followup && !full_query;
+        let previous_list = match request.op {
+            Op::List { order, limit } if inherited => Some((order, limit)),
+            _ => None,
+        };
         let analytical =
             iscompare || isrank || istrend || isbreakdown || inherited && !matches!(request.op, Op::Count { .. } | Op::List { .. });
         let measured = if inherited { request.op.metric() } else { Some(metric) };
@@ -1545,7 +1564,8 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
             (search_list || list_cue || wants_contacts || biggest || has(n, &["quais"]) && has(n, &["maior capital", "mais capital"]))
                 && !has(n, &["evolucao", "distribua", "distribuicao"])
                 && !cue(m, &cues.trend)
-                || records;
+                || records
+                || previous_list.is_some() && !analytical;
         if let Some((event_text, opened_text)) =
             ["com inicio de atividade", "com data de inicio de atividade"].iter().find_map(|phrase| temporal_raw.split_once(phrase))
         {
@@ -1569,15 +1589,24 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
                 .as_ref()
                 .map(|(limit, _)| *limit)
                 .or_else(|| trailing_limit.as_ref().map(|(limit, _)| *limit))
-                .or_else(|| list_limit(n));
+                .or_else(|| list_limit(n))
+                .or_else(|| {
+                    previous_list.and_then(|(_, limit)| {
+                        state
+                            .list_rows
+                            .or_else(|| state.export.as_ref().and_then(|file| file.rows))
+                            // Old context stored only the preview size for lists without an export.
+                            .or_else(|| (limit != 20).then_some(u32::from(limit)))
+                    })
+                });
             // An exported list shows one page and writes the requested rows to the file.
             // Above 100 rows a chat list is refused with a clamped option, never truncated.
             let limit = match explicit {
                 Some(rows) if export => rows.min(100) as u16,
                 Some(rows) => u16::try_from(rows).unwrap_or(u16::MAX),
-                None => 20,
+                None => previous_list.map_or(20, |(_, limit)| limit),
             };
-            rows = explicit.filter(|_| export);
+            rows = explicit;
             let order = if biggest || has(n, &["capital social", "capital"]) && has(n, &["maior", "mais", "ordenados"]) {
                 ListOrder::CapitalDesc
             } else if has(n, &["antigos para os mais novos", "mais antigos", "mais antigas"])
@@ -1587,7 +1616,7 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
             } else if has(n, &["mais novos", "mais recentes", "recentes primeiro", "mais novas"]) {
                 ListOrder::NewestFirst
             } else {
-                ListOrder::Cnpj
+                previous_list.map_or(ListOrder::Cnpj, |(order, _)| order)
             };
             let flow = if closed {
                 Some(FlowMetric::Closures)
@@ -1694,23 +1723,25 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
                 dim: dim.ok_or_else(|| clarify("Por qual dimensão você quer dividir: porte, situação, atividade ou local?"))?,
                 metric: if has(n, &["participacao", "percentual", "percentuais"]) { Metric::Share } else { metric },
             };
-        } else if !followup || full_query {
+        } else if !inherited {
             request.op = Op::Count { metric };
         }
         if matches!(request.op.metric(), Some(Metric::Flow(_))) {
             request.time.period =
                 temporal.or(if followup { request.time.period } else { None }).or_else(|| time::period("este ano", anchor));
-            request.scope.status = if matches!(request.op.metric(), Some(Metric::Flow(FlowMetric::Closures))) {
-                if has(n, &["ainda ativas", "ainda ativos", "somente ativas", "somente ativos", "so ativas", "so ativos"]) {
-                    Some(StatusSet::only(Status::Active))
+            if !inherited || request.scope.status.is_none() {
+                request.scope.status = if matches!(request.op.metric(), Some(Metric::Flow(FlowMetric::Closures))) {
+                    if has(n, &["ainda ativas", "ainda ativos", "somente ativas", "somente ativos", "so ativas", "so ativos"]) {
+                        Some(StatusSet::only(Status::Active))
+                    } else {
+                        Some(StatusSet::only(Status::Closed))
+                    }
+                } else if !has(n, &["continuam ativos", "continuam ativas", "ainda ativas", "ainda ativos", "ativas hoje", "ativos hoje"]) {
+                    Some(StatusSet::ALL)
                 } else {
-                    Some(StatusSet::only(Status::Closed))
-                }
-            } else if !has(n, &["continuam ativos", "continuam ativas", "ainda ativas", "ainda ativos", "ativas hoje", "ativos hoje"]) {
-                Some(StatusSet::ALL)
-            } else {
-                Some(StatusSet::only(Status::Active))
-            };
+                    Some(StatusSet::only(Status::Active))
+                };
+            }
         }
         if matches!(metric, Metric::ActiveChange { .. }) {
             let cs = time::competences(&raw);
@@ -1730,6 +1761,9 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
             request.time.competence =
                 time::competences(&raw).first().copied().ok_or_else(|| clarify("Qual competência mensal você quer consultar?"))?;
         }
+    }
+    if followup && !has(n, &["pagina"]) && state.last.as_ref().is_some_and(|last| last.scope != request.scope || last.op != request.op) {
+        request.output.page = 1;
     }
     if assumed_stock && matches!(request.op, Op::Count { metric: Metric::Stock }) && request.scope.opened.is_none() {
         notes.insert(0, "Considerei o estoque de estabelecimentos ativos.".into());

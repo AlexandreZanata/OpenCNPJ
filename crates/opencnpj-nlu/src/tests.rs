@@ -896,3 +896,151 @@ fn a_state_after_do_qualifies_the_city() {
     let r = req("quantas padarias tem Bom Jesus do Piauí");
     assert_eq!(r.scope.place, PlaceFilter::Municipalities(SmallSet::new([MunicipalityId(3)])));
 }
+
+#[test]
+fn followup_lists_keep_filters_order_and_explicit_rows() {
+    use opencnpj_query::export::ExportFormat;
+
+    let engine = interpreter();
+    let mut state = Conversation::default();
+    let first = engine.interpret(
+        "Liste 5 matrizes de farmácias ativas em Sorriso MT e Sinop MT, de pequeno porte, optantes pelo Simples, sem MEI, com telefone e e-mail e capital social acima de 20 mil reais, ordenadas pelo maior capital.",
+        &mut state,
+    );
+    let mut expected = first.request.expect("initial list").into_request();
+    assert_eq!(expected.op, Op::List { order: ListOrder::CapitalDesc, limit: 5 });
+    assert_eq!(expected.scope.contact, ContactNeed::Both);
+    assert_eq!(expected.scope.porte, PorteSet::only(Porte::Small));
+    assert_eq!(expected.scope.simples, Tri::Yes);
+    assert_eq!(expected.scope.mei, Tri::No);
+    assert_eq!(expected.scope.head_office, Tri::Yes);
+    assert_eq!(expected.scope.capital, Some(Range { from: Some(2_000_001), to: None }));
+    expected.scope.place = PlaceFilter::Municipalities(SmallSet::new([MunicipalityId(2)]));
+
+    let mut same_turn = state.clone();
+    let list = engine.interpret("dessas só as de Sinop", &mut state);
+    assert_eq!(list.request.unwrap().into_request(), expected);
+    assert!(list.export.is_none());
+    for (question, format) in [("me manda em Excel", ExportFormat::Xlsx), ("agora em CSV", ExportFormat::Csv)] {
+        let result = engine.interpret(question, &mut state);
+        assert_eq!(result.request.unwrap().into_request(), expected, "{question}");
+        let export = result.export.unwrap();
+        assert_eq!(export.format, format, "{question}");
+        assert_eq!(export.rows, Some(5), "{question}");
+    }
+    let result = engine.interpret("dessas, só as de Sinop em Excel", &mut same_turn);
+    assert_eq!(result.request.unwrap().into_request(), expected);
+    assert_eq!(result.export.unwrap().rows, Some(5));
+
+    let mut state = Conversation::default();
+    let paged = engine.interpret("Liste 20 padarias em Sorriso com e-mail na segunda página", &mut state);
+    let mut expected = paged.request.unwrap().into_request();
+    assert_eq!(expected.output.page, 2);
+    expected.output.page = 1;
+    expected.scope.place = PlaceFilter::Municipalities(SmallSet::new([MunicipalityId(2)]));
+    let next = engine.interpret("só as de Sinop", &mut state);
+    assert_eq!(next.request.unwrap().into_request(), expected);
+    assert_eq!(engine.interpret("me manda em Excel", &mut state).export.unwrap().rows, Some(20));
+    expected.op = Op::List { order: ListOrder::Cnpj, limit: 3 };
+    let shorter = engine.interpret("me manda em Excel só 3", &mut state);
+    assert_eq!(shorter.request.unwrap().into_request(), expected);
+    assert_eq!(shorter.export.unwrap().rows, Some(3));
+    assert_eq!(engine.interpret("agora em CSV", &mut state).export.unwrap().rows, Some(3));
+}
+
+#[test]
+fn followup_contacts_and_dates_keep_the_rest_of_the_query() {
+    let engine = interpreter();
+    for (start, followup) in [
+        ("Liste farmácias ativas em Sorriso MT com telefone.", "dessas, só as que têm e-mail cadastrado"),
+        ("Quantas farmácias ativas com telefone em Sorriso MT?", "e com e-mail?"),
+    ] {
+        let mut state = Conversation::default();
+        let mut expected = engine.interpret(start, &mut state).request.unwrap().into_request();
+        expected.scope.contact = ContactNeed::Both;
+        let added = engine.interpret(followup, &mut state);
+        assert_eq!(added.request.unwrap().into_request(), expected, "{followup}");
+        expected.scope.place = PlaceFilter::Municipalities(SmallSet::new([MunicipalityId(2)]));
+        let moved = engine.interpret("dessas só as de Sinop", &mut state);
+        assert_eq!(moved.request.unwrap().into_request(), expected);
+        if matches!(expected.op, Op::List { .. }) {
+            expected.scope.opened = Some(year(2025));
+            let dated = engine.interpret("dessas só as abertas em 2025", &mut state);
+            assert_eq!(dated.request.unwrap().into_request(), expected);
+        }
+        expected.op = Op::List { order: ListOrder::Cnpj, limit: 20 };
+        let file = engine.interpret("me manda em Excel", &mut state);
+        assert_eq!(file.request.unwrap().into_request(), expected);
+        assert_eq!(file.export.unwrap().rows, None);
+    }
+}
+
+#[test]
+fn followup_export_preserves_columns_after_refinements_and_errors() {
+    use opencnpj_query::export::{ExportField, ExportFormat};
+
+    let engine = interpreter();
+    let mut state = Conversation::default();
+    let first = engine
+        .interpret("Me manda um CSV com as colunas nome fantasia e CNPJ de 7 farmácias ativas em Sorriso MT com telefone.", &mut state);
+    let mut expected = first.request.unwrap().into_request();
+    let original_file = first.export.unwrap();
+    for question in ["dessas só as de Atlântida MT", "dessas só as de Atlântida MT em Excel"] {
+        let invalid = engine.interpret(question, &mut state);
+        assert_eq!(invalid.decision, Decision::Clarify, "{question}: {invalid:?}");
+        assert!(invalid.request.is_none() && invalid.export.is_none());
+        assert_eq!(state.last.as_ref(), Some(&expected));
+        assert_eq!(state.export.as_ref(), Some(&original_file));
+    }
+
+    expected.scope.place = PlaceFilter::Municipalities(SmallSet::new([MunicipalityId(2)]));
+    let next = engine.interpret("dessas só as de Sinop em Excel", &mut state);
+    assert_eq!(next.request.unwrap().into_request(), expected);
+    let export = next.export.unwrap();
+    assert_eq!(export.format, ExportFormat::Xlsx);
+    assert_eq!(export.rows, Some(7));
+    assert_eq!(export.fields, [ExportField::NomeFantasia, ExportField::Cnpj]);
+
+    let columns = engine.interpret("só o CNPJ", &mut state);
+    assert_eq!(columns.request.unwrap().into_request(), expected);
+    let export = columns.export.unwrap();
+    assert_eq!(export.rows, Some(7));
+    assert_eq!(export.fields, [ExportField::Cnpj]);
+    let new_query = engine.interpret("Nova pesquisa: quantas farmácias ativas existem em Sinop MT?", &mut state);
+    assert!(new_query.export.is_none() && state.export.is_none() && state.list_rows.is_none());
+    assert_eq!(new_query.request.unwrap().scope.contact, ContactNeed::Any);
+
+    for text in ["dessas só as de Sinop", "me manda em Excel"] {
+        let result = engine.interpret(text, &mut Conversation::default());
+        assert_eq!(result.decision, Decision::Clarify, "{text}: {result:?}");
+        assert!(result.request.is_none() && result.company.is_none(), "{text}");
+    }
+}
+
+#[test]
+fn followup_flow_keeps_status_period_and_corresponding_export_date() {
+    let engine = interpreter();
+    for (start, metric) in [
+        ("Quantas padarias abriram em Sorriso MT em 2025 e continuam ativas?", FlowMetric::Registrations),
+        ("Quantas padarias tiveram baixa em Sorriso MT em 2025?", FlowMetric::Closures),
+    ] {
+        let mut state = Conversation::default();
+        let mut expected = engine.interpret(start, &mut state).request.unwrap().into_request();
+        assert_eq!(expected.op, Op::Count { metric: Metric::Flow(metric) });
+        assert_eq!(expected.time.period, Some(Period::Days(year(2025))));
+        let status = if metric == FlowMetric::Registrations { Status::Active } else { Status::Closed };
+        assert_eq!(expected.scope.status, Some(StatusSet::only(status)));
+        expected.scope.place = PlaceFilter::Municipalities(SmallSet::new([MunicipalityId(2)]));
+        let next = engine.interpret("dessas só as de Sinop", &mut state);
+        assert_eq!(next.request.unwrap().into_request(), expected, "{start}");
+        expected.op = Op::List { order: ListOrder::Cnpj, limit: 20 };
+        expected.time.period = None;
+        if metric == FlowMetric::Registrations {
+            expected.scope.opened = Some(year(2025));
+        } else {
+            expected.scope.status_date = Some(year(2025));
+        }
+        let file = engine.interpret("me manda em Excel", &mut state);
+        assert_eq!(file.request.unwrap().into_request(), expected, "{start}");
+    }
+}

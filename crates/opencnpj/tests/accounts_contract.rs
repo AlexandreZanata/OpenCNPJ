@@ -814,23 +814,47 @@ async fn conversations_are_private_and_survive_restart() {
     assert_eq!(get(&e.public, &conversation, Some(&b)).await.status, StatusCode::NOT_FOUND);
     assert_eq!(call(&e.public, Method::DELETE, &conversation, Some(&b), None, &[]).await.status, StatusCode::NOT_FOUND);
     let ask = "/api/v1/assistant/ask";
-    let question = json!({ "conversation_id": id, "conversation_revision": 0, "question": "Quantas empresas ativas em Cuiabá?" });
+    let question = json!({
+        "conversation_id": id,
+        "conversation_revision": 0,
+        "question": "Liste 5 matrizes de farmácias ativas em Cuiabá MT e Sinop MT, optantes pelo Simples, sem MEI, com telefone e e-mail, ordenadas pelo maior capital."
+    });
     assert_eq!(post(&e.public, ask, Some(&b), question.clone()).await.status, StatusCode::NOT_FOUND);
     let first = post(&e.public, ask, Some(&a), question.clone()).await;
     assert_eq!(first.status, StatusCode::OK, "{}", first.text);
-    assert!(first.json()["context"]["last"].is_object());
+    let mut expected = first.json()["interpretation"]["request"].clone();
+    assert_eq!(expected["op"], json!({"kind": "list", "limit": 5, "order": "capital_desc"}));
+    assert_eq!(expected["scope"]["contact"], "both");
+    assert_eq!(expected["scope"]["head_office"], "yes");
+    assert_eq!(expected["scope"]["simples"], "yes");
+    assert_eq!(expected["scope"]["mei"], "no");
     let restarted = api::router(api::state(e.st.args.clone()).unwrap());
     assert_eq!(post(&restarted, ask, Some(&a), question).await.json()["error"], "conversation_changed");
-    let next = json!({ "conversation_id": id, "conversation_revision": 1, "question": "e em Sinop?" });
+    let next = json!({ "conversation_id": id, "conversation_revision": 1, "question": "dessas só as de Sinop" });
     let follow_up = post(&restarted, ask, Some(&a), next).await;
     assert_eq!(follow_up.status, StatusCode::OK, "{}", follow_up.text);
-    assert!(follow_up.json()["context"]["last"].is_object());
+    expected["scope"]["place"] = json!({"municipalities": [5067]});
+    assert_eq!(follow_up.json()["interpretation"]["request"], expected);
+    let file_turn =
+        post(&restarted, ask, Some(&a), json!({ "conversation_id": id, "conversation_revision": 2, "question": "me manda em Excel" }))
+            .await;
+    assert_eq!(file_turn.status, StatusCode::OK, "{}", file_turn.text);
+    let file_reply = file_turn.json();
+    assert_eq!(file_reply["interpretation"]["request"], expected);
+    let export = &file_reply["interpretation"]["export"];
+    assert_eq!(export["format"], "xlsx");
+    assert_eq!(export["rows"], 5);
+    let download = post(&restarted, "/api/v1/assistant/export", Some(&a), json!({"request": expected, "export": export})).await;
+    assert_eq!(download.status, StatusCode::OK);
+    assert!(download.header("content-disposition").unwrap().ends_with(".xlsx\""));
     let history = get(&restarted, &conversation, Some(&a)).await;
     assert_eq!(history.header("cache-control"), Some("private, no-store"));
     let turns = history.json();
-    assert_eq!(turns.as_array().unwrap().len(), 2);
-    assert_eq!(turns[1]["question"], "e em Sinop?");
+    assert_eq!(turns.as_array().unwrap().len(), 3);
+    assert_eq!(turns[1]["question"], "dessas só as de Sinop");
     assert_eq!(turns[1]["reply"], follow_up.json());
+    assert_eq!(turns[2]["question"], "me manda em Excel");
+    assert_eq!(turns[2]["reply"], file_reply);
     let renamed = call(&restarted, Method::PATCH, &conversation, Some(&a), Some(json!({ "title": "Empresas em Mato Grosso" })), &[]).await;
     assert_eq!(renamed.json()["title"], "Empresas em Mato Grosso");
     assert_eq!(call(&restarted, Method::DELETE, &conversation, Some(&a), None, &[]).await.status, StatusCode::NO_CONTENT);
