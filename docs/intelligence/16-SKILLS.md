@@ -127,6 +127,11 @@ scope starts at the first page. The next delivery retains the filters, sort orde
 any explicitly requested row count. The default preview size leaves the file uncapped by
 that preview. A clarification leaves the last successful query and its delivery intact.
 
+Contact edits are explicit. "tira o filtro de telefone" drops the phone requirement and
+keeps any email requirement. "troca telefone por e-mail" replaces the phone requirement
+with email. Both preserve the other query filters, sorting, and the selected file columns.
+A request for "sem telefone" asks for a different condition and requires clarification.
+
 ## 4. Files
 
 | Format | Dialect |

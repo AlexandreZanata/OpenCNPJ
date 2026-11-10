@@ -835,8 +835,16 @@ async fn conversations_are_private_and_survive_restart() {
     assert_eq!(follow_up.status, StatusCode::OK, "{}", follow_up.text);
     expected["scope"]["place"] = json!({"municipalities": [5067]});
     assert_eq!(follow_up.json()["interpretation"]["request"], expected);
+    for (revision, question, contact) in [(2, "troca telefone por e-mail", "email"), (3, "tira o filtro de e-mail", "any")] {
+        let reply =
+            post(&restarted, ask, Some(&a), json!({ "conversation_id": id, "conversation_revision": revision, "question": question }))
+                .await;
+        assert_eq!(reply.status, StatusCode::OK, "{}", reply.text);
+        expected["scope"]["contact"] = json!(contact);
+        assert_eq!(reply.json()["interpretation"]["request"], expected, "{question}");
+    }
     let file_turn =
-        post(&restarted, ask, Some(&a), json!({ "conversation_id": id, "conversation_revision": 2, "question": "me manda em Excel" }))
+        post(&restarted, ask, Some(&a), json!({ "conversation_id": id, "conversation_revision": 4, "question": "me manda em Excel" }))
             .await;
     assert_eq!(file_turn.status, StatusCode::OK, "{}", file_turn.text);
     let file_reply = file_turn.json();
@@ -850,11 +858,13 @@ async fn conversations_are_private_and_survive_restart() {
     let history = get(&restarted, &conversation, Some(&a)).await;
     assert_eq!(history.header("cache-control"), Some("private, no-store"));
     let turns = history.json();
-    assert_eq!(turns.as_array().unwrap().len(), 3);
+    assert_eq!(turns.as_array().unwrap().len(), 5);
     assert_eq!(turns[1]["question"], "dessas só as de Sinop");
     assert_eq!(turns[1]["reply"], follow_up.json());
-    assert_eq!(turns[2]["question"], "me manda em Excel");
-    assert_eq!(turns[2]["reply"], file_reply);
+    assert_eq!(turns[2]["question"], "troca telefone por e-mail");
+    assert_eq!(turns[3]["question"], "tira o filtro de e-mail");
+    assert_eq!(turns[4]["question"], "me manda em Excel");
+    assert_eq!(turns[4]["reply"], file_reply);
     let renamed = call(&restarted, Method::PATCH, &conversation, Some(&a), Some(json!({ "title": "Empresas em Mato Grosso" })), &[]).await;
     assert_eq!(renamed.json()["title"], "Empresas em Mato Grosso");
     assert_eq!(call(&restarted, Method::DELETE, &conversation, Some(&a), None, &[]).await.status, StatusCode::NO_CONTENT);
