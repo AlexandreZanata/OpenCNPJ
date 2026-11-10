@@ -398,11 +398,17 @@ mod tests {
         let cases = include_str!("../tests/fixtures/sector-phrases.tsv")
             .lines()
             .chain(include_str!("../tests/fixtures/redundant-phrases.tsv").lines())
-            .chain(include_str!("../tests/fixtures/regional-phrases.tsv").lines());
+            .chain(include_str!("../tests/fixtures/regional-phrases.tsv").lines())
+            .chain(include_str!("../tests/fixtures/noisy-phrases.tsv").lines());
         for line in cases.filter(|line| !line.starts_with('#') && !line.is_empty()) {
-            let columns: Vec<_> = line.splitn(6, '\t').collect();
-            let [expected, place, op, format, contact, question] = columns.as_slice() else {
+            let columns: Vec<_> = line.splitn(7, '\t').collect();
+            let [expected, place, op, format, contact, rest @ ..] = columns.as_slice() else {
                 panic!("invalid search test fixture: {line}");
+            };
+            let (extra, question) = match rest {
+                [question] => (None, *question),
+                [extra, question] => (Some(*extra), *question),
+                _ => panic!("invalid search test fixture: {line}"),
             };
             let result = assets.interpreter.interpret(question, &mut Conversation::default());
 
@@ -410,6 +416,9 @@ mod tests {
                 let decision = if *expected == "?" { Decision::Clarify } else { Decision::Reject };
                 assert_eq!(result.decision, decision, "{question}: {result:?}");
                 assert!(result.request.is_none() && result.company.is_none(), "{question}: {result:?}");
+                if let Some(reason) = extra.and_then(|value| value.strip_prefix("reason=")) {
+                    assert!(result.reason.contains(reason), "{question}: {result:?}");
+                }
                 continue;
             }
             let expected_place = if let Some(uf) = place.strip_prefix("uf=") {
@@ -453,6 +462,43 @@ mod tests {
                 _ => panic!("invalid contact in fixture: {contact}"),
             };
             assert_eq!(request.scope.contact, contact, "{question}");
+            if let Some(extra) = extra {
+                let mut expected = Filters::default();
+                let tri = |value| match value {
+                    "yes" => Tri::Yes,
+                    "no" => Tri::No,
+                    _ => panic!("invalid tri-state filter: {value}"),
+                };
+                for pair in extra.split(';').filter(|part| *part != "-") {
+                    let (field, value) = pair.split_once('=').unwrap();
+                    match field {
+                        "head" => expected.head_office = tri(value),
+                        "mei" => expected.mei = tri(value),
+                        "simples" => expected.simples = tri(value),
+                        "porte" => {
+                            expected.porte = PorteSet::only(match value {
+                                "micro" => Porte::Micro,
+                                "small" => Porte::Small,
+                                _ => panic!("invalid size: {value}"),
+                            })
+                        }
+                        "capital_min" => expected.capital.get_or_insert(Range { from: None, to: None }).from = Some(value.parse().unwrap()),
+                        "capital_max" => expected.capital.get_or_insert(Range { from: None, to: None }).to = Some(value.parse().unwrap()),
+                        "opened" => {
+                            let year = value.parse().unwrap();
+                            expected.opened = Some(Range { from: Day::from_ymd(year, 1, 1), to: Day::from_ymd(year, 12, 31) });
+                        }
+                        _ => panic!("invalid fixture filter: {field}"),
+                    }
+                }
+                assert_eq!(request.scope.head_office, expected.head_office, "{question}");
+                assert_eq!(request.scope.mei, expected.mei, "{question}");
+                assert_eq!(request.scope.simples, expected.simples, "{question}");
+                assert_eq!(request.scope.porte, expected.porte, "{question}");
+                assert_eq!(request.scope.capital, expected.capital, "{question}");
+                assert_eq!(request.scope.opened, expected.opened, "{question}");
+                assert_eq!(request.scope.status_date, None, "{question}");
+            }
             let requested_rows = op.strip_prefix("list=").map(|limit| limit.parse::<u16>().unwrap());
             match op {
                 "list" => assert!(matches!(request.op, Op::List { .. }), "{question}: {:?}", request.op),

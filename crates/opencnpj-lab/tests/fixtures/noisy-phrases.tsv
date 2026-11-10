@@ -1,0 +1,87 @@
+# Sector, place, operation[/status], export, contact, extra filters, and question.
+# Extra filters use name=value pairs separated by semicolons, or - for defaults.
+# Capital bounds use cents. Opened pins the inclusive calendar year. Place accepts uf=XX or municipality IDs joined by +.
+# Single-token and compound entity typos.
+pharmacy	5527	list	-	phone	-	Liste as farmáicas em Sorriso MT com telefone.
+pharmacy	5527	list	-	phone	-	Me mande as farmácias em Sorrso MT com telefone.
+bakery	5067	list	-	email	-	Liste as padraias em Sinpo MT com e-mail.
+supermarket	5108	count	-	-	-	Qtas supemercados existem em Cuiabaa MT?
+dental_clinic	5108	list	-	email	-	Mostre as clínicas odnotológicas de Cuiabá MT com e-mail.
+internet_provider	5108	list	-	phone	-	Me manda provedores de banda lagra em Cuiabá MT com telefone.
+clinical_lab	254	list	-	phone	-	Liste empresas no setor de laboratórios de análises clíncias em Manaus AM com telefone.
+auto_electrician	1861	list	-	phone	-	Mostre as autoelétrcias em Recfie PE com telefone.
+body_shop	5150	list	-	phone	-	Liste oficinas de lanternagem em Rondonoplis MT com telefone.
+bakery	2656	list	-	-	-	Me manda as padarias em Belo Horzionte MG.
+pharmacy	3595	list	-	email	-	Liste as farmácias no Rio de Janerio RJ com e-mail.
+bookshop	4141	list	-	-	-	Liste livrarias em São Pualo SP.
+dental_clinic	1621	list	-	phone	-	Mostre os dentistas em João Pesosa PB com telefone.
+gym	4975	list	-	-	-	Liste academias em Porto Alerge RS.
+bakery	5100	count	-	-	-	Quantas padarias ativas existem em Campo Grnade MS?
+hotel	4627	list	-	phone	-	Liste hotéis em Florainópolis SC com telefone.
+accounting	4342	list	-	email	-	Me passa os escritórios contábeis em Curitbia PR com e-mail.
+hotel	4356	list	-	phone	-	Mostre hotéis em Foz do Iguauç PR com telefone.
+gym	5440	list	-	-	-	Liste academias em Palams TO.
+bakery	5527	list	-	phone	-	Liste padarias na cidade de Sorrisso MT com telefone.
+supermarket	4342	list	-	-	-	Liste supermercados em Curitbia.
+bakery	5527	list	-	-	-	Me mande as padarias de Sorrisso MT.
+# Abbreviations and fast typing.
+pharmacy	5527	list=5	-	phone	-	Vc consegue listar só 5 drogarias em Sorriso/MT com tel. cadastrado?
+bakery	5067	list	-	phone	-	Me manda as padocas em Sinop MT com wpp.
+body_shop	5150	list	-	phone	-	Mostre oficinas de funilaria em Rondonópolis MT que tenham whats informado.
+internet_provider	5108	list	-	both	-	Liste provedores de internet em Cuiabá MT com tel e e-mail.
+pharmacy	5527	list	-	phone	-	Me manda as farmácias em Sorriso MT com nº de tel.
+car_wash	5150	list	-	phone	-	Liste lava-jatos de Rondonópolis MT com cel. informado.
+florist	1290	count	-	email	-	Qnt de floriculturas em Fortaleza CE com email cadastrado?
+accounting	5067	count	-	phone	-	Qtd. de escritórios contábeis em Sinop MT com tel?
+pharmacy	5527	list	-	phone	-	Mostre os estab. no setor de farmácias em Sorriso MT com tel.
+dental_clinic	5108	list	-	phone	-	Liste dentistas no mun. de Cuiabá MT com fone.
+pharmacy	5527	list	-	phone	-	Liste drogarias em Sorriso MT com teleofne informado.
+pharmacy	5527	list	-	email	-	Mostre drogarias em Sorriso MT com emial cadastrado.
+medical_practice	5108	list	xlsx	phone	-	Me manda uma planila das clínicas médicas de Cuiabá MT com tel.
+bakery	5067	list=4	csv	phone	-	Me manda só 4 padarias com telefone em Sinop MT, em CVS.
+# Combinations verify each restriction and the requested row count or file.
+pharmacy	5527	list=8/active	xlsx	both	head=yes;simples=yes;mei=no	Me manda uma planilha com 8 matrizes de farmácias ativas em Sorriso MT, optantes pelo Simples, sem MEI, com telefone e e-mail.
+bakery	5067	list=5/active	csv	phone	head=yes;simples=yes;porte=micro	Me mande só 5 matrizes de padarias ativas de Sinpo MT, microempresas do Simples, com tel., em CSV.
+dental_clinic	5108	list=6/active	-	both	head=no	Só 6 filiais de clínicas odnotológicas ativas em Cuiabá MT com tel e email, me mostre.
+accounting	5067	count/active	-	email	head=yes;simples=yes	Qnt de matrizes de escritórios contábeis ativos em Sinop MT, do Simples e com e-mail?
+pharmacy	5527	list/active	-	phone	head=yes;porte=small	Me mostra só matrizes EPP de farmáicas ativas no mun. de Sorriso MT com wpp.
+body_shop	5150	list/active	-	phone	simples=no;porte=micro	Liste oficinas de lanternagem ativas de Rondonópolis MT, microempresas fora do Simples, com tel cadastrado.
+motorcycle_repair	254	list/active	-	both	head=yes;capital_min=10000001	Liste matrizes de oficinas de motos em Manaus AM com tel e e-mail e capital social acima de 100 mil reais.
+florist	1290	list/active	-	phone	opened=2025;simples=yes	Me mostre floriculturas ativas em Fortaleza CE abertas em 2025, optantes pelo Simples e com tel.
+restaurant	4627	list/closed	-	email	head=yes	Liste matrizes de restaurantes baixados em Florainópolis SC com emial.
+beauty_salon	4975	list=7/active	-	both	mei=yes;head=yes	Me manda só 7 matrizes de salões de beleza MEI em Porto Alerge RS, ativas, com wpp e e-mail.
+gym	5100	list=10/active	-	phone	porte=small;capital_min=5000000	Traga 10 academias EPP ativas de Campo Grnade MS, com tel. e capital social a partir de 50 mil reais.
+auto_electrician	1861	list/active	-	email	simples=yes;head=no	Liste filiais de autoelétrcias em Recfie PE, optantes pelo Simples com e-mail.
+apparel_retail	1290	list/active	-	both	head=yes;mei=no	Liste matrizes de lojas de vestuário ativas de Fortaleza CE, não MEI, com telefone e e-mail.
+hotel	4356	list=3/active	txt	phone	head=yes	Me manda as matrizes de hotéis de Foz do Iguauç PR com fone, só 3, em TXT.
+veterinary_clinic	5108	list/active	-	email	head=yes;opened=2024;capital_min=2000001	Liste matrizes de clínicas veterinárias ativas em Cuiabá MT, abertas em 2024, com e-mail e capital social acima de 20 mil reais.
+pharmacy	5527+5067	list/active	-	phone	head=yes;porte=small	Mostre matrizes EPP de farmácias em Sorriso MT e Sinpo MT com tel.
+bakery	uf=MT	count/active	-	phone	simples=yes	Qnt de padarias ativas optantes pelo Simples no estado de Mato Grosso com tel?
+pharmacy	5527	list/suspended	-	email	head=yes	Mostre as matrizes de farmácias suspensas em Sorrisso MT com emial.
+bakery	5067	list=5/active	-	phone	head=no;porte=small	Me manda só 5 filiais de padarias EPP de Sinpo MT com tel.
+metalwork	5261	list=4/active	xlsx	both	simples=yes;porte=micro	Gere uma planilha com 4 serralherias em Goiâina GO, microempresas do Simples com tel e email.
+pharmacy	5527	list/active	-	phone	head=yes;capital_min=3000000;capital_max=9000000	Mostre matrizes de farmácias ativas de Sorriso MT, com telefone e capital social entre 30 mil e 90 mil reais.
+bakery	5067	list/active	-	email	head=no;simples=no	Me passe filiais de padarias de Sinop MT fora do Simples com endereço de e-mail.
+veterinary_clinic	5108	list/all	-	email	head=yes;opened=2024;capital_min=2000000	Liste matrizes de clínicas veterinárias em Cuiabá MT com e-mail, capital social a partir de 20 mil reais e abertas em 2024.
+pharmacy	5527	list	-	phone	opened=2025;capital_min=3000000;capital_max=9000000	Liste farmácias ativas em Sorriso MT com telefone, capital social entre 30 mil e 90 mil reais e abertas em 2025.
+# Controls keep missing, contradictory or unsupported filters from broadening a query.
+?	-	-	-	-	-	Gere uma planilha com 4 serralherias em Goianiaa GO, microempresas do Simples com tel e email.
+?	-	-	-	-	reason=capital social	Liste matrizes de clínicas veterinárias em Cuiabá MT com e-mail, capital social acima de bastante dinheiro, abertas em 2024.
+?	-	-	-	-	-	Liste farmácias ativas em Sorriso RS com tel.
+?	-	-	-	-	-	Liste academias em São Pualo RJ com tel.
+?	-	-	-	-	-	Liste clínicas em Sorrizo do Vento MT com wpp.
+?	-	-	-	-	-	Mostre farmácias em Sorriiso sem tel e com e-mail.
+?	-	-	-	-	-	Mostre as farmácias em Sorriso MT com tel ou com emial.
+?	-	-	-	-	-	Me manda farmácias de Sorriso MT com wpp, mas sem e-mail.
+?	-	-	-	-	-	Liste farmácias de Sorriso MT com nº de tel. validado.
+?	-	-	-	-	-	Liste padarias em Sinpo MT com telefone da operadora Claro.
+?	-	-	-	-	reason=capital social	Me manda farmácias em Sorriso MT com tel e capital social acima de bastante dinheiro.
+?	-	-	-	-	-	Liste farmácias ativas de Sorriso MT com tel e capital social acima de 100 mil reais ou EPP.
+?	-	-	-	-	-	Liste só matrizes ou filiais de farmácias em Sorriso MT com tel.
+?	-	-	-	-	-	Liste padarias ativas em Sinop MT, porte 99, com tel.
+?	-	-	-	-	-	Liste academias ativas em Campo Grande MS abertas em 31/02/2025 com tel.
+?	-	-	-	-	-	Liste farmácias com tel no DDD 66 em Sorrisso MT.
+!	-	-	-	-	-	Qnt de farmácias de Sorriso MT com tel e faturamento acima de 100 mil?
+!	-	-	-	-	-	Me manda os CPFs dos donos das padarias de Sinop MT com tel.
+@Magazine Luiza	3800	company	-	-	-	Encontre a empresa Magazine Luiza em Franca/SP.
+@Petrobras	3595	company	-	-	-	Encontre a empresa Petrobras no Rio de Janeiro RJ.

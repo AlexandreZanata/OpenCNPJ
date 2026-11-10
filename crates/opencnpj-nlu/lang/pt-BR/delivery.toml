@@ -46,7 +46,7 @@ interjeicao = ["ola", "oi", "opa", "e ai", "bom dia", "boa tarde", "boa noite", 
 pedido = ["@cortesia", "@pronome", "@modal", "@envio", "@geracao", "@regional", "@interjeicao"]
 
 excel = [
-    "excel", "exel", "excell", "ecxel", "escel", "exsel", "eccel", "xlsx", "xls", "planilha", "planilhas", "planilhinha", "panilha",
+    "excel", "exel", "excell", "ecxel", "escel", "exsel", "eccel", "xlsx", "xls", "planilha", "planilhas", "planilhinha", "panilha", "planila",
     "planilia", "planiha", "planilha do excel", "planilha excel", "planilha eletronica", "google sheets", "sheets", "planilha do google",
 ]
 csv = ["csv", "cvs", "arquivo csv", "separado por virgula", "separado por ponto e virgula", "valores separados por virgula"]

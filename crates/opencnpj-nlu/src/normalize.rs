@@ -22,6 +22,9 @@ pub fn tokens(input: &str) -> Vec<String> {
             match word.trim_matches(['.', ',', ';']) {
                 "qtas" | "qntas" | "qts" => "quantas",
                 "qtos" | "qnts" | "qntos" => "quantos",
+                "qnt" => "quantidade",
+                "estab" => "estabelecimentos",
+                "mun" => "municipio",
                 "hj" => "hoje",
                 "pra" => "para",
                 "pro" => "para",
@@ -43,10 +46,11 @@ pub fn tokens(input: &str) -> Vec<String> {
 
 /// Entity keys ignore separators; numeric parsers retain the original tokens.
 pub fn words(input: &str) -> Vec<String> {
-    tokens(input)
-        .into_iter()
-        .flat_map(|s| s.split(['.', ',', '/', '-', '%']).filter(|p| !p.is_empty()).map(str::to_owned).collect::<Vec<_>>())
-        .collect()
+    tokens(input).into_iter().flat_map(|s| word_parts(&s).map(str::to_owned).collect::<Vec<_>>()).collect()
+}
+
+pub(crate) fn word_parts(token: &str) -> impl Iterator<Item = &str> {
+    token.split(['.', ',', '/', '-', '%']).filter(|part| !part.is_empty())
 }
 
 #[cfg(test)]
