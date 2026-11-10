@@ -59,12 +59,13 @@ pub(crate) struct ResolveContext<'a> {
     pub competences: &'a [Competence],
     pub versions: CatalogueVersions,
     pub population: PopulationRef,
+    pub vocabulary: &'a crate::vocabulary::Known,
 }
 
 /// `export` marks a question whose answer is delivered as a file: a count of companies
 /// becomes the list of those companies.
 pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation, export: bool) -> Result<Frame, Box<Interpretation>> {
-    let ResolveContext { pack, cues, policy, anchor, current, competences, versions, population } = *env;
+    let ResolveContext { pack, cues, policy, anchor, current, competences, versions, population, vocabulary } = *env;
     let raw = normalize::fold(text);
     let words = normalize::words(text);
     let normalized = words.join(" ");
@@ -79,7 +80,20 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
             "Essa informação não está nos dados cadastrais disponíveis. Posso contar estabelecimentos, listar CNPJs ou mostrar registros e baixas.",
         ));
     }
-    let preliminary = pack.lexicon.scan(&words);
+    let mut preliminary = pack.lexicon.scan(&words);
+    // A misspelt activity ("supemercados", "acadmias") is recovered only when the word is
+    // unknown and exactly one activity is one edit away; the answer says so.
+    let mut approximated = Vec::new();
+    for (at, word) in words.iter().enumerate() {
+        if !preliminary.iter().any(|h| h.start <= at && at < h.end)
+            && !vocabulary.knows(word)
+            && let Some(values) = pack.lexicon.fuzzy_sector(word)
+        {
+            preliminary.push(Hit { start: at, end: at + 1, values, fuzzy: false });
+            approximated.push(format!("Atividade interpretada por aproximação: {word}."));
+        }
+    }
+    preliminary.sort_by_key(|h| h.start);
     let masked = masked_text(&words, &preliminary);
     let m = masked.as_str();
     let uncovered = |phrases: &[String]| {
@@ -92,7 +106,14 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
                     .any(|(at, w)| w == needle && !preliminary.iter().any(|h| h.start < at + needle.len() && at < h.end))
         })
     };
-    if uncovered(&policy.ambiguous_quality) {
+    let size_class = has(n, &["grande porte", "medio porte", "medio e grande porte", "grande e medio porte"]);
+    let quality: Vec<String> = policy
+        .ambiguous_quality
+        .iter()
+        .filter(|phrase| !(size_class && matches!(phrase.as_str(), "grande" | "grandes")))
+        .cloned()
+        .collect();
+    if uncovered(&quality) {
         return Err(clarify("Qual critério cadastral você quer usar? Informe porte, capital, período ou local de referência."));
     }
     if uncovered(&policy.ambiguous_activity) {
@@ -124,12 +145,43 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
                 "estoque",
                 "densidade",
                 "habitantes por estabelecimento",
+                "cooperativa",
+                "cooperativas",
+                "associacoes",
+                "fundacoes",
+                "sociedades anonimas",
+                "sociedade anonima",
+                "eireli",
+                "ltda",
             ],
         );
+    // "preciso prospectar clientes para minha distribuidora": a prospecting request that
+    // names no kind of company to look for.
+    let prospecting = has(n, &["prospectar", "prospeccao", "leads", "prospects"])
+        || has(n, &["clientes"]) && has(n, &["encontrar", "achar", "buscar", "procurar", "preciso", "quero", "novos", "potenciais"]);
+    // The activity after "para minha/meu" is the asker's own business, not the companies sought.
+    let own_business = has(n, &["para minha", "para meu", "para a minha", "para o meu", "para nossa", "para nosso"]);
+    if state.last.is_none() && prospecting && (!domain_evidence || own_business) && lookup(&raw).is_none() {
+        return Err(clarify(
+            "Que tipo de empresa você quer encontrar? Diga a atividade e o local, por exemplo: “restaurantes em Cuiabá com telefone”.",
+        ));
+    }
     if has(n, &["lojas", "loja"]) && !preliminary.iter().any(|h| h.values.iter().any(|e| matches!(e, Entity::Sector(_)))) {
         return Err(clarify("Que tipo de loja você quer pesquisar? Informe a atividade para definir os CNAEs."));
     }
     if !domain_evidence && state.last.is_none() && meta_topic(m).is_none() && lookup(&raw).is_none() {
+        // "liste os fornecedores de embalagens em Cuiabá": a list of something in a place,
+        // named by words no catalogue holds. Ask about them.
+        let strange: Vec<&str> = words
+            .iter()
+            .enumerate()
+            .filter(|(at, w)| !preliminary.iter().any(|h| h.start <= *at && *at < h.end) && !vocabulary.knows(w))
+            .map(|(_, w)| w.as_str())
+            .collect();
+        let placed = preliminary.iter().any(|h| h.values.iter().any(|e| matches!(e, Entity::Municipality { .. } | Entity::Uf(_))));
+        if cue(m, &cues.list) && placed && !strange.is_empty() {
+            return Err(clarify(&unrecognized(&strange)));
+        }
         return Err(reject("Esse pedido não é uma pesquisa cadastral de empresas. Posso contar, listar e comparar estabelecimentos."));
     }
     let mut hits = preliminary;
@@ -177,15 +229,16 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
             ));
         }
     }
-    let mut notes = Vec::new();
+    let mut notes = approximated;
     let mut rows = None;
     for i in 1..words.len() {
         if matches!(words[i - 1].as_str(), "em" | "no" | "na")
             && !hits.iter().any(|h| h.start <= i && i < h.end)
-            // Recover only a complete single-token place followed by a UF. A
-            // token inside a longer name ("Águas Lindaas de Goiás") must fail
-            // closed instead of decomposing into unrelated municipalities.
-            && words.get(i + 1).is_some_and(|s| UFS.iter().any(|u| u.eq_ignore_ascii_case(s)))
+            // Recover only a complete single-token place followed by a UF, or closing the
+            // question ("em curitba"). A token inside a longer name ("Águas Lindaas de
+            // Goiás") must fail closed instead of decomposing into unrelated municipalities.
+            && (words.get(i + 1).is_some_and(|s| UFS.iter().any(|u| u.eq_ignore_ascii_case(s)))
+                || i + 1 == words.len() && words[i].len() >= 7 && !vocabulary.knows(&words[i]))
             && let Some(values) = pack.lexicon.fuzzy_place(&words[i])
         {
             hits.push(Hit { start: i, end: i + 1, values, fuzzy: true });
@@ -440,7 +493,10 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
                 return Err(clarify("Não consegui aplicar essa exclusão a um filtro cadastral. Qual condição você quer excluir?"));
             }
         }
-        if matches!(word.as_str(), "frota" | "bairro" | "cep" | "logradouro" | "certificacao" | "licenciamento") {
+        if matches!(
+            word.as_str(),
+            "frota" | "bairro" | "bairros" | "cep" | "ddd" | "rua" | "avenida" | "logradouro" | "certificacao" | "licenciamento"
+        ) {
             return Err(clarify(
                 "Esse filtro ainda não é interpretado com segurança. Use município, setor, situação, porte, MEI, Simples, natureza, datas ou capital.",
             ));
@@ -455,6 +511,8 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
     let mut excluded_muni = Vec::new();
     let mut excluded_ufs = Vec::new();
     let mut excluded_sectors = Vec::new();
+    // Starts of the hits already read as places, for coordination ("Sinop e Sorriso").
+    let mut placed: Vec<usize> = Vec::new();
     let bare_entities = words.iter().enumerate().all(|(i, w)| {
         hits.iter().any(|h| h.start <= i && i < h.end)
             || matches!(
@@ -557,7 +615,12 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
                     "fora",
                 ],
             );
-        let geographic = has(&before, &["cidade", "municipio", "em", "no", "na", "sem", "exceto", "menos", "vs", "quis dizer"])
+        // A place coordinated with the place before it shares its role.
+        let coordinated = hits.iter().any(|h| {
+            placed.contains(&h.start) && (h.end == hit.start || h.end + 1 == hit.start && matches!(words[h.end].as_str(), "e" | "ou"))
+        });
+        let geographic = (coordinated
+            || has(&before, &["cidade", "municipio", "em", "no", "na", "sem", "exceto", "menos", "vs", "quis dizer"]))
             && !(has_sector && activity_context && !city);
         if !geographic && !city && cue(&words[hit.start..hit.end].join(" "), &cues.count) {
             continue;
@@ -610,6 +673,7 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
             } else {
                 municipalities.push(*id)
             };
+            placed.push(hit.start);
             continue;
         }
         let activities: Vec<_> = hit.values.iter().filter_map(|e| if let Entity::Sector(id) = e { Some(*id) } else { None }).collect();
@@ -633,7 +697,12 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
                     {
                         continue;
                     }
-                    if neg { excluded_ufs.push(*id) } else { ufs.push(*id) }
+                    if neg {
+                        excluded_ufs.push(*id)
+                    } else {
+                        ufs.push(*id)
+                    }
+                    placed.push(hit.start);
                 }
                 Entity::Region(id) => regions.push(*id),
                 _ => {}
@@ -651,7 +720,106 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
             .iter()
             .enumerate()
             .all(|(i, w)| hits.iter().any(|h| h.start <= i && i < h.end) || matches!(w.as_str(), "em" | "no" | "na" | "de" | "do" | "da"));
+    // "dentistas em Cuiabá com telefone", "empresas abertas em 2025 em Sinop": a noun phrase
+    // naming an activity or companies, as typed into a search box. It starts a new query when
+    // it also names the place, or when there is no conversation to refine. Every other word
+    // of it must be known (see the closed-vocabulary check at the end).
+    let company_noun = has(
+        n,
+        &[
+            "empresas",
+            "empresa",
+            "estabelecimentos",
+            "estabelecimento",
+            "cnpjs",
+            "negocios",
+            "mei",
+            "microempresas",
+            "cooperativas",
+            "associacoes",
+            "fundacoes",
+            "sociedades anonimas",
+        ],
+    );
+    let named_place = !municipalities.is_empty() || !ufs.is_empty() || !regions.is_empty();
+    let covered = |at: usize| hits.iter().any(|h| h.start <= at && at < h.end);
+    // The phrase is headed by what is searched for, after articles and a plain request.
+    let head = words.iter().position(|w| {
+        !matches!(
+            w.as_str(),
+            "a" | "o"
+                | "as"
+                | "os"
+                | "um"
+                | "uma"
+                | "uns"
+                | "umas"
+                | "todas"
+                | "todos"
+                | "novas"
+                | "novos"
+                | "quero"
+                | "queria"
+                | "preciso"
+                | "procuro"
+                | "busco"
+                | "de"
+                | "das"
+                | "dos"
+                | "concorrentes"
+                | "concorrente"
+                | "contatos"
+                | "telefones"
+                | "emails"
+                | "leads"
+                | "prospects"
+                | "vender"
+                | "prospectar"
+                | "encontrar"
+                | "achar"
+                | "para"
+                | "clientes"
+                | "gostaria"
+        )
+    });
+    let plural_noun = |w: &str| {
+        matches!(
+            w,
+            "empresas"
+                | "estabelecimentos"
+                | "negocios"
+                | "cnpjs"
+                | "firmas"
+                | "companhias"
+                | "microempresas"
+                | "cooperativas"
+                | "associacoes"
+                | "fundacoes"
+                | "sociedades"
+        )
+    };
+    let headed_by_sector =
+        head.is_some_and(|at| hits.iter().any(|h| h.start == at && h.values.iter().any(|e| matches!(e, Entity::Sector(_)))));
+    let headed_by_companies = head.is_some_and(|at| plural_noun(&words[at]) || words[at] == "mei");
+    // Words before the head are the request itself; the rest must be read by a filter.
+    let foreign: Vec<&str> = words
+        .iter()
+        .enumerate()
+        .filter(|(at, w)| head.is_some_and(|head| *at >= head) && !covered(*at) && !vocabulary.searches(w))
+        .map(|(_, w)| w.as_str())
+        .collect();
+    let search_shape = (headed_by_sector || headed_by_companies) && (named_place || state.last.is_none());
+    let search_style = search_shape && foreign.is_empty();
+    // Contacts and leads are asked for as a list of companies.
+    let wants_contacts = (has(n, &["contatos", "telefones", "emails", "e mails", "leads", "prospects", "mailing"])
+        || search_style && has(n, &["telefone", "fone", "celular", "whatsapp", "zap", "email", "e mail", "contato"]))
+        && !cue(m, &cues.count);
+    // "os maiores supermercados de Sinop": companies ordered by the only size the registry
+    // holds, the declared capital. "As maiores cidades" ranks a dimension instead.
+    let biggest = has(n, &["maiores"]) && dimension(n).is_none() && (!sectors.is_empty() || company_noun);
     let full_query = bare_topic
+        || search_style
+        || wants_contacts
         || cue(m, &cues.count)
         || cue(m, &cues.list)
         || cue(m, &cues.compare)
@@ -705,6 +873,44 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
             || export && has(n, &["essas", "esses", "isso", "dessas", "desses", "mesmas", "mesmos"])
             || !full_query
             || municipalities.is_empty() && sectors.is_empty() && has(n, &["apenas", "somente", "so"]));
+    let states_status = has(
+        n,
+        &[
+            "ativas",
+            "ativos",
+            "ativa",
+            "ativo",
+            "inativas",
+            "inativos",
+            "baixadas",
+            "baixados",
+            "fechadas",
+            "fechados",
+            "encerradas",
+            "encerrados",
+            "suspensas",
+            "suspensos",
+            "inaptas",
+            "inaptos",
+            "abertas",
+            "abertos",
+            "novas",
+            "novos",
+        ],
+    );
+    let explicit_intent = cue(m, &cues.count)
+        || cue(m, &cues.list)
+        || cue(m, &cues.compare)
+        || cue(m, &cues.rank)
+        || cue(m, &cues.trend)
+        || cue(m, &cues.breakdown)
+        || cue(m, &cues.growth)
+        || cue(m, &cues.closures)
+        || wants_contacts
+        || biggest
+        || meta.is_some()
+        || lookup(&raw).is_some();
+    let assumed_stock = search_style && !bare_topic && !explicit_intent && !states_status && !followup && !export;
     if bare_topic {
         notes.push("Considerei o estoque de estabelecimentos ativos.".into());
     }
@@ -730,6 +936,11 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
         "new_query"
     }
     .to_owned();
+    // "empresas de energia solar em Sinop": the search names companies by a word no catalogue
+    // holds. Ask about it; a sector followed by other words may be a company name instead.
+    if search_shape && headed_by_companies && !full_query && !followup && meta.is_none() {
+        return Err(clarify(&unrecognized(&foreign)));
+    }
     if !full_query && !followup && meta.is_none() {
         return Err(reject(
             "Não identifiquei uma pesquisa cadastral. Tente contar empresas de um setor, listar CNPJs ou comparar municípios.",
@@ -814,7 +1025,7 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
     {
         return Err(clarify("Qual atividade e município você quer pesquisar?"));
     }
-    filters(n, m, &raw, &mut request, &mut act, population)?;
+    filters(n, m, &raw, &mut request, &mut act, population, &mut notes)?;
     if has(n, &["nao estao ativas", "nao estao ativos", "nao tao ativas", "nao tao ativos", "inativas", "inativos", "inativa", "inativo"]) {
         notes.push("Considerei suspensas, inaptas e baixadas; situação nula não foi incluída.".into());
     }
@@ -836,6 +1047,24 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
         request.time.period = None;
     } else {
         let mut temporal = time::period(&temporal_raw, anchor);
+        if temporal.is_some() && time::relative(&temporal_raw) {
+            notes.push(format!("Períodos relativos contam até a data de referência da base, {}.", date_br(anchor)));
+        }
+        // "novas empresas", "recém-abertas" with no period: the last ninety days of the data.
+        if temporal.is_none()
+            && !cue(m, &cues.closures)
+            // Masked text: "Currais Novos" is a place; "mais novos" orders a list.
+            && has(m, &["novas", "novos", "recem abertas", "recem abertos", "recem criadas", "recem criados", "recem registradas"])
+            && !has(m, &["mais novas", "mais novos"])
+        {
+            let from = Day(anchor.0.saturating_sub(89));
+            temporal = Some(Period::Days(Range { from: Some(from), to: Some(anchor) }));
+            notes.push(format!(
+                "Considerei como novas as empresas abertas nos últimos 90 dias, de {} a {}.",
+                date_br(from),
+                date_br(anchor)
+            ));
+        }
         if has(n, &["ultimos", "ultimas", "desde", "a partir"]) && temporal.is_none() {
             return Err(clarify("Não consegui resolver o período. Informe datas válidas ou uma quantidade de meses ou dias."));
         }
@@ -843,7 +1072,7 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
         let registered = (cue(m, &cues.registrations)
             && (temporal.is_some()
                 || has(n, &["abriram", "surgiram", "comecaram", "criadas", "criados", "foram registrados", "registros de inicio"])))
-            || temporal.is_some() && has(n, &["abertas", "abertos", "novas", "novos"]);
+            || temporal.is_some() && has(m, &["abertas", "abertos", "novas", "novos", "recem"]);
         let growth = cue(m, &cues.growth);
         // An explicit census reference selects the census population; otherwise the
         // ambient default (usually the latest IBGE estimate) applies.
@@ -883,7 +1112,7 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
             && !analytical
             && !matches!(request.op, Op::List { .. } if inherited)
             && matches!(measured, Some(Metric::Stock | Metric::Flow(FlowMetric::Closures | FlowMetric::Registrations)));
-        let islist = (cue(m, &cues.list) || has(n, &["quais"]) && has(n, &["maior capital", "mais capital"]))
+        let islist = (cue(m, &cues.list) || wants_contacts || biggest || has(n, &["quais"]) && has(n, &["maior capital", "mais capital"]))
             && !has(n, &["evolucao", "distribua", "distribuicao"])
             && !cue(m, &cues.trend)
             || records;
@@ -915,7 +1144,7 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
                 None => 20,
             };
             rows = explicit.filter(|_| export);
-            let order = if has(n, &["capital social", "capital"]) && has(n, &["maior", "mais", "ordenados"]) {
+            let order = if biggest || has(n, &["capital social", "capital"]) && has(n, &["maior", "mais", "ordenados"]) {
                 ListOrder::CapitalDesc
             } else if has(n, &["antigos para os mais novos", "mais antigos", "mais antigas"])
                 && !has(n, &["mais novos para os mais antigos"])
@@ -942,6 +1171,9 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
                 return Err(clarify(
                     "Esse período se refere à abertura ou à baixa das empresas? Ex.: “abertas em 2025” ou “que fecharam em 2025”.",
                 ));
+            }
+            if biggest {
+                notes.push("Ordenei pelo capital social declarado, o único indicador de tamanho do cadastro.".into());
             }
             request.op = Op::List { order, limit };
             request.time.period = None;
@@ -1065,10 +1297,128 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
                 time::competences(&raw).first().copied().ok_or_else(|| clarify("Qual competência mensal você quer consultar?"))?;
         }
     }
+    if assumed_stock && matches!(request.op, Op::Count { metric: Metric::Stock }) && request.scope.opened.is_none() {
+        notes.insert(0, "Considerei o estoque de estabelecimentos ativos.".into());
+    }
     if hits.iter().any(|h| h.fuzzy) {
         notes.push("Confirme o município interpretado por aproximação.".into());
     }
+    // Closed vocabulary: a word that is neither a catalogue entity nor known to the grammar
+    // names something no filter applied. Dropping it would answer a broader question than
+    // the one asked ("empresas de energia solar" answered with every company).
+    if !matches!(request.op, Op::Lookup { .. } | Op::Meta { .. }) {
+        // A preamble closed by a comma or colon ("Para vender meu software, quantas…") sets
+        // the scene and is not part of the question.
+        let question_start = preamble_end(text);
+        // An explicit CNAE code pins the activity; words after it describe the code.
+        let coded = matches!(request.scope.activity, ActivityFilter::Cnae { .. });
+        let unknown: Vec<&str> = words
+            .iter()
+            .enumerate()
+            .filter(|(i, word)| *i >= question_start && !covered(*i) && !vocabulary.knows(word))
+            .map(|(_, word)| word.as_str())
+            .collect();
+        if !unknown.is_empty() && !coded {
+            return Err(clarify(&unrecognized(&unknown)));
+        }
+        if let Some(number) = unexplained_number(&normalize::tokens(text), &words, &hits) {
+            return Err(clarify(&format!(
+                "Não consegui aplicar o número “{number}” a um filtro. Diga o que ele representa: ano, capital social ou quantidade de linhas."
+            )));
+        }
+    }
     Ok(Frame { request, act, notes, rows })
+}
+
+fn date_br(day: Day) -> String {
+    day.to_ymd().map_or_else(String::new, |(year, month, day)| format!("{day:02}/{month:02}/{year}"))
+}
+
+/// The question for words outside the closed vocabulary. It starts like the other
+/// "unrecognized" questions, which a company-name search may still answer.
+fn unrecognized(unknown: &[&str]) -> String {
+    let mut seen: Vec<&str> = Vec::new();
+    for word in unknown {
+        if !seen.contains(word) {
+            seen.push(word);
+        }
+    }
+    let quoted = seen.iter().take(4).map(|word| format!("“{word}”")).collect::<Vec<_>>().join(", ");
+    format!("Não reconheci {quoted}. Diga a atividade ou o filtro com outras palavras, ou informe o código CNAE.")
+}
+
+/// Index, in [`normalize::words`], of the first word after a leading preamble: a clause that
+/// ends in a comma or colon and precedes the question word or request verb.
+fn preamble_end(text: &str) -> usize {
+    let mut at = 0;
+    let mut end = 0;
+    for token in text.split_whitespace() {
+        let parts = normalize::words(token);
+        let opens = parts.first().is_some_and(|w| {
+            matches!(
+                w.as_str(),
+                "quantos"
+                    | "quantas"
+                    | "qual"
+                    | "quais"
+                    | "liste"
+                    | "listar"
+                    | "conte"
+                    | "compare"
+                    | "mostre"
+                    | "traga"
+                    | "distribua"
+                    | "informe"
+            )
+        });
+        if opens {
+            return end;
+        }
+        at += parts.len();
+        if token.ends_with([',', ':']) {
+            end = at;
+        }
+    }
+    0
+}
+
+/// A number no rule reads: neither a date, a row count, an amount, a population, a code nor
+/// part of a catalogue name. Like an unknown word, it must not be dropped.
+fn unexplained_number<'a>(tokens: &'a [String], words: &[String], hits: &[Hit]) -> Option<&'a str> {
+    // Digits inside entity names ("Dois Irmãos", "4 de Julho") are part of the entity.
+    let entity_words: Vec<&str> = hits.iter().flat_map(|h| words[h.start..h.end.min(words.len())].iter().map(String::as_str)).collect();
+    let near = |at: usize, back: usize, ahead: usize, list: &[&str]| {
+        tokens[at.saturating_sub(back)..(at + 1 + ahead).min(tokens.len())].iter().any(|t| list.contains(&t.as_str()))
+    };
+    for (at, token) in tokens.iter().enumerate() {
+        if !token.chars().any(|c| c.is_ascii_digit()) || entity_words.contains(&token.as_str()) {
+            continue;
+        }
+        let digits: String = token.chars().filter(char::is_ascii_digit).collect();
+        let plain = token.chars().all(|c| c.is_ascii_digit() || c == '.');
+        let year = plain && digits.len() == 4 && digits.parse::<u16>().is_ok_and(|y| (1900..=2100).contains(&y));
+        let explained = year
+            || time::date_shaped(token)
+            || !time::competences(token).is_empty()
+            // CNPJ, CNPJ root and other long identifiers are validated by the lookup rule.
+            || digits.len() >= 8
+            || token.contains('/')
+            || at == 0
+            || near(at, 2, 0, &["ultimos", "ultimas", "top", "liste", "listar", "traga", "tragam", "traz", "trazem", "os", "as", "das", "dos", "lista", "listagem", "relacao", "primeiros", "primeiras", "pagina", "entre", "e", "a", "favor"])
+            || near(at, 0, 2, &["dias", "meses", "anos", "semanas", "trimestre", "tri", "semestre", "km", "passos", "pagina", "primeiros", "primeiras", "maiores", "linhas", "resultados", "habitantes", "hab", "reais", "mil", "milhao", "milhoes", "%", "cidades", "municipios", "estados", "setores", "empresas", "estabelecimentos", "cnpjs"])
+            || tokens.get(at + 1).is_some_and(|next| entity_words.contains(&next.as_str()))
+            || near(at, 3, 0, &["individual", "limitada", "ltda", "anonima", "fechada", "juridica", "ciclo", "expansao", "rodada", "etapa", "fase", "lote"])
+            || near(at, 4, 0, &["base", "minima", "minimo", "inicial"])
+            || near(at, 8, 0, &["capital", "habitantes"])
+            || near(at, 0, 4, &["habitantes", "hab", "capital"])
+            || near(at, 4, 0, &["cnae", "cnaes", "subclasse", "subclasses", "classe", "grupo", "divisao", "codigo", "codigos", "secao", "natureza", "situacao", "status", "porte", "cnpj", "raiz", "registro"])
+            || token.ends_with('%')
+            || token.ends_with('k');
+        if !explained {
+            return Some(token);
+        }
+    }
+    None
 }
 
 /// Words that describe companies without naming an activity: status, size, legal form,
@@ -1372,7 +1722,15 @@ fn explicit_cnae(n: &str, raw: &str, r: &mut Request) -> Result<(), Box<Interpre
     Ok(())
 }
 
-fn filters(n: &str, m: &str, raw: &str, r: &mut Request, act: &mut String, population: PopulationRef) -> Result<(), Box<Interpretation>> {
+fn filters(
+    n: &str,
+    m: &str,
+    raw: &str,
+    r: &mut Request,
+    act: &mut String,
+    population: PopulationRef,
+    notes: &mut Vec<String>,
+) -> Result<(), Box<Interpretation>> {
     let clear = has(
         n,
         &[
@@ -1463,6 +1821,8 @@ fn filters(n: &str, m: &str, raw: &str, r: &mut Request, act: &mut String, popul
                 n,
                 &[
                     "nao sao mei",
+                    "nao e mei",
+                    "sem ser mei",
                     "nao sejam mei",
                     "nao sao optantes pelo mei",
                     "nao sejam optantes pelo mei",
@@ -1510,6 +1870,13 @@ fn filters(n: &str, m: &str, raw: &str, r: &mut Request, act: &mut String, popul
         }
         if has(n, &["porte nao informado", "porte cadastral nao informado"]) {
             r.scope.porte = PorteSet::only(Porte::Unreported);
+        }
+        if has(n, &["medio porte", "grande porte", "medio e grande porte", "grande e medio porte", "medias empresas"]) {
+            r.scope.porte = PorteSet::only(Porte::Other);
+            notes.push(
+                "A Receita Federal classifica o porte em microempresa, pequeno porte e demais; considerei “demais”, que reúne médias e grandes."
+                    .into(),
+            );
         }
     }
     if has(n, &["todas as situacoes", "em qualquer situacao"]) {
@@ -1565,12 +1932,17 @@ fn filters(n: &str, m: &str, raw: &str, r: &mut Request, act: &mut String, popul
         }
     }
     let t = normalize::tokens(raw);
-    if has(n, &["telefone", "email", "e mail"]) {
-        r.scope.contact = match (has(n, &["telefone"]), has(n, &["email", "e mail"])) {
+    let phone = has(n, &["telefone", "telefones", "fone", "celular", "whatsapp", "zap"]);
+    let email = has(n, &["email", "emails", "e mail", "e mails"]);
+    if phone || email {
+        r.scope.contact = match (phone, email) {
             (true, true) => ContactNeed::Both,
             (true, false) => ContactNeed::Phone,
             _ => ContactNeed::Email,
         };
+    }
+    if has(n, &["whatsapp", "zap"]) {
+        notes.push("O cadastro não distingue WhatsApp: considerei os estabelecimentos com telefone informado.".into());
     }
     for i in 0..t.len() {
         if t[i] == "pagina" {
@@ -1592,8 +1964,27 @@ fn filters(n: &str, m: &str, raw: &str, r: &mut Request, act: &mut String, popul
     if has(n, &["empresario individual"]) {
         r.scope.natureza = SmallSet::new([NaturezaCode::Code(2135)]);
     }
+    if has(n, &["sociedade anonima", "sociedades anonimas"]) || t.iter().any(|token| matches!(token.as_str(), "s/a" | "s.a")) {
+        r.scope.natureza = SmallSet::new(if has(n, &["capital aberto"]) {
+            vec![NaturezaCode::Code(2046)]
+        } else if has(n, &["capital fechado"]) {
+            vec![NaturezaCode::Code(2054)]
+        } else {
+            vec![NaturezaCode::Code(2046), NaturezaCode::Code(2054)]
+        });
+    }
     if has(n, &["sociedade anonima fechada"]) {
         r.scope.natureza = SmallSet::new([NaturezaCode::Code(2054)]);
+    }
+    for (phrases, codes) in [
+        (&["cooperativa", "cooperativas"][..], &[2143][..]),
+        (&["eireli"][..], &[2305, 2313][..]),
+        (&["associacao", "associacoes"][..], &[3999][..]),
+        (&["fundacao", "fundacoes"][..], &[3069][..]),
+    ] {
+        if has(n, phrases) {
+            r.scope.natureza = SmallSet::new(codes.iter().map(|code| NaturezaCode::Code(*code)));
+        }
     }
     if has(n, &["grupo de natureza juridica 2", "entidades empresariais"]) {
         r.scope.natureza = SmallSet::new([NaturezaCode::Group(2)]);
@@ -1634,6 +2025,51 @@ fn filters(n: &str, m: &str, raw: &str, r: &mut Request, act: &mut String, popul
         }
         if r.scope.capital.is_none() && !has(n, &["maior capital", "mais capital", "por capital"]) {
             return Err(clarify("Qual o valor ou intervalo de capital social? Informe o valor em reais."));
+        }
+    }
+    // "capital acima de 100 mil": an amount right after "capital" bounds the declared capital.
+    if r.scope.capital.is_none()
+        && !has(n, &["capital social"])
+        && let Some(at) =
+            (0..t.len()).find(|&i| t[i] == "capital" && (i + 1..(i + 6).min(t.len())).any(|j| time::money_quantity(&t, j).is_some()))
+    {
+        let amounts: Vec<(usize, u64)> =
+            (at + 1..(at + 9).min(t.len())).filter_map(|i| time::money_quantity(&t, i).map(|(value, _)| (i, value))).collect();
+        let (first_at, first) = amounts[0];
+        let between = &t[at + 1..first_at];
+        let said = |list: &[&str]| between.iter().any(|w| list.contains(&w.as_str()));
+        let range = if said(&["entre"]) {
+            let second = amounts.get(1).ok_or_else(|| clarify("Informe os dois limites de capital social."))?.1;
+            Range { from: Some(first.min(second)), to: Some(first.max(second)) }
+        } else if said(&["pelo", "minimo", "partir"]) {
+            Range { from: Some(first), to: None }
+        } else if said(&["ate", "maximo"]) {
+            Range { from: None, to: Some(first) }
+        } else if said(&["acima", "maior", "superior", "mais"]) {
+            Range { from: Some(first.saturating_add(1)), to: None }
+        } else if said(&["abaixo", "menor", "inferior", "menos"]) {
+            Range { from: None, to: Some(first.saturating_sub(1)) }
+        } else {
+            Range { from: Some(first), to: None }
+        };
+        r.scope.capital = Some(range);
+    }
+    // "com mais de 10 anos": time since the start of activity, counted back from the data date.
+    for i in 3..t.len() {
+        if t[i] == "anos"
+            && t[i - 2] == "de"
+            && matches!(t[i - 3].as_str(), "mais" | "menos")
+            && !t[i.saturating_sub(5)..i].iter().any(|w| matches!(w.as_str(), "ultimos" | "ultimas"))
+            && let Some(years) = time::number(&t[i - 1]).and_then(|years| u16::try_from(years).ok())
+            && let Some((year, month, day)) = r.time.anchor.to_ymd()
+            && let Some(cutoff) = year.checked_sub(years).and_then(|y| Day::from_ymd(y, month, day.min(28)))
+        {
+            r.scope.opened = Some(if t[i - 3] == "mais" {
+                Range { from: None, to: Some(cutoff) }
+            } else {
+                Range { from: Some(Day(cutoff.0 + 1)), to: Some(r.time.anchor) }
+            });
+            notes.push(format!("Contei a idade pelo início de atividade até {}.", date_br(r.time.anchor)));
         }
     }
     if has(n, &["habitantes"])

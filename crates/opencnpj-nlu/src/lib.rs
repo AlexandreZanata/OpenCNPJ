@@ -8,6 +8,7 @@ pub mod policy;
 mod skills;
 pub mod spotter;
 pub mod time;
+mod vocabulary;
 
 use context::Conversation;
 use lang::LanguagePack;
@@ -26,6 +27,7 @@ pub struct Interpreter {
     cues: grammar::Cues,
     policy: grammar::Policy,
     delivery: skills::Vocabulary,
+    vocabulary: vocabulary::Known,
 }
 
 impl Interpreter {
@@ -37,6 +39,7 @@ impl Interpreter {
             cues: toml::from_str(include_str!("../lang/pt-BR/cues.toml")).expect("embedded grammar cues"),
             policy: toml::from_str(include_str!("../lang/pt-BR/policy.toml")).expect("embedded policy"),
             delivery: skills::Vocabulary::embedded(),
+            vocabulary: vocabulary::Known::embedded(),
         }
     }
 
@@ -44,6 +47,12 @@ impl Interpreter {
     /// [`normalize::words`]; homonym cities share a span. Read-only, for audits and contracts.
     pub fn entities(&self, text: &str) -> Vec<(usize, usize, Vec<Entity>)> {
         self.pack.lexicon.scan(&normalize::words(text)).into_iter().map(|hit| (hit.start, hit.end, hit.values)).collect()
+    }
+
+    /// Whether `word` (as produced by [`normalize::words`]) belongs to the closed vocabulary
+    /// of the grammar. Catalogue entities are known by their span, not by this list.
+    pub fn knows(&self, word: &str) -> bool {
+        self.vocabulary.knows(word)
     }
 
     pub fn interpret(&self, text: &str, state: &mut Conversation) -> Interpretation {
@@ -125,6 +134,16 @@ impl Interpreter {
             return None;
         }
         let named = self.delivery.company_name(text, result.decision == Decision::Reject)?;
+        // A name typed alone never states an intent ("liste as autoescolas de Sinop").
+        let opened = self.delivery.company_name(text, false).is_some();
+        let stated = [&self.cues.list, &self.cues.count, &self.cues.compare, &self.cues.rank, &self.cues.trend, &self.cues.breakdown]
+            .iter()
+            .any(|list| grammar::cue(&n, list));
+        if !opened && stated {
+            return None;
+        }
+        // "filiais do Bradesco em MT": the establishments of a named company.
+        let named = strip_establishment_noun(&named);
         // A CNPJ, valid or not, is answered by the lookup rules.
         if named.split_whitespace().any(|token| token.chars().filter(char::is_ascii_digit).count() >= 8) {
             return None;
@@ -235,8 +254,11 @@ impl Interpreter {
             }
             let ufs: Vec<UfId> =
                 hits.iter().flat_map(|h| &h.values).filter_map(|e| if let Entity::Uf(id) = e { Some(*id) } else { None }).collect();
+            // A name that is both a state and a city ("Goiás", "São Paulo") reads as the state,
+            // as in the cadastral grammar.
             let municipalities: Vec<MunicipalityId> = hits
                 .iter()
+                .filter(|h| !h.values.iter().any(|e| matches!(e, Entity::Uf(_))))
                 .flat_map(|h| &h.values)
                 .filter_map(|e| match e {
                     Entity::Municipality { id, uf } if ufs.is_empty() || ufs.contains(uf) => Some(*id),
@@ -272,6 +294,7 @@ impl Interpreter {
             competences: &self.capabilities.competences,
             versions: self.capabilities.catalogue_versions,
             population,
+            vocabulary: &self.vocabulary,
         };
         if !state.pending.is_empty() {
             let reply = normalize::words(text).join(" ");
@@ -388,6 +411,21 @@ impl Interpreter {
             }
         };
         (result, frame.rows)
+    }
+}
+
+/// Drop a leading "filiais do", "unidades da", "lojas da" from a company name.
+fn strip_establishment_noun(name: &str) -> String {
+    let tokens: Vec<&str> = name.split_whitespace().collect();
+    let noun = tokens.first().map(|t| normalize::fold(t)).unwrap_or_default();
+    let article = tokens.get(1).map(|t| normalize::fold(t)).unwrap_or_default();
+    if tokens.len() > 2
+        && matches!(noun.as_str(), "filiais" | "filial" | "unidades" | "lojas" | "agencias" | "matriz")
+        && matches!(article.as_str(), "do" | "da" | "de" | "dos" | "das")
+    {
+        tokens[2..].join(" ")
+    } else {
+        name.to_owned()
     }
 }
 

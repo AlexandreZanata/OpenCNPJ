@@ -215,3 +215,15 @@ civil_construction
 passenger_transport
 meat_processing
 agriculture_livestock
+driving_school
+medical_practice
+beverage_wholesale
+internet_provider
+car_dealer
+higher_education
+notary
+lottery_shop
+funeral_home
+wholesale
+retail
+manufacturing
