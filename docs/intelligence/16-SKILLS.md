@@ -138,6 +138,11 @@ establishment type, including when the previous count used the head-office unit.
 Both edits preserve any selected export columns, even when a column names the filter
 being edited.
 
+"tira o filtro de capital e mantém o porte" clears the capital bounds and keeps the
+size restriction. "troca optantes do Simples por não optantes" reverses the Simples
+selection while preserving the rest of the query and delivery. The second option can
+omit the regime name when the first explicitly identifies Simples Nacional.
+
 ## 4. Files
 
 | Format | Dialect |

@@ -1258,3 +1258,120 @@ fn size_and_unit_edits_distinguish_file_columns_and_clarify_conflicts() {
     let edited = engine.interpret("Tire o porte e o MEI", &mut state);
     assert_eq!(edited.request.unwrap().into_request(), expected);
 }
+
+#[test]
+fn capital_and_simples_edits_preserve_the_remaining_query_and_export() {
+    use opencnpj_query::export::ExportFormat;
+
+    let engine = interpreter();
+    for (regime, edit, capital_removed, simples) in [
+        ("optantes pelo Simples", "tira o filtro de capital e mantém o porte", true, Tri::Yes),
+        ("optantes pelo Simples", "Retire o limite de capital, mantendo o porte", true, Tri::Yes),
+        ("fora do Simples", "Tire o filtro de capital social e mantenha o Simples Nacional", true, Tri::No),
+        ("optantes pelo Simples", "troca optantes do Simples por não optantes", false, Tri::No),
+        ("fora do Simples", "Troque os não optantes pelo Simples Nacional pelos optantes", false, Tri::Yes),
+        (
+            "optantes pelo Simples",
+            "Substitua optantes do Simples Nacional por quem está fora do Simples, mantendo o capital social",
+            false,
+            Tri::No,
+        ),
+    ] {
+        let initial = format!(
+            "Liste 5 matrizes de farmácias ativas em Sinop MT, abertas em 2025, de pequeno porte, {regime}, sem MEI, com telefone e e-mail, capital social entre 20 mil e 200 mil reais, ordenadas pelo maior capital."
+        );
+        let mut state = Conversation::default();
+        let first = engine.interpret(&initial, &mut state);
+        let mut expected = first.request.unwrap_or_else(|| panic!("{initial}: {}", first.reason)).into_request();
+        assert_eq!(expected.op, Op::List { order: ListOrder::CapitalDesc, limit: 5 });
+        assert_eq!(expected.scope.porte, PorteSet::only(Porte::Small));
+        assert_eq!(expected.scope.head_office, Tri::Yes);
+        assert_eq!(expected.scope.contact, ContactNeed::Both);
+        assert_eq!(expected.scope.opened, Some(year(2025)));
+        assert_eq!(expected.scope.capital, Some(Range { from: Some(2_000_000), to: Some(20_000_000) }));
+        if capital_removed {
+            expected.scope.capital = None;
+        }
+        expected.scope.simples = simples;
+        // Applying the same edit again should leave the selection unchanged.
+        for _ in 0..2 {
+            let edited = engine.interpret(edit, &mut state);
+            assert_eq!(edited.request.unwrap_or_else(|| panic!("{edit}: {}", edited.reason)).into_request(), expected, "{edit}");
+        }
+        let file = engine.interpret("me manda em Excel", &mut state);
+        assert_eq!(file.request.unwrap().into_request(), expected, "{edit}");
+        let export = file.export.unwrap();
+        assert_eq!(export.format, ExportFormat::Xlsx);
+        assert_eq!(export.rows, Some(5));
+    }
+
+    let mut state = Conversation::default();
+    let first = engine.interpret(
+        "Quantas matrizes de farmácias ativas em Sinop MT optantes pelo Simples têm e-mail e capital social acima de 20 mil reais?",
+        &mut state,
+    );
+    let mut expected = first.request.unwrap().into_request();
+    assert_eq!(expected.unit, Unit::HeadOffices);
+    assert_eq!(expected.scope.simples, Tri::Yes);
+    expected.scope.simples = Tri::No;
+    let edited = engine.interpret("troca optantes do Simples por não optantes", &mut state);
+    assert_eq!(edited.request.unwrap().into_request(), expected);
+    expected.op = Op::List { order: ListOrder::Cnpj, limit: 20 };
+    let file = engine.interpret("me manda em Excel", &mut state);
+    assert_eq!(file.request.unwrap().into_request(), expected);
+    assert_eq!(file.export.unwrap().rows, None);
+}
+
+#[test]
+fn capital_and_simples_edits_keep_file_columns_and_clarify_conflicts() {
+    use opencnpj_query::export::{ExportField, ExportFormat};
+
+    let engine = interpreter();
+    let mut state = Conversation::default();
+    let first = engine.interpret(
+        "Me manda um CSV com as colunas nome fantasia e capital social de 7 farmácias ativas de pequeno porte em Sinop MT, optantes pelo Simples, com e-mail e capital social acima de 20 mil reais.",
+        &mut state,
+    );
+    let mut expected = first.request.unwrap().into_request();
+    let csv = first.export.unwrap();
+    assert_eq!(csv.fields, [ExportField::NomeFantasia, ExportField::CapitalSocial]);
+    for question in [
+        "Troca optantes do Simples por",
+        "Tira o filtro de capital e mantém o capital",
+        "Tira a coluna capital social",
+        "Troque optantes por não optantes",
+        "Troque optantes do Simples por não optantes e mantenha o Simples",
+    ] {
+        let result = engine.interpret(question, &mut state);
+        assert_eq!(result.decision, Decision::Clarify, "{question}: {result:?}");
+        assert!(result.request.is_none() && result.export.is_none());
+        assert_eq!(state.last.as_ref(), Some(&expected), "{question}");
+        assert_eq!(state.export.as_ref(), Some(&csv), "{question}");
+    }
+    expected.scope.capital = None;
+    let edited = engine.interpret("Remove o filtro de capital social e mantém o porte e me manda em Excel", &mut state);
+    assert_eq!(edited.request.unwrap().into_request(), expected);
+    let file = edited.export.unwrap();
+    assert_eq!(file.format, ExportFormat::Xlsx);
+    assert_eq!(file.fields, csv.fields);
+    assert_eq!(file.rows, Some(7));
+    expected.scope.simples = Tri::No;
+    let edited = engine.interpret("Troque optantes pelo Simples por não optantes e mantenha o porte e me mande em Excel", &mut state);
+    assert_eq!(edited.request.unwrap().into_request(), expected);
+    let file = edited.export.unwrap();
+    assert_eq!(file.format, ExportFormat::Xlsx);
+    assert_eq!(file.fields, csv.fields);
+    assert_eq!(file.rows, Some(7));
+
+    for question in ["tira o filtro de capital e mantém o porte", "troca optantes do Simples por não optantes"] {
+        let result = engine.interpret(question, &mut Conversation::default());
+        assert_eq!(result.decision, Decision::Clarify, "{question}: {result:?}");
+        assert!(result.request.is_none() && result.company.is_none());
+    }
+    let mut state = Conversation::default();
+    let first = engine.interpret("Liste farmácias de pequeno porte em Sinop MT com telefone", &mut state);
+    let expected = first.request.unwrap().into_request();
+    let result = engine.interpret("troca optantes do Simples por não optantes", &mut state);
+    assert_eq!(result.decision, Decision::Clarify);
+    assert_eq!(state.last.as_ref(), Some(&expected));
+}
