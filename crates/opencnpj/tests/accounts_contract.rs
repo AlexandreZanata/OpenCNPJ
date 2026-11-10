@@ -817,7 +817,7 @@ async fn conversations_are_private_and_survive_restart() {
     let question = json!({
         "conversation_id": id,
         "conversation_revision": 0,
-        "question": "Liste 5 matrizes de farmácias ativas em Cuiabá MT e Sinop MT, optantes pelo Simples, sem MEI, com telefone e e-mail, ordenadas pelo maior capital."
+        "question": "Liste 5 matrizes de farmácias ativas em Cuiabá MT e Sinop MT, de pequeno porte, optantes pelo Simples, sem MEI, com telefone e e-mail, ordenadas pelo maior capital."
     });
     assert_eq!(post(&e.public, ask, Some(&b), question.clone()).await.status, StatusCode::NOT_FOUND);
     let first = post(&e.public, ask, Some(&a), question.clone()).await;
@@ -827,6 +827,7 @@ async fn conversations_are_private_and_survive_restart() {
     assert_eq!(expected["scope"]["contact"], "both");
     assert_eq!(expected["scope"]["head_office"], "yes");
     assert_eq!(expected["scope"]["simples"], "yes");
+    assert_eq!(expected["scope"]["porte"], json!(["small"]));
     assert_eq!(expected["scope"]["mei"], "no");
     let restarted = api::router(api::state(e.st.args.clone()).unwrap());
     assert_eq!(post(&restarted, ask, Some(&a), question).await.json()["error"], "conversation_changed");
@@ -843,8 +844,19 @@ async fn conversations_are_private_and_survive_restart() {
         expected["scope"]["contact"] = json!(contact);
         assert_eq!(reply.json()["interpretation"]["request"], expected, "{question}");
     }
+    for (revision, question, key, value) in [
+        (4, "tira o filtro de porte e mantém o Simples", "porte", json!(["unreported", "micro", "small", "other"])),
+        (5, "troca matriz por filial", "head_office", json!("no")),
+    ] {
+        let reply =
+            post(&restarted, ask, Some(&a), json!({ "conversation_id": id, "conversation_revision": revision, "question": question }))
+                .await;
+        assert_eq!(reply.status, StatusCode::OK, "{}", reply.text);
+        expected["scope"][key] = value;
+        assert_eq!(reply.json()["interpretation"]["request"], expected, "{question}");
+    }
     let file_turn =
-        post(&restarted, ask, Some(&a), json!({ "conversation_id": id, "conversation_revision": 4, "question": "me manda em Excel" }))
+        post(&restarted, ask, Some(&a), json!({ "conversation_id": id, "conversation_revision": 6, "question": "me manda em Excel" }))
             .await;
     assert_eq!(file_turn.status, StatusCode::OK, "{}", file_turn.text);
     let file_reply = file_turn.json();
@@ -858,13 +870,15 @@ async fn conversations_are_private_and_survive_restart() {
     let history = get(&restarted, &conversation, Some(&a)).await;
     assert_eq!(history.header("cache-control"), Some("private, no-store"));
     let turns = history.json();
-    assert_eq!(turns.as_array().unwrap().len(), 5);
+    assert_eq!(turns.as_array().unwrap().len(), 7);
     assert_eq!(turns[1]["question"], "dessas só as de Sinop");
     assert_eq!(turns[1]["reply"], follow_up.json());
     assert_eq!(turns[2]["question"], "troca telefone por e-mail");
     assert_eq!(turns[3]["question"], "tira o filtro de e-mail");
-    assert_eq!(turns[4]["question"], "me manda em Excel");
-    assert_eq!(turns[4]["reply"], file_reply);
+    assert_eq!(turns[4]["question"], "tira o filtro de porte e mantém o Simples");
+    assert_eq!(turns[5]["question"], "troca matriz por filial");
+    assert_eq!(turns[6]["question"], "me manda em Excel");
+    assert_eq!(turns[6]["reply"], file_reply);
     let renamed = call(&restarted, Method::PATCH, &conversation, Some(&a), Some(json!({ "title": "Empresas em Mato Grosso" })), &[]).await;
     assert_eq!(renamed.json()["title"], "Empresas em Mato Grosso");
     assert_eq!(call(&restarted, Method::DELETE, &conversation, Some(&a), None, &[]).await.status, StatusCode::NO_CONTENT);

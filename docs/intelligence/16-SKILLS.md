@@ -132,6 +132,12 @@ keeps any email requirement. "troca telefone por e-mail" replaces the phone requ
 with email. Both preserve the other query filters, sorting, and the selected file columns.
 A request for "sem telefone" asks for a different condition and requires clarification.
 
+"tira o filtro de porte e mantém o Simples" clears only the size restriction and keeps
+the current Simples inclusion or exclusion. "troca matriz por filial" changes the
+establishment type, including when the previous count used the head-office unit.
+Both edits preserve any selected export columns, even when a column names the filter
+being edited.
+
 ## 4. Files
 
 | Format | Dialect |

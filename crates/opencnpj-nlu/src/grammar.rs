@@ -284,46 +284,99 @@ fn normalize_contact_filters(words: &mut [String], hits: &[Hit]) -> Result<(), B
     Ok(())
 }
 
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum EditTarget {
+    Contact(ContactNeed),
+    Porte,
+    UnitType(Tri),
+    Simples,
+}
+
 #[derive(Clone, Copy)]
-enum ContactAction {
-    Remove(ContactNeed),
-    Replace { source: ContactNeed, target: ContactNeed },
+enum FilterAction {
+    RemoveContact(ContactNeed),
+    ReplaceContact { source: ContactNeed, target: ContactNeed },
+    RemovePorte,
+    ReplaceUnit { source: Tri, target: Tri },
 }
 
-struct ContactEdit {
-    action: ContactAction,
-    keep: Option<ContactNeed>,
+struct FilterEdit {
+    action: FilterAction,
+    keep: Option<EditTarget>,
 }
 
-impl ContactEdit {
-    fn apply(&self, current: ContactNeed) -> Result<ContactNeed, Box<Interpretation>> {
-        let (source, target) = match self.action {
-            ContactAction::Remove(source) => (source, ContactNeed::Any),
-            ContactAction::Replace { source, target } => {
-                if current != source && current != target && current != ContactNeed::Both {
+fn unit_filter(request: &Request) -> Tri {
+    if request.unit == Unit::HeadOffices { Tri::Yes } else { request.scope.head_office }
+}
+
+fn has_contact(current: ContactNeed, need: ContactNeed) -> bool {
+    current == need || current == ContactNeed::Both
+}
+
+fn edit_contact(current: ContactNeed, source: ContactNeed, target: ContactNeed) -> ContactNeed {
+    let retains = |need| has_contact(current, need) && source != need && source != ContactNeed::Both;
+    match (retains(ContactNeed::Phone) || target == ContactNeed::Phone, retains(ContactNeed::Email) || target == ContactNeed::Email) {
+        (true, true) => ContactNeed::Both,
+        (true, false) => ContactNeed::Phone,
+        (false, true) => ContactNeed::Email,
+        (false, false) => ContactNeed::Any,
+    }
+}
+
+impl FilterEdit {
+    fn apply(&self, request: &mut Request) -> Result<&'static str, Box<Interpretation>> {
+        let previous_contact = request.scope.contact;
+        let previous_unit = unit_filter(request);
+        let act = match self.action {
+            FilterAction::RemoveContact(source) => {
+                request.scope.contact = edit_contact(previous_contact, source, ContactNeed::Any);
+                "remove_filter"
+            }
+            FilterAction::ReplaceContact { source, target } => {
+                if !has_contact(previous_contact, source) && !has_contact(previous_contact, target) {
                     return Err(clarify("Qual filtro de contato você quer aplicar à consulta atual: telefone, e-mail ou ambos?"));
                 }
-                (source, target)
+                request.scope.contact = edit_contact(previous_contact, source, target);
+                "replace_slot"
+            }
+            FilterAction::RemovePorte => {
+                request.scope.porte = PorteSet::ALL;
+                if self.keep.is_some() { "compound_edit" } else { "remove_filter" }
+            }
+            FilterAction::ReplaceUnit { source, target } => {
+                if previous_unit != source && previous_unit != target {
+                    return Err(clarify("Você quer limitar a consulta atual a matrizes ou a filiais?"));
+                }
+                if previous_unit != target {
+                    // A count of head offices carries the restriction in its unit.
+                    request.unit = Unit::Establishments;
+                    request.scope.head_office = target;
+                }
+                "replace_slot"
             }
         };
-        let keeps = |need| (current == need || current == ContactNeed::Both) && source != need && source != ContactNeed::Both;
-        let next =
-            match (keeps(ContactNeed::Phone) || target == ContactNeed::Phone, keeps(ContactNeed::Email) || target == ContactNeed::Email) {
-                (true, true) => ContactNeed::Both,
-                (true, false) => ContactNeed::Phone,
-                (false, true) => ContactNeed::Email,
-                (false, false) => ContactNeed::Any,
-            };
-        if self.keep.is_some_and(|keep| (current != keep && current != ContactNeed::Both) || (next != keep && next != ContactNeed::Both)) {
-            return Err(clarify("Quais filtros de contato você quer manter na consulta atual?"));
+        match self.keep {
+            Some(EditTarget::Contact(need)) if !has_contact(previous_contact, need) || !has_contact(request.scope.contact, need) => {
+                Err(clarify("Quais filtros de contato você quer manter na consulta atual?"))
+            }
+            Some(EditTarget::Porte) if matches!(self.action, FilterAction::RemovePorte) => {
+                Err(clarify("Você quer retirar ou manter o filtro de porte?"))
+            }
+            Some(EditTarget::UnitType(need)) if previous_unit != need || unit_filter(request) != need => {
+                Err(clarify("Qual tipo de estabelecimento você quer manter na consulta: matriz ou filial?"))
+            }
+            Some(EditTarget::Simples) if request.scope.simples == Tri::Any => {
+                Err(clarify("Como você quer filtrar pelo Simples Nacional: optantes, não optantes ou qualquer regime?"))
+            }
+            _ => Ok(act),
         }
-        Ok(next)
     }
 }
 
 fn edit_subject(words: &[String], mut at: usize) -> usize {
     let article = |word: &String| matches!(word.as_str(), "o" | "a" | "os" | "as");
     let link = |word: &String| matches!(word.as_str(), "de" | "do" | "da" | "dos" | "das");
+    at += usize::from(words.get(at).is_some_and(|word| matches!(word.as_str(), "so" | "apenas" | "somente")));
     at += usize::from(words.get(at).is_some_and(article));
     if words.get(at).is_some_and(|word| matches!(word.as_str(), "filtro" | "filtros" | "exigencia")) {
         at += 1;
@@ -332,13 +385,35 @@ fn edit_subject(words: &[String], mut at: usize) -> usize {
     at
 }
 
-/// Read a complete edit before the operands can be interpreted as positive filters.
-fn read_contact_edit(
+fn read_edit_target(words: &[String], at: usize) -> Option<(EditTarget, usize)> {
+    if let Some(contact) = contact_phrase(words, at) {
+        let need = if contact.phone(words) { ContactNeed::Phone } else { ContactNeed::Email };
+        return Some((EditTarget::Contact(need), contact_qualifier_end(words, contact.end)));
+    }
+    let target = match words.get(at)?.as_str() {
+        "contato" | "contatos" => EditTarget::Contact(ContactNeed::Both),
+        "porte" | "portes" => EditTarget::Porte,
+        "matriz" | "matrizes" => EditTarget::UnitType(Tri::Yes),
+        "filial" | "filiais" => EditTarget::UnitType(Tri::No),
+        "simples" => {
+            let end = at + 1 + usize::from(words.get(at + 1).is_some_and(|word| word == "nacional"));
+            return Some((EditTarget::Simples, end));
+        }
+        _ => return None,
+    };
+    Some((target, at + 1))
+}
+
+/// Read a complete edit before its operands can be interpreted as positive filters.
+fn read_filter_edit(
     words: &[String],
     delivery: &crate::skills::Vocabulary,
     export: bool,
-) -> Result<Option<ContactEdit>, Box<Interpretation>> {
-    let end = delivery.record_closing(words, words.len());
+) -> Result<Option<FilterEdit>, Box<Interpretation>> {
+    let mut end = delivery.record_closing(words, words.len());
+    if export && words[..end].last().is_some_and(|word| word == "e") {
+        end -= 1;
+    }
     let words = &words[..end];
     let mut start = 0;
     loop {
@@ -357,67 +432,79 @@ fn read_contact_edit(
     };
     let subject = edit_subject(words, start + 1);
     if words.get(subject).is_some_and(|word| matches!(word.as_str(), "coluna" | "colunas" | "campo" | "campos"))
-        && contact_phrase(words, edit_subject(words, subject + 1)).is_some()
+        && read_edit_target(words, edit_subject(words, subject + 1)).is_some()
     {
-        return Err(clarify("Para editar o arquivo, diga quais colunas quer manter. Para editar a busca, indique o filtro de contato."));
+        return Err(clarify("Para editar o arquivo, diga quais colunas quer manter. Para editar a busca, indique o filtro."));
     }
-    let contact_at = |at| {
-        contact_phrase(words, at).map(|contact| {
-            let need = if contact.phone(words) { ContactNeed::Phone } else { ContactNeed::Email };
-            (need, contact_qualifier_end(words, contact.end))
-        })
-    };
-    let (mut source, mut end) = if !replace
-        && words.get(subject).is_some_and(|word| matches!(word.as_str(), "contato" | "contatos"))
-        && contact_at(subject).is_none()
-    {
-        (ContactNeed::Both, subject + 1)
-    } else if let Some(contact) = contact_at(subject) {
-        contact
-    } else {
-        return Ok(None);
-    };
-    let action = if replace {
-        let separator = words.get(end).is_some_and(|word| matches!(word.as_str(), "por" | "pelo" | "pela"));
-        let Some((target, after)) = separator.then(|| contact_at(edit_subject(words, end + 1))).flatten() else {
-            return Err(clarify("Por qual filtro você quer trocar: telefone ou e-mail?"));
-        };
-        end = after;
-        ContactAction::Replace { source, target }
-    } else {
-        if words.get(end).is_some_and(|word| word == "e")
-            && let Some((other, after)) = contact_at(edit_subject(words, end + 1))
-        {
-            if source != other {
-                source = ContactNeed::Both;
-            }
+    let Some((source, mut end)) = read_edit_target(words, subject) else { return Ok(None) };
+    let action = match (replace, source) {
+        (true, EditTarget::Contact(source @ (ContactNeed::Phone | ContactNeed::Email))) => {
+            let Some((EditTarget::Contact(target @ (ContactNeed::Phone | ContactNeed::Email)), after)) = replacement_target(words, end)
+            else {
+                return Err(clarify("Por qual filtro você quer trocar: telefone ou e-mail?"));
+            };
             end = after;
+            FilterAction::ReplaceContact { source, target }
         }
-        ContactAction::Remove(source)
+        (true, EditTarget::UnitType(source)) => {
+            let Some((EditTarget::UnitType(target), after)) = replacement_target(words, end) else {
+                return Err(clarify("Por qual tipo de estabelecimento você quer trocar: matriz ou filial?"));
+            };
+            end = after;
+            FilterAction::ReplaceUnit { source, target }
+        }
+        (false, EditTarget::Contact(mut source)) => {
+            if words.get(end).is_some_and(|word| word == "e")
+                && let Some((EditTarget::Contact(other), after)) = read_edit_target(words, edit_subject(words, end + 1))
+            {
+                if source != other {
+                    source = ContactNeed::Both;
+                }
+                end = after;
+            }
+            FilterAction::RemoveContact(source)
+        }
+        (false, EditTarget::Porte) => FilterAction::RemovePorte,
+        _ => return Ok(None),
     };
 
-    let tail = &words[end..];
-    let keep = match tail {
-        [] => None,
-        [word] if export && word == "e" => None,
-        _ => {
-            let start = end + usize::from(tail[0] == "e");
-            if !words.get(start).is_some_and(|word| matches!(word.as_str(), "mantenha" | "mantem" | "mantendo")) {
-                return Err(clarify("Quais filtros de contato você quer editar? Diga quais deseja tirar ou trocar."));
-            }
-            let subject = edit_subject(words, start + 1);
-            if let Some((need, _)) = contact_at(subject).filter(|(_, after)| *after == words.len()) {
-                Some(need)
-            } else if matches!(&words[subject..], [word] if matches!(word.as_str(), "restante" | "porte" | "capital" | "mei" | "simples" | "matriz" | "matrizes"))
-                || matches!(&words[subject..], [other, filters] if other == "outros" && filters == "filtros")
-            {
-                None
-            } else {
-                return Err(clarify("Qual filtro você quer manter junto com a edição de contato?"));
-            }
+    // Combined removals of older filter types still use the existing grammar.
+    if matches!(action, FilterAction::RemovePorte)
+        && words.get(end).is_some_and(|word| word == "e")
+        && words
+            .get(edit_subject(words, end + 1))
+            .is_some_and(|word| matches!(word.as_str(), "capital" | "mei" | "matriz" | "matrizes" | "filial" | "filiais"))
+    {
+        return Ok(None);
+    }
+    let keep = if let Some(first) = words.get(end) {
+        let start = end + usize::from(first == "e");
+        if !words.get(start).is_some_and(|word| matches!(word.as_str(), "mantenha" | "mantem" | "mantendo")) {
+            return Err(clarify("Quais filtros você quer editar e quais deseja manter?"));
         }
+        let subject = edit_subject(words, start + 1);
+        if let Some((target, _)) = read_edit_target(words, subject).filter(|(_, after)| *after == words.len()) {
+            Some(target)
+        } else if matches!(&words[subject..], [word] if matches!(word.as_str(), "restante" | "capital" | "mei"))
+            || matches!(&words[subject..], [capital, social] if capital == "capital" && social == "social")
+            || matches!(&words[subject..], [other, filters] if matches!(other.as_str(), "outros" | "demais") && filters == "filtros")
+        {
+            None
+        } else {
+            return Err(clarify("Qual filtro você quer manter na consulta atual?"));
+        }
+    } else {
+        None
     };
-    Ok(Some(ContactEdit { action, keep }))
+    Ok(Some(FilterEdit { action, keep }))
+}
+
+fn replacement_target(words: &[String], at: usize) -> Option<(EditTarget, usize)> {
+    if matches!(words.get(at)?.as_str(), "por" | "pelo" | "pela" | "pelos" | "pelas") {
+        read_edit_target(words, edit_subject(words, at + 1))
+    } else {
+        None
+    }
 }
 
 fn uf_id(word: &str) -> Option<UfId> {
@@ -528,7 +615,7 @@ fn recover_places(words: &[String], hits: &mut Vec<Hit>, env: &ResolveContext<'_
 pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation, export: bool) -> Result<Frame, Box<Interpretation>> {
     let ResolveContext { pack, cues, policy, anchor, current, competences, versions, population, vocabulary, delivery } = *env;
     let mut words = normalize::words(text);
-    let edit = read_contact_edit(&words, delivery, export)?;
+    let edit = read_filter_edit(&words, delivery, export)?;
     let text = if edit.is_some() {
         if state.last.is_none() {
             return Err(clarify("A qual pesquisa você se refere? Informe a atividade e o local para começar."));
@@ -1608,12 +1695,7 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
     let previous_contact = request.scope.contact;
     filters(n, m, &raw, &mut request, &mut act, population, &mut notes)?;
     if let Some(edit) = edit {
-        request.scope.contact = edit.apply(previous_contact)?;
-        act = match edit.action {
-            ContactAction::Remove(_) => "remove_filter",
-            ContactAction::Replace { .. } => "replace_slot",
-        }
-        .into();
+        act = edit.apply(&mut request)?.into();
     } else if inherited
         && act != "correction"
         && previous_contact != ContactNeed::Any
