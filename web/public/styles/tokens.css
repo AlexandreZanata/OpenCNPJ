@@ -1,61 +1,103 @@
-/* Design tokens. Pixel values follow a 1536px-wide reference layout. */
+/* Design tokens. Every colour in the application comes from here. */
 :root {
-  /* Typography */
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-serif: "Source Serif 4", "Source Serif Pro", Georgia, "Times New Roman", serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Menlo, Consolas, monospace;
 
   /* Ink */
-  --ink-900: #0f1b2e;
-  --ink-800: #1d2939;
-  --ink-700: #344054;
-  --ink-600: #475467;
-  --ink-500: #667085;
-  --ink-400: #98a2b3;
+  --ink-900: #14171a;
+  --ink-800: #22272b;
+  --ink-700: #3a4147;
+  --ink-600: #515a61;
+  --ink-500: #6b747b;
+  --ink-400: #99a1a7;
 
   /* Surfaces */
-  --canvas: #fbfbfa;
+  --canvas: #fafaf8;
   --surface: #ffffff;
-  --surface-muted: #f1f4f3;
-  --line: #e5e9e7;
-  --line-strong: #d9dfdc;
+  --surface-muted: #f3f4f1;
+  --surface-hover: #f6f7f4;
+  --line: #e7e9e4;
+  --line-strong: #d6d9d2;
 
-  /* Brand greens */
-  --green-900: #0a4f31;
-  --green-800: #0b5c36;
-  --green-700: #0f6b3c;
-  --green-600: #0a7a4a;
-  --green-500: #1b8a52;
-  --green-400: #5cc690;
-  --green-200: #d4f1df;
-  --green-100: #d7f5d0;
-  --green-50: #eaf4ee;
-
-  /* Sidebar */
-  --navy-900: #101c2c;
-  --navy-800: #132235;
-  --sidebar-ink: #e8eef5;
-  --sidebar-muted: #9aa9b8;
-  --sidebar-active: #1f6c56;
+  /* Accent */
+  --accent: #0f6b3c;
+  --accent-hover: #0b5c33;
+  --accent-ink: #ffffff;
+  --accent-soft: #e8f3ec;
+  --accent-soft-ink: #0b5c33;
 
   /* Status */
-  --warning-bg: #fdf0cf;
-  --warning-ink: #8a5a00;
-  --danger-bg: #fde4e1;
-  --danger-ink: #b42318;
-  --neutral-bg: #eceff1;
-  --neutral-ink: #475467;
+  --warning-bg: #fdf3d7;
+  --warning-ink: #7a5200;
+  --danger: #b42318;
+  --danger-bg: #fdeceb;
+  --danger-ink: #912018;
+  --info-bg: #eef3f8;
+  --info-ink: #2b4a66;
 
-  /* Shape & depth */
-  --radius-sm: 8px;
-  --radius-md: 9px;
-  --radius-lg: 15px;
-  --radius-xl: 18px;
-  --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.03), 0 8px 24px rgba(16, 24, 40, 0.035);
-  --shadow-pop: 0 12px 32px rgba(16, 24, 40, 0.14), 0 2px 6px rgba(16, 24, 40, 0.06);
+  /* Shape and depth */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --shadow-sm: 0 1px 2px rgba(20, 23, 26, 0.05);
+  --shadow-md: 0 4px 16px rgba(20, 23, 26, 0.07), 0 1px 2px rgba(20, 23, 26, 0.04);
+  --shadow-lg: 0 18px 48px rgba(20, 23, 26, 0.16), 0 2px 8px rgba(20, 23, 26, 0.06);
   --focus-ring: 0 0 0 2px var(--surface), 0 0 0 4px #2f9e6b;
 
+  /* Charts: validated categorical pair and the brand green for a single series. */
+  --viz-series-1: #2a78d6;
+  --viz-series-2: #eb6834;
+  --viz-series-3: #1baf7a;
+  --viz-brand: #2d8369;
+  --viz-grid: #edf0ee;
+
   /* Layout */
-  --sidebar-width: 240px;
-  --workspace-pad-left: 22px;
-  --workspace-pad-right: 18px;
+  --topbar-height: 56px;
+  --column: 820px;
+  --column-wide: 1180px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink-900: #f2f4f1;
+    --ink-800: #e3e6e1;
+    --ink-700: #c6cbc4;
+    --ink-600: #a3aaa2;
+    --ink-500: #858d85;
+    --ink-400: #636a63;
+
+    --canvas: #111412;
+    --surface: #181c19;
+    --surface-muted: #202522;
+    --surface-hover: #1d221f;
+    --line: #2a302c;
+    --line-strong: #3a423d;
+
+    --accent: #3fae77;
+    --accent-hover: #55bd88;
+    --accent-ink: #08130d;
+    --accent-soft: #16291f;
+    --accent-soft-ink: #8fd6b0;
+
+    --warning-bg: #33290f;
+    --warning-ink: #f0cf7a;
+    --danger: #f97066;
+    --danger-bg: #331614;
+    --danger-ink: #fda29b;
+    --info-bg: #17222d;
+    --info-ink: #a9c6e0;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.45);
+    --shadow-lg: 0 18px 48px rgba(0, 0, 0, 0.6);
+    --focus-ring: 0 0 0 2px var(--surface), 0 0 0 4px #3fae77;
+
+    --viz-series-1: #5a9de6;
+    --viz-series-2: #f08a5d;
+    --viz-series-3: #46c794;
+    --viz-brand: #46b58f;
+    --viz-grid: #2a302c;
+  }
 }

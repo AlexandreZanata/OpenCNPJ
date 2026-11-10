@@ -60,3 +60,32 @@ export function formatCnpj(raw: string): string {
   if (digits.length !== 14) return raw;
   return `${digits.slice(0, 2)}.${digits.slice(2, 5)}.${digits.slice(5, 8)}/${digits.slice(8, 12)}-${digits.slice(12)}`;
 }
+
+/** RFB date `20061220` (or ISO `2006-12-20`) → `20/12/2006`; empty and zero dates → "". */
+export function formatRfbDate(raw: string | null | undefined): string {
+  const digits = (raw ?? "").replace(/\D/g, "");
+  if (digits.length !== 8 || Number(digits) === 0) return "";
+  return `${digits.slice(6, 8)}/${digits.slice(4, 6)}/${digits.slice(0, 4)}`;
+}
+
+/** RFB amount `100000,00` → `R$ 100.000,00`. */
+export function formatRfbMoney(raw: string | null | undefined): string {
+  if (!raw) return "";
+  const value = Number(raw.replace(/\./g, "").replace(",", "."));
+  return Number.isFinite(value) ? formatBRL(value) : raw;
+}
+
+/** `78535000` → `78535-000`. */
+export function formatCep(raw: string | null | undefined): string {
+  const digits = (raw ?? "").replace(/\D/g, "");
+  return digits.length === 8 ? `${digits.slice(0, 5)}-${digits.slice(5)}` : (raw ?? "");
+}
+
+/** `66`, `35441234` → `(66) 3544-1234`. */
+export function formatPhone(ddd: string | null | undefined, number: string | null | undefined): string {
+  const n = (number ?? "").replace(/\D/g, "");
+  if (!n) return "";
+  const local = n.length > 4 ? `${n.slice(0, n.length - 4)}-${n.slice(-4)}` : n;
+  const area = (ddd ?? "").replace(/\D/g, "");
+  return area ? `(${area}) ${local}` : local;
+}

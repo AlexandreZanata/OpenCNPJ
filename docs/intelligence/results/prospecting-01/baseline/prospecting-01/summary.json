@@ -1,0 +1,61 @@
+{
+  "categories": {
+    "age": {
+      "items": 12
+    },
+    "broad": {
+      "items": 12
+    },
+    "capital": {
+      "items": 180
+    },
+    "company": {
+      "items": 6
+    },
+    "contacts": {
+      "items": 420
+    },
+    "legal_form": {
+      "items": 12
+    },
+    "order": {
+      "items": 60
+    },
+    "period": {
+      "items": 12
+    },
+    "places": {
+      "items": 60
+    },
+    "prospecting": {
+      "items": 24
+    },
+    "search": {
+      "items": 456
+    },
+    "size": {
+      "items": 12
+    },
+    "unknown": {
+      "interpretation_correct": 72,
+      "items": 210
+    }
+  },
+  "counts": {
+    "act_correct": 1098,
+    "act_items": 1476,
+    "decision_correct": 678,
+    "interpretation_correct": 72,
+    "interpretation_wrong": 1404,
+    "invalid_gold": 240,
+    "items": 1476,
+    "out_of_policy_execution": 120
+  },
+  "data_anchor": "2026-10-11",
+  "evidence_score": "Rule evidence is not a calibrated probability.",
+  "human_validation": "Not performed; human validation is deferred to product refinement.",
+  "method": "Actual text-only deterministic interpretation; gold IR used only for canonical scoring and separate backend reference, never as a prediction or conversation seed.",
+  "set": "crates/opencnpj-lab/eval/prospecting-01/questions.jsonl",
+  "set_sha256": "c4056bdc649f8aa05490bf42e0603ed0c210214ca149775f9412378440520d6a",
+  "snapshot_sha256": null
+}

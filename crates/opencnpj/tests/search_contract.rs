@@ -169,7 +169,7 @@ async fn root_lists_endpoints_and_every_listed_endpoint_is_routed() {
     assert_eq!(v["service"], "opencnpj");
     assert_eq!(v["version"], env!("CARGO_PKG_VERSION"));
     let endpoints: Vec<&str> = v["endpoints"].as_array().unwrap().iter().map(|e| e.as_str().unwrap()).collect();
-    assert_eq!(endpoints.len(), 14);
+    assert_eq!(endpoints.len(), 15);
     for e in endpoints {
         let uri = e
             .replace("{cnpj}", "00000000000191")

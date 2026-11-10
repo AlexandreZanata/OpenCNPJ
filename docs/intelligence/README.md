@@ -56,6 +56,7 @@ outside the domain are declined.
 | 15 | [DECISIONS](15-DECISIONS.md) | Decision log (ADR) and justification of the recommended architecture |
 | — | [EVALUATION-TASKS](EVALUATION-TASKS.md) | Standing evaluation tasks, answer contracts, defect classes and run log |
 | 16 | [SKILLS](16-SKILLS.md) | Delivery skills: Excel/CSV/TXT exports, chat answers with charts and records, follow-ups, local service |
+| 17 | [PROSPECTING](17-PROSPECTING.md) | Search-style questions, closed vocabulary (no dropped words), contacts, periods and sizes, the assistant in the product server |
 | — | [results/](results/) | Measured results with commands and raw output |
 
 ## The brief's deliverables (§15) and where they are

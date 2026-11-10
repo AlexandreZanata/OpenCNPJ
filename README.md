@@ -26,6 +26,8 @@ $B get data/2026-10.ocnpj 33.000.167/0001-01
 $B search data/2026-10.ocnpj --q "padaria sao jo" --filter uf=SP --limit 5
 $B accounts --data-dir data create --username admin --email you@example.com --role admin --key-file admin.key
 $B serve --data-dir data                      # API :8080, admin http://127.0.0.1:8081/admin
+# With the web application and the Portuguese assistant (see web/README.md):
+#   $B serve --data-dir data --web web/dist --assistant-agg data/intelligence/agg/2026-10.ocagg
 K=$(cat admin.key)
 curl -H "Authorization: Bearer $K" 'localhost:8080/api/v1/cnpj/00000000000191'
 curl -H "Authorization: Bearer $K" 'localhost:8080/api/v1/search?cnae=G&uf=SP&data_inicio_atividade_de=2026-01-01&ordenar=data_inicio_atividade:desc'
@@ -61,6 +63,12 @@ $B rollback --data-dir data
   e-mail, sessions, roles (admin, moderator, analyst, user) with permissions, suspension
   and bans, plans with rate limits and daily/monthly quotas, per-user usage and search
   log, audit log ([docs/ACCOUNTS.md](docs/ACCOUNTS.md)).
+* **Assistant and web application**: questions in Portuguese ("dentistas em Cuiabá com
+  telefone", "novas empresas em Sinop") interpreted deterministically, without an LLM, and
+  answered from the data with the filters applied shown; a clean web front end with chat,
+  filter search, CNPJ records, the user's plan and usage, and staff administration of
+  accounts and search limits ([web/README.md](web/README.md),
+  [docs/intelligence/17-PROSPECTING.md](docs/intelligence/17-PROSPECTING.md)).
 * **API + admin suite**: HTTP API with snapshot distribution (resumable downloads); a web
   dashboard and a native desktop app (`opencnpj-admin`, Linux and Windows) with live
   latency histograms, user management and moderation, plans, usage, logs, query explain,

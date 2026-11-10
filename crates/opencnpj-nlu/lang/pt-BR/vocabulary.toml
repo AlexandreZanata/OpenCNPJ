@@ -1,0 +1,156 @@
+# Closed vocabulary of the grammar outside catalogue entities (see src/vocabulary.rs).
+#
+# [search]  Words a search-style question may hold besides places and activities
+#           ("dentistas ativos em Cuiabá com telefone"): every one is read by a filter, a
+#           period or the sentence structure. A noun phrase with any other word is not
+#           executed as a search.
+# [general] Further words of questions that state what they want ("quantas", "liste",
+#           "compare"): request verbs, analysis terms, scenario phrases and regional
+#           expressions. `corpus` holds the remaining words of executed evaluation questions
+#           that carry no filter meaning; review it with `opencnpj-intel vocab`.
+#
+# A word outside both tables gets a clarification instead of being dropped.
+
+[search]
+function = [
+    "tao", "faliu", "encerrou", "abertura", "aberturas", "qtde",
+    "a", "ainda", "ao", "aos", "apenas", "as", "com", "como", "da", "das", "de", "dessa", "desse", "desta", "deste",
+    "do", "dos", "e", "em", "essa", "essas", "esse", "esses", "esta", "estao", "estas", "este", "estejam", "estes",
+    "existe", "existem", "foi", "foram", "ha", "ja", "na", "nao", "nas", "nessa", "nesse", "nesta", "neste", "no",
+    "nos", "num", "numa", "o", "onde", "os", "ou", "para", "pela", "pelas", "pelo", "pelos", "por", "possuem",
+    "possui", "qualquer", "que", "sao", "se", "seja", "sejam", "sem", "sendo", "so", "somente", "tambem", "tem",
+    "tenha", "tenham", "toda", "todas", "todo", "todos", "um", "uma", "umas", "uns",
+]
+companies = [
+    "concorrente", "concorrentes", "lista",
+    "atividade", "atividades", "brasil", "cidade", "cidades", "cnae", "cnaes", "cnpj", "cnpjs", "companhia",
+    "companhias", "empresa", "empresas", "estabelecimento", "estabelecimentos", "estado", "estados", "filiais",
+    "filial", "firma", "firmas", "matriz", "matrizes", "municipio", "municipios", "negocio", "negocios", "pais",
+    "principal", "ramo", "ramos", "regiao", "secundaria", "secundarias", "secundario", "secundarios", "sede", "sedes",
+    "sediada", "sediadas", "sediado", "sediados", "segmento", "segmentos", "setor", "setores", "uf",
+]
+status = [
+    "nula", "nulas", "nulo", "aberta", "abertas", "aberto", "abertos", "abriram", "abriu", "ativa", "ativas", "ativo", "ativos", "baixa",
+    "baixada", "baixadas", "baixado", "baixados", "baixaram", "baixas", "cadastrada", "cadastradas", "cadastrado",
+    "cadastrados", "cadastral", "criada", "criadas", "criado", "criados", "encerrada", "encerradas", "encerrado",
+    "encerrados", "encerraram", "extinta", "extintas", "extinto", "extintos", "fechada", "fechadas", "fechado",
+    "fechados", "fecharam", "fechou", "funcionamento", "funcionando", "inapta", "inaptas", "inapto", "inaptos",
+    "inativa", "inativas", "inativo", "inativos", "nova", "novas", "novo", "novos", "recem", "registrada",
+    "registradas", "registrado", "registrados", "situacao", "suspensa", "suspensas", "suspenso", "suspensos", "teve",
+    "tiveram",
+]
+size_and_regime = [
+    "anonima", "anonimas", "associacao", "associacoes", "cooperativa", "cooperativas", "demais", "eireli",
+    "empresaria", "empresarias", "empresario", "empresarios", "epp", "fundacao", "fundacoes", "grande", "individuais",
+    "individual", "juridica", "limitada", "limitadas", "ltda", "media", "medias", "medio", "medios", "mei", "micro",
+    "microempresa", "microempresas", "nacional", "natureza", "optante", "optantes", "pequena", "pequenas", "pequeno",
+    "pequenos", "porte", "simples", "sociedade", "sociedades",
+]
+amounts = [
+    "abaixo", "acima", "ate", "capital", "entre", "igual", "inferior", "maior", "maiores", "mais", "maxima", "maximo",
+    "menor", "menores", "menos", "mil", "milhao", "milhoes", "minima", "minimo", "partir", "reais", "real", "social",
+    "superior", "zero",
+]
+contacts = [
+    "celular", "contato", "contatos", "email", "emails", "fone", "leads", "mail", "mailing", "prospects", "telefone",
+    "telefones", "whatsapp", "zap",
+]
+time = [
+    "abril", "agosto", "ano", "anos", "atual", "desde", "dezembro", "dia", "dias", "fevereiro", "hoje", "janeiro",
+    "julho", "junho", "maio", "marco", "mes", "meses", "novembro", "ontem", "outubro", "passada", "passado",
+    "primeiro", "quarto", "recentemente", "segundo", "semana", "semanas", "semestre", "setembro", "terceiro",
+    "trimestre", "ultima", "ultimas", "ultimo", "ultimos",
+]
+
+[general]
+function = [
+    "ai", "algum", "alguma", "algumas", "alguns", "ali", "apos", "aquela", "aquelas", "aquele", "aqueles", "aqui",
+    "aquilo", "ate", "bem", "ca", "cada", "contra", "daquela", "daquele", "dar", "dela", "delas", "dele", "deles",
+    "desde", "dessas", "desses", "destas", "destes", "deve", "devem", "dever", "diga", "diz", "dizer", "dou", "ela",
+    "elas", "ele", "eles", "era", "eram", "estando", "estar", "estava", "estavam", "esteja", "eu", "faca", "faz",
+    "fazem", "fazer", "feito", "fez", "fica", "ficam", "ficar", "gostaria", "haja", "haver", "havia", "houve",
+    "inclusive", "ir", "isso", "isto", "la", "lhe", "mal", "mas", "me", "mesma", "mesmas", "mesmo", "mesmos", "meu",
+    "meus", "mim", "minha", "minhas", "muita", "muitas", "muito", "muitos", "naquela", "naquele", "nem", "nessas",
+    "nesses", "nestas", "nestes", "nos", "nossa", "nossas", "nosso", "nossos", "outra", "outras", "outro", "outros",
+    "perante", "pertence", "pertencem", "pode", "podem", "poder", "pois", "porem", "porque", "possa", "posso",
+    "pouca", "poucas", "pouco", "poucos", "pra", "precisa", "precisamos", "precisava", "preciso", "pro", "quaisquer",
+    "quando", "quanta", "quanto", "quao", "quer", "querer", "queria", "quero", "sabe", "saber", "sei", "ser", "seu",
+    "seus", "sido", "sim", "sob", "sobre", "sua", "suas", "talvez", "tanta", "tanto", "tao", "tendo", "ter", "tinha",
+    "tinham", "usa", "usar", "use", "vai", "vao", "ve", "veja", "vejo", "vem", "ver", "vir", "voce", "voces", "vou",
+]
+question = [
+    "tamanho", "cuja", "cujo", "novamente", "restante", "condicao", "concorrente", "concorrentes", "aberto", "fechado",
+    "cade", "existiam", "havia", "quais", "qual", "quantas", "quantos", "quem",
+]
+request = [
+    "vende", "vendem", "trabalha", "trabalham", "clientes", "cliente", "potenciais",
+    "achar", "ache", "agrupar", "agrupe", "apresentar", "apresente", "arruma", "arrumar", "baixar", "boa", "bom",
+    "bota", "botar", "busca", "buscar", "busco", "busque", "calcular", "calcule", "colocar", "coloque", "compara",
+    "comparacao", "comparando", "comparar", "compare", "conferencia", "conferir", "confira", "confirmar", "confirme",
+    "considerando", "considerar", "considere", "consulta", "consultada", "consultar", "consulte", "contagem",
+    "contando", "contar", "conte", "cruzamento", "cruzando", "cruzar", "cruze", "descreva", "descrever", "desfaca",
+    "desfazer", "dimensionando", "dimensionar", "distribua", "distribuicao", "distribuir", "divida", "dividem",
+    "dividir", "download", "duplicar", "encontrar", "encontre", "envia", "enviar", "envie", "exclua", "exclui",
+    "excluindo", "excluir", "exiba", "exibir", "explicar", "explique", "exportar", "exporte", "fala", "fale", "favor",
+    "filtra", "filtrar", "filtre", "filtro", "filtros", "gentileza", "gera", "gerar", "gere", "inclua", "inclui",
+    "incluindo", "incluir", "informar", "informe", "joga", "jogar", "levantamento", "levantando", "levantar",
+    "levante", "limpar", "limpe", "lista", "listagem", "listando", "listar", "liste", "localizar", "localize",
+    "manda", "mandar", "mande", "mantem", "mantendo", "mantenha", "manter", "mapeando", "mapear", "mapeie", "mostra",
+    "mostrando", "mostrar", "mostre", "mudar", "mude", "noite", "obrigada", "obrigado", "oi", "ola", "ordem",
+    "ordenadas", "ordenados", "ordenar", "ordene", "passa", "passar", "passe", "pesquisa", "pesquisar", "pesquisas",
+    "pesquise", "pesquiso", "pf", "pfv", "procurar", "procure", "procuro", "prospectar", "relacao", "relacionar",
+    "relacione", "remova", "remover", "restringe", "restringir", "restrinja", "retira", "retirar", "retire",
+    "separado", "separar", "separe", "somando", "some", "tarde", "tira", "tirar", "tire", "traga", "tragam", "traz",
+    "trazem", "trocar", "troque", "valeu", "vender", "verificar", "verifique", "voltar", "volte",
+]
+domain = [
+    "estimada", "estimado", "estimadas", "estimativas",
+    "abertura", "aberturas", "abrir", "antiga", "antigas", "antigo", "antigos", "atuando", "atuantes", "base",
+    "bases", "cadastrais", "cadastrar", "cadastro", "cadastros", "capitais", "censo", "centroide", "classe",
+    "classes", "codigo", "codigos", "comecando", "comecaram", "dados", "declarada", "declarado", "declaram", "deram",
+    "divisao", "divisoes", "economica", "economico", "empresariais", "encerrou", "endereco", "entidade", "entidades",
+    "entrada", "entradas", "estimativa", "excluida", "excluidas", "exclusao", "exclusoes", "faliram", "fechar",
+    "federal", "fluxo", "fonte", "fontes", "funcionam", "grupo", "grupos", "hab", "habitante", "habitantes", "ibge",
+    "idade", "informada", "informado", "iniciaram", "inicio", "km", "locais", "local", "me", "nacional", "ocorreram",
+    "oficiais", "oficial", "opcao", "opcoes", "operando", "passos", "populacao", "populacional", "portes",
+    "principais", "proxima", "proximas", "proximo", "proximos", "raio", "raiz", "receita", "recente", "recentes",
+    "regioes", "regional", "registro", "registros", "rfb", "sa", "saida", "saidas", "saldo", "secao", "secoes",
+    "setorial", "situacoes", "status", "subclasse", "subclasses", "surgiram", "tempo", "territorial", "unidade",
+    "unidades", "vizinha", "vizinhanca", "vizinhas", "vizinho", "vizinhos",
+]
+time = [
+    "agora", "antes", "anuais", "anual", "atualmente", "competencia", "competencias", "data", "datas", "depois",
+    "durante", "evolucao", "evoluiu", "historico", "longo", "mensais", "mensal", "periodo", "periodos", "primeira",
+    "proximo", "segunda", "semestres", "serie", "terceira", "trimestres", "vigente",
+]
+analysis = [
+    "absoluta", "absoluto", "analise", "aumentando", "aumentou", "calculo", "cem", "cinco", "cinquenta",
+    "concentracao", "crescendo", "cresceram", "cresceu", "crescimento", "densidade", "dez", "diagnostico", "dimensao",
+    "dois", "doze", "duas", "duzentos", "estoque", "estudo", "expandindo", "expansao", "fotografia", "ganhou",
+    "indicador", "indicadores", "lado", "limite", "metodologia", "nove", "noventa", "nr", "numero", "numeros",
+    "oitenta", "oito", "onze", "pagina", "participacao", "penetracao", "percentuais", "percentual", "perdeu",
+    "perfil", "presenca", "qtd", "quantidade", "quantidades", "quarenta", "quatro", "quinhentos", "quinze", "ranking",
+    "relativa", "retrato", "seis", "sessenta", "sete", "setenta", "taxa", "top", "totais", "total", "tres", "trinta",
+    "variacao", "versus", "vinte", "vs",
+]
+corpus = [
+    "acao", "acordo", "alcancados", "ampliar", "aparece", "aparecem", "aprovar", "arquivo", "avaliacao", "bah",
+    "barbaridade", "cadeia", "carteira", "cep", "ciclo", "classificacao", "combinam", "comerciais", "comercial",
+    "concorrencia", "conforme", "consolidacao", "consta", "constam", "conta", "continuam", "coocorrencia", "corredor",
+    "csv", "curado", "dentro", "direta", "ecxel", "egua", "entram", "equipe", "estou", "excel", "exceto", "exel",
+    "exigindo", "expandir", "fantasia", "ficha", "fora", "fornecedor", "grossense", "informacoes", "inicial",
+    "instalada", "inteiro", "leitura", "maninho", "mano", "mato", "medir", "mermao", "muxirum", "nome", "olhando",
+    "operacao", "oxe", "oxente", "parceiro", "pergunto", "planejamento", "planejar", "planilha", "planilhinha",
+    "plano", "praca", "produtiva", "prospeccao", "prospectando", "publicos", "quis", "rapido", "razao", "rede",
+    "referencia", "relatorio", "representante", "restricao", "societaria", "sou", "tabela", "tcha", "tche",
+    "tributario", "txt", "uai", "usada", "usados", "usando", "validar", "vendas", "verdade", "visse", "vote", "xlsx",
+]
+everyday = [
+    "primeiros", "primeiras", "seguintes", "aproximadamente", "cerca", "exatamente", "tipo", "tipos", "area", "areas", "nicho",
+    "atua", "atuam", "localizadas", "localizados", "situadas", "situados", "existentes", "disponiveis", "possivel", "consigo",
+    "conseguir", "consegue", "obter", "pegar", "puxar", "puxa", "visualizar", "detalhes", "completo", "completa", "completos",
+    "completas", "resultado", "resultados", "alem", "disso", "geral", "gerais", "referente", "referentes", "relacionadas",
+    "relacionados", "ligadas", "ligados", "brasileiras", "brasileiros", "nacionais", "estaduais", "municipais", "interior",
+    "poderia", "poderiam", "gostariamos", "queremos", "precisamos", "ajuda", "ajudar", "ola", "obrigado", "obrigada", "porfavor",
+    "rapidamente", "urgente", "hoje", "tambem", "inclusive", "principalmente", "apenas", "ok", "certo", "entao", "bem",
+]

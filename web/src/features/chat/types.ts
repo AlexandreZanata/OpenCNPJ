@@ -1,4 +1,4 @@
-/** Contract of the local chat service (`opencnpj-intel serve`). */
+/** Contract of the assistant (`POST /api/v1/assistant/ask`). */
 
 export type Decision = "execute" | "execute_with_note" | "clarify" | "reject";
 
@@ -27,6 +27,8 @@ export interface Answer {
   understood: string;
   blocks: Block[];
   suggestions: string[];
+  /** Filters applied besides place and activity ("com telefone", "MEI"), when the turn executed. */
+  filters?: string[];
 }
 
 export type Extra =

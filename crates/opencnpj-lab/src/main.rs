@@ -12,6 +12,7 @@ mod query;
 mod questions;
 mod serve;
 mod synth;
+mod vocab;
 
 use clap::{CommandFactory, Parser, Subcommand, error::ErrorKind};
 
@@ -54,6 +55,8 @@ enum Command {
     Serve(serve::ServeArgs),
     /// Check answer contracts on evaluation sets (and, with data, against the records).
     Contracts(contracts::ContractArgs),
+    /// List the words of evaluation questions that no catalogue entity covers.
+    Vocab(vocab::VocabArgs),
     /// Interpret every question and audit predictions and backend results.
     EvalQuestions(questions::EvalArgs),
     /// Execute a query written in the intermediate language.
@@ -87,6 +90,7 @@ fn main() -> anyhow::Result<()> {
         Some(Command::Serve(args)) => serve::serve(args),
         Some(Command::EvalQuestions(args)) => questions::evaluate(args),
         Some(Command::Contracts(args)) => contracts::run(args),
+        Some(Command::Vocab(args)) => vocab::run(args),
         Some(Command::Catalog { command }) => catalog::run(command),
         Some(Command::Agg { command }) => aggregate::run(command),
         Some(Command::DiffAgg(args)) => aggregate::diff(args),

@@ -22,6 +22,7 @@ pub fn tokens(input: &str) -> Vec<String> {
             match word.trim_matches(['.', ',', ';']) {
                 "qtas" | "qntas" | "qts" => "quantas",
                 "qtos" | "qnts" | "qntos" => "quantos",
+                "hj" => "hoje",
                 "pra" => "para",
                 "pro" => "para",
                 "vc" => "voce",

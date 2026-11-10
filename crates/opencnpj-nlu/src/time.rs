@@ -88,10 +88,57 @@ pub(crate) fn invalid_dates(text: &str) -> bool {
     text.split_whitespace().any(|word| date_shaped(word) && literal_date(word).is_none())
 }
 
+const TODAY: [&str; 12] = [
+    "abertas hoje",
+    "abertos hoje",
+    "abriram hoje",
+    "abriu hoje",
+    "criadas hoje",
+    "criados hoje",
+    "registradas hoje",
+    "registrados hoje",
+    "fecharam hoje",
+    "baixadas hoje",
+    "baixados hoje",
+    "de hoje",
+];
+const THIS_WEEK: [&str; 5] = ["esta semana", "essa semana", "nesta semana", "nessa semana", "ultima semana"];
+const THIS_MONTH: [&str; 5] = ["este mes", "esse mes", "neste mes", "nesse mes", "mes atual"];
+const LAST_MONTH: [&str; 2] = ["mes passado", "ultimo mes"];
+
+/// Whether `text` names a period relative to the data date ("hoje", "esta semana").
+pub(crate) fn relative(text: &str) -> bool {
+    has(text, &TODAY)
+        || has(text, &THIS_WEEK)
+        || has(text, &THIS_MONTH)
+        || has(text, &LAST_MONTH)
+        || has(text, &["ontem", "semana passada"])
+}
+
 pub fn period(text: &str, anchor: Day) -> Option<Period> {
     let (year, month, anchor_day) = anchor.to_ymd()?;
     let ys = years(text);
     let words: Vec<String> = text.split_whitespace().map(str::to_owned).collect();
+    let days = |from: u32, to: u32| Some(Period::Days(Range { from: Some(Day(from)), to: Some(Day(to)) }));
+    if has(text, &TODAY) {
+        return days(anchor.0, anchor.0);
+    }
+    if has(text, &["ontem"]) {
+        return days(anchor.0.checked_sub(1)?, anchor.0.checked_sub(1)?);
+    }
+    if has(text, &THIS_WEEK) {
+        return days(anchor.0.checked_sub(6)?, anchor.0);
+    }
+    if has(text, &["semana passada"]) {
+        return days(anchor.0.checked_sub(13)?, anchor.0.checked_sub(7)?);
+    }
+    if has(text, &THIS_MONTH) {
+        return days(Day::from_ymd(year, month, 1)?.0, anchor.0);
+    }
+    if has(text, &LAST_MONTH) {
+        let (y, m) = if month == 1 { (year - 1, 12) } else { (year, month - 1) };
+        return days(Day::from_ymd(y, m, 1)?.0, month_end(y, m)?.0);
+    }
     if let Some(at) = words.iter().position(|s| s == "ultimos" || s == "ultimas") {
         let (n, end) = quantity(&words, at + 1)?;
         if n == 0 {
@@ -99,6 +146,7 @@ pub fn period(text: &str, anchor: Day) -> Option<Period> {
         }
         let from = match words.get(end)?.as_str() {
             "dias" => Day(anchor.0.checked_sub(u32::try_from(n).ok()?.checked_sub(1)?)?),
+            "semanas" => Day(anchor.0.checked_sub(u32::try_from(n.checked_mul(7)?).ok()?.checked_sub(1)?)?),
             "meses" | "anos" => {
                 let months = if words[end] == "anos" { n.checked_mul(12)? } else { n };
                 let absolute = u64::from(year).checked_mul(12)?.checked_add(u64::from(month - 1))?.checked_sub(months)?;

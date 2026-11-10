@@ -42,6 +42,11 @@ impl AuthMode {
     }
 }
 
+/// What a handler wants written to the search log instead of the URL query (the question
+/// of an assistant turn). Attached to the response.
+#[derive(Clone)]
+pub struct LoggedQuery(pub String);
+
 /// The authenticated caller, attached to the request for handlers.
 #[derive(Clone)]
 pub struct Caller {
@@ -662,7 +667,11 @@ fn limited(code: &str, message: String, retry_after: u64, limit: i64, remaining:
 
 /// Usage category of a data route.
 pub fn kind_of(route: &str) -> &'static str {
-    if route.starts_with("/api/v1/cpf") {
+    if route == "/api/v1/assistant/export" {
+        "export"
+    } else if route.starts_with("/api/v1/assistant") {
+        "assistant"
+    } else if route.starts_with("/api/v1/cpf") {
         "cpf"
     } else if route.ends_with("/search") || route == "/api/v1/busca" {
         "search"
@@ -766,7 +775,7 @@ pub async fn gate(State(st): State<Shared>, mut req: Request, next: Next) -> Res
             ts: accounts::now(),
             user_id: (principal.id > 0).then_some(principal.id),
             route,
-            query: query.chars().take(1000).collect(),
+            query: resp.extensions().get::<LoggedQuery>().map_or(query, |q| q.0.clone()).chars().take(1000).collect(),
             status,
             ms,
             cache: hit,
@@ -953,6 +962,8 @@ mod tests {
         assert_eq!(kind_of("/api/v1/busca"), "search");
         assert_eq!(kind_of("/api/v1/cpf/{cpf}"), "cpf");
         assert_eq!(kind_of("/downloads/{name}"), "download");
+        assert_eq!(kind_of("/api/v1/assistant/ask"), "assistant");
+        assert_eq!(kind_of("/api/v1/assistant/export"), "export");
         assert_eq!(query_param("a=1&limit=50&b", "limit").as_deref(), Some("50"));
     }
 }

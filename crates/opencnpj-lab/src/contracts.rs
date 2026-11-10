@@ -232,7 +232,7 @@ pub fn run(args: ContractArgs) -> anyhow::Result<()> {
             if data && prediction.act == "new_query" || data && prediction.act == "company_search" {
                 new_questions += 1;
                 if new_questions.is_multiple_of(args.data_every) {
-                    found.extend(assistant.data_findings(&prediction));
+                    found.extend(crate::assistant::data_findings(&assistant, &prediction));
                     *summary.entry(name.clone()).or_default().entry("data_checked").or_default().entry("all").or_default() += 1;
                 }
             }

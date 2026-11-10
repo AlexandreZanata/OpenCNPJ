@@ -48,7 +48,8 @@ register (username, email) ──► pending ──first login with the e-mailed
 | `POST /api/v1/auth/register` | `{"username","email"}` | `202` — the key is e-mailed. `409 username_taken`, `400 invalid_username` (3–32 of `a-z 0-9 . _ -`), `400 invalid_email`, `403 registration_closed`. An address that already has an account gets a "use recovery" e-mail instead; the response is the same, so addresses cannot be enumerated. |
 | `POST /api/v1/auth/login` | `{"key"}` | `{"token","token_type":"Bearer","expires_at","user"}`. `401 invalid_key`. |
 | `POST /api/v1/auth/logout` | — | `204`; the session token is revoked. |
-| `GET /api/v1/auth/me` | — | `{"user","plan","limits","usage"}` (see below). |
+| `GET /api/v1/auth/me` | — | `{"user","plan","limits","usage","permissions"}` (see below). |
+| `GET /api/v1/auth/usage` | — | The caller's own activity: `{"usage_daily":[{"day","kind","count","cache_hits","errors"}],"recent_searches":[...]}` (30 days, last 50 searches). |
 | `POST /api/v1/auth/key/rotate` | — | `{"key","key_prefix"}`: the old key and every session are revoked; a notice is e-mailed. |
 | `POST /api/v1/auth/recover` | `{"email"}` | Always `202`. If the address has an account, a confirmation link valid for 30 minutes is e-mailed. |
 | `GET /api/v1/auth/recover/confirm?token=` | — | HTML page with a confirm button (a GET never changes anything, so mail scanners that open links are harmless). |
@@ -86,8 +87,11 @@ Seeded plans: `anonymous` (100/day, 10/min), `free` (1,000/day, 20,000/month, 60
 `pro` (100,000/day, 2,000,000/month, 600/min, export up to 100,000 rows) and `unlimited`
 (staff default). Admins edit them freely.
 
-Every data request counts as one search. It is admitted only when the bucket and both
-counters allow it; a 5xx response is refunded. Rejections are `429 rate_limited` or
+Every data request counts as one search, whether it comes with the login key (API) or
+with a session (the web application): a CNPJ lookup, a filter search, a turn of the
+assistant (`POST /api/v1/assistant/ask`, usage kind `assistant`) or a generated file
+(`POST /api/v1/assistant/export`, kind `export`). It is admitted only when the bucket and
+both counters allow it; a 5xx response is refunded. Rejections are `429 rate_limited` or
 `429 quota_exceeded` with `Retry-After`. Every authenticated data response carries:
 
 ```
@@ -167,6 +171,16 @@ the public API, including `/api/v1/auth/login`.
 
 `Plan` object: `{"id","name","daily_limit","monthly_limit","per_minute","burst","max_page_size","export","max_export_rows","downloads"}`
 (`null` limits mean unlimited).
+
+## Web application
+
+`serve --web web/dist` serves the front end on both listeners (see `web/README.md`). A
+user signs in with the login key and gets a session; the account page shows the plan, the
+day and month meters, thirty days of usage, the key prefix with key rotation, and the
+recent searches. Opened on the admin listener with a staff login, the same application
+shows **Administração**: accounts (search, plan, role, per-account day/month/minute
+limits, suspension, usage reset, session revocation, key rotation, deletion, creation
+with the key shown once), plans and service-wide usage, all through the admin API below.
 
 ## E-mail
 

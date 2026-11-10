@@ -1,64 +1,42 @@
 /**
- * Example questions shown on the chat page, grouped by skill. Every question is part of
- * the versioned skills dataset (`crates/opencnpj-lab/eval/skills-export-01`), so the
- * page only offers questions the interpreter is tested to answer.
+ * Starting points shown on the empty assistant page, grouped by what the person wants to
+ * do. Every question is part of a versioned evaluation set
+ * (`crates/opencnpj-lab/eval/prospecting-01`, `skills-export-01`, `skills-company-01`), so
+ * the page only offers questions the interpreter is tested to answer.
  */
 export interface ExampleGroup {
   title: string;
-  hint?: string;
   questions: readonly string[];
 }
 
 export const EXAMPLE_GROUPS: readonly ExampleGroup[] = [
   {
-    title: "Excel, CSV e TXT",
-    hint: "Peça o arquivo e, se quiser, só as colunas que interessam.",
+    title: "Encontrar clientes",
     questions: [
-      "Me mande um Excel com todas as empresas que tiveram baixa em Mato Grosso no setor de TI",
-      "Me mande apenas o nome e o número em um Excel com todas as empresas que tiveram baixa em Mato Grosso no setor de TI",
-      "Quero um CSV das padarias que fecharam em 2025 em Cuiabá/MT",
-      "Gere um TXT com o CNPJ, a razão social e a data de abertura das farmácias abertas em 2025 em Sinop/MT",
-      "Planilha com nome, CNPJ, telefone e e-mail dos restaurantes ativos de Rondonópolis/MT",
-      "Exporte em Excel o ranking das 10 cidades de MT com mais padarias ativas",
+      "dentistas em Cuiabá/MT com telefone",
+      "novas empresas em Sinop/MT",
+      "liste os maiores restaurantes de Goiânia/GO",
+      "telefones de imobiliárias em Londrina/PR",
     ],
   },
   {
-    title: "Contagens",
+    title: "Entender o mercado",
     questions: [
-      "Quantas padarias ativas existem em Cuiabá/MT?",
-      "Quantos estabelecimentos de serviços de TI estão ativos em Mato Grosso?",
-      "Quantas empresas tiveram baixa em Sorriso/MT em 2025?",
-    ],
-  },
-  {
-    title: "Evolução",
-    questions: [
-      "Mostre a evolução mensal de registros de empresas em Cuiabá/MT em 2025.",
-      "Mostre a evolução mensal das baixas de restaurantes em Mato Grosso em 2025.",
-    ],
-  },
-  {
-    title: "Comparações e rankings",
-    questions: [
-      "Compare a densidade por 10 mil habitantes de farmácias ativas entre Cuiabá/MT e Várzea Grande/MT.",
+      "Quantas farmácias ativas existem em Sinop/MT?",
       "Quais as 10 cidades de MT com mais padarias ativas?",
-      "Distribua os estabelecimentos ativos no estado de Mato Grosso por divisão CNAE conforme o cadastro atual.",
+      "academias abertas em 2024 em Goiânia/GO",
+      "Compare a densidade por 10 mil habitantes de farmácias ativas entre Cuiabá/MT e Várzea Grande/MT.",
     ],
   },
   {
-    title: "Listas com CNPJ",
-    questions: ["Liste as 20 farmácias mais recentes de Sinop/MT", "Liste as empresas de TI abertas em 2025 em Cuiabá/MT"],
+    title: "Consultar uma empresa",
+    questions: ["33.000.167/0001-01", "filiais do Bradesco em MT", "Encontre a empresa Zaflas"],
   },
   {
-    title: "Conversa",
-    hint: "Faça a primeira pergunta e continue com as seguintes: o motor lembra o contexto.",
+    title: "Levar para a planilha",
     questions: [
-      "Quantas padarias ativas existem em Cuiabá/MT?",
-      "E só as matrizes?",
-      "Agora liste esses estabelecimentos",
-      "Me mande isso em Excel",
-      "Agora em CSV",
-      "Só o nome e o CNPJ",
+      "Me mande um Excel com nome, CNPJ e telefone das padarias de Cuiabá MT",
+      "Quero um CSV das padarias que fecharam em 2025 em Cuiabá/MT",
     ],
   },
 ];

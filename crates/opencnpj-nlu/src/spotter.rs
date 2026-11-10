@@ -96,6 +96,23 @@ impl Lexicon {
         }
         candidates.pop()
     }
+
+    /// A single-word activity one edit away from `word`, when exactly one exists.
+    pub fn fuzzy_sector(&self, word: &str) -> Option<Vec<Entity>> {
+        if word.len() < 7 || !word.is_ascii() {
+            return None;
+        }
+        let mut candidates: Vec<Vec<Entity>> = Vec::new();
+        for (key, &node) in &self.nodes[0].children {
+            if key.len() >= 6 && one_edit(word.as_bytes(), key.as_bytes()) {
+                let values: Vec<_> = self.nodes[node].values.iter().filter(|e| matches!(e, Entity::Sector(_))).cloned().collect();
+                if !values.is_empty() && !candidates.contains(&values) {
+                    candidates.push(values);
+                }
+            }
+        }
+        if candidates.len() == 1 { candidates.pop() } else { None }
+    }
 }
 
 fn one_edit(a: &[u8], b: &[u8]) -> bool {

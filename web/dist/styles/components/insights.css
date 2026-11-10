@@ -1,6 +1,0 @@
-.insights {
-  display: grid;
-  /* Proportions of the reference layout: 188 · 194 · 165 · 354 · 298 */
-  grid-template-columns: 188fr 194fr 165fr 354fr 298fr;
-  gap: 15px;
-}

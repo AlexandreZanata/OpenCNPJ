@@ -179,6 +179,21 @@ async fn me(State(st): State<Shared>, req: Request) -> Response {
     }
 }
 
+/// The caller's own activity: requests per day and kind (30 days) and recent searches.
+async fn usage(State(st): State<Shared>, req: Request) -> Response {
+    let ip = client_ip(&req, st.gate.trust_proxy);
+    let p = match caller(&st, req.headers(), ip).await {
+        Ok(p) => p,
+        Err(r) => return r,
+    };
+    let Ok(acc) = accounts(&st) else { return StatusCode::NOT_FOUND.into_response() };
+    let id = p.id;
+    match blocking(move || acc.user_detail(id)).await {
+        Ok(detail) => Json(json!({ "usage_daily": detail["usage_daily"], "recent_searches": detail["recent_searches"] })).into_response(),
+        Err(e) => e.into_response(),
+    }
+}
+
 async fn rotate(State(st): State<Shared>, req: Request) -> Response {
     let ip = client_ip(&req, st.gate.trust_proxy);
     let p = match caller(&st, req.headers(), ip).await {
@@ -349,6 +364,7 @@ pub fn router() -> Router<Shared> {
         .route("/api/v1/auth/login", post(login))
         .route("/api/v1/auth/logout", post(logout))
         .route("/api/v1/auth/me", get(me))
+        .route("/api/v1/auth/usage", get(usage))
         .route("/api/v1/auth/key/rotate", post(rotate))
         .route("/api/v1/auth/recover", post(recover))
         .route("/api/v1/auth/recover/confirm", get(confirm_page).post(confirm))

@@ -1,0 +1,58 @@
+{
+  "commercial-round-01": {
+    "data_checked": {
+      "all": 92
+    },
+    "items": {
+      "all": 1000
+    }
+  },
+  "commercial-round-02": {
+    "data_checked": {
+      "all": 92
+    },
+    "items": {
+      "all": 1000
+    }
+  },
+  "h-informal": {
+    "data_checked": {
+      "all": 20
+    },
+    "items": {
+      "all": 202
+    }
+  },
+  "probes-01": {
+    "data_checked": {
+      "all": 2
+    },
+    "items": {
+      "all": 28
+    }
+  },
+  "prospecting-01": {
+    "data_checked": {
+      "all": 148
+    },
+    "items": {
+      "all": 1476
+    }
+  },
+  "skills-company-01": {
+    "data_checked": {
+      "all": 107
+    },
+    "items": {
+      "all": 1068
+    }
+  },
+  "skills-export-01": {
+    "data_checked": {
+      "all": 170
+    },
+    "items": {
+      "all": 1881
+    }
+  }
+}

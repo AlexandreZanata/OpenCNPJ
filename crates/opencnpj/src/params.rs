@@ -64,7 +64,9 @@ pub fn parse(pairs: &[(String, String)], caps: Caps) -> Result<Query, String> {
     let mut hi: Vec<(NumField, u64)> = Vec::new();
     for (k, v) in pairs {
         let k = k.as_str();
-        if v.len() > 2000 {
+        // Activity filters may list every subclass of a broad sector (a CNAE section).
+        let cap = if k.starts_with("cnae") { 8000 } else { 2000 };
+        if v.len() > cap {
             return Err(format!("parameter {k} too long"));
         }
         match k {

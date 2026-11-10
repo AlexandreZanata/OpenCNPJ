@@ -12,7 +12,7 @@ since = "v1"
 [[sector]]
 id = "advertising_agency"
 display = { sing = "agência de publicidade", plural = "agências de publicidade", gender = "f" }
-aliases = ["agência de propaganda", "agências de propaganda"]
+aliases = ["agência de propaganda", "agências de propaganda", "agência de marketing", "agências de marketing"]
 cnae_core = ["7311400"]
 cnae_extended = []
 scope = "main"
@@ -93,7 +93,7 @@ since = "v1"
 [[sector]]
 id = "auto_mechanic"
 display = { sing = "oficina mecânica", plural = "oficinas mecânicas", gender = "f" }
-aliases = ["mecânico de automóveis", "mecânica de automóveis", "oficina", "oficinas", "mecânica", "mecânicas", "retífica", "retíficas", "autocenter", "autocenters", "autocentro", "autocentros", "troca de óleo", "trocas de óleo"]
+aliases = ["mecânico de automóveis", "mecânica de automóveis", "oficina", "oficinas", "mecânica", "mecânicas", "retífica", "retíficas", "autocenter", "autocenters", "autocentro", "autocentros", "troca de óleo", "trocas de óleo", "oficina mecânica", "oficinas mecânicas"]
 cnae_core = ["4520001"]
 cnae_extended = []
 scope = "main"
@@ -120,7 +120,7 @@ since = "v1"
 [[sector]]
 id = "bakery"
 display = { sing = "padaria", plural = "padarias", gender = "f" }
-aliases = ["panificadora", "panificadoras", "padoca", "padocas"]
+aliases = ["panificadora", "panificadoras", "padoca", "padocas", "confeitaria", "confeitarias"]
 cnae_core = ["1091102", "4721101", "4721102"]
 cnae_extended = ["1091101"]
 scope = "main"
@@ -211,7 +211,7 @@ since = "v1"
 [[sector]]
 id = "bookshop"
 display = { sing = "livraria", plural = "livrarias", gender = "f" }
-aliases = ["loja de livros", "lojas de livros"]
+aliases = ["loja de livros", "lojas de livros", "livraria", "livrarias"]
 cnae_core = ["4761001"]
 cnae_extended = []
 scope = "main"
@@ -229,7 +229,7 @@ since = "v1"
 [[sector]]
 id = "building_materials"
 display = { sing = "loja de materiais de construção", plural = "lojas de materiais de construção", gender = "f" }
-aliases = ["material de construção", "materiais de construção"]
+aliases = ["material de construção", "materiais de construção", "loja de material de construção", "lojas de material de construção", "lojas de materiais de construção"]
 cnae_core = ["4744005", "4744099"]
 cnae_extended = ["4744001", "4744002", "4744003", "4744004", "4744006"]
 scope = "main"
@@ -256,7 +256,7 @@ since = "v1"
 [[sector]]
 id = "butcher"
 display = { sing = "açougue", plural = "açougues", gender = "m" }
-aliases = ["casa de carnes", "casas de carnes"]
+aliases = ["casa de carnes", "casas de carnes", "açougue", "açougues"]
 cnae_core = ["4722901"]
 cnae_extended = []
 scope = "main"
@@ -274,7 +274,7 @@ since = "v1"
 [[sector]]
 id = "car_rental"
 display = { sing = "locadora de carros", plural = "locadoras de carros", gender = "f" }
-aliases = ["aluguel de veículos sem motorista"]
+aliases = ["aluguel de veículos sem motorista", "locadora de veículos", "locadoras de veículos", "locadora de carros", "locadoras de carros"]
 cnae_core = ["7711000"]
 cnae_extended = []
 scope = "main"
@@ -319,7 +319,7 @@ since = "v1"
 [[sector]]
 id = "clinical_lab"
 display = { sing = "laboratório de análises clínicas", plural = "laboratórios de análises clínicas", gender = "m" }
-aliases = ["laboratório clínico", "laboratórios clínicos"]
+aliases = ["laboratório clínico", "laboratórios clínicos", "laboratório de análises clínicas", "laboratórios de análises clínicas"]
 cnae_core = ["8640202"]
 cnae_extended = []
 scope = "main"
@@ -382,7 +382,7 @@ since = "v1"
 [[sector]]
 id = "condominium"
 display = { sing = "condomínio predial", plural = "condomínios prediais", gender = "m" }
-aliases = ["condomínio edilício", "condomínios edilícios"]
+aliases = ["condomínio edilício", "condomínios edilícios", "condomínio", "condomínios"]
 cnae_core = ["8112500"]
 cnae_extended = []
 scope = "main"
@@ -391,7 +391,7 @@ since = "v1"
 [[sector]]
 id = "construction"
 display = { sing = "construtora", plural = "construtoras", gender = "f" }
-aliases = ["construção de edifícios", "construção predial"]
+aliases = ["construção de edifícios", "construção predial", "construtora", "construtoras", "empreiteira", "empreiteiras"]
 cnae_core = ["4120400"]
 cnae_extended = []
 scope = "main"
@@ -454,7 +454,7 @@ since = "v1"
 [[sector]]
 id = "custom_software"
 display = { sing = "empresa de software sob encomenda", plural = "empresas de software sob encomenda", gender = "f" }
-aliases = ["desenvolvimento de software sob encomenda", "programação sob encomenda"]
+aliases = ["desenvolvimento de software sob encomenda", "programação sob encomenda", "empresa de software", "empresas de software", "software house", "desenvolvimento de software", "fábrica de software"]
 cnae_core = ["6201501"]
 cnae_extended = []
 scope = "main"
@@ -508,7 +508,7 @@ since = "v1"
 [[sector]]
 id = "dental_clinic"
 display = { sing = "clínica odontológica", plural = "clínicas odontológicas", gender = "f" }
-aliases = ["dentista", "dentistas", "consultório odontológico"]
+aliases = ["dentista", "dentistas", "consultório odontológico", "clínica odontológica", "clínicas odontológicas", "clínica dentária", "clínicas dentárias"]
 cnae_core = ["8630504", "8630505"]
 cnae_extended = []
 scope = "main"
@@ -656,7 +656,7 @@ since = "v1"
 [[sector]]
 id = "fishmonger"
 display = { sing = "peixaria", plural = "peixarias", gender = "f" }
-aliases = ["loja de pescados", "lojas de pescados"]
+aliases = ["loja de pescados", "lojas de pescados", "peixaria", "peixarias"]
 cnae_core = ["4722902"]
 cnae_extended = []
 scope = "main"
@@ -683,7 +683,7 @@ since = "v1"
 [[sector]]
 id = "florist"
 display = { sing = "floricultura", plural = "floriculturas", gender = "f" }
-aliases = ["loja de flores", "lojas de flores"]
+aliases = ["loja de flores", "lojas de flores", "floricultura", "floriculturas"]
 cnae_core = ["4789002"]
 cnae_extended = []
 scope = "main"
@@ -701,7 +701,7 @@ since = "v1"
 [[sector]]
 id = "fuel_station"
 display = { sing = "posto de combustível", plural = "postos de combustível", gender = "m" }
-aliases = ["posto de gasolina", "postos de gasolina", "posto", "postos"]
+aliases = ["posto de gasolina", "postos de gasolina", "posto", "postos", "posto de combustível", "postos de combustível", "posto de combustíveis", "postos de combustíveis"]
 cnae_core = ["4731800"]
 cnae_extended = []
 scope = "main"
@@ -854,7 +854,7 @@ since = "v1"
 [[sector]]
 id = "hospital"
 display = { sing = "hospital", plural = "hospitais", gender = "m" }
-aliases = ["unidade hospitalar", "unidades hospitalares"]
+aliases = ["unidade hospitalar", "unidades hospitalares", "hospitais"]
 cnae_core = ["8610101"]
 cnae_extended = ["8610102"]
 scope = "main"
@@ -863,7 +863,7 @@ since = "v1"
 [[sector]]
 id = "hotel"
 display = { sing = "hotel", plural = "hotéis", gender = "m" }
-aliases = ["hotelaria"]
+aliases = ["hotelaria", "pousada", "pousadas"]
 cnae_core = ["5510801"]
 cnae_extended = []
 scope = "main"
@@ -908,7 +908,7 @@ since = "v1"
 [[sector]]
 id = "insurance_broker"
 display = { sing = "corretora de seguros", plural = "corretoras de seguros", gender = "f" }
-aliases = ["corretor de seguros", "corretores de seguros"]
+aliases = ["corretor de seguros", "corretores de seguros", "corretora de seguros", "corretoras de seguros"]
 cnae_core = ["6622300"]
 cnae_extended = []
 scope = "main"
@@ -954,7 +954,7 @@ since = "v1"
 [[sector]]
 id = "jewelry_store"
 display = { sing = "joalheria", plural = "joalherias", gender = "f" }
-aliases = ["loja de joias", "lojas de joias"]
+aliases = ["loja de joias", "lojas de joias", "joalheria", "joalherias"]
 cnae_core = ["4783101"]
 cnae_extended = []
 scope = "main"
@@ -972,7 +972,7 @@ since = "v1"
 [[sector]]
 id = "language_school"
 display = { sing = "escola de idiomas", plural = "escolas de idiomas", gender = "f" }
-aliases = ["curso de línguas", "cursos de línguas"]
+aliases = ["curso de línguas", "cursos de línguas", "escola de idiomas", "escolas de idiomas", "curso de idiomas", "cursos de idiomas"]
 cnae_core = ["8593700"]
 cnae_extended = []
 scope = "main"
@@ -1188,7 +1188,7 @@ since = "v1"
 [[sector]]
 id = "nursery"
 display = { sing = "creche", plural = "creches", gender = "f" }
-aliases = ["berçário", "berçários"]
+aliases = ["berçário", "berçários", "creche", "creches"]
 cnae_core = ["8511200"]
 cnae_extended = []
 scope = "main"
@@ -1251,7 +1251,7 @@ since = "v1"
 [[sector]]
 id = "parking"
 display = { sing = "estacionamento", plural = "estacionamentos", gender = "m" }
-aliases = ["estacionamento de veículos"]
+aliases = ["estacionamento de veículos", "estacionamento", "estacionamentos"]
 cnae_core = ["5223100"]
 cnae_extended = []
 scope = "main"
@@ -1332,7 +1332,7 @@ since = "v1"
 [[sector]]
 id = "physiotherapy"
 display = { sing = "clínica de fisioterapia", plural = "clínicas de fisioterapia", gender = "f" }
-aliases = ["fisioterapeuta", "fisioterapeutas"]
+aliases = ["fisioterapeuta", "fisioterapeutas", "clínica de fisioterapia", "clínicas de fisioterapia"]
 cnae_core = ["8650004"]
 cnae_extended = []
 scope = "main"
@@ -1431,7 +1431,7 @@ since = "v1"
 [[sector]]
 id = "psychology"
 display = { sing = "consultório de psicologia", plural = "consultórios de psicologia", gender = "m" }
-aliases = ["psicólogo", "psicóloga", "psicólogos", "psicólogas"]
+aliases = ["psicólogo", "psicóloga", "psicólogos", "psicólogas", "clínica de psicologia", "clínicas de psicologia"]
 cnae_core = ["8650003"]
 cnae_extended = []
 scope = "main"
@@ -1458,7 +1458,7 @@ since = "v1"
 [[sector]]
 id = "real_estate_developer"
 display = { sing = "incorporadora imobiliária", plural = "incorporadoras imobiliárias", gender = "f" }
-aliases = ["incorporador imobiliário", "incorporadores imobiliários"]
+aliases = ["incorporador imobiliário", "incorporadores imobiliários", "incorporadora", "incorporadoras"]
 cnae_core = ["4110700"]
 cnae_extended = []
 scope = "main"
@@ -1476,7 +1476,7 @@ since = "v1"
 [[sector]]
 id = "religious_organization"
 display = { sing = "organização religiosa", plural = "organizações religiosas", gender = "f" }
-aliases = ["entidade religiosa", "entidades religiosas"]
+aliases = ["entidade religiosa", "entidades religiosas", "igreja", "igrejas"]
 cnae_core = ["9491000"]
 cnae_extended = []
 scope = "main"
@@ -1778,7 +1778,7 @@ notes = "Shared aliases require a clarification before selecting a sector."
 [[sector]]
 id = "union"
 display = { sing = "sindicato", plural = "sindicatos", gender = "m" }
-aliases = ["organização sindical", "organizações sindicais"]
+aliases = ["organização sindical", "organizações sindicais", "sindicato", "sindicatos"]
 cnae_core = ["9420100"]
 cnae_extended = []
 scope = "main"
@@ -1841,7 +1841,7 @@ since = "v1"
 [[sector]]
 id = "veterinary_clinic"
 display = { sing = "clínica veterinária", plural = "clínicas veterinárias", gender = "f" }
-aliases = ["veterinário", "veterinária", "veterinários", "veterinárias"]
+aliases = ["veterinário", "veterinária", "veterinários", "veterinárias", "clínica veterinária", "clínicas veterinárias"]
 cnae_core = ["7500100"]
 cnae_extended = []
 scope = "main"
@@ -1962,3 +1962,115 @@ cnae_extended = []
 scope = "main"
 since = "v1"
 notes = "Every subclass of CNAE division 01 (agriculture, livestock and related services). Broad agro words map here; agronegócio and empresas do agro still ask for an activity."
+
+[[sector]]
+id = "driving_school"
+display = { sing = "autoescola", plural = "autoescolas", gender = "f" }
+aliases = ["auto escola", "auto escolas", "centro de formação de condutores", "cfc"]
+cnae_core = ["8599601"]
+cnae_extended = []
+scope = "main"
+since = "v1"
+
+[[sector]]
+id = "medical_practice"
+display = { sing = "clínica médica", plural = "clínicas médicas", gender = "f" }
+aliases = ["médicos", "médicas"]
+cnae_core = ["8630501", "8630502", "8630503"]
+cnae_extended = []
+scope = "main"
+since = "v1"
+notes = "Outpatient medical practice: the three subclasses of CNAE class 8630-5 for physicians."
+
+[[sector]]
+id = "beverage_wholesale"
+display = { sing = "distribuidora de bebidas", plural = "distribuidoras de bebidas", gender = "f" }
+aliases = ["atacado de bebidas", "distribuidor de bebidas", "distribuidores de bebidas"]
+cnae_core = ["4635401", "4635402", "4635403", "4635499"]
+cnae_extended = []
+scope = "main"
+since = "v1"
+
+[[sector]]
+id = "internet_provider"
+display = { sing = "provedor de internet", plural = "provedores de internet", gender = "m" }
+aliases = ["provedor de acesso à internet", "provedores de acesso à internet"]
+cnae_core = ["6110803", "6190601"]
+cnae_extended = []
+scope = "main"
+since = "v1"
+
+[[sector]]
+id = "car_dealer"
+display = { sing = "concessionária de veículos", plural = "concessionárias de veículos", gender = "f" }
+aliases = ["concessionária", "concessionárias", "revenda de carros novos"]
+cnae_core = ["4511101"]
+cnae_extended = []
+scope = "main"
+since = "v1"
+
+[[sector]]
+id = "higher_education"
+display = { sing = "faculdade", plural = "faculdades", gender = "f" }
+aliases = ["universidade", "universidades", "instituição de ensino superior", "instituições de ensino superior"]
+cnae_core = ["8531700", "8532500", "8533300"]
+cnae_extended = []
+scope = "main"
+since = "v1"
+
+[[sector]]
+id = "notary"
+display = { sing = "cartório", plural = "cartórios", gender = "m" }
+aliases = ["tabelionato", "tabelionatos"]
+cnae_core = ["6912500"]
+cnae_extended = []
+scope = "main"
+since = "v1"
+
+[[sector]]
+id = "lottery_shop"
+display = { sing = "casa lotérica", plural = "casas lotéricas", gender = "f" }
+aliases = ["lotérica", "lotéricas"]
+cnae_core = ["8299706"]
+cnae_extended = []
+scope = "main"
+since = "v1"
+
+[[sector]]
+id = "funeral_home"
+display = { sing = "funerária", plural = "funerárias", gender = "f" }
+aliases = ["serviço funerário", "serviços funerários"]
+cnae_core = ["9603304"]
+cnae_extended = []
+scope = "main"
+since = "v1"
+
+[[sector]]
+id = "wholesale"
+display = { sing = "atacadista", plural = "atacadistas", gender = "m" }
+aliases = ["atacado", "comércio atacadista", "empresa atacadista", "empresas atacadistas", "distribuidora", "distribuidoras"]
+cnae_core = ["4611700", "4612500", "4613300", "4614100", "4615000", "4616800", "4617600", "4618401", "4618402", "4618403", "4618499", "4619200", "4621400", "4622200", "4623101", "4623102", "4623103", "4623104", "4623105", "4623106", "4623107", "4623108", "4623109", "4623199", "4631100", "4632001", "4632002", "4632003", "4633801", "4633802", "4633803", "4634601", "4634602", "4634603", "4634699", "4635401", "4635402", "4635403", "4635499", "4636201", "4636202", "4637101", "4637102", "4637103", "4637104", "4637105", "4637106", "4637107", "4637199", "4639701", "4639702", "4641901", "4641902", "4641903", "4642701", "4642702", "4643501", "4643502", "4644301", "4644302", "4645101", "4645102", "4645103", "4646001", "4646002", "4647801", "4647802", "4649401", "4649402", "4649403", "4649404", "4649405", "4649406", "4649407", "4649408", "4649409", "4649410", "4649499", "4651601", "4651602", "4652400", "4661300", "4662100", "4663000", "4664800", "4665600", "4669901", "4669999", "4671100", "4672900", "4673700", "4674500", "4679601", "4679602", "4679603", "4679604", "4679699", "4681801", "4681802", "4681803", "4681804", "4681805", "4682600", "4683400", "4684201", "4684202", "4684299", "4685100", "4686901", "4686902", "4687701", "4687702", "4687703", "4689301", "4689302", "4689399", "4691500", "4692300", "4693100"]
+cnae_extended = []
+scope = "main"
+since = "v1"
+notes = "Every subclass of CNAE division 46 (wholesale trade). Narrower wholesale sectors keep their own, longer names."
+
+[[sector]]
+id = "retail"
+display = { sing = "varejista", plural = "varejistas", gender = "m" }
+aliases = ["varejo", "comércio varejista", "lojista", "lojistas", "empresa de varejo", "empresas de varejo"]
+cnae_core = ["4711301", "4711302", "4712100", "4713002", "4713004", "4713005", "4721102", "4721103", "4721104", "4722901", "4722902", "4723700", "4724500", "4729601", "4729602", "4729699", "4731800", "4732600", "4741500", "4742300", "4743100", "4744001", "4744002", "4744003", "4744004", "4744005", "4744006", "4744099", "4751201", "4751202", "4752100", "4753900", "4754701", "4754702", "4754703", "4755501", "4755502", "4755503", "4756300", "4757100", "4759801", "4759899", "4761001", "4761002", "4761003", "4762800", "4763601", "4763602", "4763603", "4763604", "4763605", "4771701", "4771702", "4771703", "4771704", "4772500", "4773300", "4774100", "4781400", "4782201", "4782202", "4783101", "4783102", "4784900", "4785701", "4785799", "4789001", "4789002", "4789003", "4789004", "4789005", "4789006", "4789007", "4789008", "4789009", "4789099"]
+cnae_extended = []
+scope = "main"
+since = "v1"
+notes = "Every subclass of CNAE division 47 (retail trade)."
+
+[[sector]]
+id = "manufacturing"
+display = { sing = "indústria", plural = "indústrias", gender = "f" }
+aliases = ["fábrica", "fábricas", "fabricante", "fabricantes", "indústria de transformação", "empresa industrial", "empresas industriais"]
+cnae_core = ["1011201", "1011202", "1011203", "1011204", "1011205", "1012101", "1012102", "1012103", "1012104", "1013901", "1013902", "1020101", "1020102", "1031700", "1032501", "1032599", "1033301", "1033302", "1041400", "1042200", "1043100", "1051100", "1052000", "1053800", "1061901", "1061902", "1062700", "1063500", "1064300", "1065101", "1065102", "1065103", "1066000", "1069400", "1071600", "1072401", "1072402", "1081301", "1081302", "1082100", "1091101", "1091102", "1092900", "1093701", "1093702", "1094500", "1095300", "1096100", "1099601", "1099602", "1099603", "1099604", "1099605", "1099606", "1099607", "1099699", "1111901", "1111902", "1112700", "1113501", "1113502", "1121600", "1122401", "1122402", "1122403", "1122404", "1122499", "1210700", "1220401", "1220402", "1220403", "1220499", "1311100", "1312000", "1313800", "1314600", "1321900", "1322700", "1323500", "1330800", "1340501", "1340502", "1340599", "1351100", "1352900", "1353700", "1354500", "1359600", "1411801", "1411802", "1412601", "1412602", "1412603", "1413401", "1413402", "1413403", "1414200", "1421500", "1422300", "1510600", "1521100", "1529700", "1531901", "1531902", "1532700", "1533500", "1539400", "1540800", "1610203", "1610204", "1610205", "1621800", "1622601", "1622602", "1622699", "1623400", "1629301", "1629302", "1710900", "1721400", "1722200", "1731100", "1732000", "1733800", "1741901", "1741902", "1742701", "1742702", "1742799", "1749400", "1811301", "1811302", "1812100", "1813001", "1813099", "1821100", "1822901", "1822999", "1830001", "1830002", "1830003", "1910100", "1921700", "1922501", "1922502", "1922599", "1931400", "1932200", "2011800", "2012600", "2013401", "2013402", "2014200", "2019301", "2019399", "2021500", "2022300", "2029100", "2031200", "2032100", "2033900", "2040100", "2051700", "2052500", "2061400", "2062200", "2063100", "2071100", "2072000", "2073800", "2091600", "2092401", "2092402", "2092403", "2093200", "2094100", "2099101", "2099199", "2110600", "2121101", "2121102", "2121103", "2122000", "2123800", "2211100", "2212900", "2219600", "2221800", "2222600", "2223400", "2229301", "2229302", "2229303", "2229399", "2311700", "2312500", "2319200", "2320600", "2330301", "2330302", "2330303", "2330304", "2330305", "2330399", "2341900", "2342701", "2342702", "2349401", "2349499", "2391501", "2391502", "2391503", "2392300", "2399101", "2399102", "2399199", "2411300", "2412100", "2421100", "2422901", "2422902", "2423701", "2423702", "2424501", "2424502", "2431800", "2439300", "2441501", "2441502", "2442300", "2443100", "2449101", "2449102", "2449103", "2449199", "2451200", "2452100", "2511000", "2512800", "2513600", "2521700", "2522500", "2531401", "2531402", "2532201", "2532202", "2539001", "2539002", "2541100", "2542000", "2543800", "2550101", "2550102", "2591800", "2592601", "2592602", "2593400", "2599301", "2599302", "2599399", "2610800", "2621300", "2622100", "2631100", "2632900", "2640000", "2651500", "2652300", "2660400", "2670101", "2670102", "2680900", "2710401", "2710402", "2710403", "2721000", "2722801", "2722802", "2731700", "2732500", "2733300", "2740601", "2740602", "2751100", "2759701", "2759799", "2790201", "2790202", "2790299", "2811900", "2812700", "2813500", "2814301", "2814302", "2815101", "2815102", "2821601", "2821602", "2822401", "2822402", "2823200", "2824101", "2824102", "2825900", "2829101", "2829199", "2831300", "2832100", "2833000", "2840200", "2851800", "2852600", "2853400", "2854200", "2861500", "2862300", "2863100", "2864000", "2865800", "2866600", "2869100", "2910701", "2910702", "2910703", "2920401", "2920402", "2930101", "2930102", "2930103", "2941700", "2942500", "2943300", "2944100", "2945000", "2949201", "2949299", "2950600", "3011301", "3011302", "3012100", "3031800", "3032600", "3041500", "3042300", "3050400", "3091101", "3091102", "3092000", "3099700", "3101200", "3102100", "3103900", "3104700", "3211601", "3211602", "3211603", "3212400", "3220500", "3230200", "3240001", "3240002", "3240003", "3240099", "3250701", "3250702", "3250703", "3250704", "3250705", "3250706", "3250707", "3250709", "3291400", "3292201", "3292202", "3299001", "3299002", "3299003", "3299004", "3299005", "3299006", "3299099", "3311200", "3312102", "3312103", "3312104", "3313901", "3313902", "3313999", "3314701", "3314702", "3314703", "3314704", "3314705", "3314706", "3314707", "3314708", "3314709", "3314710", "3314711", "3314712", "3314713", "3314714", "3314715", "3314716", "3314717", "3314718", "3314719", "3314720", "3314721", "3314722", "3314799", "3315500", "3316301", "3316302", "3317101", "3317102", "3319800", "3321000", "3329501", "3329599"]
+cnae_extended = []
+scope = "main"
+since = "v1"
+notes = "Every subclass of CNAE section C (manufacturing, divisions 10 to 33). Narrower factory sectors keep their own, longer names."

@@ -1,0 +1,17 @@
+decision           server ms  wall ms  question -> filters
+execute                 6.66     7.78  dentistas em Cuiabá/MT com telefone -> ['com telefone']
+execute_with_note      20.44    21.53  novas empresas em Sinop/MT -> ['período de 14/07/2026 a 11/10/2026']
+execute                12.71    14.61  academias abertas em 2024 em Goiânia/GO -> ['período de 01/01/2024 a 31/12/2024']
+execute                11.80    13.05  telefones de imobiliárias em Londrina/PR -> ['com telefone']
+execute                 9.78    10.80  restaurantes em Sinop/MT com telefone e capital acima de 50 mil -> ['com telefone', 'capital acima de R$ 50.000']
+execute_with_note      25.68    26.78  liste os maiores restaurantes de Goiânia/GO -> []
+execute_with_note      11.42    12.36  supermercados em Sinop e Sorriso -> []
+execute                19.74    21.00  Quantas farmácias ativas existem em Sinop/MT? -> []
+execute                 1.92     3.16  Quais as 10 cidades de MT com mais padarias ativas? -> []
+execute                 7.79     9.07  33.000.167/0001-01 -> []
+execute                17.07    18.22  filiais do Bradesco em MT -> []
+clarify                 0.48     1.69  empresas de energia solar em Sinop -> []
+clarify                 0.13     1.18  liste as farmácias de Sinop/MT com DDD 66 -> []
+clarify                 0.13     0.79  preciso prospectar clientes para minha distribuidora de bebidas em Cuiabá -> []
+reject                  0.03     0.53  sócios da empresa Zaflas -> []
+15 questions, 0 unexpected decisions

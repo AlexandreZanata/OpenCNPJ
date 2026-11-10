@@ -74,7 +74,7 @@ enum Cmd {
         out: PathBuf,
     },
     /// Run the HTTP API.
-    Serve(api::ServeArgs),
+    Serve(Box<api::ServeArgs>),
     /// Reproducible query benchmark against a snapshot.
     Bench(bench::BenchArgs),
     /// Manage accounts (users, roles, plans, keys) in the accounts database.
@@ -283,7 +283,7 @@ fn main() -> Result<()> {
             log(&format!("wrote {n} rows to {}", out.display()));
             Ok(())
         }
-        Cmd::Serve(a) => api::run(a),
+        Cmd::Serve(a) => api::run(*a),
         Cmd::Bench(a) => bench::run(a),
         Cmd::Accounts(a) => opencnpj::accounts_cli::run(a),
         Cmd::Loadtest(a) => opencnpj::loadtest::run(a),
