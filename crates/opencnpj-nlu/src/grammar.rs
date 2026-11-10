@@ -285,12 +285,43 @@ fn normalize_contact_filters(words: &mut [String], hits: &[Hit]) -> Result<(), B
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
+enum TaxRegime {
+    Simples,
+    Mei,
+}
+
+impl TaxRegime {
+    fn name(self) -> &'static str {
+        match self {
+            Self::Simples => "Simples Nacional",
+            Self::Mei => "MEI",
+        }
+    }
+
+    fn current(self, scope: &Filters) -> Tri {
+        match self {
+            Self::Simples => scope.simples,
+            Self::Mei => scope.mei,
+        }
+    }
+
+    fn set(self, scope: &mut Filters, choice: Tri) {
+        match self {
+            Self::Simples => scope.simples = choice,
+            Self::Mei => scope.mei = choice,
+        }
+    }
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
 enum EditTarget {
     Contact(ContactNeed),
     Porte,
     Capital,
+    Opened,
+    Status,
     UnitType(Tri),
-    Simples(Tri),
+    Tax(TaxRegime, Tri),
 }
 
 #[derive(Clone, Copy)]
@@ -299,8 +330,9 @@ enum FilterAction {
     ReplaceContact { source: ContactNeed, target: ContactNeed },
     RemovePorte,
     RemoveCapital,
+    RemoveOpened,
     ReplaceUnit { source: Tri, target: Tri },
-    ReplaceSimples { source: Tri, target: Tri },
+    ReplaceTax { regime: TaxRegime, source: Tri, target: Tri },
 }
 
 struct FilterEdit {
@@ -330,7 +362,10 @@ impl FilterEdit {
     fn apply(&self, request: &mut Request) -> Result<&'static str, Box<Interpretation>> {
         let previous_contact = request.scope.contact;
         let previous_unit = unit_filter(request);
-        let previous_simples = request.scope.simples;
+        let previous_tax = match self.keep {
+            Some(EditTarget::Tax(regime, _)) => regime.current(&request.scope),
+            _ => Tri::Any,
+        };
         let act = match self.action {
             FilterAction::RemoveContact(source) => {
                 request.scope.contact = edit_contact(previous_contact, source, ContactNeed::Any);
@@ -351,11 +386,24 @@ impl FilterEdit {
                 request.scope.capital = None;
                 if self.keep.is_some() { "compound_edit" } else { "remove_filter" }
             }
-            FilterAction::ReplaceSimples { source, target } => {
-                if previous_simples != source && previous_simples != target {
-                    return Err(clarify("Você quer aplicar o filtro de optantes ou de não optantes do Simples Nacional?"));
+            FilterAction::RemoveOpened => {
+                if request.scope.opened.is_none()
+                    && request.op.metric() == Some(Metric::Flow(FlowMetric::Registrations))
+                    && request.time.period.is_some()
+                {
+                    return Err(clarify(
+                        "A contagem de aberturas usa um período. Qual período você quer consultar, ou prefere contar os estabelecimentos pela situação atual?",
+                    ));
                 }
-                request.scope.simples = target;
+                request.scope.opened = None;
+                if self.keep.is_some() { "compound_edit" } else { "remove_filter" }
+            }
+            FilterAction::ReplaceTax { regime, source, target } => {
+                let current = regime.current(&request.scope);
+                if current != source && current != target {
+                    return Err(clarify(&format!("Você quer filtrar a consulta por optantes ou não optantes do {}?", regime.name())));
+                }
+                regime.set(&mut request.scope, target);
                 "replace_slot"
             }
             FilterAction::ReplaceUnit { source, target } => {
@@ -380,15 +428,18 @@ impl FilterEdit {
             Some(EditTarget::Capital) if matches!(self.action, FilterAction::RemoveCapital) => {
                 Err(clarify("Você quer retirar ou manter o filtro de capital social?"))
             }
+            Some(EditTarget::Opened) if matches!(self.action, FilterAction::RemoveOpened) => {
+                Err(clarify("Você quer retirar ou manter o filtro de data de abertura?"))
+            }
             Some(EditTarget::UnitType(need)) if previous_unit != need || unit_filter(request) != need => {
                 Err(clarify("Qual tipo de estabelecimento você quer manter na consulta: matriz ou filial?"))
             }
-            Some(EditTarget::Simples(need))
-                if previous_simples == Tri::Any
-                    || (need != Tri::Any && need != previous_simples)
-                    || request.scope.simples != previous_simples =>
+            Some(EditTarget::Tax(regime, need))
+                if (regime == TaxRegime::Simples && previous_tax == Tri::Any)
+                    || (need != Tri::Any && need != previous_tax)
+                    || regime.current(&request.scope) != previous_tax =>
             {
-                Err(clarify("Como você quer filtrar pelo Simples Nacional: optantes, não optantes ou qualquer regime?"))
+                Err(clarify(&format!("Como você quer filtrar pelo {}: optantes, não optantes ou qualquer regime?", regime.name())))
             }
             _ => Ok(act),
         }
@@ -407,27 +458,39 @@ fn edit_subject(words: &[String], mut at: usize) -> usize {
     at
 }
 
-fn simples_end(words: &[String], at: usize) -> usize {
-    at + 1 + usize::from(words.get(at + 1).is_some_and(|word| word == "nacional"))
+fn read_tax_regime(words: &[String], at: usize) -> Option<(TaxRegime, usize)> {
+    match words.get(at)?.as_str() {
+        "simples" => Some((TaxRegime::Simples, at + 1 + usize::from(words.get(at + 1).is_some_and(|word| word == "nacional")))),
+        "mei" => Some((TaxRegime::Mei, at + 1)),
+        _ => None,
+    }
 }
 
-/// Return whether the phrase names the regime. Only the target of a qualified
-/// swap can omit it ("optantes do Simples por não optantes").
-fn read_simples_option(words: &[String], at: usize) -> Option<(Tri, usize, bool)> {
+/// Only the destination of a qualified swap can omit the regime name.
+fn read_tax_option(words: &[String], at: usize) -> Option<(Tri, usize, Option<TaxRegime>)> {
     let at = at + if matches!(words.get(at..), Some([who, is, ..]) if who == "quem" && is == "esta") { 2 } else { 0 };
-    if matches!(words.get(at..), Some([outside, link, regime, ..]) if outside == "fora" && link == "do" && regime == "simples") {
-        return Some((Tri::No, simples_end(words, at + 2), true));
+    if matches!(words.get(at..), Some([outside, link, ..]) if outside == "fora" && link == "do")
+        && let Some((regime, end)) = read_tax_regime(words, at + 2)
+    {
+        return Some((Tri::No, end, Some(regime)));
     }
     let negative = words.get(at).is_some_and(|word| word == "nao");
-    let optant = at + usize::from(negative);
-    if !matches!(words.get(optant)?.as_str(), "optante" | "optantes") {
-        return None;
+    let option = at + usize::from(negative);
+    match words.get(option)?.as_str() {
+        "mei" if negative => Some((Tri::No, option + 1, Some(TaxRegime::Mei))),
+        "optante" | "optantes" => {
+            let choice = if negative { Tri::No } else { Tri::Yes };
+            let end = option + 1;
+            if words.get(end).is_some_and(|word| matches!(word.as_str(), "do" | "pelo" | "de"))
+                && let Some((regime, end)) = read_tax_regime(words, end + 1)
+            {
+                Some((choice, end, Some(regime)))
+            } else {
+                Some((choice, end, None))
+            }
+        }
+        _ => None,
     }
-    let end = optant + 1;
-    let qualified = matches!(words.get(end..), Some([link, regime, ..])
-        if matches!(link.as_str(), "do" | "pelo" | "de") && regime == "simples");
-    let end = if qualified { simples_end(words, end + 1) } else { end };
-    Some((if negative { Tri::No } else { Tri::Yes }, end, qualified))
 }
 
 fn read_edit_target(words: &[String], at: usize) -> Option<(EditTarget, usize)> {
@@ -435,8 +498,22 @@ fn read_edit_target(words: &[String], at: usize) -> Option<(EditTarget, usize)> 
         let need = if contact.phone(words) { ContactNeed::Phone } else { ContactNeed::Email };
         return Some((EditTarget::Contact(need), contact_qualifier_end(words, contact.end)));
     }
-    if let Some((choice, end, true)) = read_simples_option(words, at) {
-        return Some((EditTarget::Simples(choice), end));
+    if let Some((choice, end, Some(regime))) = read_tax_option(words, at) {
+        return Some((EditTarget::Tax(regime, choice), end));
+    }
+    if let Some((regime, end)) = read_tax_regime(words, at) {
+        return Some((EditTarget::Tax(regime, Tri::Any), end));
+    }
+    for phrase in [
+        &["data", "de", "abertura"][..],
+        &["periodo", "de", "abertura"][..],
+        &["data", "de", "inicio", "da", "atividade"][..],
+        &["data", "de", "inicio", "de", "atividade"][..],
+        &["inicio", "de", "atividade"][..],
+    ] {
+        if words.get(at..at + phrase.len()).is_some_and(|part| part.iter().zip(phrase).all(|(word, expected)| word == expected)) {
+            return Some((EditTarget::Opened, at + phrase.len()));
+        }
     }
     let at = if matches!(words.get(at..), Some([noun, link, capital, ..])
         if matches!(noun.as_str(), "limite" | "faixa") && link == "de" && capital == "capital")
@@ -454,7 +531,10 @@ fn read_edit_target(words: &[String], at: usize) -> Option<(EditTarget, usize)> 
         }
         "matriz" | "matrizes" => EditTarget::UnitType(Tri::Yes),
         "filial" | "filiais" => EditTarget::UnitType(Tri::No),
-        "simples" => return Some((EditTarget::Simples(Tri::Any), simples_end(words, at))),
+        "situacao" | "status" => {
+            let end = at + 1 + usize::from(words.get(at + 1).is_some_and(|word| word == "cadastral"));
+            return Some((EditTarget::Status, end));
+        }
         _ => return None,
     };
     Some((target, at + 1))
@@ -493,8 +573,11 @@ fn read_filter_edit(
         return Err(clarify("Para editar o arquivo, diga quais colunas quer manter. Para editar a busca, indique o filtro."));
     }
     let Some((source, mut end)) = read_edit_target(words, subject) else {
-        if replace && read_simples_option(words, subject).is_some() {
+        if replace && read_tax_option(words, subject).is_some() {
             return Err(clarify("Qual regime você quer editar? Informe, por exemplo, “troca optantes do Simples por não optantes”."));
+        }
+        if words.get(subject).is_some_and(|word| matches!(word.as_str(), "data" | "periodo")) {
+            return Err(clarify("Qual data você quer editar: a data de abertura ou a data da situação cadastral?"));
         }
         return Ok(None);
     };
@@ -514,13 +597,19 @@ fn read_filter_edit(
             end = after;
             FilterAction::ReplaceUnit { source, target }
         }
-        (true, EditTarget::Simples(source)) => {
-            let target = replacement_start(words, end).and_then(|at| read_simples_option(words, at));
-            let Some((target, after, _)) = target.filter(|_| source != Tri::Any) else {
-                return Err(clarify("Informe a opção atual e a nova opção do Simples Nacional: optantes ou não optantes."));
+        (true, EditTarget::Tax(regime, source)) => {
+            let source = if regime == TaxRegime::Mei && source == Tri::Any { Tri::Yes } else { source };
+            let target = replacement_start(words, end).and_then(|at| {
+                read_tax_option(words, at)
+                    .filter(|(_, _, named)| named.is_none_or(|named| named == regime))
+                    .map(|(choice, end, _)| (choice, end))
+                    .or_else(|| (regime == TaxRegime::Mei && words.get(at).is_some_and(|word| word == "mei")).then_some((Tri::Yes, at + 1)))
+            });
+            let Some((target, after)) = target.filter(|_| source != Tri::Any) else {
+                return Err(clarify(&format!("Informe a opção atual e a nova opção do {}: optantes ou não optantes.", regime.name())));
             };
             end = after;
-            FilterAction::ReplaceSimples { source, target }
+            FilterAction::ReplaceTax { regime, source, target }
         }
         (false, EditTarget::Contact(mut source)) => {
             if words.get(end).is_some_and(|word| word == "e")
@@ -535,6 +624,7 @@ fn read_filter_edit(
         }
         (false, EditTarget::Porte) => FilterAction::RemovePorte,
         (false, EditTarget::Capital) => FilterAction::RemoveCapital,
+        (false, EditTarget::Opened) => FilterAction::RemoveOpened,
         _ => return Ok(None),
     };
 
@@ -555,7 +645,7 @@ fn read_filter_edit(
         let subject = edit_subject(words, start + 1);
         if let Some((target, _)) = read_edit_target(words, subject).filter(|(_, after)| *after == words.len()) {
             Some(target)
-        } else if matches!(&words[subject..], [word] if matches!(word.as_str(), "restante" | "mei"))
+        } else if matches!(&words[subject..], [word] if word == "restante")
             || matches!(&words[subject..], [other, filters] if matches!(other.as_str(), "outros" | "demais") && filters == "filtros")
         {
             None

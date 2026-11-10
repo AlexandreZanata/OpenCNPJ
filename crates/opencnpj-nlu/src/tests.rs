@@ -1375,3 +1375,128 @@ fn capital_and_simples_edits_keep_file_columns_and_clarify_conflicts() {
     assert_eq!(result.decision, Decision::Clarify);
     assert_eq!(state.last.as_ref(), Some(&expected));
 }
+
+#[test]
+fn opening_date_edits_keep_status_and_other_dates_in_the_export() {
+    use opencnpj_query::export::ExportFormat;
+
+    let engine = interpreter();
+    for (initial, status, status_date) in [
+        (
+            "Liste 5 matrizes de farmácias ativas em Sinop MT, abertas em 2025, de pequeno porte, optantes pelo Simples, sem MEI, com telefone e e-mail, capital social acima de 20 mil reais, ordenadas pelo maior capital.",
+            Status::Active,
+            None,
+        ),
+        ("Liste 5 farmácias baixadas em 2025 em Sinop MT com início de atividade em 2024.", Status::Closed, Some(year(2025))),
+    ] {
+        let mut state = Conversation::default();
+        let first = engine.interpret(initial, &mut state);
+        let mut expected = first.request.unwrap_or_else(|| panic!("{initial}: {}", first.reason)).into_request();
+        assert!(expected.scope.opened.is_some(), "{initial}");
+        assert_eq!(expected.scope.status, Some(StatusSet::only(status)));
+        assert_eq!(expected.scope.status_date, status_date);
+        expected.scope.opened = None;
+        for _ in 0..2 {
+            let edited = engine.interpret("tira o filtro de data de abertura e mantém a situação cadastral", &mut state);
+            assert_eq!(edited.request.unwrap().into_request(), expected, "{initial}");
+        }
+        let file = engine.interpret("me manda em Excel", &mut state);
+        assert_eq!(file.request.unwrap().into_request(), expected, "{initial}");
+        let export = file.export.unwrap();
+        assert_eq!(export.format, ExportFormat::Xlsx);
+        assert_eq!(export.rows, Some(5));
+    }
+
+    let mut state = Conversation::default();
+    let first = engine.interpret("Quantas farmácias abriram em 2025 em Sinop MT e continuam ativas?", &mut state);
+    let expected = first.request.unwrap().into_request();
+    assert_eq!(expected.op.metric(), Some(Metric::Flow(FlowMetric::Registrations)));
+    assert_eq!(expected.time.period, Some(Period::Days(year(2025))));
+    let edited = engine.interpret("tira o filtro de data de abertura e mantém a situação cadastral", &mut state);
+    assert_eq!(edited.decision, Decision::Clarify);
+    assert!(edited.reason.contains("período"));
+    assert_eq!(state.last.as_ref(), Some(&expected));
+}
+
+#[test]
+fn mei_edits_preserve_simples_and_the_opening_period() {
+    use opencnpj_query::export::ExportFormat;
+
+    let engine = interpreter_with(&[(&["salão de beleza", "salões de beleza"], 9602501)]);
+    for (initial_mei, edit, wanted) in [
+        ("MEI", "troca MEI por não MEI", Tri::No),
+        ("sem MEI", "Troque não MEI por MEI", Tri::Yes),
+        ("MEI", "Substitua optantes pelo MEI por não optantes, mantendo a data de abertura", Tri::No),
+    ] {
+        let initial = format!(
+            "Liste 5 matrizes de salões de beleza ativos em Sinop MT, abertos em 2025, optantes pelo Simples, {initial_mei}, com telefone e e-mail, ordenados pelo maior capital."
+        );
+        let mut state = Conversation::default();
+        let first = engine.interpret(&initial, &mut state);
+        let mut expected = first.request.unwrap_or_else(|| panic!("{initial}: {}", first.reason)).into_request();
+        assert_eq!(expected.scope.mei, if initial_mei == "MEI" { Tri::Yes } else { Tri::No });
+        assert_eq!(expected.scope.simples, Tri::Yes);
+        assert_eq!(expected.scope.opened, Some(year(2025)));
+        expected.scope.mei = wanted;
+        for _ in 0..2 {
+            let edited = engine.interpret(edit, &mut state);
+            assert_eq!(edited.request.unwrap_or_else(|| panic!("{edit}: {}", edited.reason)).into_request(), expected, "{edit}");
+        }
+        let file = engine.interpret("me manda em Excel", &mut state);
+        assert_eq!(file.request.unwrap().into_request(), expected);
+        assert_eq!(file.export.unwrap().rows, Some(5));
+    }
+
+    let mut state = Conversation::default();
+    let first = engine.interpret("Quantas matrizes de salões de beleza ativos em Sinop MT são MEI e têm e-mail?", &mut state);
+    let mut expected = first.request.unwrap().into_request();
+    assert_eq!(expected.unit, Unit::HeadOffices);
+    expected.scope.mei = Tri::No;
+    let result = engine.interpret("Troque MEI por não MEI e me mande em Excel", &mut state);
+    expected.op = Op::List { order: ListOrder::Cnpj, limit: 20 };
+    assert_eq!(result.request.unwrap().into_request(), expected);
+    let file = result.export.unwrap();
+    assert_eq!(file.format, ExportFormat::Xlsx);
+    assert_eq!(file.rows, None);
+}
+
+#[test]
+fn opening_and_mei_edits_keep_columns_and_clarify_conflicts() {
+    use opencnpj_query::export::{ExportField, ExportFormat};
+
+    let engine = interpreter();
+    let mut state = Conversation::default();
+    let first = engine.interpret(
+        "Me manda um CSV com as colunas nome fantasia e data de abertura de 7 farmácias ativas em Sinop MT abertas em 2025 com telefone e e-mail.",
+        &mut state,
+    );
+    let mut expected = first.request.unwrap().into_request();
+    let csv = first.export.unwrap();
+    assert_eq!(csv.fields, [ExportField::NomeFantasia, ExportField::DataInicio]);
+    for question in [
+        "Troca MEI por",
+        "troca MEI por não MEI",
+        "Troca MEI por não optantes do Simples",
+        "Tira o filtro de data de abertura e mantém a data de abertura",
+        "Tira a coluna data de abertura",
+    ] {
+        let result = engine.interpret(question, &mut state);
+        assert_eq!(result.decision, Decision::Clarify, "{question}: {result:?}");
+        assert!(result.request.is_none() && result.export.is_none());
+        assert_eq!(state.last.as_ref(), Some(&expected), "{question}");
+        assert_eq!(state.export.as_ref(), Some(&csv), "{question}");
+    }
+    expected.scope.opened = None;
+    let file = engine.interpret("Remove a data de início da atividade e mantém o status cadastral e me manda em Excel", &mut state);
+    assert_eq!(file.request.unwrap().into_request(), expected);
+    let export = file.export.unwrap();
+    assert_eq!(export.format, ExportFormat::Xlsx);
+    assert_eq!(export.fields, csv.fields);
+    assert_eq!(export.rows, Some(7));
+
+    for question in ["tira o filtro de data de abertura e mantém a situação cadastral", "troca MEI por não MEI"] {
+        let result = engine.interpret(question, &mut Conversation::default());
+        assert_eq!(result.decision, Decision::Clarify, "{question}: {result:?}");
+        assert!(result.request.is_none() && result.company.is_none());
+    }
+}

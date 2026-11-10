@@ -143,6 +143,12 @@ size restriction. "troca optantes do Simples por não optantes" reverses the Sim
 selection while preserving the rest of the query and delivery. The second option can
 omit the regime name when the first explicitly identifies Simples Nacional.
 
+"tira o filtro de data de abertura e mantém a situação cadastral" clears the opening
+date restriction and retains the status and any status date filter. A registration
+count with a required period asks for clarification when that period is the only
+opening date restriction. "troca MEI por não MEI" changes only the MEI selection.
+Both edits retain the selected columns, sort order, and explicit row limit.
+
 ## 4. Files
 
 | Format | Dialect |
