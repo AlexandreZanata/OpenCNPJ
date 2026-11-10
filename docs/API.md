@@ -47,16 +47,49 @@ reference table or the RFB layout defines them.
 | `GET /api/v1/distribution` | Snapshot files offered for download, with sizes and SHA-256 |
 | `GET /downloads/{file}` | Download a snapshot / checksum / build report (supports `Range`, resumable) |
 | `GET /api/v1/dominios`, `/api/v1/dominios/{tabela}` | Reference tables (`cnaes`, `municipios`, `naturezas`, `paises`, `qualificacoes`, `motivos`) |
+| `GET /api/v1/dominios/municipios/{uf}` | Municipalities of one state with their RFB codes, by name (the national table has no state column) |
+| `POST /api/v1/assistant/ask` | One turn of the Portuguese assistant (requires `--assistant-agg`): body `{"question", "context"?}`, see [Assistant](#assistant) |
+| `POST /api/v1/assistant/export` | The Excel, CSV or TXT file offered by an assistant turn: body `{"request", "export", "question"?}` |
+| `GET /api/v1/platform` | What a client needs before logging in: auth mode, registration, whether the assistant, export and contacts are served, competence |
 | `GET /api/v1/official/sources` | Official source/dataset registry states and locally imported `.ocind` manifests |
 | `GET /api/v1/official/query` | Typed official-indicator lookup, compare, rank, trend or ratio (requires `--official-dir`) |
-| `GET /` | Service name, version and endpoint list |
+| `GET /api/v1` (and `GET /` without `--web`) | Service name, version and endpoint list |
+| `GET /` and static paths (with `--web DIR`) | The built web front end (`web/dist`), on both listeners |
 | `GET /healthz`, `/health`, `/readyz` | Liveness / readiness |
 | `GET /metrics` | Prometheus: per-route request counts, latency histograms, status classes, caches, rejections, RSS. On the public listener only with `--auth off`; otherwise on the admin listener (staff login). |
 | `/api/v1/auth/*` | Register, login, logout, profile, key rotation, recovery — see [ACCOUNTS.md](ACCOUNTS.md) |
 
 Public without a credential: `/`, health routes, `/campos`, `/dominios*`, `/snapshot`,
-`/distribution`, `/api/v1/official/sources` and `/api/v1/auth/*`. Every other route above
-is a data route.
+`/distribution`, `/platform`, `/api/v1/official/sources` and `/api/v1/auth/*`. Every other
+route above is a data route.
+
+## Assistant
+
+Start the server with `--assistant-agg FILE`, the aggregates (`.ocagg`) built from the
+snapshot served at start (optionally `--assistant-history DIR` for earlier competences).
+The assistant interprets a question in Portuguese deterministically and answers from the
+aggregates and the snapshot; design in `docs/intelligence/` (16 and 17).
+
+Both routes are data routes: they need a credential, count one search each (usage kinds
+`assistant` and `export`), obey the rate limit and quotas of the caller and return the
+`X-Quota-*` headers. The search log stores the question.
+
+`POST /api/v1/assistant/ask` with `{"question": "dentistas em Cuiabá/MT com telefone"}`
+returns `{interpretation, answer, extras, export, context, timing_us}`:
+
+* `answer.decision` is `execute`, `execute_with_note`, `clarify` or `reject`;
+  `answer.blocks` are typed (`text`, `kpi`, `chart`, `table`, `records`, `company`,
+  `notice`, `clarify`, `reject`, `methodology`, `sources`, `caveats`); `answer.filters`
+  lists the filters applied besides place and activity; `answer.suggestions` are follow-ups.
+* `context` is the conversation state: send it back with the next question for follow-ups
+  ("e só as matrizes?", "agora em CSV"). The server keeps no conversation.
+* `export`, when the question asked for a file, describes it (`format`, `filename`, `rows`,
+  `columns`, `notes`) and carries the `request` and `export` to post to
+  `/api/v1/assistant/export`. That route canonicalizes and validates the request again,
+  needs a plan with export (`403 plan_forbids_export`) and writes at most the plan's
+  `max_export_rows` and `--assistant-export-rows` rows (`X-OpenCNPJ-Rows` has the count).
+
+Without `--assistant-agg` both routes answer `503 assistant_unavailable`.
 
 ## Official indicator endpoints
 
@@ -155,6 +188,10 @@ curl -o snap.ocnpj -C - 'localhost:8080/downloads/2026-10-balanced-1.2.ocnpj'
 | `--trust-proxy` | off | Client address from `X-Forwarded-For` (behind Caddy/nginx) |
 | `--reuse-port`, `--drain-secs` | off, 5 | Zero-downtime restarts: see [DEPLOYMENT.md](DEPLOYMENT.md) |
 | `--no-auto-update`, `--auto-update-hours` | updates on (setting), 0 | Automatic RFB release updates |
+| `--web` | none | Directory of the built front end served at `/` (`web/dist`); the service description moves to `/api/v1` |
+| `--assistant-agg`, `--assistant-history` | none | Aggregates of the served snapshot (enables `/api/v1/assistant/*`) and of earlier competences |
+| `--assistant-catalog`, `--assistant-sectors`, `--assistant-anchor` | catalogues in `crates/opencnpj-insights/catalog`, `2026-10-11` | Municipality and sector catalogues and the data date relative periods count back from |
+| `--assistant-export-rows` | 100000 | Rows per file generated by the assistant (plans can lower it) |
 
 ## Admin suite (`http://<admin-bind>/admin`)
 

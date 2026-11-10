@@ -1,0 +1,63 @@
+{
+  "categories": {
+    "corporate_structure_hq_branches_identity": {
+      "interpretation_correct": 4000,
+      "items": 4000
+    },
+    "cross_variable_correlation": {
+      "interpretation_correct": 4500,
+      "items": 5000
+    },
+    "dialogue_corrections_references_planning": {
+      "interpretation_correct": 6000,
+      "items": 6000
+    },
+    "geography_catchments_comparisons": {
+      "interpretation_correct": 5000,
+      "items": 5000
+    },
+    "historical_stock_flows_seasonality": {
+      "interpretation_correct": 3000,
+      "items": 5000
+    },
+    "market_size_density_competition": {
+      "interpretation_correct": 5000,
+      "items": 5000
+    },
+    "prospecting_qualification_territory": {
+      "interpretation_correct": 7000,
+      "items": 7000
+    },
+    "source_quality_provenance_uncertainty": {
+      "interpretation_correct": 3000,
+      "items": 3000
+    },
+    "supply_chain_complementary": {
+      "interpretation_correct": 5000,
+      "items": 5000
+    },
+    "tax_size_legal_capital_numeric": {
+      "interpretation_correct": 2000,
+      "items": 2000
+    },
+    "unsupported_missing_contradictions": {
+      "interpretation_correct": 3000,
+      "items": 3000
+    }
+  },
+  "counts": {
+    "act_correct": 40244,
+    "act_items": 41700,
+    "decision_correct": 47500,
+    "interpretation_correct": 47500,
+    "interpretation_wrong": 2500,
+    "items": 50000
+  },
+  "data_anchor": "2026-10-11",
+  "evidence_score": "Rule evidence is not a calibrated probability.",
+  "human_validation": "Not performed; human validation is deferred to product refinement.",
+  "method": "Actual text-only deterministic interpretation; gold IR used only for canonical scoring and separate backend reference, never as a prediction or conversation seed.",
+  "set": "crates/opencnpj-lab/eval/commercial-round-12/questions.jsonl",
+  "set_sha256": "721547e9ba39c20991471f898689d6a3dfe9dd6ddb6f9034e9389dd93e8629d9",
+  "snapshot_sha256": null
+}

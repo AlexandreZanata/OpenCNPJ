@@ -12,7 +12,10 @@ byte layout is in [FORMAT.md](FORMAT.md).
 | `opencnpj-core` | CNPJ identifiers (numeric and alphanumeric check digits), RFB layouts, lossless field codecs, Latin-1 decoding, search normalization |
 | `opencnpj-store` | Snapshot writer/reader, columnar blocks, compression, FST + postings index, query execution |
 | `opencnpj-ingest` | ZIP streaming with limits, RFB CSV dialect parser, bucketed external sort, parallel block encoding, index merge |
-| `opencnpj` | The binary: `download`, `update`, `rollback`, `build`, `verify`, `get`, `search`, `export`, `reconstruct`, `serve`, `bench`; the public API (`api.rs`, `params.rs`), the admin suite (`admin.rs`, `admin.html`) and request metrics (`metrics.rs`) |
+| `opencnpj` | The binary: `download`, `update`, `rollback`, `build`, `verify`, `get`, `search`, `export`, `reconstruct`, `serve`, `bench`; the public API (`api.rs`, `params.rs`), accounts and quotas (`accounts.rs`, `gate.rs`), the assistant over the snapshot (`assistant/`, routes `/api/v1/assistant/*`), the admin suite (`admin.rs`, `admin.html`) and request metrics (`metrics.rs`) |
+| `opencnpj-query`, `opencnpj-nlu`, `opencnpj-insights` | Query IR and validation; deterministic Portuguese interpretation; aggregates, planning and rendered answers (`docs/intelligence/`) |
+| `opencnpj-lab` | Evaluation, differential and contract tools for the assistant (`opencnpj-intel`); not part of the served product |
+| `web/` | Front end served by `serve --web` (`web/README.md`) |
 
 ## Build pipeline
 

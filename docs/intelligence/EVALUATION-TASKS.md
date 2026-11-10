@@ -18,7 +18,7 @@ asking is always preferable to that.
 | ET-03 | Interpretation contracts on every set | same script (`contracts` on all sets) | Every such PR | 0 findings on items scored correct; findings on wrong items opened as defects | `contracts/summary.json`, `findings.jsonl` |
 | ET-04 | Data contracts on the snapshot | same script with `DATA_DIR` | Every snapshot release and before a deploy | 0 findings | `data-contracts/summary.json` |
 | ET-05 | Backend differential | `opencnpj-intel diff-exec` / `diff-agg` (see `results/commercial-round-*/RUNBOOK.md`) | Every snapshot release | 0 mismatches | release results |
-| ET-06 | Skill and probe scores | part of ET-02 | Every PR | skills-export, skills-company and probes at 100% | `regression.txt` |
+| ET-06 | Skill and probe scores | part of ET-02 | Every PR | skills-export, skills-company, prospecting and probes at 100% | `regression.txt` |
 | ET-07 | Live smoke on the service | `python3 docs/intelligence/results/skills-company-01/live_check.py http://<host>:5175` | After each deploy | Expected decisions, files open, counts match ET-04 | `live-check.txt` |
 | ET-08 | Latency budget | `python3 docs/intelligence/results/skills-export-01/latency.py http://<host>:5175 web/src/features/chat/examples.ts` | Every release | Interpretation < 1 ms; sector-scoped answers < 50 ms; files of 1,000 rows < 2 s warm | `latency*.txt` |
 | ET-09 | Probe intake | Add every newly found silent error to `eval/probes-NN` with its defect class | When a defect is found | The probe fails before the fix and passes after | probe set + PR |
@@ -54,6 +54,15 @@ vocabulary is a place name except reviewed regional words.
 | Row count truncated | "Excel com 5000 padarias" → 20 | explicit counts kept | `row_count_truncated` |
 | City before "do <estado>" dropped | "Belém do Pará" → national | state after "do" qualifies the city | `city_before_state_dropped` |
 | Catalogue code that does not exist | `1012105` in meat processing | removed | catalogue contract |
+| Unknown word dropped after a request verb | "liste as empresas de energia solar em Sinop" → every company | closed vocabulary (17 §1) | `prospecting-01` `unknown/*` |
+| Unread number dropped | "com DDD 66", "com mais de 10 anos" → filter ignored | number check, age rule | `unknown/area_code`, `age/*` |
+| Relative period dropped | "abertas hoje / este mês / esta semana" → every active company | periods relative to the data date | `period/*` |
+| Capital without "social" dropped | "capital acima de 100 mil" → no bound | amount after "capital" | `capital/*` |
+| Size class dropped | "empresas de médio porte" → every company | size class "demais" with a note | `size/*` |
+| Coordinated place dropped | "Sinop e Sorriso" → Sinop only | coordination | `places/*` |
+| "Novas" dropped | "quantas novas empresas em Sinop" → every active company | last 90 days with a note | `search/new` |
+| Request read as a company name | "liste as autoescolas de Rondonópolis" → name search for "liste as autoescolas" | a bare name never states an intent | `contacts/*`, live probes |
+| Own business read as the target | "prospectar clientes para minha distribuidora" → list of distributors | clarification | `prospecting/own_business` |
 
 ## Log
 
@@ -62,3 +71,4 @@ Append one line per run: date, change or release, tasks run, outcome, evidence p
 | Date | Change | Tasks | Outcome | Evidence |
 |---|---|---|---|---|
 | 2026-11-09 | PR #8 (company search, agro, contracts) | ET-01–ET-04, ET-06, ET-07 | see `results/contracts-2026-11-09/REPORT.md` | `results/contracts-2026-11-09/` |
+| 2026-11-10 | Prospecting questions, closed vocabulary, assistant in the product server | ET-01–ET-04, ET-06 | see `results/prospecting-01/REPORT.md` | `results/prospecting-01/` |

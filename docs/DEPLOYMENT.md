@@ -52,6 +52,14 @@ sudo systemctl enable --now opencnpj@blue
 sudo cp deploy/Caddyfile /etc/caddy/Caddyfile && sudo systemctl reload caddy   # edit host names first
 ```
 
+To serve the web application and the assistant, add to the service's `serve` flags
+`--web /usr/local/share/opencnpj/web` (the contents of `web/dist`) and
+`--assistant-agg /var/lib/opencnpj/intelligence/agg/<competence>.ocagg`, built from the
+snapshot in `current` (`opencnpj-intel agg build`), with `--assistant-catalog` and
+`--assistant-sectors` pointing at the installed catalogues and `--assistant-anchor` at the
+data date. The assistant loads once at start and binds to the snapshot served then:
+after a monthly update, build the new aggregates and restart (blue/green, below).
+
 The admin listener (`127.0.0.1:8081`) is never exposed directly: reach it through an SSH
 tunnel (`ssh -L 8081:127.0.0.1:8081 server`) or the IP-restricted Caddy block, from the
 web dashboard (`/admin`) or the desktop app (`opencnpj-admin`).

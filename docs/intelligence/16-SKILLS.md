@@ -44,9 +44,10 @@ question ──► skills::delivery ──► rest of the question ──► gra
 | Conversation memory of the export | `Conversation::export` in `crates/opencnpj-nlu/src/context.rs` |
 | Writers (XLSX, CSV, TXT) and record cells | `crates/opencnpj-insights/src/export.rs` |
 | Value tables and titles for files | `render::value_table`, `render::title` |
-| Assistant (interpret, execute, render, extras, files) | `crates/opencnpj-lab/src/assistant.rs` |
-| HTTP service and `answer` CLI | `crates/opencnpj-lab/src/serve.rs` |
-| Chat page | `web/src/pages/local-consulta-page.ts`, `web/src/features/chat/` |
+| Assistant (interpret, execute, render, extras, files) | `crates/opencnpj/src/assistant/` (`mod.rs`, `assets.rs`, `engine.rs`, `geo.rs`) |
+| Product routes (`/api/v1/assistant/*`, accounts and quotas) | `crates/opencnpj/src/assistant/http.rs`, see `17-PROSPECTING.md` §5 |
+| Local development service and `answer` CLI | `crates/opencnpj-lab/src/serve.rs` |
+| Chat page | `web/src/pages/assistant-page.ts`, `web/src/features/chat/` |
 | Evaluation set | `crates/opencnpj-lab/eval/skills-export-01/` |
 
 ### 2.1 Why the export is not in the query IR
