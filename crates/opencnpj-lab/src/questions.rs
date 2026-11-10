@@ -2,19 +2,16 @@
 
 use crate::{eval, query};
 use anyhow::{Context, Result, ensure};
+pub(crate) use opencnpj::assistant::assets::{Assets, DataArgs, meta_text, remember_execution, value_json};
 use opencnpj_core::schema::Table;
 use opencnpj_ingest::source::sha256_file;
 use opencnpj_insights::{
-    agg,
-    catalog::municipalities::{MunicipalityCatalogue, Place},
-    execute::{self, AggregateSet, ExecContext, Value},
+    execute::{self, ExecContext},
     plan::{self, Backend},
-    render::SectorLabel,
 };
-use opencnpj_nlu::{Interpreter, context::Conversation, lang::LanguagePack, policy::Interpretation};
+use opencnpj_nlu::{context::Conversation, policy::Interpretation};
 use opencnpj_query::{ir::*, validate::ValidRequest};
-use opencnpj_store::{Snapshot, search::Limits};
-use serde::Deserialize;
+use opencnpj_store::search::Limits;
 use serde_json::{Value as Json, json};
 use std::{
     collections::BTreeMap,
@@ -22,22 +19,6 @@ use std::{
     io::{BufWriter, Write},
     path::PathBuf,
 };
-
-#[derive(clap::Args)]
-pub struct DataArgs {
-    #[arg(long, default_value = "crates/opencnpj-insights/catalog/municipalities.tsv")]
-    pub catalog: PathBuf,
-    #[arg(long, default_value = "crates/opencnpj-insights/catalog/sectors.toml")]
-    pub sectors: PathBuf,
-    #[arg(long, default_value = "2026-10-11")]
-    pub anchor: String,
-    #[arg(long)]
-    pub agg: Option<PathBuf>,
-    #[arg(long)]
-    pub history: Option<PathBuf>,
-    #[arg(long)]
-    pub snapshot: Option<PathBuf>,
-}
 
 #[derive(clap::Args)]
 pub struct AskArgs {
@@ -65,226 +46,89 @@ pub struct EvalArgs {
     pub milestone: bool,
 }
 
-pub(crate) struct Assets {
-    pub(crate) catalogue: MunicipalityCatalogue,
-    pub(crate) sectors: execute::SectorMap,
-    /// Display names by sector id, for rendered answers.
-    pub(crate) sector_labels: BTreeMap<u16, SectorLabel>,
-    pub(crate) interpreter: Interpreter,
-    pub(crate) aggregates: Option<AggregateSet>,
-    pub(crate) snapshot: Option<Snapshot>,
-    pub(crate) anchor: Day,
-    pub(crate) snapshot_sha256: Option<String>,
-}
-
-#[derive(Deserialize)]
-struct SectorFile {
-    sector: Vec<Sector>,
-}
-#[derive(Deserialize)]
-struct Sector {
-    aliases: Vec<String>,
-    display: Display,
-    cnae_core: Vec<String>,
-}
-#[derive(Deserialize)]
-struct Display {
-    sing: String,
-    plural: String,
-    #[serde(default)]
-    gender: String,
-}
-
-impl Assets {
-    pub(crate) fn open(args: &DataArgs) -> Result<Self> {
-        let parts = args.anchor.split('-').map(str::parse::<u16>).collect::<std::result::Result<Vec<_>, _>>()?;
-        ensure!(parts.len() == 3, "anchor must be YYYY-MM-DD");
-        let anchor = Day::from_ymd(parts[0], u8::try_from(parts[1])?, u8::try_from(parts[2])?).context("invalid data anchor")?;
-        let catalogue = MunicipalityCatalogue::load(&args.catalog)?;
-        let sectors = query::load_sectors(&args.sectors)?;
-        let mut pack = LanguagePack::new();
-        for row in catalogue.rows() {
-            if let Place::Municipality(geo) = &row.place {
-                pack.municipality(MunicipalityId(row.id), agg::uf_id(&geo.uf).context("UF")?, &row.name, &row.variants);
-            }
-        }
-        let file: SectorFile = toml::from_str(&fs::read_to_string(&args.sectors)?)?;
-        let mut sector_labels = BTreeMap::new();
-        for (i, s) in file.sector.into_iter().enumerate() {
-            sector_labels.insert(
-                u16::try_from(i)?,
-                SectorLabel { singular: s.display.sing.clone(), plural: s.display.plural.clone(), feminine: s.display.gender == "f" },
-            );
-            let mut aliases = s.aliases;
-            aliases.extend([s.display.sing, s.display.plural]);
-            pack.sector(
-                SectorId(u16::try_from(i)?),
-                &aliases,
-                SmallSet::new(
-                    s.cnae_core.iter().map(|c| c.parse::<u32>().map(CnaeCode::Subclass)).collect::<std::result::Result<Vec<_>, _>>()?,
-                ),
-            );
-        }
-        let aggregates = args.agg.as_ref().map(|p| AggregateSet::open(p, args.history.as_deref())).transpose()?;
-        if let Some(agg) = &aggregates {
-            ensure!(sha256_file(&args.catalog)? == agg.current().manifest().municipality_sha256, "aggregate/catalogue identity mismatch");
-        }
-        let snapshot = args.snapshot.as_ref().map(|path| Snapshot::open(path)).transpose()?;
-        let snapshot_sha256 = if let Some(snapshot) = &snapshot {
-            snapshot.set_postings_cache_bytes(512 << 20);
-            let sha = sha256_file(snapshot.path())?;
-            if let Some(agg) = &aggregates {
-                ensure!(sha == agg.current().manifest().snapshot_sha256, "snapshot/aggregate identity mismatch");
-            }
-            Some(sha)
-        } else {
-            None
-        };
-        let mut caps = query::validate_capabilities(&catalogue, &sectors, anchor);
-        caps.current = Competence::from_year_month(parts[0], parts[1] as u8).context("competence")?;
-        caps.competences = if let Some(aggregates) = &aggregates {
-            ensure!(aggregates.current().manifest().competence == caps.current, "anchor and aggregate competence differ");
-            (0..=caps.current.0).map(Competence).filter(|c| aggregates.get(*c).is_some()).collect()
-        } else {
-            vec![caps.current]
-        };
-        let interpreter = Interpreter::new(pack, caps, anchor);
-        Ok(Self { catalogue, sectors, sector_labels, interpreter, aggregates, snapshot, anchor, snapshot_sha256 })
+/// Execute a request and, when asked, check it against an independent backend.
+fn execute(assets: &Assets, request: &ValidRequest, verify: bool) -> Result<Json> {
+    let selected = plan::plan(request)?;
+    let context = ExecContext::new(&assets.catalogue, &assets.sectors);
+    if selected.backend == Backend::Static {
+        let text = meta_text(request);
+        return Ok(json!({"status":"ok","backend":"static","text":text,"verification":"not_numeric"}));
     }
-
-    pub(crate) fn canonical(&self, request: Request) -> Result<ValidRequest> {
-        query::validate_request(request, &self.catalogue, &self.sectors, self.anchor)
-    }
-
-    fn execute(&self, request: &ValidRequest, verify: bool) -> Result<Json> {
-        let selected = plan::plan(request)?;
-        let context = ExecContext::new(&self.catalogue, &self.sectors);
-        if selected.backend == Backend::Static {
-            let text = meta_text(request);
-            return Ok(json!({"status":"ok","backend":"static","text":text,"verification":"not_numeric"}));
-        }
-        let engine = self.snapshot.as_ref().map(|snapshot| query::EngineExecutor { snapshot, context: &context, limits: Limits::DEFAULT });
-        if matches!(request.op, Op::List { .. } | Op::Lookup { .. }) {
-            let snapshot = self.snapshot.as_ref().context("supply --snapshot to execute lists and lookups")?;
-            let result = engine.as_ref().context("engine")?.records(request)?;
-            ensure!(!result.expansion_truncated, "query expansion was truncated");
-            // Only public identifiers and cadastral business fields are copied to the artefact.
-            let columns = Table::Estabelecimentos.row_columns();
-            let rows = snapshot
-                .docs(&result.docs)?
-                .into_iter()
-                .map(|record| {
-                    let mut row = json!({"cnpj_root":record.company.basico});
-                    if let Some(est) = record.estab.and_then(|i| record.company.estabelecimentos.get(i)) {
-                        for field in [
-                            "cnpj_ordem",
-                            "cnpj_dv",
-                            "identificador_matriz_filial",
-                            "situacao_cadastral",
-                            "data_inicio_atividade",
-                            "cnae_fiscal_principal",
-                            "uf",
-                            "municipio",
-                        ] {
-                            if let Some(at) = columns.iter().position(|c| c.name == field) {
-                                row[field] = json!(est.get(at));
-                            }
+    let engine = assets.snapshot.as_ref().map(|snapshot| query::EngineExecutor { snapshot, context: &context, limits: Limits::DEFAULT });
+    if matches!(request.op, Op::List { .. } | Op::Lookup { .. }) {
+        let snapshot = assets.snapshot.as_ref().context("supply --snapshot to execute lists and lookups")?;
+        let result = engine.as_ref().context("engine")?.records(request)?;
+        ensure!(!result.expansion_truncated, "query expansion was truncated");
+        // Only public identifiers and cadastral business fields are copied to the artefact.
+        let columns = Table::Estabelecimentos.row_columns();
+        let rows = snapshot
+            .docs(&result.docs)?
+            .into_iter()
+            .map(|record| {
+                let mut row = json!({"cnpj_root":record.company.basico});
+                if let Some(est) = record.estab.and_then(|i| record.company.estabelecimentos.get(i)) {
+                    for field in [
+                        "cnpj_ordem",
+                        "cnpj_dv",
+                        "identificador_matriz_filial",
+                        "situacao_cadastral",
+                        "data_inicio_atividade",
+                        "cnae_fiscal_principal",
+                        "uf",
+                        "municipio",
+                    ] {
+                        if let Some(at) = columns.iter().position(|c| c.name == field) {
+                            row[field] = json!(est.get(at));
                         }
                     }
-                    row
-                })
-                .collect::<Vec<_>>();
-            return Ok(
-                json!({"status":"ok","backend":"engine","adapter":"filtered_records","total":result.total,"rows":rows,"returned":rows.len(),"page":request.output.page,"verification":"single_backend","contacts":"presence_filter_only"}),
-            );
-        }
-        let (value, verification, reference) = match selected.backend {
-            Backend::Aggregates => {
-                let aggregates = self.aggregates.as_ref().context("supply --agg to execute aggregate-backed requests")?;
-                let value = execute::execute(request, aggregates, &context)?;
-                if !verify {
-                    (value, "not_requested", None)
-                } else if request.time.competence != aggregates.current().manifest().competence
-                    || matches!(request.op.metric(), Some(Metric::ActiveChange { .. }))
-                {
-                    match crate::oracle::marginal_value(request, aggregates, &self.sectors)? {
-                        Some(other) => {
-                            let status = if value == other { "marginal_match" } else { "mismatch" };
-                            (value, status, Some(other))
-                        }
-                        None => (value, "no_independent_reference", None),
-                    }
-                } else if let Some(engine) = &engine {
-                    match engine.execute(request) {
-                        Ok(other) => {
-                            let status = if value == other { "engine_match" } else { "mismatch" };
-                            (value, status, Some(other))
-                        }
-                        Err(error) => {
-                            return Ok(
-                                json!({"status":"reference_error","backend":"aggregates","value":value_json(&value),"error":error.to_string()}),
-                            );
-                        }
-                    }
-                } else {
-                    (value, "no_independent_reference", None)
                 }
-            }
-            Backend::Engine => {
-                (engine.context("supply --snapshot to execute engine-backed requests")?.execute(request)?, "single_backend", None)
-            }
-            Backend::Static => unreachable!(),
-        };
-        Ok(
-            json!({"status":if verification=="mismatch"{"mismatch"}else{"ok"},"backend":format!("{:?}",selected.backend).to_lowercase(),"value":value_json(&value),"verification":verification,"reference":reference.as_ref().map(value_json)}),
-        )
+                row
+            })
+            .collect::<Vec<_>>();
+        return Ok(
+            json!({"status":"ok","backend":"engine","adapter":"filtered_records","total":result.total,"rows":rows,"returned":rows.len(),"page":request.output.page,"verification":"single_backend","contacts":"presence_filter_only"}),
+        );
     }
-}
-
-/// Answer to a question about the service itself.
-pub(crate) fn meta_text(request: &ValidRequest) -> String {
-    match request.op {
-        Op::Meta { topic: MetaTopic::DataDate } => format!("Competência {}; referência {}.", request.time.competence, request.time.anchor),
-        Op::Meta { topic: MetaTopic::Sources } => {
-            "Receita Federal: dados cadastrais; IBGE: população e geografia. Veja os manifestos dos catálogos e agregados.".into()
+    let (value, verification, reference) = match selected.backend {
+        Backend::Aggregates => {
+            let aggregates = assets.aggregates.as_ref().context("supply --agg to execute aggregate-backed requests")?;
+            let value = execute::execute(request, aggregates, &context)?;
+            if !verify {
+                (value, "not_requested", None)
+            } else if request.time.competence != aggregates.current().manifest().competence
+                || matches!(request.op.metric(), Some(Metric::ActiveChange { .. }))
+            {
+                match crate::oracle::marginal_value(request, aggregates, &assets.sectors)? {
+                    Some(other) => {
+                        let status = if value == other { "marginal_match" } else { "mismatch" };
+                        (value, status, Some(other))
+                    }
+                    None => (value, "no_independent_reference", None),
+                }
+            } else if let Some(engine) = &engine {
+                match engine.execute(request) {
+                    Ok(other) => {
+                        let status = if value == other { "engine_match" } else { "mismatch" };
+                        (value, status, Some(other))
+                    }
+                    Err(error) => {
+                        return Ok(
+                            json!({"status":"reference_error","backend":"aggregates","value":value_json(&value),"error":error.to_string()}),
+                        );
+                    }
+                }
+            } else {
+                (value, "no_independent_reference", None)
+            }
         }
-        Op::Meta { topic: MetaTopic::Cnaes } => format!("CNAEs da consulta: {:?}", request.scope.activity),
-        Op::Meta { topic: MetaTopic::Methodology } => "A unidade padrão é o estabelecimento. Estoque ativo usa situação 02. Registros usam início de atividade; baixas usam a última data da situação 08. Capital social não é faturamento.".into(),
-        _ => "Posso contar e listar estabelecimentos, comparar locais e setores, mostrar distribuições, registros, baixas, estoque histórico e densidade por habitante. Também entrego os resultados em Excel, CSV ou TXT: peça \"me mande um Excel com…\".".into(),
-    }
-}
-
-pub(crate) fn value_json(value: &Value) -> Json {
-    match value {
-        Value::Scalar { value } => json!({"scalar":value}),
-        Value::Ratio { num, den } => json!({"numerator":num,"denominator":den}),
-        Value::Rows(rows) => json!({"rows":rows.iter().map(|r|json!({"key":r.key,"value":r.value,"base":r.base})).collect::<Vec<_>>()}),
-    }
-}
-
-pub(crate) fn remember_execution(state: &mut Conversation, interpretation: &Interpretation, execution: &Json) {
-    if execution["status"] != "ok" {
-        return;
-    }
-    let Some(request) = &interpretation.request else {
-        return;
+        Backend::Engine => {
+            (engine.context("supply --snapshot to execute engine-backed requests")?.execute(request)?, "single_backend", None)
+        }
+        Backend::Static => unreachable!(),
     };
-    let Some(rows) = execution.pointer("/value/rows").and_then(Json::as_array) else {
-        return;
-    };
-    let members = rows
-        .iter()
-        .filter_map(|row| {
-            let key = row.get("key")?.as_u64()?;
-            match request.op.dimension()? {
-                Dim::Municipality => u16::try_from(key).ok().map(|id| Member::Municipality(MunicipalityId(id))),
-                Dim::Uf => u8::try_from(key).ok().map(|id| Member::Uf(UfId(id))),
-                Dim::Sector => u16::try_from(key).ok().map(|id| Member::Sector(SectorId(id))),
-                _ => None,
-            }
-        })
-        .collect();
-    state.remember_result(members);
+    Ok(
+        json!({"status":if verification=="mismatch"{"mismatch"}else{"ok"},"backend":format!("{:?}",selected.backend).to_lowercase(),"value":value_json(&value),"verification":verification,"reference":reference.as_ref().map(value_json)}),
+    )
 }
 
 pub fn ask(args: AskArgs) -> Result<()> {
@@ -297,7 +141,7 @@ pub fn ask(args: AskArgs) -> Result<()> {
     let execution = interpreted
         .request
         .as_ref()
-        .map(|r| assets.execute(r, false).unwrap_or_else(|error| json!({"status":"error","error":error.to_string()})));
+        .map(|r| execute(&assets, r, false).unwrap_or_else(|error| json!({"status":"error","error":error.to_string()})));
     if let Some(result) = &execution {
         remember_execution(&mut state, &interpreted, result);
     }
@@ -393,7 +237,7 @@ pub fn evaluate(args: EvalArgs) -> Result<()> {
                 increment(&mut counts, "execution_reused_identical_ir");
                 return reused;
             }
-            let mut fresh = assets.execute(r, true).unwrap_or_else(|error| json!({"status":"error","error":error.to_string()}));
+            let mut fresh = execute(&assets, r, true).unwrap_or_else(|error| json!({"status":"error","error":error.to_string()}));
             if let Some(obj) = fresh.as_object_mut() {
                 obj.insert("execution_provenance".into(), json!("fresh"));
             }
@@ -490,6 +334,7 @@ pub fn evaluate(args: EvalArgs) -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use opencnpj_insights::catalog::municipalities::MunicipalityCatalogue;
     #[test]
     fn commercial_round_has_unique_questions_and_valid_frozen_labels() {
         let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
@@ -545,6 +390,33 @@ mod tests {
                 (state, session) = (Conversation::default(), session_of(item));
             }
             let prediction = assets.interpreter.interpret(&item.text, &mut state);
+            let expected = item.gold.ir.clone().map(|ir| assets.canonical(serde_json::from_value(ir).unwrap()).unwrap());
+            if !interpretation_match(&prediction, &item.gold, expected.as_ref()) {
+                wrong.push(&item.id);
+            }
+        }
+        assert!(wrong.is_empty(), "{} wrong: {wrong:?}", wrong.len());
+    }
+
+    /// Every search-style, contact, period and unknown-word question of the prospecting
+    /// round is interpreted to its gold request, company search or clarification.
+    #[test]
+    fn prospecting_round_is_interpreted_exactly() {
+        let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
+        let data = DataArgs {
+            catalog: root.join("crates/opencnpj-insights/catalog/municipalities.tsv"),
+            sectors: root.join("crates/opencnpj-insights/catalog/sectors.toml"),
+            anchor: "2026-10-11".into(),
+            agg: None,
+            history: None,
+            snapshot: None,
+        };
+        let assets = Assets::open(&data).unwrap();
+        let items = eval::load_items(&root.join("crates/opencnpj-lab/eval/prospecting-01/questions.jsonl")).unwrap();
+        assert!(items.len() >= 1400);
+        let mut wrong = Vec::new();
+        for item in &items {
+            let prediction = assets.interpreter.interpret(&item.text, &mut Conversation::default());
             let expected = item.gold.ir.clone().map(|ir| assets.canonical(serde_json::from_value(ir).unwrap()).unwrap());
             if !interpretation_match(&prediction, &item.gold, expected.as_ref()) {
                 wrong.push(&item.id);

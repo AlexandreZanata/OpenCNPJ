@@ -623,3 +623,57 @@ async fn optional_and_off_modes() {
     assert_eq!(get(&off.public, "/metrics", None).await.status, StatusCode::OK);
     assert_eq!(get(&off.admin, "/admin/api/overview", None).await.status, StatusCode::OK);
 }
+
+#[tokio::test(flavor = "multi_thread")]
+async fn platform_assistant_routes_and_web_front_end() {
+    let e = env(&[]);
+    // What a client learns before logging in.
+    let p = get(&e.public, "/api/v1/platform", None).await;
+    assert_eq!(p.status, StatusCode::OK);
+    let v = p.json();
+    assert_eq!((v["auth"].as_str(), v["registration"].as_str()), (Some("required"), Some("open")));
+    assert_eq!((v["assistant"].as_bool(), v["search"].as_bool(), v["competence"].as_str()), (Some(false), Some(true), Some("2026-10")));
+
+    // The assistant routes are data routes: a credential first, then the plan, then the service.
+    let ask = json!({ "question": "padarias em Sinop/MT" });
+    let r = post(&e.public, "/api/v1/assistant/ask", None, ask.clone()).await;
+    assert_eq!((r.status, r.json()["error"].as_str()), (StatusCode::UNAUTHORIZED, Some("unauthenticated")));
+    let key = create(&e, "ana", "user", None);
+    let r = post(&e.public, "/api/v1/assistant/ask", Some(&key), ask).await;
+    assert_eq!((r.status, r.json()["error"].as_str()), (StatusCode::SERVICE_UNAVAILABLE, Some("assistant_unavailable")));
+    let r = post(&e.public, "/api/v1/assistant/export", Some(&key), json!({ "request": {}, "export": {} })).await;
+    assert_eq!((r.status, r.json()["error"].as_str()), (StatusCode::FORBIDDEN, Some("plan_forbids_export")));
+
+    // A user reads their own usage and searches; nobody else's.
+    assert_eq!(get(&e.public, "/api/v1/auth/usage", None).await.status, StatusCode::UNAUTHORIZED);
+    assert_eq!(get(&e.public, "/api/v1/search?uf=SP&limit=1", Some(&key)).await.status, StatusCode::OK);
+    let own = get(&e.public, "/api/v1/auth/usage", Some(&key)).await;
+    assert_eq!(own.status, StatusCode::OK);
+    assert!(own.json()["usage_daily"].is_array() && own.json()["recent_searches"].is_array());
+
+    // Municipalities of one state, for filter forms: reference data, no credential.
+    let cities = get(&e.public, "/api/v1/dominios/municipios/sp", None).await;
+    assert_eq!(cities.status, StatusCode::OK);
+    let rows = cities.json();
+    assert!(!rows.as_array().unwrap().is_empty());
+    assert!(rows[0]["codigo"].is_string() && rows[0]["descricao"].is_string());
+    assert_eq!(get(&e.public, "/api/v1/dominios/municipios/s1", None).await.status, StatusCode::BAD_REQUEST);
+
+    // The built front end owns `/`; the service description moves to `/api/v1`.
+    let site = tempfile::tempdir().unwrap();
+    std::fs::write(site.path().join("index.html"), "<!doctype html><title>OpenCNPJ</title>").unwrap();
+    std::fs::create_dir(site.path().join("js")).unwrap();
+    std::fs::write(site.path().join("js/main.js"), "export {};").unwrap();
+    std::fs::write(site.path().join(".secret"), "no").unwrap();
+    let w = env(&["--web", site.path().to_str().unwrap()]);
+    let home = get(&w.public, "/", None).await;
+    assert_eq!((home.status, home.header("content-type")), (StatusCode::OK, Some("text/html; charset=utf-8")));
+    assert!(home.header("content-security-policy").unwrap().contains("default-src 'self'"));
+    assert_eq!(home.header("x-content-type-options"), Some("nosniff"));
+    assert_eq!(get(&w.public, "/js/main.js", None).await.header("content-type"), Some("text/javascript; charset=utf-8"));
+    for missing in ["/.secret", "/js/../.secret", "/nope.css", "/api/v1/nope", "/admin/nope"] {
+        assert_eq!(get(&w.public, missing, None).await.status, StatusCode::NOT_FOUND, "{missing}");
+    }
+    assert_eq!(get(&w.public, "/api/v1", None).await.json()["service"], "opencnpj");
+    assert_eq!(get(&w.admin, "/", None).await.status, StatusCode::OK, "the admin listener serves the application too");
+}

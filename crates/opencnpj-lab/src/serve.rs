@@ -14,7 +14,7 @@ use axum::{
     extract::{ConnectInfo, Request, State},
     http::{StatusCode, Uri, header},
     middleware::{self, Next},
-    response::{IntoResponse, Redirect, Response},
+    response::{IntoResponse, Response},
     routing::{get, post},
 };
 use opencnpj_nlu::context::Conversation;
@@ -99,6 +99,7 @@ struct Service {
     assistant: Assistant,
     web: Option<PathBuf>,
     network: Option<(Ipv4Addr, u32)>,
+    hide_contacts: bool,
 }
 
 fn parse_network(text: &str) -> Result<(Ipv4Addr, u32)> {
@@ -144,11 +145,16 @@ pub fn serve(args: ServeArgs) -> Result<()> {
         started.elapsed().as_millis(),
         if assistant.has_snapshot() { "yes" } else { "no, lists and exports of companies are unavailable" }
     );
-    let service = Arc::new(Service { assistant, web: args.web, network });
+    let service = Arc::new(Service { assistant, web: args.web, network, hide_contacts: args.hide_contacts });
     let app = Router::new()
         .route("/api/local/ask", post(ask))
         .route("/api/local/export", post(export))
         .route("/api/local/health", get(health))
+        // The web front end talks to the product routes; this service answers the same
+        // paths without accounts, so the built `web/dist` works here too.
+        .route("/api/v1/assistant/ask", post(ask))
+        .route("/api/v1/assistant/export", post(export))
+        .route("/api/v1/platform", get(platform))
         .fallback(get(static_file))
         .layer(middleware::from_fn_with_state(service.clone(), guard))
         .with_state(service);
@@ -157,7 +163,7 @@ pub fn serve(args: ServeArgs) -> Result<()> {
         let mut servers = tokio::task::JoinSet::new();
         for address in args.listen {
             let listener = tokio::net::TcpListener::bind(address).await?;
-            println!("http://{}/?local=1#/consulta", listener.local_addr()?);
+            println!("http://{}/", listener.local_addr()?);
             let service = app.clone().into_make_service_with_connect_info::<SocketAddr>();
             servers.spawn(async move { axum::serve(listener, service).await });
         }
@@ -233,6 +239,23 @@ async fn export(State(service): State<Arc<Service>>, body: Result<Json<ExportBod
     }
 }
 
+/// What the web front end asks before starting: no accounts here, and only the assistant.
+async fn platform(State(service): State<Arc<Service>>) -> Response {
+    Json(json!({
+        "service": "opencnpj-intel",
+        "version": env!("CARGO_PKG_VERSION"),
+        "auth": "off",
+        "registration": null,
+        "assistant": true,
+        "search": false,
+        "export": true,
+        "contacts": !service.hide_contacts,
+        "competence": service.assistant.competence(),
+        "documents": 0,
+    }))
+    .into_response()
+}
+
 async fn health(State(service): State<Arc<Service>>) -> Response {
     Json(json!({"status": "ok", "snapshot": service.assistant.has_snapshot()})).into_response()
 }
@@ -253,9 +276,6 @@ fn media_type(path: &Path) -> &'static str {
 
 async fn static_file(State(service): State<Arc<Service>>, uri: Uri) -> Response {
     let Some(web) = &service.web else { return error(StatusCode::NOT_FOUND, "front end not configured") };
-    if uri.path() == "/" && !uri.query().is_some_and(|q| q.split('&').any(|p| p == "local=1")) {
-        return Redirect::to("/?local=1").into_response();
-    }
     let relative = Path::new(uri.path().trim_start_matches('/'));
     if relative.components().any(|c| !matches!(c, Component::Normal(part) if !part.to_string_lossy().starts_with('.'))) {
         return error(StatusCode::NOT_FOUND, "not found");
