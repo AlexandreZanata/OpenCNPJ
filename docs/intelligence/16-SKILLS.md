@@ -245,12 +245,26 @@ and an unrecognized word describing the companies was dropped. Two changes:
 * The sector `agriculture_livestock` (appended, so earlier sector ids are unchanged) holds
   every subclass of CNAE division 01 under the words users say: agrícola(s), agricultura,
   agropecuária, fazenda(s), lavoura(s), produtor(es) rural(is), pecuária, agricultor,
-  fazendeiro. Longer aliases still win ("fazendas de soja" stays soybean); "agronegócio" and
-  "empresas do agro" keep asking for an activity.
+  fazendeiro. "Setor do agro" also uses division 01.
+  Longer aliases still win ("fazendas de soja" stays soybean). "Agronegócio" and
+  "empresas do agro" still ask for an activity because the supply chain spans multiple divisions.
 * Fail closed: a word right after a plural "empresas / estabelecimentos / negócios / firmas
   / companhias" that is no catalogue entity and no known status, size or connective
   ("empresas xyzolicas") gets "Qual atividade você quer pesquisar?" instead of answering
   every company. The singular "a empresa Zaflas" names one company and is left to §8.
+
+The sector catalogue also covers common service and trade phrases such as "escritórios
+contábeis", "oficinas de lanternagem", "delivery de marmitas" and "provedores de banda
+larga". A complete phrase takes precedence over shorter matches inside it. Broad terms
+such as "comércio de vestuário" still need a narrower activity, for example "varejo de
+vestuário" or "comércio atacadista de vestuário".
+
+Search commands such as "procure" and "mostre" list records when they are followed by
+a recognized activity and filters. Named companies still use the company search. A
+phrase such as "empresas de produção de soja" identifies an activity, while a request
+for the volume of soybean production needs a different source. The
+[sector phrase fixture](../../crates/opencnpj-lab/tests/fixtures/sector-phrases.tsv)
+checks the expected CNAEs, municipality, operation, contact filter and export format.
 
 ## 10. Repeated lines in a file
 

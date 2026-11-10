@@ -176,6 +176,15 @@ impl Interpreter {
             return None;
         }
         let words = normalize::words(&name);
+        // A plural activity request must not fall back to a company name. An explicit
+        // name qualifier still allows a legal name such as "Empresas de Transporte União".
+        if !time::has(&n, &["a empresa", "a firma", "razao social", "nome fantasia", "com o nome"])
+            && matches!(words.as_slice(), [noun, link, ..]
+                if matches!(noun.as_str(), "empresas" | "estabelecimentos" | "negocios" | "cnpjs" | "firmas" | "companhias")
+                    && matches!(link.as_str(), "de" | "do" | "da" | "dos" | "das" | "com" | "sem"))
+        {
+            return None;
+        }
         let hits = self.pack.lexicon.scan(&words);
         let only_sectors = !hits.is_empty()
             && hits.iter().map(|h| h.end - h.start).sum::<usize>() == words.len()

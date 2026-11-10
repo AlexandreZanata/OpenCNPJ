@@ -75,12 +75,26 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
             "A pesquisa de pessoas, CPFs e sócios não está disponível no chat. Posso pesquisar estabelecimentos por município e atividade.",
         ));
     }
-    if cue(n, &policy.unavailable) {
+    let mut preliminary = pack.lexicon.scan(&words);
+    // A complete sector alias can contain the name of an unavailable metric.
+    // "Empresas de produção de soja" names an activity. "Qual a produção de soja" asks for output.
+    let unavailable = policy.unavailable.iter().filter(|phrase| has(n, &[phrase])).any(|phrase| {
+        let needle = normalize::words(phrase);
+        !needle.is_empty()
+            && words.windows(needle.len()).enumerate().any(|(at, window)| {
+                window == needle
+                    && !preliminary.iter().any(|hit| {
+                        hit.start <= at
+                            && at + needle.len() <= hit.end
+                            && hit.values.iter().any(|entity| matches!(entity, Entity::Sector(_)))
+                    })
+            })
+    });
+    if unavailable {
         return Err(reject(
             "Essa informação não está nos dados cadastrais disponíveis. Posso contar estabelecimentos, listar CNPJs ou mostrar registros e baixas.",
         ));
     }
-    let mut preliminary = pack.lexicon.scan(&words);
     // A misspelt activity ("supemercados", "acadmias") is recovered only when the word is
     // unknown and exactly one activity is one edit away; the answer says so.
     let mut approximated = Vec::new();
@@ -744,43 +758,45 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
     let named_place = !municipalities.is_empty() || !ufs.is_empty() || !regions.is_empty();
     let covered = |at: usize| hits.iter().any(|h| h.start <= at && at < h.end);
     // The phrase is headed by what is searched for, after articles and a plain request.
+    const SEARCH_COMMANDS: &[&str] = &["procure", "busque", "mostre", "pesquise", "encontre", "ache"];
     let head = words.iter().position(|w| {
-        !matches!(
-            w.as_str(),
-            "a" | "o"
-                | "as"
-                | "os"
-                | "um"
-                | "uma"
-                | "uns"
-                | "umas"
-                | "todas"
-                | "todos"
-                | "novas"
-                | "novos"
-                | "quero"
-                | "queria"
-                | "preciso"
-                | "procuro"
-                | "busco"
-                | "de"
-                | "das"
-                | "dos"
-                | "concorrentes"
-                | "concorrente"
-                | "contatos"
-                | "telefones"
-                | "emails"
-                | "leads"
-                | "prospects"
-                | "vender"
-                | "prospectar"
-                | "encontrar"
-                | "achar"
-                | "para"
-                | "clientes"
-                | "gostaria"
-        )
+        !SEARCH_COMMANDS.contains(&w.as_str())
+            && !matches!(
+                w.as_str(),
+                "a" | "o"
+                    | "as"
+                    | "os"
+                    | "um"
+                    | "uma"
+                    | "uns"
+                    | "umas"
+                    | "todas"
+                    | "todos"
+                    | "novas"
+                    | "novos"
+                    | "quero"
+                    | "queria"
+                    | "preciso"
+                    | "procuro"
+                    | "busco"
+                    | "de"
+                    | "das"
+                    | "dos"
+                    | "concorrentes"
+                    | "concorrente"
+                    | "contatos"
+                    | "telefones"
+                    | "emails"
+                    | "leads"
+                    | "prospects"
+                    | "vender"
+                    | "prospectar"
+                    | "encontrar"
+                    | "achar"
+                    | "para"
+                    | "clientes"
+                    | "gostaria"
+            )
     });
     let plural_noun = |w: &str| {
         matches!(
@@ -810,6 +826,13 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
         .collect();
     let search_shape = (headed_by_sector || headed_by_companies) && (named_place || state.last.is_none());
     let search_style = search_shape && foreign.is_empty();
+    let analytical_cue =
+        [&cues.count, &cues.compare, &cues.rank, &cues.trend, &cues.breakdown, &cues.growth].into_iter().any(|phrases| cue(m, phrases));
+    // Imperatives select a list only when no explicit analytical operation was requested.
+    let search_list = search_style
+        && !analytical_cue
+        && (head.is_some_and(|at| words[..at].iter().any(|word| SEARCH_COMMANDS.contains(&word.as_str())))
+            || has(m, &["quero todos", "quero todas"]));
     // Contacts and leads are asked for as a list of companies.
     let wants_contacts = (has(n, &["contatos", "telefones", "emails", "e mails", "leads", "prospects", "mailing"])
         || search_style && has(n, &["telefone", "fone", "celular", "whatsapp", "zap", "email", "e mail", "contato"]))
@@ -820,14 +843,9 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
     let full_query = bare_topic
         || search_style
         || wants_contacts
-        || cue(m, &cues.count)
+        || analytical_cue
         || cue(m, &cues.list)
-        || cue(m, &cues.compare)
-        || cue(m, &cues.rank)
-        || cue(m, &cues.trend)
-        || cue(m, &cues.breakdown)
         || meta.is_some()
-        || cue(m, &cues.growth)
         || lookup(&raw).is_some()
         || has(n, &["densidade", "habitantes por estabelecimento"])
         || export && (!hits.is_empty() || has(n, &["empresas", "empresa", "estabelecimentos", "estabelecimento", "cnpjs", "negocios"]));
@@ -898,13 +916,9 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
             "novos",
         ],
     );
-    let explicit_intent = cue(m, &cues.count)
+    let explicit_intent = search_list
+        || analytical_cue
         || cue(m, &cues.list)
-        || cue(m, &cues.compare)
-        || cue(m, &cues.rank)
-        || cue(m, &cues.trend)
-        || cue(m, &cues.breakdown)
-        || cue(m, &cues.growth)
         || cue(m, &cues.closures)
         || wants_contacts
         || biggest
@@ -1112,7 +1126,11 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
             && !analytical
             && !matches!(request.op, Op::List { .. } if inherited)
             && matches!(measured, Some(Metric::Stock | Metric::Flow(FlowMetric::Closures | FlowMetric::Registrations)));
-        let islist = (cue(m, &cues.list) || wants_contacts || biggest || has(n, &["quais"]) && has(n, &["maior capital", "mais capital"]))
+        let islist = (search_list
+            || cue(m, &cues.list)
+            || wants_contacts
+            || biggest
+            || has(n, &["quais"]) && has(n, &["maior capital", "mais capital"]))
             && !has(n, &["evolucao", "distribua", "distribuicao"])
             && !cue(m, &cues.trend)
             || records;

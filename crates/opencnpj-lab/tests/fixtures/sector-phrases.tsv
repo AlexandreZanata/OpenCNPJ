@@ -1,0 +1,112 @@
+# Expected sector ID, municipality ID, operation, export format, contact and question.
+# A ? means clarify, ! means reject, and @ introduces a literal company name.
+agriculture_livestock	5527	list	xlsx	-	Pesquise e me traga todas as empresas do setor do agro em sorriso mt , me mande um exel com todas
+agriculture_livestock	5527	list	-	-	Liste empresas do ramo agropecuário em Sorriso MT
+agriculture_livestock	5527	list	xlsx	-	Quero uma planilha de estabelecimentos de produção agropecuária em Sorriso MT
+soybean	5527	count	-	-	Quantas fazendas de soja existem em Sorriso MT?
+soybean	5527	list	-	-	Mostre as empresas de produção de soja em Sorriso MT
+corn	5527	list	-	-	Liste os produtores de milho em Sorriso MT
+beef_cattle	5527	list	-	-	Liste fazendas de gado de corte em Sorriso MT
+farm_services	5527	list	-	-	Mostre as empresas de serviços de colheita em Sorriso MT
+?	-	-	-	-	Liste todas as empresas de agronegócio em Sorriso MT
+?	-	-	-	-	Liste todas as empresas do agro em Sorriso MT
+?	-	-	-	-	Liste as empresas de revenda agro em Sorriso MT
+?	-	-	-	-	Liste as empresas do setor agro industrial em Sorriso MT
+accounting	5067	list	-	-	Liste os escritórios contábeis em Sinop MT
+accounting	5067	list	-	-	Mostre as empresas de serviços de contabilidade em Sinop MT
+accounting	5067	list	-	-	Mostre as empresas do ramo da contabilidade em Sinop MT
+law_firm	5108	list	-	-	Liste os escritórios de advogados em Cuiabá MT
+law_firm	5108	list	xlsx	-	Quero uma planilha dos prestadores de serviços advocatícios em Cuiabá MT
+law_firm	5108	count	-	-	Quantos escritórios de advocacia existem em Cuiabá MT?
+architecture	5108	list	-	-	Liste as empresas de serviços de arquitetura em Cuiabá MT
+management_consulting	5108	list	-	-	Liste consultorias de gestão empresarial em Cuiabá MT
+dental_clinic	5150	list	-	-	Procure consultórios dentários em Rondonópolis MT
+dental_clinic	5150	list	-	-	Liste as clínicas dentárias em Rondonópolis MT
+dental_clinic	5150	list	csv	-	Quero um CSV de empresas do setor de odontologia em Rondonópolis MT
+clinical_lab	5108	list	-	-	Mostre os laboratórios de exames clínicos em Cuiabá MT
+physiotherapy	5108	list	-	-	Liste consultórios de fisioterapia em Cuiabá MT
+psychology	5108	list	-	-	Liste clínicas de psicologia em Cuiabá MT
+medical_practice	5108	count	-	-	Quantas clínicas médicas existem em Cuiabá MT?
+?	-	-	-	-	Liste todas as clínicas em Cuiabá MT
+pharmacy	5067	list	-	-	Liste drogarias em Sinop MT
+compounding_pharmacy	5067	list	csv	-	Quero as farmácias de manipulação em Sinop MT em CSV
+veterinary_clinic	5536	list	-	-	Liste consultórios veterinários em Lucas do Rio Verde MT
+veterinary_clinic	5536	list	-	-	Mostre as clínicas veterinárias em Lucas do Rio Verde MT
+pet_grooming	5536	count	-	-	Tem banho e tosa em Lucas do Rio Verde MT?
+pet_grooming	5536	list	-	-	Liste estabelecimentos de tosas e banhos para pets em Lucas do Rio Verde MT
+pet_shop	5536	list	-	-	Liste as lojas de produtos para pets em Lucas do Rio Verde MT
+pet_shop	5536	list	-	-	Quero a lista de pet shops em Lucas do Rio Verde MT
+pet_boarding	5536	list	-	-	Quero todos os hotéis para cães em Lucas do Rio Verde MT
+bakery	5527	list	xlsx	-	Quero um Excel de padocas em Sorriso MT
+?	-	-	-	-	Liste as empresas do ramo de panificação em Sorriso MT
+restaurant	5158	list	-	-	Mostre as pizzarias em Várzea Grande MT
+snack_bar	5158	list	-	-	Liste as hamburguerias em Várzea Grande MT
+meal_delivery	5158	list	-	-	Liste as empresas de entrega de quentinhas em Várzea Grande MT
+meal_delivery	5158	list	xlsx	-	Quero um Excel do delivery de marmitas em Várzea Grande MT
+meal_delivery	5158	list	-	-	Procure empresas de entrega de marmitas em Várzea Grande MT
+beverage_wholesale	5158	list	-	-	Liste as distribuidoras de bebidas em Várzea Grande MT
+?	-	-	-	-	Quantos depósitos de cerveja existem em Várzea Grande MT?
+supermarket	5158	list	-	-	Liste supermercados em Várzea Grande MT
+?	-	-	-	-	Liste todas as lojas em Várzea Grande MT
+?	-	-	-	-	Quero um CSV do comércio de vestuário em Primavera do Leste MT
+apparel_retail	5509	list	-	-	Liste varejo de vestuário em Primavera do Leste MT
+clothing_factory	5509	list	-	-	Liste as confecções de roupas em Primavera do Leste MT
+cosmetics_retail	5509	list	-	-	Mostre as lojas de maquiagem e cosméticos em Primavera do Leste MT
+beauty_salon	5167	list	-	-	Liste cabeleireiros em Tangará da Serra MT
+beauty_salon	5167	list	-	-	Liste salões de cabeleireiro em Tangará da Serra MT
+beauty_care	5167	list	-	-	Mostre centros de estética em Tangará da Serra MT
+?	-	-	-	-	Liste oficinas automotivas em Rondonópolis MT
+auto_mechanic	5150	list	-	-	Mostre as empresas de mecânica automotiva em Rondonópolis MT
+body_shop	5150	list	-	-	Liste oficinas de lanternagem em Rondonópolis MT
+motorcycle_repair	5150	count	-	-	Quero as oficinas de conserto de motos em Rondonópolis MT
+car_wash	5150	list	-	-	Liste lava-carros em Rondonópolis MT
+towing	5150	list	-	-	Liste serviços de reboque automotivo em Rondonópolis MT
+used_auto_parts	5150	list	-	-	Mostre lojas de autopeças usadas em Rondonópolis MT
+tire_store	5150	count	-	-	Quero os comércios varejistas de pneus em Rondonópolis MT
+civil_construction	5108	list	-	-	Liste as empresas de obras civis em Cuiabá MT
+construction	5108	list	-	-	Mostre as empresas de construção de prédios em Cuiabá MT
+building_materials	5108	list	-	-	Liste lojas de materiais de construção em Cuiabá MT
+masonry	5108	count	-	-	Quero serviços de pedreiros em Cuiabá MT
+plumbing	5108	list	-	-	Liste empresas de serviços hidráulicos prediais em Cuiabá MT
+electrical_installation	5108	count	-	-	Quantos serviços de instalações elétricas prediais existem em Cuiabá MT?
+?	-	-	-	-	Quero as empresas de energia solar em Cuiabá MT
+truck_freight	5067	list	-	-	Liste as empresas de frete de caminhão em Sinop MT
+long_distance_freight	5067	list	-	-	Liste transportadoras de cargas interestaduais em Sinop MT
+moving_company	5067	list	-	-	Mostre as transportadoras de mudança residencial em Sinop MT
+express_delivery	5067	list	-	-	Liste empresas de entrega expressa em Sinop MT
+school_transport	5067	list	-	-	Mostre as empresas de van de escola em Sinop MT
+?	-	-	-	-	Quero as empresas de logística em Sinop MT
+it_services	5108	list	-	-	Liste as empresas do setor de TI em Cuiabá MT
+it_support	5108	list	-	-	Liste prestadores de suporte de informática em Cuiabá MT
+custom_software	5108	list	-	-	Liste empresas de desenvolvimento de sistemas sob medida em Cuiabá MT
+computer_repair	5108	list	-	-	Liste as empresas de assistência técnica de notebooks em Cuiabá MT
+internet_provider	5108	list	-	-	Liste os provedores de banda larga em Cuiabá MT
+?	-	-	-	-	Quero empresas de tecnologia verde em Cuiabá MT
+language_school	5108	list	-	-	Liste escolas de línguas em Cuiabá MT
+computing_courses	5108	list	-	-	Liste cursos de informática básica em Cuiabá MT
+driving_school	5108	list	-	-	Mostre centros de formação de motoristas em Cuiabá MT
+exam_prep	5108	count	-	-	Quero cursinhos preparatórios para concursos em Cuiabá MT
+real_estate_broker	5527	list	-	-	Liste as empresas de intermediação imobiliária em Sorriso MT
+property_management	5527	list	-	-	Liste empresas de administração imobiliária em Sorriso MT
+used_car_dealer	5527	list	-	-	Liste revendas de carros seminovos em Sorriso MT
+hotel	5104	list	-	-	Mostre pousadas em Chapada dos Guimarães MT
+?	-	-	-	-	Quero um CSV de meios de hospedagem em Chapada dos Guimarães MT
+warehouse	5527	list	-	-	Liste armazéns gerais em Sorriso MT
+?	-	-	-	-	Liste firmas xyzolicas em Sorriso MT
+?	-	-	-	-	Liste lojas sem dizer qual em Cuiabá MT
+beverage_retail	2519	list	-	-	Mostre os depósitos varejistas de cerveja em Salvador BA
+apparel_retail	1861	list	csv	-	Quero um CSV de comércio varejista de vestuário em Recife PE
+apparel_wholesale	5261	list	-	-	Liste comércio atacadista de vestuário em Goiânia GO
+clinical_lab	4342	list	-	-	Liste os laboratórios de exames clínicos em Curitiba PR
+it_support	4072	list	-	-	Procure suporte de informática em Ribeirão Preto SP
+body_shop	533	list	-	-	Mostre oficinas de funilaria e pintura em Santarém PA
+accounting	5067	list	-	phone	Busque escritórios contábeis com telefone em Sinop MT
+?	-	-	-	-	Procure empresas de energia solar em Cuiabá MT
+?	-	-	-	-	Busque empresas de serviços em Sinop MT
+!	-	-	-	-	Qual a produção de soja em Sorriso MT?
+!	-	-	-	-	Qual a produção de soja das empresas de produção de soja em Sorriso MT?
+!	-	-	-	-	Qual o faturamento das empresas de produção de soja em Sorriso MT?
+@Padaria Pão Quente	5108	company	-	-	Encontre a empresa Padaria Pão Quente em Cuiabá MT
+@Zaflas	5108	company	-	-	Procure a empresa Zaflas em Cuiabá MT
+@Empresas de Transporte União	5108	company	-	-	Encontre a empresa Empresas de Transporte União em Cuiabá MT
+bakery	5527	by_size	-	-	Mostre padocas por porte em Sorriso MT

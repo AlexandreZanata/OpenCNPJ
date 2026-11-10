@@ -367,6 +367,83 @@ mod tests {
         assert_eq!(decisions, BTreeMap::from([("execute".into(), 895), ("clarify".into(), 50), ("reject".into(), 55)]));
     }
 
+    #[test]
+    fn sector_phrases_keep_the_expected_activity_and_intent() {
+        use opencnpj_nlu::policy::Decision;
+
+        #[derive(serde::Deserialize)]
+        struct SectorIds {
+            sector: Vec<SectorEntry>,
+        }
+
+        #[derive(serde::Deserialize)]
+        struct SectorEntry {
+            id: String,
+        }
+
+        let catalogue = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../opencnpj-insights/catalog");
+        let data = DataArgs {
+            catalog: catalogue.join("municipalities.tsv"),
+            sectors: catalogue.join("sectors.toml"),
+            anchor: "2026-10-11".into(),
+            agg: None,
+            history: None,
+            snapshot: None,
+        };
+        let assets = Assets::open(&data).unwrap();
+        let sector_ids: SectorIds = toml::from_str(&std::fs::read_to_string(&data.sectors).unwrap()).unwrap();
+        let sectors: BTreeMap<_, _> =
+            sector_ids.sector.iter().enumerate().map(|(id, entry)| (entry.id.as_str(), u16::try_from(id).unwrap())).collect();
+
+        let fixture = include_str!("../tests/fixtures/sector-phrases.tsv");
+        for line in fixture.lines().filter(|line| !line.starts_with('#') && !line.is_empty()) {
+            let columns: Vec<_> = line.splitn(6, '\t').collect();
+            let [expected, city, op, format, contact, question] = columns.as_slice() else {
+                panic!("invalid sector test fixture: {line}");
+            };
+            let result = assets.interpreter.interpret(question, &mut Conversation::default());
+
+            if matches!(*expected, "?" | "!") {
+                let decision = if *expected == "?" { Decision::Clarify } else { Decision::Reject };
+                assert_eq!(result.decision, decision, "{question}: {result:?}");
+                assert!(result.request.is_none() && result.company.is_none(), "{question}: {result:?}");
+                continue;
+            }
+            let city = MunicipalityId(city.parse().unwrap());
+            assert!(matches!(result.decision, Decision::Execute | Decision::ExecuteWithNote), "{question}: {result:?}");
+            if let Some(expected_name) = expected.strip_prefix('@') {
+                let company = result.company.unwrap_or_else(|| panic!("expected a company search: {question}"));
+                assert_eq!(company.name, expected_name, "{question}");
+                assert_eq!(company.municipalities, [city], "{question}");
+                continue;
+            }
+            let request = result.request.unwrap_or_else(|| panic!("missing cadastral request: {question}"));
+            let sector = sectors[expected];
+            let cnaes = SmallSet::new(assets.sectors[&sector].iter().copied().map(CnaeCode::Subclass));
+            assert_eq!(
+                request.scope.activity,
+                ActivityFilter::Sectors { ids: SmallSet::new([SectorId(sector)]), cnaes, scope: CnaeScope::Main },
+                "{question}"
+            );
+            assert_eq!(request.scope.place, PlaceFilter::Municipalities(SmallSet::new([city])), "{question}");
+            assert_eq!(request.scope.status, Some(StatusSet::only(Status::Active)), "{question}");
+            assert_eq!(request.scope.contact, if *contact == "phone" { ContactNeed::Phone } else { ContactNeed::Any }, "{question}");
+            match *op {
+                "list" => assert!(matches!(request.op, Op::List { .. }), "{question}: {:?}", request.op),
+                "count" => assert!(matches!(request.op, Op::Count { .. }), "{question}: {:?}", request.op),
+                "by_size" => assert!(matches!(request.op, Op::Breakdown { dim: Dim::Porte, .. }), "{question}: {:?}", request.op),
+                _ => panic!("unknown operation: {op}"),
+            }
+            if *format == "-" {
+                assert!(result.export.is_none(), "{question}");
+            } else {
+                let export = result.export.unwrap_or_else(|| panic!("missing export: {question}"));
+                assert_eq!(export.format.extension(), *format, "{question}");
+                assert_eq!(export.rows, None, "{question}");
+            }
+        }
+    }
+
     /// Every file request of the skills round, dialogues included, is interpreted to its
     /// gold request and gold export.
     #[test]
