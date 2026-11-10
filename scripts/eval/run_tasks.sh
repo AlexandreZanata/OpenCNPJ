@@ -11,7 +11,8 @@ set -eu
 BASE=$1 CAND=$2 OUT=$3 DATA=${4:-}
 SETS=$(ls crates/opencnpj-lab/eval/commercial-round-*/questions.jsonl crates/opencnpj-lab/eval/adv.jsonl \
   crates/opencnpj-lab/eval/dialogues.jsonl crates/opencnpj-lab/eval/h-informal.jsonl crates/opencnpj-lab/eval/ood.jsonl \
-  crates/opencnpj-lab/eval/skills-*/questions.jsonl crates/opencnpj-lab/eval/probes-*/questions.jsonl)
+  crates/opencnpj-lab/eval/skills-*/questions.jsonl crates/opencnpj-lab/eval/probes-*/questions.jsonl \
+  crates/opencnpj-lab/eval/prospecting-*/questions.jsonl)
 mkdir -p "$OUT/baseline" "$OUT/candidate"
 git show origin/main:crates/opencnpj-insights/catalog/sectors.toml > "$OUT/baseline/sectors.toml"
 name() { echo "$1" | sed 's#.*/eval/##; s#/questions.jsonl##; s#.jsonl##'; }
@@ -37,6 +38,7 @@ if [ -n "$DATA" ]; then
     --set crates/opencnpj-lab/eval/commercial-round-01/questions.jsonl --set crates/opencnpj-lab/eval/commercial-round-02/questions.jsonl \
     --set crates/opencnpj-lab/eval/h-informal.jsonl --set crates/opencnpj-lab/eval/skills-export-01/questions.jsonl \
     --set crates/opencnpj-lab/eval/skills-company-01/questions.jsonl --set crates/opencnpj-lab/eval/probes-01/questions.jsonl \
+    --set crates/opencnpj-lab/eval/prospecting-01/questions.jsonl \
     --out "$OUT/data-contracts" > /dev/null
 fi
 
