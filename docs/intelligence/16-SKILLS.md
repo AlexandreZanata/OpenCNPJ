@@ -149,6 +149,12 @@ count with a required period asks for clarification when that period is the only
 opening date restriction. "troca MEI por não MEI" changes only the MEI selection.
 Both edits retain the selected columns, sort order, and explicit row limit.
 
+"tira o filtro de data da baixa e mantém a situação cadastral" clears the status date
+range and retains the current status and opening date. "troca ativas por baixadas"
+replaces the active status and keeps other selected statuses. A status change with a
+status date filter asks the user to resolve that date first. A closure count with a
+required period asks for clarification when an edit would change that period or metric.
+
 ## 4. Files
 
 | Format | Dialect |

@@ -1500,3 +1500,156 @@ fn opening_and_mei_edits_keep_columns_and_clarify_conflicts() {
         assert!(result.request.is_none() && result.company.is_none());
     }
 }
+
+#[test]
+fn removing_the_status_date_keeps_the_opening_date_and_status() {
+    use opencnpj_query::export::ExportFormat;
+
+    let engine = interpreter();
+    let mut state = Conversation::default();
+    let first = engine.interpret("Liste 5 farmácias baixadas em 2025 em Sinop MT com início de atividade em 2024.", &mut state);
+    let mut expected = first.request.unwrap().into_request();
+    assert_eq!(expected.scope.status, Some(StatusSet::only(Status::Closed)));
+    assert_eq!(expected.scope.status_date, Some(year(2025)));
+    assert_eq!(expected.scope.opened, Some(year(2024)));
+
+    let blocked = engine.interpret("troca baixadas por ativas", &mut state);
+    assert_eq!(blocked.decision, Decision::Clarify);
+    assert!(blocked.reason.contains("data da situação"));
+    assert_eq!(state.last.as_ref(), Some(&expected));
+
+    let mut same_turn = state.clone();
+    expected.scope.status_date = None;
+    for _ in 0..2 {
+        let edited = engine.interpret("tira o filtro de data da baixa e mantém a situação cadastral", &mut state);
+        assert_eq!(edited.request.unwrap().into_request(), expected);
+    }
+    let file = engine.interpret("me manda em Excel", &mut state);
+    assert_eq!(file.request.unwrap().into_request(), expected);
+    assert_eq!(file.export.unwrap().rows, Some(5));
+
+    let file = engine.interpret("Remove a data de encerramento e mantém o status cadastral e me manda em Excel", &mut same_turn);
+    assert_eq!(file.request.unwrap().into_request(), expected);
+    assert_eq!(file.export.unwrap().format, ExportFormat::Xlsx);
+
+    expected.scope.status = Some(StatusSet::only(Status::Active));
+    let edited = engine.interpret("troca baixadas por ativas", &mut state);
+    assert_eq!(edited.request.unwrap().into_request(), expected);
+
+    let mut state = Conversation::default();
+    let first = engine.interpret("Quantas farmácias tiveram baixa em 2025 em Sinop MT?", &mut state);
+    let expected = first.request.unwrap().into_request();
+    assert_eq!(expected.op.metric(), Some(Metric::Flow(FlowMetric::Closures)));
+    assert_eq!(expected.time.period, Some(Period::Days(year(2025))));
+    for question in ["tira o filtro de data da baixa e mantém a situação cadastral", "troca baixadas por ativas"] {
+        let edited = engine.interpret(question, &mut state);
+        assert_eq!(edited.decision, Decision::Clarify, "{question}: {edited:?}");
+        assert!(edited.reason.contains("período"), "{question}: {edited:?}");
+        assert_eq!(state.last.as_ref(), Some(&expected), "{question}");
+    }
+}
+
+#[test]
+fn replacing_a_status_keeps_other_statuses_and_query_filters() {
+    use opencnpj_query::export::ExportFormat;
+
+    let engine = interpreter();
+    for (initial, question, before, after) in [
+        (
+            "Liste 5 matrizes de farmácias ativas em Sinop MT, abertas em 2025, de pequeno porte, optantes pelo Simples, sem MEI, com telefone e e-mail, capital social acima de 20 mil reais, ordenadas pelo maior capital.",
+            "Substitua a situação cadastral ativa pela baixada, mantendo o Simples",
+            StatusSet::only(Status::Active),
+            StatusSet::only(Status::Closed),
+        ),
+        (
+            "Liste 5 matrizes de farmácias baixadas em Sinop MT com e-mail, de pequeno porte e capital social acima de 20 mil reais, ordenadas pelo maior capital.",
+            "Troque as baixadas pelas ativas",
+            StatusSet::only(Status::Closed),
+            StatusSet::only(Status::Active),
+        ),
+        (
+            "Liste 5 farmácias ativas e suspensas em Sinop MT com e-mail.",
+            "Troque ativas por baixadas",
+            StatusSet::new([Status::Active, Status::Suspended]),
+            StatusSet::new([Status::Suspended, Status::Closed]),
+        ),
+    ] {
+        let mut state = Conversation::default();
+        let first = engine.interpret(initial, &mut state);
+        let mut expected = first.request.unwrap_or_else(|| panic!("{initial}: {}", first.reason)).into_request();
+        assert_eq!(expected.scope.status, Some(before));
+        expected.scope.status = Some(after);
+        for _ in 0..2 {
+            let edited = engine.interpret(question, &mut state);
+            assert_eq!(edited.request.unwrap_or_else(|| panic!("{question}: {}", edited.reason)).into_request(), expected);
+        }
+        let file = engine.interpret("me manda em Excel", &mut state);
+        assert_eq!(file.request.unwrap().into_request(), expected);
+        let export = file.export.unwrap();
+        assert_eq!(export.format, ExportFormat::Xlsx);
+        assert_eq!(export.rows, Some(5));
+    }
+
+    let mut state = Conversation::default();
+    let first = engine.interpret("Quantas matrizes de farmácias ativas em Sinop MT têm e-mail?", &mut state);
+    let mut expected = first.request.unwrap().into_request();
+    assert_eq!(expected.unit, Unit::HeadOffices);
+    assert_eq!(expected.op.metric(), Some(Metric::Stock));
+    expected.scope.status = Some(StatusSet::only(Status::Closed));
+    let edited = engine.interpret("troca ativas por baixadas", &mut state);
+    assert_eq!(edited.request.unwrap().into_request(), expected);
+    expected.op = Op::List { order: ListOrder::Cnpj, limit: 20 };
+    let file = engine.interpret("me manda em Excel", &mut state);
+    assert_eq!(file.request.unwrap().into_request(), expected);
+    assert_eq!(file.export.unwrap().rows, None);
+}
+
+#[test]
+fn status_edits_keep_selected_columns_and_clarify_conflicts() {
+    use opencnpj_query::export::{ExportField, ExportFormat};
+
+    let engine = interpreter();
+    let mut state = Conversation::default();
+    let first = engine.interpret(
+        "Me manda um CSV com as colunas nome fantasia e data da situação de 7 farmácias baixadas em 2025 em Sinop MT.",
+        &mut state,
+    );
+    let mut expected = first.request.unwrap().into_request();
+    let csv = first.export.unwrap();
+    assert_eq!(csv.fields, [ExportField::NomeFantasia, ExportField::DataSituacao]);
+    for question in [
+        "Troca baixadas por",
+        "Tira o filtro de data da baixa e mantém a data da baixa",
+        "Tira a coluna data da baixa",
+        "Troca baixadas por ativas",
+    ] {
+        let result = engine.interpret(question, &mut state);
+        assert_eq!(result.decision, Decision::Clarify, "{question}: {result:?}");
+        assert!(result.request.is_none() && result.export.is_none());
+        assert_eq!(state.last.as_ref(), Some(&expected), "{question}");
+        assert_eq!(state.export.as_ref(), Some(&csv), "{question}");
+    }
+    expected.scope.status_date = None;
+    let file = engine.interpret("tira o filtro de data da baixa e mantém a situação cadastral", &mut state);
+    assert_eq!(file.request.unwrap().into_request(), expected);
+    assert_eq!(file.export.as_ref(), Some(&csv));
+    expected.scope.status = Some(StatusSet::only(Status::Active));
+    let file = engine.interpret("Troque baixadas por ativas e me manda em Excel", &mut state);
+    assert_eq!(file.request.unwrap().into_request(), expected);
+    let export = file.export.unwrap();
+    assert_eq!(export.format, ExportFormat::Xlsx);
+    assert_eq!(export.fields, csv.fields);
+    assert_eq!(export.rows, Some(7));
+
+    for question in ["tira o filtro de data da baixa e mantém a situação cadastral", "troca ativas por baixadas"] {
+        let result = engine.interpret(question, &mut Conversation::default());
+        assert_eq!(result.decision, Decision::Clarify, "{question}: {result:?}");
+        assert!(result.request.is_none() && result.company.is_none());
+    }
+    let mut state = Conversation::default();
+    let first = engine.interpret("Liste farmácias em qualquer situação cadastral em Sinop MT com telefone", &mut state);
+    let expected = first.request.unwrap().into_request();
+    let edited = engine.interpret("troca ativas por baixadas", &mut state);
+    assert_eq!(edited.decision, Decision::Clarify);
+    assert_eq!(state.last.as_ref(), Some(&expected));
+}

@@ -313,13 +313,22 @@ impl TaxRegime {
     }
 }
 
+const STATUS_TERMS: [(&[&str], Status); 5] = [
+    (&["ativos", "ativas", "ativa", "ativo", "funcionando", "em funcionamento"], Status::Active),
+    (&["suspensos", "suspensas", "suspensa"], Status::Suspended),
+    (&["inaptos", "inaptas", "inapta"], Status::Unfit),
+    (&["baixados", "baixadas", "baixada", "fechadas", "fechados", "encerradas", "encerrados", "extintas", "extintos"], Status::Closed),
+    (&["situacao cadastral nula", "situacao nula"], Status::Null),
+];
+
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum EditTarget {
     Contact(ContactNeed),
     Porte,
     Capital,
     Opened,
-    Status,
+    StatusDate,
+    Status(Option<Status>),
     UnitType(Tri),
     Tax(TaxRegime, Tri),
 }
@@ -331,6 +340,8 @@ enum FilterAction {
     RemovePorte,
     RemoveCapital,
     RemoveOpened,
+    RemoveStatusDate,
+    ReplaceStatus { source: Status, target: Status },
     ReplaceUnit { source: Tri, target: Tri },
     ReplaceTax { regime: TaxRegime, source: Tri, target: Tri },
 }
@@ -362,6 +373,7 @@ impl FilterEdit {
     fn apply(&self, request: &mut Request) -> Result<&'static str, Box<Interpretation>> {
         let previous_contact = request.scope.contact;
         let previous_unit = unit_filter(request);
+        let previous_status = request.scope.status.unwrap_or_else(|| request.op.default_status());
         let previous_tax = match self.keep {
             Some(EditTarget::Tax(regime, _)) => regime.current(&request.scope),
             _ => Tri::Any,
@@ -398,6 +410,37 @@ impl FilterEdit {
                 request.scope.opened = None;
                 if self.keep.is_some() { "compound_edit" } else { "remove_filter" }
             }
+            FilterAction::RemoveStatusDate => {
+                if request.scope.status_date.is_none()
+                    && request.op.metric() == Some(Metric::Flow(FlowMetric::Closures))
+                    && request.time.period.is_some()
+                {
+                    return Err(clarify(
+                        "A contagem de baixas usa um período. Qual período você quer consultar, ou prefere contar os estabelecimentos pela situação cadastral atual?",
+                    ));
+                }
+                request.scope.status_date = None;
+                if self.keep.is_some() { "compound_edit" } else { "remove_filter" }
+            }
+            FilterAction::ReplaceStatus { source, target } => {
+                if previous_status == StatusSet::ALL || (!previous_status.contains(source) && !previous_status.contains(target)) {
+                    return Err(clarify("Qual situação cadastral da consulta atual você quer trocar?"));
+                }
+                if source != target && previous_status.contains(source) {
+                    if request.op.metric() == Some(Metric::Flow(FlowMetric::Closures)) && target != Status::Closed {
+                        return Err(clarify(
+                            "A consulta atual conta baixas no período. Você quer trocar para uma contagem pela situação cadastral atual?",
+                        ));
+                    }
+                    if request.scope.status_date.is_some() {
+                        return Err(clarify(
+                            "A busca tem um filtro de data da situação. Você quer retirar essa data antes de trocar a situação cadastral?",
+                        ));
+                    }
+                    request.scope.status = Some(StatusSet::new(previous_status.iter().filter(|status| *status != source).chain([target])));
+                }
+                "replace_slot"
+            }
             FilterAction::ReplaceTax { regime, source, target } => {
                 let current = regime.current(&request.scope);
                 if current != source && current != target {
@@ -430,6 +473,16 @@ impl FilterEdit {
             }
             Some(EditTarget::Opened) if matches!(self.action, FilterAction::RemoveOpened) => {
                 Err(clarify("Você quer retirar ou manter o filtro de data de abertura?"))
+            }
+            Some(EditTarget::StatusDate) if matches!(self.action, FilterAction::RemoveStatusDate) => {
+                Err(clarify("Você quer retirar ou manter o filtro de data da situação cadastral?"))
+            }
+            Some(EditTarget::Status(need))
+                if need.map_or(request.scope.status.unwrap_or(previous_status) != previous_status, |status| {
+                    !previous_status.contains(status) || !request.scope.status.unwrap_or(previous_status).contains(status)
+                }) =>
+            {
+                Err(clarify("Qual situação cadastral você quer manter na consulta atual?"))
             }
             Some(EditTarget::UnitType(need)) if previous_unit != need || unit_filter(request) != need => {
                 Err(clarify("Qual tipo de estabelecimento você quer manter na consulta: matriz ou filial?"))
@@ -493,6 +546,15 @@ fn read_tax_option(words: &[String], at: usize) -> Option<(Tri, usize, Option<Ta
     }
 }
 
+fn read_status(words: &[String], at: usize) -> Option<(Status, usize)> {
+    STATUS_TERMS.iter().find_map(|(terms, status)| {
+        terms.iter().find_map(|term| {
+            let end = at + term.split_whitespace().count();
+            words.get(at..end)?.iter().map(String::as_str).eq(term.split_whitespace()).then_some((*status, end))
+        })
+    })
+}
+
 fn read_edit_target(words: &[String], at: usize) -> Option<(EditTarget, usize)> {
     if let Some(contact) = contact_phrase(words, at) {
         let need = if contact.phone(words) { ContactNeed::Phone } else { ContactNeed::Email };
@@ -504,16 +566,26 @@ fn read_edit_target(words: &[String], at: usize) -> Option<(EditTarget, usize)> 
     if let Some((regime, end)) = read_tax_regime(words, at) {
         return Some((EditTarget::Tax(regime, Tri::Any), end));
     }
-    for phrase in [
-        &["data", "de", "abertura"][..],
-        &["periodo", "de", "abertura"][..],
-        &["data", "de", "inicio", "da", "atividade"][..],
-        &["data", "de", "inicio", "de", "atividade"][..],
-        &["inicio", "de", "atividade"][..],
+    for (target, phrase) in [
+        (EditTarget::Opened, &["data", "de", "abertura"][..]),
+        (EditTarget::Opened, &["periodo", "de", "abertura"][..]),
+        (EditTarget::Opened, &["data", "de", "inicio", "da", "atividade"][..]),
+        (EditTarget::Opened, &["data", "de", "inicio", "de", "atividade"][..]),
+        (EditTarget::Opened, &["inicio", "de", "atividade"][..]),
+        (EditTarget::StatusDate, &["data", "da", "baixa"][..]),
+        (EditTarget::StatusDate, &["data", "de", "baixa"][..]),
+        (EditTarget::StatusDate, &["periodo", "de", "baixa"][..]),
+        (EditTarget::StatusDate, &["data", "do", "encerramento"][..]),
+        (EditTarget::StatusDate, &["data", "de", "encerramento"][..]),
+        (EditTarget::StatusDate, &["data", "da", "situacao", "cadastral"][..]),
+        (EditTarget::StatusDate, &["data", "da", "situacao"][..]),
     ] {
         if words.get(at..at + phrase.len()).is_some_and(|part| part.iter().zip(phrase).all(|(word, expected)| word == expected)) {
-            return Some((EditTarget::Opened, at + phrase.len()));
+            return Some((target, at + phrase.len()));
         }
+    }
+    if let Some((status, end)) = read_status(words, at) {
+        return Some((EditTarget::Status(Some(status)), end));
     }
     let at = if matches!(words.get(at..), Some([noun, link, capital, ..])
         if matches!(noun.as_str(), "limite" | "faixa") && link == "de" && capital == "capital")
@@ -533,7 +605,10 @@ fn read_edit_target(words: &[String], at: usize) -> Option<(EditTarget, usize)> 
         "filial" | "filiais" => EditTarget::UnitType(Tri::No),
         "situacao" | "status" => {
             let end = at + 1 + usize::from(words.get(at + 1).is_some_and(|word| word == "cadastral"));
-            return Some((EditTarget::Status, end));
+            let start = end + usize::from(words.get(end).is_some_and(|word| word == "de"));
+            return Some(
+                read_status(words, start).map_or((EditTarget::Status(None), end), |(status, end)| (EditTarget::Status(Some(status)), end)),
+            );
         }
         _ => return None,
     };
@@ -597,6 +672,13 @@ fn read_filter_edit(
             end = after;
             FilterAction::ReplaceUnit { source, target }
         }
+        (true, EditTarget::Status(source)) => {
+            let (Some(source), Some((EditTarget::Status(Some(target)), after))) = (source, replacement_target(words, end)) else {
+                return Err(clarify("Informe a situação cadastral atual e a desejada, como “troca ativas por baixadas”."));
+            };
+            end = after;
+            FilterAction::ReplaceStatus { source, target }
+        }
         (true, EditTarget::Tax(regime, source)) => {
             let source = if regime == TaxRegime::Mei && source == Tri::Any { Tri::Yes } else { source };
             let target = replacement_start(words, end).and_then(|at| {
@@ -625,6 +707,7 @@ fn read_filter_edit(
         (false, EditTarget::Porte) => FilterAction::RemovePorte,
         (false, EditTarget::Capital) => FilterAction::RemoveCapital,
         (false, EditTarget::Opened) => FilterAction::RemoveOpened,
+        (false, EditTarget::StatusDate) => FilterAction::RemoveStatusDate,
         _ => return Ok(None),
     };
 
@@ -2820,16 +2903,7 @@ fn filters(
         // "sociedade anônima fechada" is a legal form (natureza 2054), not a closed status.
         let status_text = n.replace("anonimas fechadas", "anonimas").replace("anonima fechada", "anonima");
         let mut statuses = Vec::new();
-        for (phrases, status) in [
-            (&["ativos", "ativas", "ativa", "ativo", "funcionando", "em funcionamento"][..], Status::Active),
-            (&["suspensos", "suspensas", "suspensa"][..], Status::Suspended),
-            (&["inaptos", "inaptas", "inapta"][..], Status::Unfit),
-            (
-                &["baixados", "baixadas", "baixada", "fechadas", "fechados", "encerradas", "encerrados", "extintas", "extintos"][..],
-                Status::Closed,
-            ),
-            (&["situacao cadastral nula", "situacao nula"][..], Status::Null),
-        ] {
+        for (phrases, status) in STATUS_TERMS {
             if has(&status_text, phrases) {
                 statuses.push(status);
             }
