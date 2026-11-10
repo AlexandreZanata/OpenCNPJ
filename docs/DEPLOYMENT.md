@@ -60,6 +60,14 @@ snapshot in `current` (`opencnpj-intel agg build`), with `--assistant-catalog` a
 data date. The assistant loads once at start and binds to the snapshot served then:
 after a monthly update, build the new aggregates and restart (blue/green, below).
 
+For a public web preview, add `--auth trial` and set `--public-url` to the site's
+HTTPS URL so the trial cookie uses `Secure`. With `--trust-proxy`, the trial requires
+loopback listeners. Configure the reverse proxy to replace `X-Forwarded-For` with the
+verified client address, as the supplied Caddyfile does. Configure SMTP to deliver
+account keys and optionally set `OPENCNPJ_UPGRADE_URL` to an HTTPS or mailto URL.
+The `--trial-deny-networks` CIDR file can restrict known VPN/proxy egress networks.
+See [accounts](ACCOUNTS.md) for the trial budgets and trade-offs.
+
 The admin listener (`127.0.0.1:8081`) is never exposed directly: reach it through an SSH
 tunnel (`ssh -L 8081:127.0.0.1:8081 server`) or the IP-restricted Caddy block, from the
 web dashboard (`/admin`) or the desktop app (`opencnpj-admin`).

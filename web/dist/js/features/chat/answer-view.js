@@ -50,7 +50,8 @@ function records(title, columns, rows, total) {
 function exportCard(offer, question) {
     const status = h("span", { class: "muted", role: "status" });
     const plan = session().account?.plan;
-    const allowed = !plan || plan.export;
+    const trial = !session().token && session().platform?.auth === "trial";
+    const allowed = !trial && (!plan || plan.export);
     const button = Button({
         label: `Baixar ${offer.format.toUpperCase()}`,
         icon: "download",
@@ -69,7 +70,9 @@ function exportCard(offer, question) {
         }),
     });
     if (!allowed)
-        status.textContent = `O plano ${plan?.name ?? ""} não inclui exportação de arquivos.`;
+        status.textContent = trial
+            ? "A exportação de arquivos está disponível nos planos com exportação."
+            : `O plano ${plan?.name ?? ""} não inclui exportação de arquivos.`;
     return h("section", { class: "file", "aria-label": "Arquivo da resposta" }, h("span", { class: "file__icon" }, Icon({ name: "file", size: 20 })), h("div", { class: "file__body" }, h("strong", null, offer.filename), h("span", { class: "muted" }, `${offer.label} · ${formatInteger(offer.rows)} ${offer.rows === 1 ? "linha" : "linhas"} · ${offer.columns.join(", ")}`), offer.notes.map((note) => h("span", { class: "muted" }, note)), status), button);
 }
 function block(item, actions, first, metric = "Valor") {

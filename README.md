@@ -27,14 +27,16 @@ $B search data/2026-10.ocnpj --q "padaria sao jo" --filter uf=SP --limit 5
 $B accounts --data-dir data create --username admin --email you@example.com --role admin --key-file admin.key
 $B serve --data-dir data                      # API :8080, admin http://127.0.0.1:8081/admin
 # With the web application and the Portuguese assistant (see web/README.md):
-#   $B serve --data-dir data --web web/dist --assistant-agg data/intelligence/agg/2026-10.ocagg
+#   $B serve --data-dir data --web web/dist --auth trial --assistant-agg data/intelligence/agg/2026-10.ocagg
 K=$(cat admin.key)
 curl -H "Authorization: Bearer $K" 'localhost:8080/api/v1/cnpj/00000000000191'
 curl -H "Authorization: Bearer $K" 'localhost:8080/api/v1/search?cnae=G&uf=SP&data_inicio_atividade_de=2026-01-01&ordenar=data_inicio_atividade:desc'
 ```
 
 Users register with a username and an e-mail address and receive their login key by
-e-mail (`POST /api/v1/auth/register`); `serve --auth off` runs without accounts.
+e-mail (`POST /api/v1/auth/register`). The web trial gives visitors three searches before
+sign-in. Signed-in users can save and organize assistant conversations. `serve --auth off`
+runs without accounts.
 
 Monthly operation (download → rebuild only if sources changed → verify → atomic switch,
 previous snapshot kept for rollback):

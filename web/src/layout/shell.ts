@@ -8,6 +8,7 @@ import { accountsEnabled, onSession, session, type SessionState } from "../core/
 import { Icon } from "../ui/icon.js";
 import type { IconName } from "../ui/icons.js";
 import { Logo } from "./logo.js";
+import { ThemeToggle } from "./theme-toggle.js";
 
 const NAV: readonly (readonly [RouteName, string, IconName])[] = [
   ["assistente", "Assistente", "message"],
@@ -34,7 +35,8 @@ export function AppShell(): Shell {
       return link;
     }),
   );
-  const side = h("div", { class: "topbar__side" });
+  const side = h("div", { class: "topbar__account" });
+  const notice = h("div", { class: "access-notice", hidden: true, role: "status" });
   const outlet = h("main", { class: "outlet", id: "conteudo" });
   let current: RouteName = "assistente";
   const mark = (): void => {
@@ -78,6 +80,24 @@ export function AppShell(): Shell {
         items.push(h("a", { class: "btn btn--primary btn--sm", href: href("conta") }, "Entrar"));
       }
     }
+    if (!state.token && state.trialQuota && state.trialQuota.remaining > 0) {
+      const { remaining } = state.trialQuota;
+      const label = remaining === 1 ? "1 consulta grátis" : `${remaining} consultas grátis`;
+      items.unshift(h("a", { class: "usage trial-usage", href: href("conta", "criar") }, label));
+    }
+    const free = state.account?.plan.name === "free";
+    const exhausted = !state.token && state.trialQuota?.remaining === 0;
+    const upgrade = free && (state.upgradeNeeded || quota?.dailyRemaining === 0 || quota?.monthlyRemaining === 0);
+    if (exhausted) {
+      notice.replaceChildren(
+        h("span", null, "Sua amostra grátis terminou."),
+        ...(state.platform?.registration === "closed" ? [] : [h("a", { href: href("conta", "criar") }, "Criar conta grátis")]),
+        h("a", { href: href("conta") }, "Entrar"),
+      );
+    } else if (upgrade) {
+      notice.replaceChildren(h("span", null, "Você atingiu um limite do plano gratuito."), h("a", { href: href("conta") }, "Ver opções de plano"));
+    }
+    notice.hidden = !exhausted && !upgrade;
     side.replaceChildren(...items.filter((item): item is HTMLElement => item !== null));
     mark();
   };
@@ -89,7 +109,8 @@ export function AppShell(): Shell {
       "div",
       { class: "app" },
       h("a", { class: "sr-only", href: "#conteudo" }, "Pular para o conteúdo"),
-      h("header", { class: "topbar" }, h("a", { class: "topbar__brand", href: href("assistente"), "aria-label": "OpenCNPJ — início" }, Logo()), nav, side),
+      h("header", { class: "topbar" }, h("a", { class: "topbar__brand", href: href("assistente"), "aria-label": "OpenCNPJ — início" }, Logo()), nav, h("div", { class: "topbar__side" }, ThemeToggle(), side)),
+      notice,
       outlet,
     ),
     outlet,

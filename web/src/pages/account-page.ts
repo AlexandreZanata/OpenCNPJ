@@ -107,6 +107,16 @@ export function AccountPage(): Page {
       ),
       card(
         "Plano e uso",
+        plan.name === "free"
+          ? h(
+              "p",
+              { class: "note" },
+              "Para ter mais consultas e exportar resultados, solicite um plano superior. ",
+              session().platform?.upgrade_url
+                ? h("a", { href: session().platform?.upgrade_url ?? undefined }, "Solicitar upgrade")
+                : "Fale com o administrador para ativar o plano.",
+            )
+          : null,
         h("p", { class: "plan" }, Badge(plan.name, "good"), limits.per_minute ? h("span", { class: "muted" }, `até ${formatInteger(limits.per_minute)} consultas por minuto`) : null),
         h("div", { class: "meters" }, Meter("Hoje", usage.today, limits.daily_limit), Meter("Este mês", usage.month, limits.monthly_limit)),
         h(

@@ -244,10 +244,13 @@ export function SearchPage(param: string): Page {
   const results = h("div", { class: "page__result" });
   const page = Math.max(1, Number(get("pagina")) || 1);
 
+  const platform = session().platform;
+  const trial = !session().token && platform?.auth === "trial";
+  const pageSize = Math.min(config.pageSize, session().account?.plan.max_page_size ?? (trial ? platform.trial?.max_page_size ?? 20 : config.pageSize));
   const run = (): void => {
     const query = criteria(filters);
-    query.set("limit", String(config.pageSize));
-    query.set("offset", String((page - 1) * config.pageSize));
+    query.set("limit", String(pageSize));
+    query.set("offset", String((page - 1) * pageSize));
     results.replaceChildren(Spinner("Buscando"));
     getJson<SearchReply>(`/api/v1/search?${query.toString()}`, controller.signal)
       .then((reply) => {
@@ -255,13 +258,13 @@ export function SearchPage(param: string): Page {
           results.replaceChildren(EmptyState("search", "Nenhum estabelecimento com esses filtros.", "Tire um filtro ou amplie a região."));
           return;
         }
-        const pages = Math.ceil(reply.total / config.pageSize);
+        const pages = Math.ceil(reply.total / pageSize);
         const go = (to: number): void => {
           const next = new URLSearchParams(filters);
           next.set("pagina", String(to));
           navigate("busca", next.toString());
         };
-        exportButton.hidden = session().account?.plan.export === false;
+        exportButton.hidden = trial || session().account?.plan.export === false;
         mount(
           results,
           h(

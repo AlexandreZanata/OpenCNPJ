@@ -261,8 +261,8 @@ async fn register_login_me_logout_rotate() {
     // The key works directly as a bearer credential and proves the address.
     let r = get(&e.public, "/api/v1/search?uf=SP&limit=1", Some(&key)).await;
     assert_eq!(r.status, StatusCode::OK, "{}", r.text);
-    assert_eq!(r.header("x-quota-daily-limit"), Some("1000"));
-    assert_eq!(r.header("x-quota-daily-remaining"), Some("999"));
+    assert_eq!(r.header("x-quota-daily-limit"), Some("10"));
+    assert_eq!(r.header("x-quota-daily-remaining"), Some("9"));
     assert_eq!(r.header("x-ratelimit-limit"), Some("60"));
     let r = call(&e.public, Method::GET, "/api/v1/search?uf=SP&limit=1", None, None, &[("x-api-key", &key)]).await;
     assert_eq!(r.status, StatusCode::OK);
@@ -612,7 +612,7 @@ async fn optional_and_off_modes() {
     assert_eq!(r.header("x-quota-daily-limit"), Some("100"));
     assert_eq!(get(&e.public, "/api/v1/search?uf=SP&limit=21", None).await.json()["error"], "limit_exceeds_plan");
     let key = create(&e, "hal", "user", None);
-    assert_eq!(get(&e.public, "/api/v1/search?uf=SP&limit=1", Some(&key)).await.header("x-quota-daily-limit"), Some("1000"));
+    assert_eq!(get(&e.public, "/api/v1/search?uf=SP&limit=1", Some(&key)).await.header("x-quota-daily-limit"), Some("10"));
 
     let off = env(&["--auth", "off"]);
     let r = get(&off.public, "/api/v1/search?uf=SP&limit=1", None).await;
@@ -676,4 +676,163 @@ async fn platform_assistant_routes_and_web_front_end() {
     }
     assert_eq!(get(&w.public, "/api/v1", None).await.json()["service"], "opencnpj");
     assert_eq!(get(&w.admin, "/", None).await.status, StatusCode::OK, "the admin listener serves the application too");
+}
+
+fn trial_cookie(response: &Resp) -> &str {
+    response.header("set-cookie").unwrap().split(';').next().unwrap()
+}
+
+const TRIAL_SEARCH: &str = "/api/v1/search?uf=SP&limit=1";
+
+#[tokio::test]
+async fn browser_trial_survives_restart_ip_changes_and_concurrent_requests() {
+    let e = env(&["--auth", "trial", "--trust-proxy", "--public-url", "https://example.com"]);
+    let status = get(&e.public, "/api/v1/trial", None).await;
+    assert_eq!(status.json(), json!({ "limit": 3, "remaining": 3 }));
+    let cookie = trial_cookie(&status);
+    let set_cookie = status.header("set-cookie").unwrap();
+    assert!(set_cookie.contains("HttpOnly") && set_cookie.contains("SameSite=Lax") && set_cookie.ends_with("; Secure"));
+    assert_eq!(get(&e.public, "/api/v1/export?uf=SP", None).await.json()["error"], "plan_forbids_export");
+    assert_eq!(get(&e.public, "/api/v1/search?uf=SP&limit=1&%6cimit=21", None).await.json()["error"], "limit_exceeds_plan");
+
+    let other = api::router(api::state(e.st.args.clone()).unwrap());
+    let addresses = ["192.0.2.1", "192.0.2.2", "192.0.2.3", "192.0.2.4", "192.0.2.5"];
+    let responses = futures_util::future::join_all(addresses.iter().enumerate().map(|(i, &ip)| {
+        let app = if i % 2 == 0 { &e.public } else { &other };
+        async move { call(app, Method::GET, TRIAL_SEARCH, None, None, &[("cookie", cookie), ("x-forwarded-for", ip)]).await }
+    }))
+    .await;
+    assert_eq!(responses.iter().filter(|r| r.status == StatusCode::OK).count(), 3);
+    assert_eq!(responses.iter().filter(|r| r.status == StatusCode::TOO_MANY_REQUESTS).count(), 2);
+
+    let restarted = api::router(api::state(e.st.args.clone()).unwrap());
+    let r = call(&restarted, Method::GET, TRIAL_SEARCH, None, None, &[("cookie", cookie), ("x-forwarded-for", "192.0.2.6")]).await;
+    assert_eq!(r.json()["error"], "trial_exhausted");
+    assert_eq!(r.header("x-trial-remaining"), Some("0"));
+    assert_eq!(r.header("cache-control"), Some("private, no-store"));
+}
+
+#[tokio::test]
+async fn trial_network_budget_survives_cookie_reset_and_ipv6_rotation() {
+    let e = env(&["--auth", "trial", "--trust-proxy"]);
+    for i in 1..=13 {
+        let ip = format!("2001:db8:100:2::{i}");
+        let r = call(&e.public, Method::GET, TRIAL_SEARCH, None, None, &[("x-forwarded-for", &ip)]).await;
+        if i <= 12 {
+            assert_eq!(r.status, StatusCode::OK, "{}", r.text);
+        } else {
+            assert_eq!(r.json()["error"], "trial_exhausted");
+        }
+    }
+}
+
+#[tokio::test]
+async fn free_accounts_share_device_budget_and_paid_plans_keep_their_access() {
+    let e = env(&["--auth", "trial", "--trust-proxy"]);
+    let a = create(&e, "free-one", "user", Some("free"));
+    let b = create(&e, "free-two", "user", Some("free"));
+    let pro = create(&e, "paid", "user", Some("pro"));
+    let status = get(&e.public, "/api/v1/trial", None).await;
+    let cookie = trial_cookie(&status);
+    for i in 0..10 {
+        let key = if i % 2 == 0 { &a } else { &b };
+        let r = call(&e.public, Method::GET, TRIAL_SEARCH, Some(key), None, &[("cookie", cookie)]).await;
+        assert_eq!(r.status, StatusCode::OK, "{}", r.text);
+        assert_eq!(r.header("x-quota-monthly-limit"), Some("30"));
+    }
+    let r = call(&e.public, Method::GET, TRIAL_SEARCH, Some(&b), None, &[("cookie", cookie), ("x-forwarded-for", "192.0.2.20")]).await;
+    assert_eq!(r.json()["error"], "free_access_limited");
+    assert_eq!(get(&e.public, "/api/v1/export?uf=SP", Some(&a)).await.json()["error"], "plan_forbids_export");
+    assert_eq!(get(&e.public, "/api/v1/export?uf=SP", Some(&pro)).await.status, StatusCode::OK);
+}
+
+#[tokio::test]
+async fn registration_is_limited_by_device_and_configured_vpn_networks() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("vpn.txt");
+    std::fs::write(&path, "203.0.113.0/24 # known VPN egress\n").unwrap();
+    let e = env(&["--auth", "trial", "--trust-proxy", "--trial-deny-networks", path.to_str().unwrap()]);
+    let route = "/api/v1/auth/register";
+    let status = get(&e.public, "/api/v1/trial", None).await;
+    let cookie = trial_cookie(&status);
+    let signup = |i| json!({ "username": format!("guest-{i}"), "email": format!("guest-{i}@example.com") });
+    let denied = call(&e.public, Method::POST, route, None, Some(signup(0)), &[("x-forwarded-for", "203.0.113.15")]).await;
+    assert_eq!(denied.json()["error"], "trial_network_blocked");
+    for i in 1..=3 {
+        let ip = format!("192.0.2.{i}");
+        let r = call(&e.public, Method::POST, route, None, Some(signup(i)), &[("cookie", cookie), ("x-forwarded-for", &ip)]).await;
+        if i <= 2 {
+            assert_eq!(r.status, StatusCode::ACCEPTED, "{}", r.text);
+        } else {
+            assert_eq!(r.json()["error"], "registration_limited");
+        }
+    }
+}
+
+#[tokio::test]
+async fn conversations_are_private_and_survive_restart() {
+    use opencnpj_ingest::source::sha256_file;
+    use opencnpj_insights::agg::{Manifest, Table, write};
+    use opencnpj_query::ir::Competence;
+
+    let dir = tempfile::tempdir().unwrap();
+    let aggregate = dir.path().join("fixture.ocagg");
+    let catalogue = Path::new(env!("CARGO_MANIFEST_DIR")).join("../opencnpj-insights/catalog");
+    let municipalities = catalogue.join("municipalities.tsv");
+    let sectors = catalogue.join("sectors.toml");
+    write(
+        std::fs::File::create(&aggregate).unwrap(),
+        &Manifest {
+            competence: Competence::from_year_month(2026, 10).unwrap(),
+            snapshot_sha256: sha256_file(fixture()).unwrap(),
+            municipality_sha256: sha256_file(&municipalities).unwrap(),
+            tables: Table::ALL.to_vec(),
+            establishments: 0,
+            missing_registration_date: 0,
+            missing_closure_date: 0,
+        },
+        &Default::default(),
+    )
+    .unwrap();
+    let e = env(&[
+        "--assistant-agg",
+        aggregate.to_str().unwrap(),
+        "--assistant-catalog",
+        municipalities.to_str().unwrap(),
+        "--assistant-sectors",
+        sectors.to_str().unwrap(),
+    ]);
+    let a = create(&e, "author", "user", Some("pro"));
+    let b = create(&e, "another", "user", Some("pro"));
+    let root = "/api/v1/conversations";
+    assert_eq!(get(&e.public, root, None).await.status, StatusCode::UNAUTHORIZED);
+    let created = post(&e.public, root, Some(&a), json!({ "title": "Pesquisa em Cuiabá" })).await;
+    assert_eq!(created.status, StatusCode::CREATED);
+    let id = created.json()["id"].as_i64().unwrap();
+    let conversation = format!("{root}/{id}");
+    assert_eq!(get(&e.public, root, Some(&b)).await.json(), json!([]));
+    assert_eq!(get(&e.public, &conversation, Some(&b)).await.status, StatusCode::NOT_FOUND);
+    assert_eq!(call(&e.public, Method::DELETE, &conversation, Some(&b), None, &[]).await.status, StatusCode::NOT_FOUND);
+    let ask = "/api/v1/assistant/ask";
+    let question = json!({ "conversation_id": id, "conversation_revision": 0, "question": "Quantas empresas ativas em Cuiabá?" });
+    assert_eq!(post(&e.public, ask, Some(&b), question.clone()).await.status, StatusCode::NOT_FOUND);
+    let first = post(&e.public, ask, Some(&a), question.clone()).await;
+    assert_eq!(first.status, StatusCode::OK, "{}", first.text);
+    assert!(first.json()["context"]["last"].is_object());
+    let restarted = api::router(api::state(e.st.args.clone()).unwrap());
+    assert_eq!(post(&restarted, ask, Some(&a), question).await.json()["error"], "conversation_changed");
+    let next = json!({ "conversation_id": id, "conversation_revision": 1, "question": "e em Sinop?" });
+    let follow_up = post(&restarted, ask, Some(&a), next).await;
+    assert_eq!(follow_up.status, StatusCode::OK, "{}", follow_up.text);
+    assert!(follow_up.json()["context"]["last"].is_object());
+    let history = get(&restarted, &conversation, Some(&a)).await;
+    assert_eq!(history.header("cache-control"), Some("private, no-store"));
+    let turns = history.json();
+    assert_eq!(turns.as_array().unwrap().len(), 2);
+    assert_eq!(turns[1]["question"], "e em Sinop?");
+    assert_eq!(turns[1]["reply"], follow_up.json());
+    let renamed = call(&restarted, Method::PATCH, &conversation, Some(&a), Some(json!({ "title": "Empresas em Mato Grosso" })), &[]).await;
+    assert_eq!(renamed.json()["title"], "Empresas em Mato Grosso");
+    assert_eq!(call(&restarted, Method::DELETE, &conversation, Some(&a), None, &[]).await.status, StatusCode::NO_CONTENT);
+    assert_eq!(get(&restarted, &conversation, Some(&a)).await.status, StatusCode::NOT_FOUND);
 }

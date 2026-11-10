@@ -35,6 +35,8 @@ zstd.workspace = true
 libc = "0.2"
 argon2 = { version = "0.6", default-features = false, features = ["alloc", "password-hash"] }
 getrandom = "0.3"
+ipnet = "2"
+ring = "0.17"
 rusqlite = { version = "0.40", features = ["bundled"] }
 moka = { version = "0.12", features = ["future", "sync"] }
 lettre = { version = "0.11", default-features = false, features = ["builder", "smtp-transport", "tokio1", "tokio1-rustls", "ring", "webpki-roots", "hostname"] }

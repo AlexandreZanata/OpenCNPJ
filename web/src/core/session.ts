@@ -5,7 +5,9 @@
  */
 
 export interface Platform {
-  auth: "off" | "optional" | "required";
+  auth: "off" | "optional" | "trial" | "required";
+  trial?: { limit: number; max_page_size: number | null } | null;
+  upgrade_url?: string | null;
   registration: "open" | "closed" | null;
   assistant: boolean;
   /** Filter search and CNPJ lookup are served (false on the local assistant-only service). */
@@ -43,11 +45,18 @@ export interface Quota {
   monthlyRemaining: number | null;
 }
 
+export interface TrialQuota {
+  limit: number;
+  remaining: number;
+}
+
 export interface SessionState {
   platform: Platform | null;
   token: string | null;
   account: Account | null;
   quota: Quota | null;
+  trialQuota: TrialQuota | null;
+  upgradeNeeded: boolean;
   /** The admin API answers on this origin for this user (admin listener, staff login). */
   staff: boolean;
 }
@@ -63,7 +72,7 @@ function storedToken(): string | null {
   }
 }
 
-let state: SessionState = { platform: null, token: storedToken(), account: null, quota: null, staff: false };
+let state: SessionState = { platform: null, token: storedToken(), account: null, quota: null, trialQuota: null, upgradeNeeded: false, staff: false };
 
 export function session(): Readonly<SessionState> {
   return state;

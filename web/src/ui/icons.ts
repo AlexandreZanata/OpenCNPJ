@@ -9,6 +9,10 @@ export type Shape = readonly [tag: "path" | "circle" | "rect" | "ellipse", attrs
 const path = (d: string, extra: Record<string, string | number> = {}): Shape => ["path", { d, ...extra }];
 
 export const ICONS = {
+  sun: [["circle", { cx: 12, cy: 12, r: 4 }], path("M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42m0-14.14-1.42 1.42m-11.3 11.3-1.42 1.42")],
+  moon: [path("M20.99 12.79A9 9 0 0 1 11.21 3a9 9 0 1 0 9.78 9.79Z")],
+  pencil: [path("m16 3 5 5M4 20l4-1L21 6l-3-3L5 16z")],
+  trash: [path("M3 6h18M9 6V3h6v3m4 0-1 15H6L5 6m5 4v7m4-7v7")],
   sparkle: [
     path("M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"),
   ],

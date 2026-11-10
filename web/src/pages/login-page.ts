@@ -3,13 +3,14 @@
 import { errorMessage, login, sendJson } from "../core/api.js";
 import { h } from "../core/dom.js";
 import { session } from "../core/session.js";
+import { ThemeToggle } from "../layout/theme-toggle.js";
 import { Logo } from "../layout/logo.js";
 import { Button, Field, Input, busy } from "../ui/kit.js";
 import type { Page } from "./page.js";
 
 type Mode = "entrar" | "criar" | "recuperar";
 
-export function LoginPage(): Page {
+export function LoginPage(initial: Mode = "entrar", standalone = false): Page {
   const card = h("div", { class: "auth__card card" });
   const registration = session().platform?.registration !== "closed";
 
@@ -59,7 +60,7 @@ export function LoginPage(): Page {
       const submit = Button({ label: "Criar conta", variant: "primary", type: "submit", class: "btn--block" });
       card.replaceChildren(
         h("h1", null, "Criar conta"),
-        h("p", { class: "muted" }, "Enviamos a sua chave de acesso para o e-mail informado. Não há senha para lembrar."),
+        h("p", { class: "muted" }, "Sua conta começa no plano gratuito. Enviamos a chave de acesso para o seu e-mail."),
         h(
           "form",
           {
@@ -121,11 +122,12 @@ export function LoginPage(): Page {
     email.focus();
   };
 
-  render("entrar");
+  render(initial === "criar" && !registration ? "entrar" : initial);
   return {
     el: h(
       "div",
       { class: "auth" },
+      standalone ? h("div", { class: "auth__theme" }, ThemeToggle()) : null,
       h("div", { class: "auth__brand" }, Logo(), h("p", { class: "muted" }, "Pesquisa comercial sobre os dados oficiais do CNPJ.")),
       card,
     ),

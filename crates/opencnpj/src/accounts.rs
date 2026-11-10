@@ -505,6 +505,16 @@ CREATE TABLE IF NOT EXISTS audit (
 CREATE INDEX IF NOT EXISTS audit_actor ON audit(actor_id, id);
 CREATE INDEX IF NOT EXISTS audit_target ON audit(target_id, id);
 CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS conversations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    title TEXT NOT NULL, updated_at INTEGER NOT NULL, turn_count INTEGER NOT NULL DEFAULT 0,
+    context TEXT NOT NULL DEFAULT '{}');
+CREATE INDEX IF NOT EXISTS conversations_user ON conversations(user_id, updated_at DESC, id DESC);
+CREATE TABLE IF NOT EXISTS conversation_turns (
+    conversation_id INTEGER NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
+    position INTEGER NOT NULL, question TEXT NOT NULL, reply TEXT NOT NULL,
+    PRIMARY KEY (conversation_id, position)
+) WITHOUT ROWID;
 ";
 
 fn seed_plans() -> Vec<Plan> {
@@ -522,7 +532,17 @@ fn seed_plans() -> Vec<Plan> {
     };
     vec![
         p("anonymous", Some(100), Some(1_000), Some(10), Some(10), 20, false, Some(0), false),
-        p("free", Some(1_000), Some(20_000), Some(60), Some(30), 100, false, Some(0), false),
+        p(
+            "free",
+            Some(crate::trial::FREE_DAILY_LIMIT),
+            Some(crate::trial::FREE_MONTHLY_LIMIT),
+            Some(60),
+            Some(30),
+            100,
+            false,
+            Some(0),
+            false,
+        ),
         p("pro", Some(100_000), Some(2_000_000), Some(600), Some(200), 1_000, true, Some(100_000), true),
         p("unlimited", None, None, None, None, 10_000, true, None, true),
     ]
@@ -586,6 +606,11 @@ impl Accounts {
                 params![p.name, p.daily_limit, p.monthly_limit, p.per_minute, p.burst, p.max_page_size, p.export, p.max_export_rows, p.downloads],
             )?;
         }
+        conn.execute(
+            "UPDATE plans SET daily_limit=?1, monthly_limit=?2 WHERE name='free' AND daily_limit=1000 AND monthly_limit=20000
+             AND per_minute=60 AND burst=30 AND max_page_size=100 AND export=0 AND max_export_rows=0 AND downloads=0",
+            params![crate::trial::FREE_DAILY_LIMIT, crate::trial::FREE_MONTHLY_LIMIT],
+        )?;
         let settings = {
             let mut s = Settings::default();
             let stored: Option<String> =
@@ -618,7 +643,7 @@ impl Accounts {
         Ok(a)
     }
 
-    fn conn(&self) -> std::sync::MutexGuard<'_, Connection> {
+    pub(crate) fn conn(&self) -> std::sync::MutexGuard<'_, Connection> {
         self.db.lock().unwrap_or_else(std::sync::PoisonError::into_inner)
     }
 
@@ -1587,7 +1612,7 @@ mod tests {
         assert!(a.start_recovery("nobody@example.com").unwrap().is_none());
 
         let p = a.principal(u.id).unwrap().unwrap();
-        assert_eq!((p.daily_limit, p.per_minute), (Some(1_000), Some(60)));
+        assert_eq!((p.daily_limit, p.per_minute), (Some(10), Some(60)));
         a.update_user(u.id, &json!({ "daily_limit": 5, "plan": "pro", "notes": "vip" }), &sys).unwrap();
         let p = a.principal(u.id).unwrap().unwrap();
         assert_eq!((p.daily_limit, p.per_minute, p.plan.name.as_str()), (Some(5), Some(600), "pro"));

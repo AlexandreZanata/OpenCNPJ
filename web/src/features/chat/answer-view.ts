@@ -106,7 +106,8 @@ function records(title: string | null, columns: readonly string[], rows: readonl
 function exportCard(offer: ExportOffer, question: string): HTMLElement {
   const status = h("span", { class: "muted", role: "status" });
   const plan = session().account?.plan;
-  const allowed = !plan || plan.export;
+  const trial = !session().token && session().platform?.auth === "trial";
+  const allowed = !trial && (!plan || plan.export);
   const button = Button({
     label: `Baixar ${offer.format.toUpperCase()}`,
     icon: "download",
@@ -124,7 +125,9 @@ function exportCard(offer: ExportOffer, question: string): HTMLElement {
         }
       }),
   });
-  if (!allowed) status.textContent = `O plano ${plan?.name ?? ""} não inclui exportação de arquivos.`;
+  if (!allowed) status.textContent = trial
+    ? "A exportação de arquivos está disponível nos planos com exportação."
+    : `O plano ${plan?.name ?? ""} não inclui exportação de arquivos.`;
   return h(
     "section",
     { class: "file", "aria-label": "Arquivo da resposta" },

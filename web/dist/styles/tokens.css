@@ -1,5 +1,6 @@
 /* Design tokens. Every colour in the application comes from here. */
 :root {
+  color-scheme: light;
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-serif: "Source Serif 4", "Source Serif Pro", Georgia, "Times New Roman", serif;
   --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Menlo, Consolas, monospace;
@@ -59,45 +60,44 @@
   --column-wide: 1180px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --ink-900: #f2f4f1;
-    --ink-800: #e3e6e1;
-    --ink-700: #c6cbc4;
-    --ink-600: #a3aaa2;
-    --ink-500: #858d85;
-    --ink-400: #636a63;
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ink-900: #f2f4f1;
+  --ink-800: #e3e6e1;
+  --ink-700: #c6cbc4;
+  --ink-600: #a3aaa2;
+  --ink-500: #858d85;
+  --ink-400: #636a63;
 
-    --canvas: #111412;
-    --surface: #181c19;
-    --surface-muted: #202522;
-    --surface-hover: #1d221f;
-    --line: #2a302c;
-    --line-strong: #3a423d;
+  --canvas: #111412;
+  --surface: #181c19;
+  --surface-muted: #202522;
+  --surface-hover: #1d221f;
+  --line: #2a302c;
+  --line-strong: #3a423d;
 
-    --accent: #3fae77;
-    --accent-hover: #55bd88;
-    --accent-ink: #08130d;
-    --accent-soft: #16291f;
-    --accent-soft-ink: #8fd6b0;
+  --accent: #3fae77;
+  --accent-hover: #55bd88;
+  --accent-ink: #08130d;
+  --accent-soft: #16291f;
+  --accent-soft-ink: #8fd6b0;
 
-    --warning-bg: #33290f;
-    --warning-ink: #f0cf7a;
-    --danger: #f97066;
-    --danger-bg: #331614;
-    --danger-ink: #fda29b;
-    --info-bg: #17222d;
-    --info-ink: #a9c6e0;
+  --warning-bg: #33290f;
+  --warning-ink: #f0cf7a;
+  --danger: #f97066;
+  --danger-bg: #331614;
+  --danger-ink: #fda29b;
+  --info-bg: #17222d;
+  --info-ink: #a9c6e0;
 
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.45);
-    --shadow-lg: 0 18px 48px rgba(0, 0, 0, 0.6);
-    --focus-ring: 0 0 0 2px var(--surface), 0 0 0 4px #3fae77;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 18px 48px rgba(0, 0, 0, 0.6);
+  --focus-ring: 0 0 0 2px var(--surface), 0 0 0 4px #3fae77;
 
-    --viz-series-1: #5a9de6;
-    --viz-series-2: #f08a5d;
-    --viz-series-3: #46c794;
-    --viz-brand: #46b58f;
-    --viz-grid: #2a302c;
-  }
+  --viz-series-1: #5a9de6;
+  --viz-series-2: #f08a5d;
+  --viz-series-3: #46c794;
+  --viz-brand: #46b58f;
+  --viz-grid: #2a302c;
 }

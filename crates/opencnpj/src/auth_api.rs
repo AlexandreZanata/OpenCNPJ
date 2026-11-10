@@ -56,6 +56,14 @@ struct Register {
 
 async fn register(State(st): State<Shared>, req: Request) -> Response {
     let ip = client_ip(&req, st.gate.trust_proxy);
+    let ticket = if let Some(trial) = &st.trial {
+        match trial.ticket(req.headers(), ip, crate::trial::Activity::Register) {
+            Ok(ticket) => Some((trial, Arc::new(ticket))),
+            Err(response) => return response,
+        }
+    } else {
+        None
+    };
     let r: Register = match parse_body(req).await {
         Ok(r) => r,
         Err(e) => return e.into_response(),
@@ -66,6 +74,23 @@ async fn register(State(st): State<Shared>, req: Request) -> Response {
     let acc = match accounts(&st) {
         Ok(a) => a,
         Err(e) => return e.into_response(),
+    };
+    if acc.settings().registration != "open" {
+        return ApiError::new(StatusCode::FORBIDDEN, "registration_closed", "registration is closed on this server").into_response();
+    }
+    if let Some((trial, ticket)) = &ticket {
+        match trial.reserve(ticket.clone()).await {
+            Ok(Some(_)) => {}
+            Ok(None) => {
+                let mut response = gate::error(StatusCode::TOO_MANY_REQUESTS, "registration_limited", "registration limit reached", &[]);
+                ticket.decorate(&mut response, None);
+                return response;
+            }
+            Err(response) => return response,
+        }
+    }
+    let Ok(_permit) = st.gate.argon.acquire().await else {
+        return StatusCode::SERVICE_UNAVAILABLE.into_response();
     };
     let email = r.email.trim().to_ascii_lowercase();
     let (a, u, e) = (acc.clone(), r.username.clone(), email.clone());
@@ -85,13 +110,23 @@ async fn register(State(st): State<Shared>, req: Request) -> Response {
                 m.spawn(u.email.clone(), "OpenCNPJ account already exists", mail::already_registered(&u.username, &m.public_url));
             }
         }
-        Err(e) => return e.into_response(),
-    }
-    (
+        Err(e) => {
+            let mut response = e.into_response();
+            if let Some((_, ticket)) = ticket {
+                ticket.decorate(&mut response, None);
+            }
+            return response;
+        }
+    };
+    let mut response = (
         StatusCode::ACCEPTED,
         Json(json!({ "status": "pending", "message": "if the address can receive mail, a login key is on its way to it" })),
     )
-        .into_response()
+        .into_response();
+    if let Some((_, ticket)) = ticket {
+        ticket.decorate(&mut response, None);
+    }
+    response
 }
 
 #[derive(Deserialize)]
@@ -353,7 +388,7 @@ fn form_value(body: &Bytes, key: &str) -> Option<String> {
     })
 }
 
-async fn parse_body<T: serde::de::DeserializeOwned>(req: Request) -> Result<T, ApiError> {
+pub(crate) async fn parse_body<T: serde::de::DeserializeOwned>(req: Request) -> Result<T, ApiError> {
     let bytes = axum::body::to_bytes(req.into_body(), 16 << 10).await.map_err(|_| ApiError::bad("body too large"))?;
     serde_json::from_slice(&bytes).map_err(|e| ApiError::bad(format!("invalid JSON body: {e}")))
 }

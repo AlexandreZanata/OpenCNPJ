@@ -28,6 +28,8 @@ pub enum AuthMode {
     Off,
     /// Credentials are optional; anonymous callers use the `anonymous` plan per IP.
     Optional,
+    /// A small persistent browser trial followed by account plans.
+    Trial,
     /// Every data route needs a key or session token.
     Required,
 }
@@ -37,6 +39,7 @@ impl AuthMode {
         match self {
             AuthMode::Off => "off",
             AuthMode::Optional => "optional",
+            AuthMode::Trial => "trial",
             AuthMode::Required => "required",
         }
     }
@@ -632,7 +635,7 @@ pub fn client_ip(req: &Request, trust_proxy: bool) -> IpAddr {
     req.extensions().get::<ConnectInfo<SocketAddr>>().map_or(IpAddr::V4(Ipv4Addr::LOCALHOST), |c| c.0.ip())
 }
 
-async fn blocking<T: Send + 'static>(f: impl FnOnce() -> anyhow::Result<T> + Send + 'static) -> Result<T, Response> {
+pub(crate) async fn blocking<T: Send + 'static>(f: impl FnOnce() -> anyhow::Result<T> + Send + 'static) -> Result<T, Response> {
     match tokio::task::spawn_blocking(f).await {
         Ok(Ok(v)) => Ok(v),
         Ok(Err(e)) => Err(crate::api::ApiError::from(e).into_response()),
@@ -686,20 +689,13 @@ pub fn kind_of(route: &str) -> &'static str {
     }
 }
 
-fn query_param(q: &str, key: &str) -> Option<String> {
-    q.split('&').find_map(|kv| {
-        let (k, v) = kv.split_once('=')?;
-        (k == key).then(|| v.to_string())
-    })
-}
-
 /// Plan rules that depend on the request: export, downloads, page size.
-fn plan_check(p: &Principal, kind: &str, query: &str) -> Result<(), Response> {
+fn plan_check(p: &Principal, kind: &str, uri: &axum::http::Uri, preview: bool) -> Result<(), Response> {
     let plan = &p.plan;
-    if kind == "export" && !plan.export {
+    if kind == "export" && (preview || !plan.export) {
         return Err(error(StatusCode::FORBIDDEN, "plan_forbids_export", &format!("the {} plan does not include export", plan.name), &[]));
     }
-    if kind == "download" && !plan.downloads {
+    if kind == "download" && (preview || !plan.downloads) {
         return Err(error(
             StatusCode::FORBIDDEN,
             "plan_forbids_downloads",
@@ -707,10 +703,9 @@ fn plan_check(p: &Principal, kind: &str, query: &str) -> Result<(), Response> {
             &[],
         ));
     }
-    for key in ["limit", "estab_limit"] {
-        if let Some(v) = query_param(query, key).and_then(|v| v.parse::<i64>().ok())
-            && v > plan.max_page_size
-        {
+    let pairs = axum::extract::Query::<Vec<(String, String)>>::try_from_uri(uri).map(|query| query.0).unwrap_or_default();
+    for (key, value) in pairs {
+        if matches!(key.as_str(), "limit" | "estab_limit") && value.parse::<u64>().is_ok_and(|limit| limit > plan.max_page_size as u64) {
             return Err(error(
                 StatusCode::BAD_REQUEST,
                 "limit_exceeds_plan",
@@ -738,7 +733,7 @@ pub async fn gate(State(st): State<Shared>, mut req: Request, next: Next) -> Res
     let query = req.uri().query().unwrap_or("").to_string();
     let principal = match g.authenticate(req.headers(), ip).await {
         Ok(Some(p)) => p,
-        Ok(None) if g.mode == AuthMode::Optional => {
+        Ok(None) if matches!(g.mode, AuthMode::Optional | AuthMode::Trial) => {
             let Some(plan) = g.accounts.as_ref().and_then(|a| a.plan("anonymous")) else {
                 return unauthorized("unauthenticated", "anonymous plan is missing");
             };
@@ -752,13 +747,56 @@ pub async fn gate(State(st): State<Shared>, mut req: Request, next: Next) -> Res
         }
         Err(r) => return r,
     };
-    if let Err(r) = plan_check(&principal, kind, &query) {
+    if let Err(r) = plan_check(&principal, kind, req.uri(), st.trial.is_some() && principal.id == 0) {
         return r;
     }
     let subject = if principal.id == 0 { Subject::Ip(ip) } else { Subject::User(principal.id) };
     let adm = match g.admit(subject.clone(), &principal).await {
         Ok(a) => a,
         Err(r) => return r,
+    };
+    let ticket = if let Some(trial) = &st.trial {
+        use crate::trial::Activity;
+        let activity = if principal.id == 0 {
+            Some(Activity::Preview)
+        } else if principal.role == accounts::Role::User && principal.plan.name == "free" {
+            Some(Activity::Free)
+        } else {
+            None
+        };
+        if let Some(activity) = activity {
+            let preview = matches!(activity, Activity::Preview);
+            let ticket = match trial.ticket(req.headers(), ip, activity) {
+                Ok(ticket) => Arc::new(ticket),
+                Err(response) => {
+                    g.refund(&subject);
+                    return response;
+                }
+            };
+            match trial.reserve(ticket.clone()).await {
+                Ok(Some(remaining)) => Some((trial, ticket, preview, remaining)),
+                Ok(None) => {
+                    g.refund(&subject);
+                    g.rejected_quota.fetch_add(1, Relaxed);
+                    let (code, message) = if preview {
+                        ("trial_exhausted", "free preview used up; create an account or sign in to continue")
+                    } else {
+                        ("free_access_limited", "shared free usage limit reached; see account plans for higher limits")
+                    };
+                    let mut response = error(StatusCode::TOO_MANY_REQUESTS, code, message, &[]);
+                    ticket.decorate(&mut response, preview.then_some(0));
+                    return response;
+                }
+                Err(response) => {
+                    g.refund(&subject);
+                    return response;
+                }
+            }
+        } else {
+            None
+        }
+    } else {
+        None
     };
     req.extensions_mut().insert(Caller { principal: principal.clone(), ip });
     let t0 = Instant::now();
@@ -768,6 +806,14 @@ pub async fn gate(State(st): State<Shared>, mut req: Request, next: Next) -> Res
     let hit = resp.headers().get("x-cache").is_some_and(|v| v != "MISS");
     if status >= 500 {
         g.refund(&subject);
+    }
+    if let Some((trial, ticket, preview, mut remaining)) = ticket {
+        if status >= 500
+            && let Ok(refunded) = trial.refund(ticket.clone()).await
+        {
+            remaining = refunded;
+        }
+        ticket.decorate(&mut resp, preview.then_some(remaining));
     }
     g.record(principal.id, kind, status, hit, ms);
     if g.accounts.as_ref().is_some_and(|a| a.settings_cached_search_log()) {
@@ -826,6 +872,9 @@ fn cache_key(st: &Shared, req: &Request) -> u128 {
         h.update(v.as_bytes());
     }
     h.update(&[u8::from(st.privacy.hide_socios), u8::from(st.privacy.hide_contacts)]);
+    if let Some(caller) = req.extensions().get::<Caller>() {
+        h.update(&caller.principal.plan.max_page_size.to_le_bytes());
+    }
     h.digest128()
 }
 
@@ -964,6 +1013,5 @@ mod tests {
         assert_eq!(kind_of("/downloads/{name}"), "download");
         assert_eq!(kind_of("/api/v1/assistant/ask"), "assistant");
         assert_eq!(kind_of("/api/v1/assistant/export"), "export");
-        assert_eq!(query_param("a=1&limit=50&b", "limit").as_deref(), Some("50"));
     }
 }

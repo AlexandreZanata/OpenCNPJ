@@ -60,9 +60,9 @@ register (username, email) ──► pending ──first login with the e-mailed
 ```json
 {
   "user": { "id": 7, "username": "ana", "email": "ana@example.com", "role": "user", "status": "active", "plan": "free", "key_prefix": "Ab3dE5gH9k", ... },
-  "plan": { "name": "free", "daily_limit": 1000, "monthly_limit": 20000, "per_minute": 60, "burst": 30, "max_page_size": 100, "export": false, "max_export_rows": 0, "downloads": false },
-  "limits": { "daily_limit": 1000, "monthly_limit": 20000, "per_minute": 60 },
-  "usage": { "today": 12, "month": 310 }
+  "plan": { "name": "free", "daily_limit": 10, "monthly_limit": 30, "per_minute": 60, "burst": 30, "max_page_size": 100, "export": false, "max_export_rows": 0, "downloads": false },
+  "limits": { "daily_limit": 10, "monthly_limit": 30, "per_minute": 60 },
+  "usage": { "today": 2, "month": 10 }
 }
 ```
 
@@ -70,12 +70,37 @@ register (username, email) ──► pending ──first login with the e-mailed
 
 `serve --auth required` (default with `--data-dir`) requires a credential on every data route.
 `--auth optional` serves unauthenticated requests under the `anonymous` plan, limited per IP.
-`--auth off` disables accounts entirely (the previous behaviour; used by benchmarks).
+`--auth trial` enables the public web preview and shared free-tier limits.
+`--auth off` disables accounts entirely (used by benchmarks and private instances).
 
 Always public: `/`, `/healthz`, `/health`, `/readyz`, `/api/v1/campos`, `/api/v1/dominios*`,
 `/api/v1/snapshot`, `/api/v1/distribution` and `/api/v1/auth/*`. Data routes (`cnpj`,
 `estabelecimentos`, `empresas`, `cpf`, `search`, `busca`, `stats`, `export`, `/downloads/*`)
-need a credential. `/metrics` moves to the admin listener.
+need a credential in required mode. In trial mode, data requests may use the preview
+while export and snapshot download require a plan. `/metrics` moves to the admin listener.
+
+### Public preview
+
+`GET /api/v1/trial` returns the limit and remaining preview requests without consuming
+one. The server issues a signed, HttpOnly browser cookie that expires after one year.
+The preview allows three queries per browser cookie and twelve per network per UTC
+day. A network means one IPv4 address or one IPv6 /64. The `X-Trial-Limit` and
+`X-Trial-Remaining` headers report the effective balance. A depleted preview returns
+`429 trial_exhausted` with the account sign-in or registration flow available.
+
+The free plan also shares a budget of ten searches a day and thirty a month across
+accounts using the same browser, and forty a day and 120 a month across a network.
+Registrations are limited to two per browser and six per network per UTC day. Paid
+plans use their own quotas. Trial and shared free counters are persisted atomically
+in the accounts SQLite database and keyed by HMACs of browser and network identifiers.
+Expired counters are pruned as new requests arrive.
+
+Use `--trial-deny-networks FILE` for known VPN/proxy egress ranges, one CIDR per line.
+Empty lines and `#` comments are accepted. The ranges apply to preview, free searches
+and registration. A browser cookie is not a hardware identifier, and a user changing
+both browser identity and network can evade these controls. Networks shared by
+several legitimate users share the same budget. See [deployment](DEPLOYMENT.md) for
+the reverse proxy and HTTPS configuration.
 
 ## Plans, quotas and rate limits
 
@@ -83,9 +108,11 @@ A plan sets: `daily_limit`, `monthly_limit` (requests; `null` = unlimited), `per
 `burst` (token bucket), `max_page_size`, `export` and `max_export_rows`, `downloads`.
 A user can override `daily_limit`, `monthly_limit` and `per_minute`.
 
-Seeded plans: `anonymous` (100/day, 10/min), `free` (1,000/day, 20,000/month, 60/min),
+Seeded plans: `anonymous` (100/day, 10/min), `free` (10/day, 30/month, 60/min),
 `pro` (100,000/day, 2,000,000/month, 600/min, export up to 100,000 rows) and `unlimited`
-(staff default). Admins edit them freely.
+(staff default). The original free seed is migrated on startup when all its settings
+still match the original defaults. Admins can assign higher plans and configure a
+website or email link for upgrade requests with `OPENCNPJ_UPGRADE_URL`.
 
 Every data request counts as one search, whether it comes with the login key (API) or
 with a session (the web application): a CNPJ lookup, a filter search, a turn of the
@@ -96,8 +123,8 @@ both counters allow it; a 5xx response is refunded. Rejections are `429 rate_lim
 
 ```
 X-RateLimit-Limit: 60            X-RateLimit-Remaining: 59
-X-Quota-Daily-Limit: 1000        X-Quota-Daily-Remaining: 988
-X-Quota-Monthly-Limit: 20000     X-Quota-Monthly-Remaining: 19690
+X-Quota-Daily-Limit: 10          X-Quota-Daily-Remaining: 8
+X-Quota-Monthly-Limit: 30        X-Quota-Monthly-Remaining: 20
 X-Cache: HIT | MISS
 ```
 

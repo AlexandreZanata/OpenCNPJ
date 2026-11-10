@@ -10,6 +10,7 @@ pub mod assistant;
 pub mod auth_api;
 pub mod autoupdate;
 pub mod bench;
+mod conversations;
 pub mod download;
 pub mod gate;
 pub mod loadtest;
@@ -18,6 +19,7 @@ pub mod manage;
 pub mod metrics;
 pub mod output;
 pub mod params;
+mod trial;
 
 use anyhow::Result;
 use clap::Args;

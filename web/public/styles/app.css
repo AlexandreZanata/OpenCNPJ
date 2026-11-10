@@ -1510,3 +1510,153 @@
     flex-direction: column;
   }
 }
+
+.topbar__account {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.auth__theme {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.access-notice {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px 16px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--line);
+  background: var(--warning-bg);
+  color: var(--warning-ink);
+  font-size: 14px;
+}
+
+.access-notice[hidden] {
+  display: none;
+}
+
+.access-notice a {
+  color: inherit;
+  font-weight: 650;
+  text-decoration: underline;
+}
+
+.trial-usage {
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .trial-usage {
+    font-size: 11px;
+    padding: 0 6px;
+  }
+
+  .topbar__side,
+  .topbar__account {
+    gap: 2px;
+  }
+}
+
+.assistant-workspace {
+  display: grid;
+  grid-template-columns: minmax(190px, 240px) minmax(0, 1fr);
+  align-items: start;
+  flex: 1;
+}
+
+.assistant-workspace > .page {
+  align-self: stretch;
+  min-width: 0;
+}
+
+.conversation-sidebar {
+  position: sticky;
+  top: var(--topbar-height);
+  min-height: calc(100vh - var(--topbar-height));
+  padding: 16px 10px;
+  border-right: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.conversation-sidebar summary {
+  cursor: pointer;
+  font-weight: 650;
+  margin: 0 0 8px 8px;
+}
+
+.conversation-sidebar__body {
+  display: grid;
+  gap: 8px;
+}
+
+.conversation-list {
+  display: grid;
+  align-content: start;
+  gap: 2px;
+  max-height: calc(100vh - 160px);
+  overflow-y: auto;
+}
+
+.conversation-item {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  border-radius: var(--radius-md);
+}
+
+.conversation-item:hover {
+  background: var(--surface-muted);
+}
+
+.conversation-item--active {
+  background: var(--accent-soft);
+  color: var(--accent-soft-ink);
+}
+
+.conversation-item__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  padding: 8px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.conversation-status {
+  padding: 0 8px;
+  font-size: 12px;
+}
+
+.conversation-status:empty {
+  display: none;
+}
+
+@media (max-width: 700px) {
+  .assistant-workspace {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+  }
+
+  .conversation-sidebar {
+    position: static;
+    min-height: 0;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .conversation-list {
+    max-height: 150px;
+  }
+}

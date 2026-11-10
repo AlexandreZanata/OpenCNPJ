@@ -13,7 +13,7 @@ function storedToken() {
         return null;
     }
 }
-let state = { platform: null, token: storedToken(), account: null, quota: null, staff: false };
+let state = { platform: null, token: storedToken(), account: null, quota: null, trialQuota: null, upgradeNeeded: false, staff: false };
 export function session() {
     return state;
 }
