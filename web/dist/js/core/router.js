@@ -1,22 +1,15 @@
-/** Hash router: `#/consulta`, `#/analises`, … */
-export const ROUTES = [
-    "consulta",
-    "explorar",
-    "analises",
-    "relatorios",
-    "exportacoes",
-    "favoritos",
-    "api",
-    "documentacao",
-    "configuracoes",
-];
-export const DEFAULT_ROUTE = "consulta";
+/** Hash router: `#/`, `#/busca`, `#/cnpj/33000167000101`, `#/conta`, `#/admin`. */
+const NAMES = ["assistente", "busca", "cnpj", "conta", "admin"];
 export function currentRoute() {
-    const id = window.location.hash.replace(/^#\/?/, "");
-    return ROUTES.includes(id) ? id : DEFAULT_ROUTE;
+    const [name = "", ...rest] = window.location.hash.replace(/^#\/?/, "").split("/");
+    const known = NAMES.includes(name) ? name : "assistente";
+    return { name: known, param: decodeURIComponent(rest.join("/")) };
 }
-export function routeHref(id) {
-    return `#/${id}`;
+export function href(name, param = "") {
+    return name === "assistente" && !param ? "#/" : `#/${name}${param ? `/${encodeURIComponent(param)}` : ""}`;
+}
+export function navigate(name, param = "") {
+    window.location.hash = href(name, param);
 }
 export function onRouteChange(listener) {
     const handler = () => listener(currentRoute());

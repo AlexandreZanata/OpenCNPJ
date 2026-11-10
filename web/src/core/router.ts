@@ -1,31 +1,30 @@
-/** Hash router: `#/consulta`, `#/analises`, … */
+/** Hash router: `#/`, `#/busca`, `#/cnpj/33000167000101`, `#/conta`, `#/admin`. */
 
-export const ROUTES = [
-  "consulta",
-  "explorar",
-  "analises",
-  "relatorios",
-  "exportacoes",
-  "favoritos",
-  "api",
-  "documentacao",
-  "configuracoes",
-] as const;
+export type RouteName = "assistente" | "busca" | "cnpj" | "conta" | "admin";
 
-export type RouteId = (typeof ROUTES)[number];
-
-export const DEFAULT_ROUTE: RouteId = "consulta";
-
-export function currentRoute(): RouteId {
-  const id = window.location.hash.replace(/^#\/?/, "");
-  return (ROUTES as readonly string[]).includes(id) ? (id as RouteId) : DEFAULT_ROUTE;
+export interface Route {
+  name: RouteName;
+  /** Path segment after the route name (`#/cnpj/<param>`). */
+  param: string;
 }
 
-export function routeHref(id: RouteId): string {
-  return `#/${id}`;
+const NAMES: readonly RouteName[] = ["assistente", "busca", "cnpj", "conta", "admin"];
+
+export function currentRoute(): Route {
+  const [name = "", ...rest] = window.location.hash.replace(/^#\/?/, "").split("/");
+  const known = (NAMES as readonly string[]).includes(name) ? (name as RouteName) : "assistente";
+  return { name: known, param: decodeURIComponent(rest.join("/")) };
 }
 
-export function onRouteChange(listener: (route: RouteId) => void): () => void {
+export function href(name: RouteName, param = ""): string {
+  return name === "assistente" && !param ? "#/" : `#/${name}${param ? `/${encodeURIComponent(param)}` : ""}`;
+}
+
+export function navigate(name: RouteName, param = ""): void {
+  window.location.hash = href(name, param);
+}
+
+export function onRouteChange(listener: (route: Route) => void): () => void {
   const handler = (): void => listener(currentRoute());
   window.addEventListener("hashchange", handler);
   return () => window.removeEventListener("hashchange", handler);

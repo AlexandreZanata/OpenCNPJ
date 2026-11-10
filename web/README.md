@@ -1,95 +1,77 @@
 # OpenCNPJ Web
 
-Frontend da plataforma OpenCNPJ para inteligência empresarial e consulta em linguagem natural com dados oficiais do CNPJ (Receita Federal).
+Front end of the OpenCNPJ platform: commercial research and prospecting over the official
+CNPJ data, in the browser. TypeScript 7 compiled to plain ES modules, HTML and CSS, with
+**zero runtime dependencies** (no framework, no bundler). The compiled `dist/` is served by
+`opencnpj serve --web web/dist`.
 
-Construído de forma 100% desacoplada, utilizando exclusivamente **TypeScript 7.0.2** compilado para módulos JavaScript ES2022 nativos, **HTML5** e **CSS3** puro, com **zero dependências em runtime** (sem React, Vue, Angular, Tailwind, Webpack, etc.).
+## What it does
 
-## Estrutura do Projeto
+| Page | Route | Purpose |
+|---|---|---|
+| Assistente | `#/` | Conversation with the deterministic assistant: counts, lists with CNPJ, rankings, series, comparisons and Excel/CSV/TXT files, with follow-ups. Each answer shows the filters it applied, how it was computed and its source |
+| Busca | `#/busca/<filters>` | Search by filters (name, CNAE, state, city, status, size, regime, head office, contacts, opening date, capital) with pagination and CSV export. The filters live in the address, so a search can be bookmarked |
+| CNPJ | `#/cnpj/<cnpj>` | Registration record of an establishment or of a company root; the same record opens as a side panel from any CNPJ in the other pages |
+| Conta | `#/conta` | Plan and limits, day and month meters, thirty days of usage, login key rotation, API quick start, recent searches |
+| Administração | `#/admin` | For staff, on the admin listener: accounts and per-account search limits, plans, service-wide usage |
+| Sign-in | — | Login with the key, account creation and key recovery by e-mail (when the server runs with accounts) |
+
+The application asks `GET /api/v1/platform` what the server offers and adapts: without
+accounts (`--auth off`) there is no sign-in; without the assistant the first page points to
+the search.
+
+## Layout
 
 ```
 web/
-├── package.json          # Metadados e scripts de build/dev (0 dependências de runtime)
-├── tsconfig.json         # Configuração TypeScript 7 (ES2022, target nativo)
-├── public/               # Assets estáticos (HTML, CSS modular, fontes locais)
-│   ├── index.html        # Shell HTML semântico com preloads de fontes
-│   ├── fonts/            # Fontes self-hosted (Inter e Source Serif 4 em WOFF2)
-│   └── styles/           # CSS modular baseado em design tokens
-│       ├── tokens.css    # Paleta de cores, tipografia, elevações e espaçamentos
-│       ├── base.css      # Reset semântico e estilos globais
-│       ├── layout.css    # Grid responsivo (sidebar + workspace)
-│       └── components/   # Estilos isolados por componente reutilizável
-├── src/                  # Código TypeScript desacoplado
-│   ├── config.ts         # Parâmetros e URL da API
-│   ├── main.ts           # Ponto de entrada e bootstrap
-│   ├── core/             # Primitivas fundamentais (DOM, store, router, formatters)
-│   ├── domain/           # Modelos de domínio e tipos da plataforma
-│   ├── services/         # Camada de serviços e integração (mock + contrato API)
-│   ├── state/            # Controllers e gestão de estado reativo
-│   ├── ui/               # Componentes visuais atômicos e reutilizáveis
-│   ├── features/         # Módulos de negócio (layout, query com IA, insights, tabela)
-│   └── pages/            # Páginas da aplicação e placeholders de navegação
-├── scripts/
-│   ├── build.sh          # Compila TS para dist/ e copia assets
-│   ├── serve.sh          # Inicia servidor estático de desenvolvimento
-│   └── tsc.sh            # Invoca o compilador TypeScript 7
-└── dist/                 # Artefatos finais compilados (HTML/CSS/JS nativo)
+├── public/                 # copied as is
+│   ├── index.html
+│   ├── favicon.svg
+│   ├── fonts/              # self-hosted Inter and Source Serif 4 (WOFF2)
+│   └── styles/
+│       ├── tokens.css      # every colour, radius and shadow; light and dark schemes
+│       ├── base.css        # reset and element defaults
+│       ├── app.css         # frame, pages and shared pieces
+│       └── charts.css      # line and bar charts of assistant answers
+├── src/
+│   ├── main.ts             # bootstrap: platform, session, routes
+│   ├── config.ts
+│   ├── core/               # dom (h/s builders), api (client, session, quota), router, format
+│   ├── layout/             # top bar and logo
+│   ├── ui/                 # buttons, fields, tables, overlays, toasts, icons
+│   ├── features/chat/      # answer blocks, charts, examples, reply types
+│   ├── features/company/   # registration record (page and side panel)
+│   └── pages/              # assistant, search, cnpj, account, admin, login
+├── scripts/                # build.sh, tsc.sh (TypeScript 7.0.2), serve.sh
+└── dist/                   # build output served by the API
 ```
 
-## Como Rodar Localmente
+Conventions: components are functions that return DOM elements (`core/dom.ts`); colours
+come only from `tokens.css`; the session token is kept in `localStorage` and sent as
+`Authorization: Bearer`; every request goes through `core/api.ts`, which also reads the
+`X-Quota-*` headers so the usage in the top bar is always current.
 
-### Pré-requisitos
-Apenas Python 3 (para servir os arquivos estáticos) ou qualquer servidor HTTP estático.
-O frontend compilado em `dist/` não requer instalação de pacotes npm em runtime.
-
-### 1. Iniciar o servidor
-```bash
-cd web
-sh scripts/serve.sh
-# ou: python3 -m http.server 5173 --bind 127.0.0.1 --directory dist
-```
-Acesse no navegador:
-👉 [http://127.0.0.1:5173/](http://127.0.0.1:5173/)
-
-### 2. Recompilar alterações de TypeScript
-```bash
-cd web
-sh scripts/build.sh
-```
-
-## Design e Fidelidade Visual
-O layout implementa exatamente a interface de inteligência empresarial:
-- **Sidebar**: Navegação completa da plataforma com rotas via hash (`#/consulta`, `#/explorar`, etc.) e badge da Receita Federal.
-- **Header & Hero**: Arte decorativa com gradientes em vidro, sininho com indicador de notificação e menu do plano corporativo.
-- **Consulta com IA**: Campo em linguagem natural, botões de atalho/exemplos e banner de filtros verificáveis derivados pela IA.
-- **KPIs & Métricas**: Cartões com números formatados (ex: R$ 318,6 milhões), tendências percentuais e contadores.
-- **Gráficos em CSS/SVG**: Gráfico de aberturas mensais com eixos e gráfico donut de distribuição por porte (ME, EPP, Demais).
-- **Tabela de Empresas**: Tabela com ordenação por colunas, menu para exibir/ocultar colunas, exportação (CSV / NDJSON) e paginação completa.
-- **Design Responsivo**: Adaptável para desktop (1536px), notebooks e dispositivos móveis.
-
-## Chat with official data
-
-The static server shows the original demo. The chat page (`?local=1`) talks to the
-local engine service, which keeps the catalogues, aggregates and snapshot in memory and
-answers each question in milliseconds: the lead sentence, KPIs, monthly charts, tables,
-the establishments with CNPJ, and Excel, CSV or TXT files on request ("me mande um Excel
-com…", "apenas o nome e o CNPJ"). Follow-ups reuse the conversation ("e só as matrizes?",
-"agora em CSV"). See `docs/intelligence/16-SKILLS.md`.
+## Build and run
 
 ```sh
-sh scripts/build.sh
-cargo build --release -p opencnpj-lab --bin opencnpj-intel
-../target/release/opencnpj-intel serve \
-  --catalog ../crates/opencnpj-insights/catalog/municipalities.tsv \
-  --sectors ../crates/opencnpj-insights/catalog/sectors.toml \
-  --agg "$AGGREGATE" --history "$HISTORY" --snapshot "$SNAPSHOT" \
-  --web dist --listen 127.0.0.1:5174
+sh web/scripts/build.sh            # type-checks and compiles src/ to dist/js, copies public/
+cargo build --release -p opencnpj
+./target/release/opencnpj serve --data-dir "$DATA" --web web/dist \
+  --assistant-agg "$DATA/intelligence/agg/2026-10.ocagg" \
+  --assistant-history "$DATA/intelligence/backfill/aggregates"
 ```
 
-Open [Consulta com IA](http://127.0.0.1:5174/?local=1#/consulta), pick an example from
-"Experimente" or type a question; "Nova conversa" clears the context. Without
-`--snapshot` the service answers aggregate questions (counts, comparisons, series) and
-declines lists and files of companies.
+Open `http://127.0.0.1:8080/` and sign in with a login key
+(`opencnpj accounts --data-dir "$DATA" create --username NAME --email ADDRESS`). The admin
+listener (`http://127.0.0.1:8081/`) serves the same application with the administration
+page for staff accounts; the operations dashboard stays at `/admin`.
 
-To share a local preview, pass `--listen` with the computer's LAN IPv4 address and
-`--allow-network` with its subnet in CIDR notation (for example
-`--listen 192.168.0.10:5174 --allow-network 192.168.0.0/24`). Other clients get 403.
+`sh web/scripts/tsc.sh --noEmit` type-checks only.
+
+## Local chat service
+
+`opencnpj-intel serve --web web/dist` (crate `opencnpj-lab`) serves the assistant alone,
+without accounts, on loopback or one LAN subnet, for development and evaluation. It
+answers the product paths of the assistant (`/api/v1/assistant/*`, `/api/v1/platform`), so
+this front end works there with the Busca and CNPJ tools hidden. For the whole product
+without accounts use `opencnpj serve --auth off`.

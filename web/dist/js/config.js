@@ -1,7 +1,8 @@
 export const config = {
     /** Base URL of the OpenCNPJ HTTP API ("" = same origin). */
     apiBase: "",
-    pageSize: 5,
+    /** Rows per page of the search table. */
+    pageSize: 25,
 };
 export function apiUrl(path) {
     return `${config.apiBase}${path}`;
