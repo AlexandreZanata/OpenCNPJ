@@ -22,6 +22,7 @@ pub(crate) struct Cues {
     pub breakdown: Vec<String>,
     pub registrations: Vec<String>,
     pub closures: Vec<String>,
+    pub dated_closures: Vec<String>,
     pub growth: Vec<String>,
 }
 #[derive(Deserialize)]
@@ -46,7 +47,7 @@ pub(crate) struct Frame {
     pub request: Request,
     pub act: String,
     pub notes: Vec<String>,
-    /// Explicit row count of an exported list ("as 50 primeiras").
+    /// Explicit row count of a list ("as 50 primeiras").
     pub rows: Option<u32>,
 }
 
@@ -60,42 +61,985 @@ pub(crate) struct ResolveContext<'a> {
     pub versions: CatalogueVersions,
     pub population: PopulationRef,
     pub vocabulary: &'a crate::vocabulary::Known,
+    pub delivery: &'a crate::skills::Vocabulary,
+}
+
+const PHONE_WORDS: &[&str] = &["telefone", "telefones", "fone", "celular", "whatsapp", "zap"];
+const EMAIL_WORDS: &[&str] = &["email", "emails", "e mail", "e mails"];
+
+pub(crate) const SECTOR_QUALIFIERS: &[&str] = &["area", "atividade", "setor", "ramo", "segmento"];
+const PLACE_QUALIFIERS: &[&str] = &["cidade", "municipio", "cidades", "municipios", "estado"];
+
+/// Use the same grammar for each sector qualifier, provided it points to a known activity.
+fn normalize_sector_qualifier(words: &mut [String], hits: &mut Vec<Hit>) {
+    let mut qualified = false;
+    let mut generic_farms = BTreeSet::new();
+    for hit in hits.iter().filter(|hit| hit.values.iter().any(|entity| matches!(entity, Entity::Sector(_)))) {
+        let mut end = hit.start;
+        loop {
+            let genitive = end > 0 && matches!(words[end - 1].as_str(), "de" | "da" | "do" | "das" | "dos");
+            let Some(start) = end.checked_sub(2 + usize::from(genitive)) else { break };
+            if !(end < hit.start || genitive)
+                || !matches!(words[start].as_str(), "na" | "no" | "da" | "do" | "em")
+                || !SECTOR_QUALIFIERS.contains(&words[start + 1].as_str())
+                || hits.iter().any(|other| other.start < end && start < other.end)
+            {
+                break;
+            }
+            words[start] = "no".into();
+            words[start + 1] = "setor".into();
+            if genitive {
+                words[start + 2] = "de".into();
+            }
+            qualified = true;
+            end = start;
+        }
+        if end < hit.start && end > 0 && matches!(words[end - 1].as_str(), "fazenda" | "fazendas") {
+            generic_farms.insert(end - 1);
+        }
+    }
+    hits.retain(|hit| {
+        let generic = hit.end - hit.start == 1
+            && generic_farms.contains(&hit.start)
+            && hit.values.iter().all(|entity| matches!(entity, Entity::Sector(_)));
+        if generic {
+            words[hit.start] = "estabelecimentos".into();
+        }
+        !generic
+    });
+    if qualified {
+        for (at, word) in words.iter_mut().enumerate() {
+            if word == "comercios" && !hits.iter().any(|hit| hit.start <= at && at < hit.end) {
+                *word = "estabelecimentos".into();
+            }
+        }
+    }
+}
+
+fn contact_alias(word: &str) -> Option<&'static str> {
+    match word {
+        "tel" | "teleofne" => Some("telefone"),
+        "wpp" | "whats" => Some("whatsapp"),
+        "cel" => Some("celular"),
+        "emial" => Some("email"),
+        _ => None,
+    }
+}
+
+struct ContactPhrase {
+    end: usize,
+    name: usize,
+    descriptor: Option<usize>,
+    alias: Option<&'static str>,
+}
+
+impl ContactPhrase {
+    fn phone(&self, words: &[String]) -> bool {
+        PHONE_WORDS.contains(&self.alias.unwrap_or(&words[self.end - 1]))
+    }
+}
+
+/// Read a contact noun phrase. Keep its span so a conjunction, qualification or
+/// restatement immediately after it can be interpreted before normalization.
+fn contact_phrase(words: &[String], start: usize) -> Option<ContactPhrase> {
+    let start = start
+        + usize::from(
+            words.get(start).is_some_and(|word| matches!(word.as_str(), "um" | "uma" | "o" | "a" | "nenhum" | "nenhuma" | "tanto")),
+        );
+    let name = match words.get(start..)? {
+        [noun, link, ..]
+            if matches!(noun.as_str(), "numero" | "numeros" | "endereco" | "enderecos" | "no")
+                && matches!(link.as_str(), "de" | "do" | "da") =>
+        {
+            start + 2
+        }
+        _ => start,
+    };
+    let (length, alias) = match words.get(name..)? {
+        [word, ..] if PHONE_WORDS.contains(&word.as_str()) || matches!(word.as_str(), "email" | "emails") => (1, None),
+        [word, ..] if contact_alias(word).is_some() => (1, contact_alias(word)),
+        [prefix, word, ..] if prefix == "e" && matches!(word.as_str(), "mail" | "mails") => (2, None),
+        [noun, qualifier, ..] if noun == "contato" && qualifier == "telefonico" => (2, Some("telefone")),
+        [noun, link, verb, ..] if noun == "numero" && link == "para" && verb == "ligar" => (3, Some("telefone")),
+        [noun, qualifier, ..] if matches!(noun.as_str(), "correio" | "endereco") && qualifier == "eletronico" => (2, Some("email")),
+        _ => return None,
+    };
+    Some(ContactPhrase { end: name + length, name, descriptor: (name != start).then_some(start), alias })
+}
+
+fn contact_qualifier_end(words: &[String], end: usize) -> usize {
+    match &words[end..] {
+        [qualifier, ..]
+            if matches!(
+                qualifier.as_str(),
+                "cadastrado" | "cadastrada" | "informado" | "informada" | "publicado" | "publicada" | "disponivel"
+            ) =>
+        {
+            end + 1
+        }
+        [link, qualifier, ..]
+            if matches!(link.as_str(), "de" | "para") && qualifier == "contato" || link == "no" && qualifier == "cadastro" =>
+        {
+            end + 2
+        }
+        _ => end,
+    }
+}
+
+fn contact_predicate_end(words: &[String], verb: usize) -> Option<usize> {
+    match words.get(verb)?.as_str() {
+        "com" | "sem" | "tem" | "tenha" | "tenham" | "possui" | "possuem" | "informam" | "informaram" | "deixam" => Some(verb + 1),
+        "dispoe" | "dispoem" if words.get(verb + 1).is_some_and(|word| word == "de") => Some(verb + 2),
+        "conta" | "contam" if words.get(verb + 1).is_some_and(|word| word == "com") => Some(verb + 2),
+        _ => None,
+    }
+}
+
+/// Read contact clauses independently of the request operation. Keep word positions
+/// aligned with the original text and refuse conditions the contact filter cannot express.
+fn normalize_contact_filters(words: &mut [String], hits: &[Hit]) -> Result<(), Box<Interpretation>> {
+    let covered = |start, end| {
+        hits.iter().any(|hit| hit.start < end && start < hit.end && hit.values.iter().any(|entity| !matches!(entity, Entity::Uf(_))))
+    };
+    let choice = || clarify("Você quer filtrar por telefone, por e-mail ou exigir os dois?");
+    for at in 0..words.len() {
+        if let Some(contact) = contact_phrase(words, at)
+            && !covered(at, contact.end)
+        {
+            let end = contact_qualifier_end(words, contact.end);
+            if words.get(end).is_some_and(|word| word == "ou") {
+                let next = end + 1 + usize::from(words.get(end + 1).is_some_and(|word| word == "que"));
+                let name = contact_predicate_end(words, next).unwrap_or(next);
+                if let Some(other) = contact_phrase(words, name)
+                    && !covered(next, other.end)
+                {
+                    return Err(choice());
+                }
+            }
+        }
+    }
+    for at in 0..words.len() {
+        let (verb, negated) = if words[at] == "nao" { (at + 1, true) } else { (at, words[at] == "sem") };
+        let Some(name) = contact_predicate_end(words, verb) else { continue };
+        let Some(contact) = contact_phrase(words, name) else { continue };
+        if covered(at, contact.end) {
+            continue;
+        }
+        if negated {
+            return Err(clarify(
+                "O filtro de contato busca dados informados no cadastro. Você quer estabelecimentos com telefone, e-mail ou ambos?",
+            ));
+        }
+        if matches!(words[verb].as_str(), "tem" | "tenha" | "tenham" | "possui" | "possuem")
+            && !(at > 0 && (words[at - 1] == "que" || hits.iter().any(|hit| hit.end <= at)))
+        {
+            continue;
+        }
+        let after_contact = contact_qualifier_end(words, contact.end);
+        let restatement = match &words[after_contact..] {
+            [first, ..] if first == "digo" => 1,
+            [first, second, ..] if matches!((first.as_str(), second.as_str()), ("isto", "e") | ("ou", "seja")) => 2,
+            [first, second, third, ..] if first == "em" && second == "outras" && third == "palavras" => 3,
+            _ => 0,
+        };
+        let both = words[name] == "tanto" && words.get(after_contact).is_some_and(|word| word == "quanto");
+        if restatement > 0 || both {
+            let next = after_contact + restatement.max(1);
+            let other_name = contact_predicate_end(words, next).unwrap_or(next);
+            if let Some(other) = contact_phrase(words, other_name)
+                && !covered(after_contact, other.end)
+            {
+                if restatement > 0 && contact.phone(words) != other.phone(words) {
+                    return Err(choice());
+                }
+                if both {
+                    words[name] = "o".into();
+                }
+                words[after_contact..next].fill("e".into());
+                if other_name == next {
+                    words[next - 1] = "com".into();
+                }
+            }
+        }
+        if words[verb] != "com" {
+            words[verb] = "possui".into();
+        }
+        if let Some(descriptor) = contact.descriptor {
+            words[descriptor] = "contato".into();
+        }
+    }
+    for at in 0..words.len() {
+        if let Some(contact) = contact_phrase(words, at)
+            && !covered(at, contact.end)
+        {
+            if let Some(alias) = contact.alias {
+                words[contact.name..contact.end].fill("contato".into());
+                words[contact.name] = alias.into();
+            }
+            if words.get(contact.end).is_some_and(|word| word == "disponivel") {
+                words[contact.end] = "informado".into();
+            }
+        }
+    }
+    Ok(())
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum TaxRegime {
+    Simples,
+    Mei,
+}
+
+impl TaxRegime {
+    fn name(self) -> &'static str {
+        match self {
+            Self::Simples => "Simples Nacional",
+            Self::Mei => "MEI",
+        }
+    }
+
+    fn current(self, scope: &Filters) -> Tri {
+        match self {
+            Self::Simples => scope.simples,
+            Self::Mei => scope.mei,
+        }
+    }
+
+    fn set(self, scope: &mut Filters, choice: Tri) {
+        match self {
+            Self::Simples => scope.simples = choice,
+            Self::Mei => scope.mei = choice,
+        }
+    }
+}
+
+const STATUS_TERMS: [(&[&str], Status); 5] = [
+    (&["ativos", "ativas", "ativa", "ativo", "funcionando", "em funcionamento"], Status::Active),
+    (&["suspensos", "suspensas", "suspensa"], Status::Suspended),
+    (&["inaptos", "inaptas", "inapta"], Status::Unfit),
+    (&["baixados", "baixadas", "baixada", "fechadas", "fechados", "encerradas", "encerrados", "extintas", "extintos"], Status::Closed),
+    (&["situacao cadastral nula", "situacao nula"], Status::Null),
+];
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum EditTarget {
+    Contact(ContactNeed),
+    Porte,
+    Capital,
+    Opened,
+    StatusDate,
+    Status(Option<Status>),
+    UnitType(Tri),
+    Tax(TaxRegime, Tri),
+}
+
+#[derive(Clone, Copy)]
+enum FilterAction {
+    RemoveContact(ContactNeed),
+    ReplaceContact { source: ContactNeed, target: ContactNeed },
+    RemovePorte,
+    RemoveCapital,
+    RemoveOpened,
+    RemoveStatusDate,
+    ReplaceStatus { source: Status, target: Status },
+    ReplaceUnit { source: Tri, target: Tri },
+    ReplaceTax { regime: TaxRegime, source: Tri, target: Tri },
+}
+
+struct FilterEdit {
+    action: FilterAction,
+    keep: Option<EditTarget>,
+}
+
+fn unit_filter(request: &Request) -> Tri {
+    if request.unit == Unit::HeadOffices { Tri::Yes } else { request.scope.head_office }
+}
+
+fn has_contact(current: ContactNeed, need: ContactNeed) -> bool {
+    current == need || current == ContactNeed::Both
+}
+
+fn edit_contact(current: ContactNeed, source: ContactNeed, target: ContactNeed) -> ContactNeed {
+    let retains = |need| has_contact(current, need) && source != need && source != ContactNeed::Both;
+    match (retains(ContactNeed::Phone) || target == ContactNeed::Phone, retains(ContactNeed::Email) || target == ContactNeed::Email) {
+        (true, true) => ContactNeed::Both,
+        (true, false) => ContactNeed::Phone,
+        (false, true) => ContactNeed::Email,
+        (false, false) => ContactNeed::Any,
+    }
+}
+
+impl FilterEdit {
+    fn apply(&self, request: &mut Request) -> Result<&'static str, Box<Interpretation>> {
+        let previous_contact = request.scope.contact;
+        let previous_unit = unit_filter(request);
+        let previous_status = request.scope.status.unwrap_or_else(|| request.op.default_status());
+        let previous_tax = match self.keep {
+            Some(EditTarget::Tax(regime, _)) => regime.current(&request.scope),
+            _ => Tri::Any,
+        };
+        let act = match self.action {
+            FilterAction::RemoveContact(source) => {
+                request.scope.contact = edit_contact(previous_contact, source, ContactNeed::Any);
+                "remove_filter"
+            }
+            FilterAction::ReplaceContact { source, target } => {
+                if !has_contact(previous_contact, source) && !has_contact(previous_contact, target) {
+                    return Err(clarify("Qual filtro de contato você quer aplicar à consulta atual: telefone, e-mail ou ambos?"));
+                }
+                request.scope.contact = edit_contact(previous_contact, source, target);
+                "replace_slot"
+            }
+            FilterAction::RemovePorte => {
+                request.scope.porte = PorteSet::ALL;
+                if self.keep.is_some() { "compound_edit" } else { "remove_filter" }
+            }
+            FilterAction::RemoveCapital => {
+                request.scope.capital = None;
+                if self.keep.is_some() { "compound_edit" } else { "remove_filter" }
+            }
+            FilterAction::RemoveOpened => {
+                if request.scope.opened.is_none()
+                    && request.op.metric() == Some(Metric::Flow(FlowMetric::Registrations))
+                    && request.time.period.is_some()
+                {
+                    return Err(clarify(
+                        "A contagem de aberturas usa um período. Qual período você quer consultar, ou prefere contar os estabelecimentos pela situação atual?",
+                    ));
+                }
+                request.scope.opened = None;
+                if self.keep.is_some() { "compound_edit" } else { "remove_filter" }
+            }
+            FilterAction::RemoveStatusDate => {
+                if request.scope.status_date.is_none()
+                    && request.op.metric() == Some(Metric::Flow(FlowMetric::Closures))
+                    && request.time.period.is_some()
+                {
+                    return Err(clarify(
+                        "A contagem de baixas usa um período. Qual período você quer consultar, ou prefere contar os estabelecimentos pela situação cadastral atual?",
+                    ));
+                }
+                request.scope.status_date = None;
+                if self.keep.is_some() { "compound_edit" } else { "remove_filter" }
+            }
+            FilterAction::ReplaceStatus { source, target } => {
+                if previous_status == StatusSet::ALL || (!previous_status.contains(source) && !previous_status.contains(target)) {
+                    return Err(clarify("Qual situação cadastral da consulta atual você quer trocar?"));
+                }
+                if source != target && previous_status.contains(source) {
+                    if request.op.metric() == Some(Metric::Flow(FlowMetric::Closures)) && target != Status::Closed {
+                        return Err(clarify(
+                            "A consulta atual conta baixas no período. Você quer trocar para uma contagem pela situação cadastral atual?",
+                        ));
+                    }
+                    if request.scope.status_date.is_some() {
+                        return Err(clarify(
+                            "A busca tem um filtro de data da situação. Você quer retirar essa data antes de trocar a situação cadastral?",
+                        ));
+                    }
+                    request.scope.status = Some(StatusSet::new(previous_status.iter().filter(|status| *status != source).chain([target])));
+                }
+                "replace_slot"
+            }
+            FilterAction::ReplaceTax { regime, source, target } => {
+                let current = regime.current(&request.scope);
+                if current != source && current != target {
+                    return Err(clarify(&format!("Você quer filtrar a consulta por optantes ou não optantes do {}?", regime.name())));
+                }
+                regime.set(&mut request.scope, target);
+                "replace_slot"
+            }
+            FilterAction::ReplaceUnit { source, target } => {
+                if previous_unit != source && previous_unit != target {
+                    return Err(clarify("Você quer limitar a consulta atual a matrizes ou a filiais?"));
+                }
+                if previous_unit != target {
+                    // A count of head offices carries the restriction in its unit.
+                    request.unit = Unit::Establishments;
+                    request.scope.head_office = target;
+                }
+                "replace_slot"
+            }
+        };
+        match self.keep {
+            Some(EditTarget::Contact(need)) if !has_contact(previous_contact, need) || !has_contact(request.scope.contact, need) => {
+                Err(clarify("Quais filtros de contato você quer manter na consulta atual?"))
+            }
+            Some(EditTarget::Porte) if matches!(self.action, FilterAction::RemovePorte) => {
+                Err(clarify("Você quer retirar ou manter o filtro de porte?"))
+            }
+            Some(EditTarget::Capital) if matches!(self.action, FilterAction::RemoveCapital) => {
+                Err(clarify("Você quer retirar ou manter o filtro de capital social?"))
+            }
+            Some(EditTarget::Opened) if matches!(self.action, FilterAction::RemoveOpened) => {
+                Err(clarify("Você quer retirar ou manter o filtro de data de abertura?"))
+            }
+            Some(EditTarget::StatusDate) if matches!(self.action, FilterAction::RemoveStatusDate) => {
+                Err(clarify("Você quer retirar ou manter o filtro de data da situação cadastral?"))
+            }
+            Some(EditTarget::Status(need))
+                if need.map_or(request.scope.status.unwrap_or(previous_status) != previous_status, |status| {
+                    !previous_status.contains(status) || !request.scope.status.unwrap_or(previous_status).contains(status)
+                }) =>
+            {
+                Err(clarify("Qual situação cadastral você quer manter na consulta atual?"))
+            }
+            Some(EditTarget::UnitType(need)) if previous_unit != need || unit_filter(request) != need => {
+                Err(clarify("Qual tipo de estabelecimento você quer manter na consulta: matriz ou filial?"))
+            }
+            Some(EditTarget::Tax(regime, need))
+                if (regime == TaxRegime::Simples && previous_tax == Tri::Any)
+                    || (need != Tri::Any && need != previous_tax)
+                    || regime.current(&request.scope) != previous_tax =>
+            {
+                Err(clarify(&format!("Como você quer filtrar pelo {}: optantes, não optantes ou qualquer regime?", regime.name())))
+            }
+            _ => Ok(act),
+        }
+    }
+}
+
+fn edit_subject(words: &[String], mut at: usize) -> usize {
+    let article = |word: &String| matches!(word.as_str(), "o" | "a" | "os" | "as");
+    let link = |word: &String| matches!(word.as_str(), "de" | "do" | "da" | "dos" | "das");
+    at += usize::from(words.get(at).is_some_and(|word| matches!(word.as_str(), "so" | "apenas" | "somente")));
+    at += usize::from(words.get(at).is_some_and(article));
+    if words.get(at).is_some_and(|word| matches!(word.as_str(), "filtro" | "filtros" | "exigencia")) {
+        at += 1;
+    }
+    at += usize::from(words.get(at).is_some_and(link));
+    at
+}
+
+fn read_tax_regime(words: &[String], at: usize) -> Option<(TaxRegime, usize)> {
+    match words.get(at)?.as_str() {
+        "simples" => Some((TaxRegime::Simples, at + 1 + usize::from(words.get(at + 1).is_some_and(|word| word == "nacional")))),
+        "mei" => Some((TaxRegime::Mei, at + 1)),
+        _ => None,
+    }
+}
+
+/// Only the destination of a qualified swap can omit the regime name.
+fn read_tax_option(words: &[String], at: usize) -> Option<(Tri, usize, Option<TaxRegime>)> {
+    let at = at + if matches!(words.get(at..), Some([who, is, ..]) if who == "quem" && is == "esta") { 2 } else { 0 };
+    if matches!(words.get(at..), Some([outside, link, ..]) if outside == "fora" && link == "do")
+        && let Some((regime, end)) = read_tax_regime(words, at + 2)
+    {
+        return Some((Tri::No, end, Some(regime)));
+    }
+    let negative = words.get(at).is_some_and(|word| word == "nao");
+    let option = at + usize::from(negative);
+    match words.get(option)?.as_str() {
+        "mei" if negative => Some((Tri::No, option + 1, Some(TaxRegime::Mei))),
+        "optante" | "optantes" => {
+            let choice = if negative { Tri::No } else { Tri::Yes };
+            let end = option + 1;
+            if words.get(end).is_some_and(|word| matches!(word.as_str(), "do" | "pelo" | "de"))
+                && let Some((regime, end)) = read_tax_regime(words, end + 1)
+            {
+                Some((choice, end, Some(regime)))
+            } else {
+                Some((choice, end, None))
+            }
+        }
+        _ => None,
+    }
+}
+
+fn read_status(words: &[String], at: usize) -> Option<(Status, usize)> {
+    STATUS_TERMS.iter().find_map(|(terms, status)| {
+        terms.iter().find_map(|term| {
+            let end = at + term.split_whitespace().count();
+            words.get(at..end)?.iter().map(String::as_str).eq(term.split_whitespace()).then_some((*status, end))
+        })
+    })
+}
+
+fn read_edit_target(words: &[String], at: usize) -> Option<(EditTarget, usize)> {
+    if let Some(contact) = contact_phrase(words, at) {
+        let need = if contact.phone(words) { ContactNeed::Phone } else { ContactNeed::Email };
+        return Some((EditTarget::Contact(need), contact_qualifier_end(words, contact.end)));
+    }
+    if let Some((choice, end, Some(regime))) = read_tax_option(words, at) {
+        return Some((EditTarget::Tax(regime, choice), end));
+    }
+    if let Some((regime, end)) = read_tax_regime(words, at) {
+        return Some((EditTarget::Tax(regime, Tri::Any), end));
+    }
+    for (target, phrase) in [
+        (EditTarget::Opened, &["data", "de", "abertura"][..]),
+        (EditTarget::Opened, &["periodo", "de", "abertura"][..]),
+        (EditTarget::Opened, &["data", "de", "inicio", "da", "atividade"][..]),
+        (EditTarget::Opened, &["data", "de", "inicio", "de", "atividade"][..]),
+        (EditTarget::Opened, &["inicio", "de", "atividade"][..]),
+        (EditTarget::StatusDate, &["data", "da", "baixa"][..]),
+        (EditTarget::StatusDate, &["data", "de", "baixa"][..]),
+        (EditTarget::StatusDate, &["periodo", "de", "baixa"][..]),
+        (EditTarget::StatusDate, &["data", "do", "encerramento"][..]),
+        (EditTarget::StatusDate, &["data", "de", "encerramento"][..]),
+        (EditTarget::StatusDate, &["data", "da", "situacao", "cadastral"][..]),
+        (EditTarget::StatusDate, &["data", "da", "situacao"][..]),
+    ] {
+        if words.get(at..at + phrase.len()).is_some_and(|part| part.iter().zip(phrase).all(|(word, expected)| word == expected)) {
+            return Some((target, at + phrase.len()));
+        }
+    }
+    if let Some((status, end)) = read_status(words, at) {
+        return Some((EditTarget::Status(Some(status)), end));
+    }
+    let at = if matches!(words.get(at..), Some([noun, link, capital, ..])
+        if matches!(noun.as_str(), "limite" | "faixa") && link == "de" && capital == "capital")
+    {
+        at + 2
+    } else {
+        at
+    };
+    let target = match words.get(at)?.as_str() {
+        "contato" | "contatos" => EditTarget::Contact(ContactNeed::Both),
+        "porte" | "portes" => EditTarget::Porte,
+        "capital" => {
+            let end = at + 1 + usize::from(words.get(at + 1).is_some_and(|word| word == "social"));
+            return Some((EditTarget::Capital, end));
+        }
+        "matriz" | "matrizes" => EditTarget::UnitType(Tri::Yes),
+        "filial" | "filiais" => EditTarget::UnitType(Tri::No),
+        "situacao" | "status" => {
+            let end = at + 1 + usize::from(words.get(at + 1).is_some_and(|word| word == "cadastral"));
+            let start = end + usize::from(words.get(end).is_some_and(|word| word == "de"));
+            return Some(
+                read_status(words, start).map_or((EditTarget::Status(None), end), |(status, end)| (EditTarget::Status(Some(status)), end)),
+            );
+        }
+        _ => return None,
+    };
+    Some((target, at + 1))
+}
+
+/// Read a complete edit before its operands can be interpreted as positive filters.
+fn read_filter_edit(
+    words: &[String],
+    delivery: &crate::skills::Vocabulary,
+    export: bool,
+) -> Result<Option<FilterEdit>, Box<Interpretation>> {
+    let mut end = delivery.record_closing(words, words.len());
+    if export && words[..end].last().is_some_and(|word| word == "e") {
+        end -= 1;
+    }
+    let words = &words[..end];
+    let mut start = 0;
+    loop {
+        start += delivery.record_opening(&words[start..]).0;
+        if words.get(start).is_some_and(|word| matches!(word.as_str(), "agora" | "dessas" | "desses" | "e")) {
+            start += 1;
+        } else {
+            break;
+        }
+    }
+    let Some(command) = words.get(start) else { return Ok(None) };
+    let replace = match command.as_str() {
+        "tira" | "tire" | "tirar" | "retira" | "retire" | "retirar" | "remove" | "remova" | "remover" | "limpa" | "limpe" => false,
+        "troca" | "troque" | "trocar" | "substitui" | "substitua" | "substituir" => true,
+        _ => return Ok(None),
+    };
+    let subject = edit_subject(words, start + 1);
+    if words.get(subject).is_some_and(|word| matches!(word.as_str(), "coluna" | "colunas" | "campo" | "campos"))
+        && read_edit_target(words, edit_subject(words, subject + 1)).is_some()
+    {
+        return Err(clarify("Para editar o arquivo, diga quais colunas quer manter. Para editar a busca, indique o filtro."));
+    }
+    let Some((source, mut end)) = read_edit_target(words, subject) else {
+        if replace && read_tax_option(words, subject).is_some() {
+            return Err(clarify("Qual regime você quer editar? Informe, por exemplo, “troca optantes do Simples por não optantes”."));
+        }
+        if words.get(subject).is_some_and(|word| matches!(word.as_str(), "data" | "periodo")) {
+            return Err(clarify("Qual data você quer editar: a data de abertura ou a data da situação cadastral?"));
+        }
+        return Ok(None);
+    };
+    let action = match (replace, source) {
+        (true, EditTarget::Contact(source @ (ContactNeed::Phone | ContactNeed::Email))) => {
+            let Some((EditTarget::Contact(target @ (ContactNeed::Phone | ContactNeed::Email)), after)) = replacement_target(words, end)
+            else {
+                return Err(clarify("Por qual filtro você quer trocar: telefone ou e-mail?"));
+            };
+            end = after;
+            FilterAction::ReplaceContact { source, target }
+        }
+        (true, EditTarget::UnitType(source)) => {
+            let Some((EditTarget::UnitType(target), after)) = replacement_target(words, end) else {
+                return Err(clarify("Por qual tipo de estabelecimento você quer trocar: matriz ou filial?"));
+            };
+            end = after;
+            FilterAction::ReplaceUnit { source, target }
+        }
+        (true, EditTarget::Status(source)) => {
+            let (Some(source), Some((EditTarget::Status(Some(target)), after))) = (source, replacement_target(words, end)) else {
+                return Err(clarify("Informe a situação cadastral atual e a desejada, como “troca ativas por baixadas”."));
+            };
+            end = after;
+            FilterAction::ReplaceStatus { source, target }
+        }
+        (true, EditTarget::Tax(regime, source)) => {
+            let source = if regime == TaxRegime::Mei && source == Tri::Any { Tri::Yes } else { source };
+            let target = replacement_start(words, end).and_then(|at| {
+                read_tax_option(words, at)
+                    .filter(|(_, _, named)| named.is_none_or(|named| named == regime))
+                    .map(|(choice, end, _)| (choice, end))
+                    .or_else(|| (regime == TaxRegime::Mei && words.get(at).is_some_and(|word| word == "mei")).then_some((Tri::Yes, at + 1)))
+            });
+            let Some((target, after)) = target.filter(|_| source != Tri::Any) else {
+                return Err(clarify(&format!("Informe a opção atual e a nova opção do {}: optantes ou não optantes.", regime.name())));
+            };
+            end = after;
+            FilterAction::ReplaceTax { regime, source, target }
+        }
+        (false, EditTarget::Contact(mut source)) => {
+            if words.get(end).is_some_and(|word| word == "e")
+                && let Some((EditTarget::Contact(other), after)) = read_edit_target(words, edit_subject(words, end + 1))
+            {
+                if source != other {
+                    source = ContactNeed::Both;
+                }
+                end = after;
+            }
+            FilterAction::RemoveContact(source)
+        }
+        (false, EditTarget::Porte) => FilterAction::RemovePorte,
+        (false, EditTarget::Capital) => FilterAction::RemoveCapital,
+        (false, EditTarget::Opened) => FilterAction::RemoveOpened,
+        (false, EditTarget::StatusDate) => FilterAction::RemoveStatusDate,
+        _ => return Ok(None),
+    };
+
+    // Combined removals of older filter types still use the existing grammar.
+    if matches!(action, FilterAction::RemovePorte | FilterAction::RemoveCapital)
+        && words.get(end).is_some_and(|word| word == "e")
+        && words
+            .get(edit_subject(words, end + 1))
+            .is_some_and(|word| matches!(word.as_str(), "capital" | "porte" | "mei" | "matriz" | "matrizes" | "filial" | "filiais"))
+    {
+        return Ok(None);
+    }
+    let keep = if let Some(first) = words.get(end) {
+        let start = end + usize::from(first == "e");
+        if !words.get(start).is_some_and(|word| matches!(word.as_str(), "mantenha" | "mantem" | "mantendo")) {
+            return Err(clarify("Quais filtros você quer editar e quais deseja manter?"));
+        }
+        let subject = edit_subject(words, start + 1);
+        if let Some((target, _)) = read_edit_target(words, subject).filter(|(_, after)| *after == words.len()) {
+            Some(target)
+        } else if matches!(&words[subject..], [word] if word == "restante")
+            || matches!(&words[subject..], [other, filters] if matches!(other.as_str(), "outros" | "demais") && filters == "filtros")
+        {
+            None
+        } else {
+            return Err(clarify("Qual filtro você quer manter na consulta atual?"));
+        }
+    } else {
+        None
+    };
+    Ok(Some(FilterEdit { action, keep }))
+}
+
+fn replacement_start(words: &[String], at: usize) -> Option<usize> {
+    matches!(words.get(at)?.as_str(), "por" | "pelo" | "pela" | "pelos" | "pelas").then(|| edit_subject(words, at + 1))
+}
+
+fn replacement_target(words: &[String], at: usize) -> Option<(EditTarget, usize)> {
+    read_edit_target(words, replacement_start(words, at)?)
+}
+
+fn uf_id(word: &str) -> Option<UfId> {
+    UFS.iter().position(|uf| uf.eq_ignore_ascii_case(word)).map(|index| UfId(index as u8))
+}
+
+/// A multiword typo is only tried at an activity boundary, then matched as a
+/// complete alias. A partial sector cannot remain alongside the recovery.
+fn recover_activities(words: &[String], hits: &mut Vec<Hit>, env: &ResolveContext<'_>, notes: &mut Vec<String>) {
+    let first_name =
+        hits.iter().find(|hit| hit.values.iter().any(|entity| !matches!(entity, Entity::Uf(_)))).map_or(words.len(), |hit| hit.start);
+    let opening = env.delivery.record_opening(&words[..first_name]).0;
+    let head = (opening..words.len())
+        .find(|&at| !matches!(words[at].as_str(), "as" | "os" | "a" | "o" | "todas" | "todos" | "so" | "somente" | "apenas"));
+    let editable = |word: &str| !env.vocabulary.knows(word);
+    for start in 0..words.len() {
+        let qualified = start >= 2
+            && matches!(words[start - 1].as_str(), "de" | "do" | "da" | "dos" | "das")
+            && (SECTOR_QUALIFIERS.contains(&words[start - 2].as_str())
+                || matches!(words[start - 2].as_str(), "empresas" | "estabelecimentos" | "matrizes" | "filiais"));
+        if head != Some(start) && !qualified {
+            continue;
+        }
+        for end in (start + 2..=(start + 6).min(words.len())).rev() {
+            let name = &words[start..end];
+            if !name.iter().any(|word| editable(word))
+                || hits.iter().any(|hit| {
+                    hit.start < end
+                        && start < hit.end
+                        && (hit.start < start
+                            || hit.end > end
+                            || hit.start == start && hit.end == end
+                            || hit.values.iter().any(|entity| !matches!(entity, Entity::Sector(_))))
+                })
+            {
+                continue;
+            }
+            if let Some(values) = env.pack.lexicon.fuzzy_sector(name, editable) {
+                hits.retain(|hit| hit.start >= end || hit.end <= start);
+                hits.push(Hit { start, end, values, fuzzy: false });
+                notes.push(format!("Atividade interpretada por aproximação: {}.", name.join(" ")));
+                break;
+            }
+        }
+    }
+    for (start, word) in words.iter().enumerate() {
+        if word.len() >= 7
+            && editable(word)
+            && !hits.iter().any(|hit| hit.start <= start && start < hit.end)
+            && let Some(values) = env.pack.lexicon.fuzzy_sector(&words[start..start + 1], editable)
+        {
+            hits.push(Hit { start, end: start + 1, values, fuzzy: false });
+            notes.push(format!("Atividade interpretada por aproximação: {word}."));
+        }
+    }
+}
+
+/// Require a geographic introducer and a full place name. Multiword recovery also
+/// requires an adjacent UF, so an incomplete name cannot fall back to a short prefix.
+fn recover_places(words: &[String], hits: &mut Vec<Hit>, env: &ResolveContext<'_>, notes: &mut Vec<String>) {
+    for at in 1..words.len() {
+        let previous = words[at - 1].as_str();
+        let locative = matches!(previous, "em" | "no" | "na");
+        let coordinated = previous == "e"
+            && hits.iter().any(|hit| {
+                hit.values.iter().any(|entity| matches!(entity, Entity::Municipality { .. }))
+                    && (hit.end + 1 == at || hit.end + 2 == at && uf_id(&words[hit.end]).is_some())
+            });
+        if !locative && !coordinated && !matches!(previous, "de" | "do" | "da") {
+            continue;
+        }
+        let start = if locative
+            && PLACE_QUALIFIERS.contains(&words[at].as_str())
+            && words.get(at + 1).is_some_and(|word| matches!(word.as_str(), "de" | "do" | "da"))
+        {
+            at + 2
+        } else {
+            at
+        };
+        let explicit = (start + 1..(start + 7).min(words.len())).find_map(|end| uf_id(&words[end]).map(|uf| (end, Some(uf))));
+        let Some((end, uf)) = explicit.or_else(|| {
+            (locative && start + 1 == words.len() && words[start].len() >= 7 && !env.vocabulary.knows(&words[start]))
+                .then_some((start + 1, None))
+        }) else {
+            continue;
+        };
+        if hits.iter().any(|hit| {
+            hit.start < end
+                && start < hit.end
+                && (hit.start < start
+                    || hit.end > end
+                    || hit.start == start && hit.end == end
+                    || hit.values.iter().any(|entity| matches!(entity, Entity::Sector(_) | Entity::Region(_))))
+        }) {
+            continue;
+        }
+        let name = &words[start..end];
+        if let Some(values) = env.pack.lexicon.fuzzy_place(name, uf) {
+            hits.retain(|hit| hit.start >= end || hit.end <= start);
+            hits.push(Hit { start, end, values, fuzzy: true });
+            notes.push(format!("Local interpretado por aproximação: {}.", name.join(" ")));
+        }
+    }
+}
+
+/// Read a name predicate before spotting entities. A prefix such as "MT" is a
+/// literal in this clause, even when the same word is a state elsewhere.
+pub(crate) fn read_name_prefix(text: &str) -> Result<Option<(NamePrefix, std::ops::Range<usize>)>, Box<Interpretation>> {
+    // Literal name fragments bypass colloquial rewrites such as "pro" -> "para".
+    let literal = normalize::fold(text);
+    let words: Vec<&str> = literal.split(|c: char| !c.is_alphanumeric()).filter(|word| !word.is_empty()).collect();
+    let mut found = None;
+    for (at, pair) in words.windows(2).enumerate() {
+        if !matches!(pair, ["comeca" | "comecam" | "comece" | "comecem" | "inicia" | "iniciam" | "inicie" | "iniciem", "com"]) {
+            continue;
+        }
+        let mut before = &words[..at];
+        let negated = before.last() == Some(&"nao");
+        if negated {
+            before = &before[..before.len() - 1];
+        }
+        let relative = before.last() == Some(&"que");
+        if relative {
+            before = &before[..before.len() - 1];
+        }
+        let (field, width) = match before {
+            [.., "razao", "social"] => (NameField::Legal, 2),
+            [.., "nome", "fantasia"] => (NameField::Trade, 2),
+            [.., "nome" | "nomes"] => (NameField::Any, 1),
+            _ if relative => (NameField::Any, 0),
+            _ => continue,
+        };
+        let mut start = before.len() - width;
+        if width > 0 {
+            if matches!(words[..start].last(), Some(&("o" | "a" | "os" | "as"))) {
+                start -= 1;
+            }
+            if matches!(words[..start].last(), Some(&("cujo" | "cuja" | "cujos" | "cujas" | "que" | "com"))) {
+                start -= 1;
+            }
+        }
+        let mut value = at + 2;
+        match &words[value..] {
+            ["a", "letra", ..] | ["as", "letras", ..] => value += 2,
+            ["letra" | "letras", ..] => value += 1,
+            _ => {}
+        }
+        let Some(&prefix) = words.get(value).filter(|word| NamePrefix::valid_text(word)) else {
+            return Err(clarify("Com quais letras o nome deve começar? Informe um prefixo, como “Z” ou “ZA”."));
+        };
+        let end = value + 1;
+        let rest = &words[end..];
+        let next_is_filter = match rest.strip_prefix(&["e"]).unwrap_or(rest) {
+            [] => rest.is_empty(),
+            [
+                "em" | "no" | "na" | "nos" | "nas" | "com" | "sem" | "ativa" | "ativas" | "ativos" | "ativo" | "baixada" | "baixadas"
+                | "baixados" | "baixado" | "me" | "mande" | "manda" | "existem" | "existe" | "ha" | "tem",
+                ..,
+            ] => true,
+            _ => false,
+        };
+        if negated || found.is_some() || !next_is_filter {
+            return Err(clarify("Informe um único prefixo para o começo do nome, como “começa com Z”."));
+        }
+        found = Some((NamePrefix { field, prefix: prefix.to_ascii_uppercase() }, start..end));
+    }
+    Ok(found)
 }
 
 /// `export` marks a question whose answer is delivered as a file: a count of companies
 /// becomes the list of those companies.
 pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation, export: bool) -> Result<Frame, Box<Interpretation>> {
-    let ResolveContext { pack, cues, policy, anchor, current, competences, versions, population, vocabulary } = *env;
+    let ResolveContext { pack, cues, policy, anchor, current, competences, versions, population, vocabulary, delivery } = *env;
+    let mut words = normalize::words(text);
+    let edit = read_filter_edit(&words, delivery, export)?;
+    let text = if edit.is_some() {
+        if state.last.is_none() {
+            return Err(clarify("A qual pesquisa você se refere? Informe a atividade e o local para começar."));
+        }
+        words.clear();
+        ""
+    } else {
+        text
+    };
     let raw = normalize::fold(text);
-    let words = normalize::words(text);
-    let normalized = words.join(" ");
-    let n = normalized.as_str();
-    if cue(n, &policy.privacy) {
+    if state.last.is_none() && words.first().is_some_and(|word| matches!(word.as_str(), "dessas" | "desses" | "delas" | "deles")) {
+        return Err(clarify("A qual pesquisa você se refere? Informe a atividade e o local para começar."));
+    }
+    let mut normalized = words.join(" ");
+    if cue(&normalized, &policy.privacy) {
         return Err(reject(
             "A pesquisa de pessoas, CPFs e sócios não está disponível no chat. Posso pesquisar estabelecimentos por município e atividade.",
         ));
     }
-    if cue(n, &policy.unavailable) {
+    let name = read_name_prefix(text)?;
+    let prefix_span = name.as_ref().map(|(_, span)| span);
+    if let Some(span) = prefix_span {
+        words[span.clone()].fill(String::new());
+        normalized = words.join(" ");
+    }
+    let mut preliminary = pack.lexicon.scan(&words);
+    // A complete sector alias can contain the name of an unavailable metric.
+    // "Empresas de produção de soja" names an activity. "Qual a produção de soja" asks for output.
+    let unavailable = policy.unavailable.iter().filter(|phrase| has(&normalized, &[phrase])).any(|phrase| {
+        let needle = normalize::words(phrase);
+        !needle.is_empty()
+            && words.windows(needle.len()).enumerate().any(|(at, window)| {
+                window == needle
+                    && !preliminary.iter().any(|hit| {
+                        hit.start <= at
+                            && at + needle.len() <= hit.end
+                            && hit.values.iter().any(|entity| matches!(entity, Entity::Sector(_)))
+                    })
+            })
+    });
+    if unavailable {
         return Err(reject(
             "Essa informação não está nos dados cadastrais disponíveis. Posso contar estabelecimentos, listar CNPJs ou mostrar registros e baixas.",
         ));
     }
-    let mut preliminary = pack.lexicon.scan(&words);
-    // A misspelt activity ("supemercados", "acadmias") is recovered only when the word is
-    // unknown and exactly one activity is one edit away; the answer says so.
     let mut approximated = Vec::new();
-    for (at, word) in words.iter().enumerate() {
-        if !preliminary.iter().any(|h| h.start <= at && at < h.end)
-            && !vocabulary.knows(word)
-            && let Some(values) = pack.lexicon.fuzzy_sector(word)
+    recover_places(&words, &mut preliminary, env, &mut approximated);
+    recover_activities(&words, &mut preliminary, env, &mut approximated);
+    preliminary.sort_by_key(|h| h.start);
+    // A normalized opener such as "dá pra" can contain the word "para". Ignore
+    // UF readings entirely inside a recognized opener, never a named entity.
+    let first_name = preliminary
+        .iter()
+        .find(|hit| hit.values.iter().any(|entity| !matches!(entity, Entity::Uf(_))))
+        .map_or(words.len(), |hit| hit.start);
+    let (mut opening, mut list_command) = delivery.record_opening(&words[..first_name]);
+    preliminary.retain(|hit| hit.end > opening);
+    let first_comma = text.split_once(',').map(|(prefix, _)| normalize::words(prefix).len());
+    if let Some(end) = first_comma {
+        let places = preliminary.iter().take_while(|hit| hit.end <= end);
+        if end > 0
+            && places.clone().all(|hit| hit.values.iter().all(|entity| matches!(entity, Entity::Municipality { .. } | Entity::Uf(_))))
+            && places.map(|hit| hit.end - hit.start).sum::<usize>() == end
         {
-            preliminary.push(Hit { start: at, end: at + 1, values, fuzzy: false });
-            approximated.push(format!("Atividade interpretada por aproximação: {word}."));
+            let next_name = preliminary
+                .iter()
+                .find(|hit| hit.start >= end && hit.values.iter().any(|entity| !matches!(entity, Entity::Uf(_))))
+                .map_or(words.len(), |hit| hit.start);
+            let (after_place, command) = delivery.record_opening(&words[end..next_name]);
+            if after_place > 0 {
+                opening = end + after_place;
+                list_command = command;
+            }
         }
     }
-    preliminary.sort_by_key(|h| h.start);
-    let masked = masked_text(&words, &preliminary);
-    let m = masked.as_str();
+    // A place name before "em" followed immediately by another municipality is not
+    // a coordinated list. "Flores em Fortaleza CE" can also mean flowers in Fortaleza.
+    if let [first, second, ..] = preliminary.as_slice()
+        && first.start == 0
+        && first.end + 1 == second.start
+        && words[first.end] == "em"
+        && [first, second].iter().all(|hit| hit.values.iter().any(|entity| matches!(entity, Entity::Municipality { .. })))
+        && first_comma.is_none_or(|end| end >= second.end)
+    {
+        return Err(clarify("Qual município você quer pesquisar? Separe locais diferentes por “e” ou por vírgula."));
+    }
+    let closing = delivery.record_closing(&words, words.len()).max(preliminary.last().map_or(opening, |hit| hit.end));
+    if words.iter().any(|word| {
+        matches!(word.as_str(), "area" | "atividade" | "ramo" | "setor" | "segmento" | "comercios")
+            || PHONE_WORDS.contains(&word.as_str())
+            || contact_alias(word).is_some()
+            || matches!(word.as_str(), "email" | "emails" | "mail" | "mails" | "eletronico" | "telefonico" | "ligar")
+    }) {
+        normalize_sector_qualifier(&mut words, &mut preliminary);
+        normalize_contact_filters(&mut words, &preliminary)?;
+    }
+    for hit in &preliminary {
+        if hit.start >= 2
+            && hit.values.iter().any(|entity| matches!(entity, Entity::Municipality { .. } | Entity::Uf(_)))
+            && words[hit.start - 2] == "la"
+            && words[hit.start - 1] == "em"
+        {
+            words[hit.start - 2] = "e".into();
+        }
+    }
+    normalized = words.join(" ");
+    let n = normalized.as_str();
+    let masked = masked_words(&words, &preliminary);
+    let body = masked[opening..].join(" ");
+    let m = body.as_str();
+    if has(m, &["matrizes ou filiais", "filiais ou matrizes", "matriz ou filial", "filial ou matriz"])
+        || has(m, &["capital social", "capital acima"])
+            && has(m, &["ou epp", "ou pequeno porte", "ou microempresa", "ou mei", "ou simples"])
+    {
+        return Err(clarify("Esses filtros são alternativas? Informe qual condição quer aplicar ou use “e” para combinar filtros."));
+    }
+    // An opener can be the first word of a list cue, as in "mostre as matrizes".
+    let list_cue = cue(m, &cues.list) || opening > 0 && cue(&masked.join(" "), &cues.list);
     let uncovered = |phrases: &[String]| {
         phrases.iter().any(|phrase| {
             let needle = normalize::words(phrase);
@@ -125,6 +1069,7 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
             &[
                 "empresa",
                 "empresas",
+                "comercios",
                 "estabelecimento",
                 "estabelecimentos",
                 "cnpj",
@@ -175,11 +1120,11 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
         let strange: Vec<&str> = words
             .iter()
             .enumerate()
-            .filter(|(at, w)| !preliminary.iter().any(|h| h.start <= *at && *at < h.end) && !vocabulary.knows(w))
+            .filter(|(at, w)| *at >= opening && !preliminary.iter().any(|h| h.start <= *at && *at < h.end) && !vocabulary.knows(w))
             .map(|(_, w)| w.as_str())
             .collect();
         let placed = preliminary.iter().any(|h| h.values.iter().any(|e| matches!(e, Entity::Municipality { .. } | Entity::Uf(_))));
-        if cue(m, &cues.list) && placed && !strange.is_empty() {
+        if (list_command || list_cue) && placed && !strange.is_empty() {
             return Err(clarify(&unrecognized(&strange)));
         }
         return Err(reject("Esse pedido não é uma pesquisa cadastral de empresas. Posso contar, listar e comparar estabelecimentos."));
@@ -218,7 +1163,7 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
     });
     // Mask entity spans, retaining date punctuation. Short UF hits must not
     // erase matching substrings elsewhere ("es" once turned "meses" into "m  ").
-    let temporal_raw = temporal_text(text, &hits);
+    let temporal_raw = temporal_text(text, &hits, prefix_span);
     if time::invalid_dates(&temporal_raw) {
         return Err(clarify("Informe datas válidas no formato DD/MM/AAAA ou AAAA-MM-DD."));
     }
@@ -231,21 +1176,6 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
     }
     let mut notes = approximated;
     let mut rows = None;
-    for i in 1..words.len() {
-        if matches!(words[i - 1].as_str(), "em" | "no" | "na")
-            && !hits.iter().any(|h| h.start <= i && i < h.end)
-            // Recover only a complete single-token place followed by a UF, or closing the
-            // question ("em curitba"). A token inside a longer name ("Águas Lindaas de
-            // Goiás") must fail closed instead of decomposing into unrelated municipalities.
-            && (words.get(i + 1).is_some_and(|s| UFS.iter().any(|u| u.eq_ignore_ascii_case(s)))
-                || i + 1 == words.len() && words[i].len() >= 7 && !vocabulary.knows(&words[i]))
-            && let Some(values) = pack.lexicon.fuzzy_place(&words[i])
-        {
-            hits.push(Hit { start: i, end: i + 1, values, fuzzy: true });
-            notes.push(format!("Local interpretado por aproximação: {}.", words[i]));
-        }
-    }
-    hits.sort_by_key(|h| h.start);
     // Fail closed on unknown places and on unsupported restrictions. A familiar
     // city elsewhere in the question must never hide an unrecognized filter.
     for (i, word) in words.iter().enumerate() {
@@ -256,28 +1186,43 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
         }
         if matches!(word.as_str(), "em" | "no" | "na") {
             let mut at = i + 1;
-            while words.get(at).is_some_and(|w| {
-                matches!(
-                    w.as_str(),
-                    "cidade"
-                            | "municipio"
-                            | "municipios"
-                            | "cidades"
-                            | "estado"
-                            | "de"
-                            | "do"
-                            | "da"
-                            // "no setor de TI": the activity after it must be recognized.
-                            | "setor"
-                            | "setores"
-                            | "ramo"
-                            | "segmento"
-                )
-            }) {
+            if matches!(&words[at..], [todo, article, state, ..] if todo == "todo" && article == "o" && state == "estado") {
+                at += 2;
+            }
+            let first = words.get(at).map(String::as_str).unwrap_or("");
+            let sector = SECTOR_QUALIFIERS.contains(&first) || first == "setores";
+            let labels = if sector { SECTOR_QUALIFIERS } else { PLACE_QUALIFIERS };
+            let repeated = |at: usize| {
+                at > i + 1
+                    && labels.contains(&first)
+                    && matches!(words.get(at..), Some([prep, noun, ..])
+                        if matches!(prep.as_str(), "em" | "no" | "na") && labels.contains(&noun.as_str()))
+            };
+            let mut restated = false;
+            while let Some(w) = words.get(at) {
+                if repeated(at) {
+                    restated = true;
+                } else if !(PLACE_QUALIFIERS.contains(&w.as_str())
+                    || SECTOR_QUALIFIERS.contains(&w.as_str())
+                    || matches!(w.as_str(), "setores" | "de" | "do" | "da"))
+                {
+                    break;
+                }
                 at += 1;
             }
             if let Some(next) = words.get(at) {
-                let recognized = hits.iter().any(|h| h.start <= at && at < h.end);
+                let recognized = hits.iter().any(|h| {
+                    h.start <= at
+                        && at < h.end
+                        && (!restated
+                            || h.values.iter().any(|entity| {
+                                if sector {
+                                    matches!(entity, Entity::Sector(_))
+                                } else {
+                                    matches!(entity, Entity::Municipality { .. } | Entity::Uf(_))
+                                }
+                            }))
+                });
                 let grammatical = next == "com"
                     || next == "menos"
                     || next == "mais"
@@ -351,7 +1296,7 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
                     "dezembro",
                 ]
                 .contains(&next.as_str());
-                if !recognized && !grammatical && !numeric && !month {
+                if !recognized && (restated || !grammatical && !numeric && !month) {
                     return Err(clarify("Não reconheci o local ou a restrição. Informe o município e a UF, ou reformule esse filtro."));
                 }
                 // A multi-word place must be fully recognized up to its UF.
@@ -742,46 +1687,7 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
         ],
     );
     let named_place = !municipalities.is_empty() || !ufs.is_empty() || !regions.is_empty();
-    let covered = |at: usize| hits.iter().any(|h| h.start <= at && at < h.end);
-    // The phrase is headed by what is searched for, after articles and a plain request.
-    let head = words.iter().position(|w| {
-        !matches!(
-            w.as_str(),
-            "a" | "o"
-                | "as"
-                | "os"
-                | "um"
-                | "uma"
-                | "uns"
-                | "umas"
-                | "todas"
-                | "todos"
-                | "novas"
-                | "novos"
-                | "quero"
-                | "queria"
-                | "preciso"
-                | "procuro"
-                | "busco"
-                | "de"
-                | "das"
-                | "dos"
-                | "concorrentes"
-                | "concorrente"
-                | "contatos"
-                | "telefones"
-                | "emails"
-                | "leads"
-                | "prospects"
-                | "vender"
-                | "prospectar"
-                | "encontrar"
-                | "achar"
-                | "para"
-                | "clientes"
-                | "gostaria"
-        )
-    });
+    let covered = |at: usize| prefix_span.is_some_and(|span| span.contains(&at)) || hits.iter().any(|h| h.start <= at && at < h.end);
     let plural_noun = |w: &str| {
         matches!(
             w,
@@ -798,38 +1704,121 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
                 | "sociedades"
         )
     };
+    // The phrase is headed by what is searched for, after articles and a plain request.
+    let head = words[opening..]
+        .iter()
+        .position(|w| {
+            !matches!(
+                w.as_str(),
+                "a" | "o"
+                    | "as"
+                    | "os"
+                    | "um"
+                    | "uma"
+                    | "uns"
+                    | "umas"
+                    | "todas"
+                    | "todos"
+                    | "me"
+                    | "apenas"
+                    | "somente"
+                    | "so"
+                    | "novas"
+                    | "novos"
+                    | "quero"
+                    | "queria"
+                    | "preciso"
+                    | "procuro"
+                    | "busco"
+                    | "de"
+                    | "das"
+                    | "dos"
+                    | "concorrentes"
+                    | "concorrente"
+                    | "contatos"
+                    | "telefones"
+                    | "emails"
+                    | "leads"
+                    | "prospects"
+                    | "vender"
+                    | "prospectar"
+                    | "encontrar"
+                    | "achar"
+                    | "para"
+                    | "clientes"
+                    | "gostaria"
+                    | "quais"
+                    | "sao"
+            )
+        })
+        .map(|at| at + opening);
+    // A row limit can come between a hand-over command and the target noun.
+    let leading_limit = head.filter(|_| list_command || list_cue || export).and_then(|at| {
+        let (quantity, end) = time::quantity(&words, at)?;
+        let target = words.get(end)?;
+        let sector = hits.iter().any(|h| h.start == end && h.values.iter().any(|e| matches!(e, Entity::Sector(_))));
+        (quantity <= 1_000_000
+            && !(1900..=2100).contains(&quantity)
+            && (plural_noun(target) || sector || matches!(target.as_str(), "matrizes" | "filiais")))
+        .then_some((quantity as u32, at..end))
+    });
+    let head = leading_limit.as_ref().map(|(_, span)| span.end).or(head);
+    let tokens = normalize::tokens(text);
+    let tail = delivery.record_closing(&tokens, tokens.len());
+    let trailing_limit = (export || list_command || list_cue || state.last.as_ref().is_some_and(|last| matches!(last.op, Op::List { .. })))
+        .then(|| {
+            (tail.saturating_sub(2).max(1)..tail).find_map(|at| {
+                if !matches!(tokens[at - 1].as_str(), "so" | "apenas" | "somente") {
+                    return None;
+                }
+                let (limit, end) = time::quantity(&tokens, at)?;
+                (end == tail && limit <= 1_000_000 && !(1900..=2100).contains(&limit)).then_some((limit as u32, at..end))
+            })
+        })
+        .flatten();
     let headed_by_sector =
         head.is_some_and(|at| hits.iter().any(|h| h.start == at && h.values.iter().any(|e| matches!(e, Entity::Sector(_)))));
-    let headed_by_companies = head.is_some_and(|at| plural_noun(&words[at]) || words[at] == "mei");
+    let headed_by_companies = head.is_some_and(|at| {
+        plural_noun(&words[at])
+            || words[at] == "mei"
+            || list_command && matches!(words[at].as_str(), "matrizes" | "filiais")
+            || name.is_some() && matches!(words[at].as_str(), "empresa" | "estabelecimento")
+    });
     // Words before the head are the request itself; the rest must be read by a filter.
     let foreign: Vec<&str> = words
         .iter()
         .enumerate()
-        .filter(|(at, w)| head.is_some_and(|head| *at >= head) && !covered(*at) && !vocabulary.searches(w))
+        .filter(|(at, w)| head.is_some_and(|head| *at >= head) && *at < closing && !covered(*at) && !vocabulary.searches(w))
         .map(|(_, w)| w.as_str())
         .collect();
     let search_shape = (headed_by_sector || headed_by_companies) && (named_place || state.last.is_none());
     let search_style = search_shape && foreign.is_empty();
+    let rank_cue = cue(m, &cues.rank);
+    let rank_intent = rank_cue && has(n, &["mais", "menos", "maior", "menor", "variacao", "top", "ranking"]);
+    let analytical_intent =
+        rank_intent || [&cues.count, &cues.compare, &cues.trend, &cues.breakdown, &cues.growth].into_iter().any(|phrases| cue(m, phrases));
+    let analytical_cue = analytical_intent || rank_cue;
+    // Imperatives select a list only when no explicit analytical operation was requested.
+    let search_list = search_style
+        && !analytical_intent
+        && (name.is_some() || list_command || has(n, &["quero todos", "quero todas"]) || headed_by_sector && has(m, &["quais"]));
     // Contacts and leads are asked for as a list of companies.
     let wants_contacts = (has(n, &["contatos", "telefones", "emails", "e mails", "leads", "prospects", "mailing"])
         || search_style && has(n, &["telefone", "fone", "celular", "whatsapp", "zap", "email", "e mail", "contato"]))
-        && !cue(m, &cues.count);
+        && !analytical_intent;
     // "os maiores supermercados de Sinop": companies ordered by the only size the registry
     // holds, the declared capital. "As maiores cidades" ranks a dimension instead.
     let biggest = has(n, &["maiores"]) && dimension(n).is_none() && (!sectors.is_empty() || company_noun);
-    let full_query = bare_topic
+    let standalone = bare_topic
         || search_style
+        || search_shape && list_command && has(m, &["capital social"])
         || wants_contacts
-        || cue(m, &cues.count)
-        || cue(m, &cues.list)
-        || cue(m, &cues.compare)
-        || cue(m, &cues.rank)
-        || cue(m, &cues.trend)
-        || cue(m, &cues.breakdown)
+        || analytical_cue
+        || list_cue
         || meta.is_some()
-        || cue(m, &cues.growth)
         || lookup(&raw).is_some()
-        || has(n, &["densidade", "habitantes por estabelecimento"])
+        || has(n, &["densidade", "habitantes por estabelecimento"]);
+    let full_query = standalone
         || export && (!hits.is_empty() || has(n, &["empresas", "empresa", "estabelecimentos", "estabelecimento", "cnpjs", "negocios"]));
     let followup = state.last.is_some()
         && !has(n, &["nova pesquisa", "nova pergunta", "novo assunto"])
@@ -873,6 +1862,7 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
             || export && has(n, &["essas", "esses", "isso", "dessas", "desses", "mesmas", "mesmos"])
             || !full_query
             || municipalities.is_empty() && sectors.is_empty() && has(n, &["apenas", "somente", "so"]));
+    let inherited = followup && !standalone;
     let states_status = has(
         n,
         &[
@@ -898,18 +1888,10 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
             "novos",
         ],
     );
-    let explicit_intent = cue(m, &cues.count)
-        || cue(m, &cues.list)
-        || cue(m, &cues.compare)
-        || cue(m, &cues.rank)
-        || cue(m, &cues.trend)
-        || cue(m, &cues.breakdown)
-        || cue(m, &cues.growth)
-        || cue(m, &cues.closures)
-        || wants_contacts
-        || biggest
-        || meta.is_some()
-        || lookup(&raw).is_some();
+    let period = time::period(&temporal_raw, anchor);
+    let closed = cue(m, &cues.closures) || period.is_some() && cue(m, &cues.dated_closures);
+    let explicit_intent =
+        search_list || analytical_cue || list_cue || closed || wants_contacts || biggest || meta.is_some() || lookup(&raw).is_some();
     let assumed_stock = search_style && !bare_topic && !explicit_intent && !states_status && !followup && !export;
     if bare_topic {
         notes.push("Considerei o estoque de estabelecimentos ativos.".into());
@@ -1025,7 +2007,18 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
     {
         return Err(clarify("Qual atividade e município você quer pesquisar?"));
     }
+    let previous_contact = request.scope.contact;
     filters(n, m, &raw, &mut request, &mut act, population, &mut notes)?;
+    if let Some(edit) = edit {
+        act = edit.apply(&mut request)?.into();
+    } else if inherited
+        && act != "correction"
+        && previous_contact != ContactNeed::Any
+        && request.scope.contact != ContactNeed::Any
+        && request.scope.contact != previous_contact
+    {
+        request.scope.contact = ContactNeed::Both;
+    }
     if has(n, &["nao estao ativas", "nao estao ativos", "nao tao ativas", "nao tao ativos", "inativas", "inativos", "inativa", "inativo"]) {
         notes.push("Considerei suspensas, inaptas e baixadas; situação nula não foi incluída.".into());
     }
@@ -1046,13 +2039,13 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
         request.scope = Filters::default();
         request.time.period = None;
     } else {
-        let mut temporal = time::period(&temporal_raw, anchor);
+        let mut temporal = period;
         if temporal.is_some() && time::relative(&temporal_raw) {
             notes.push(format!("Períodos relativos contam até a data de referência da base, {}.", date_br(anchor)));
         }
         // "novas empresas", "recém-abertas" with no period: the last ninety days of the data.
         if temporal.is_none()
-            && !cue(m, &cues.closures)
+            && !closed
             // Masked text: "Currais Novos" is a place; "mais novos" orders a list.
             && has(m, &["novas", "novos", "recem abertas", "recem abertos", "recem criadas", "recem criados", "recem registradas"])
             && !has(m, &["mais novas", "mais novos"])
@@ -1065,10 +2058,10 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
                 date_br(anchor)
             ));
         }
-        if has(n, &["ultimos", "ultimas", "desde", "a partir"]) && temporal.is_none() {
+        let capital_floor = has(n, &["capital social a partir de", "capital a partir de"]) && request.scope.capital.is_some();
+        if temporal.is_none() && (has(n, &["ultimos", "ultimas", "desde"]) || has(n, &["a partir"]) && !capital_floor) {
             return Err(clarify("Não consegui resolver o período. Informe datas válidas ou uma quantidade de meses ou dias."));
         }
-        let closed = cue(m, &cues.closures);
         let registered = (cue(m, &cues.registrations)
             && (temporal.is_some()
                 || has(n, &["abriram", "surgiram", "comecaram", "criadas", "criados", "foram registrados", "registros de inicio"])))
@@ -1098,13 +2091,18 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
                 Metric::Stock
             };
         let iscompare = (cue(m, &cues.compare) && !has(n, &["antes de", "quero comparar com"]))
-            || followup && (n.starts_with("e com ") || has(n, &["qual tem mais", "qual tem menos", "qual das duas", "compare com"]));
-        let isrank = cue(m, &cues.rank) && has(n, &["mais", "menos", "maior", "menor", "variacao", "top", "ranking"]);
+            || followup
+                && (n.starts_with("e com ") && (named_place || !sectors.is_empty())
+                    || has(n, &["qual tem mais", "qual tem menos", "qual das duas", "compare com"]));
+        let isrank = rank_intent;
         let istrend = cue(m, &cues.trend) || has(n, &["evolucao mensal", "evolucao anual"]);
         let isbreakdown = cue(m, &cues.breakdown);
         // A file of companies lists the records a count would measure. Rankings, series,
         // comparisons and distributions are exported as their own table instead.
-        let inherited = followup && !full_query;
+        let previous_list = match request.op {
+            Op::List { order, limit } if inherited => Some((order, limit)),
+            _ => None,
+        };
         let analytical =
             iscompare || isrank || istrend || isbreakdown || inherited && !matches!(request.op, Op::Count { .. } | Op::List { .. });
         let measured = if inherited { request.op.metric() } else { Some(metric) };
@@ -1112,10 +2110,12 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
             && !analytical
             && !matches!(request.op, Op::List { .. } if inherited)
             && matches!(measured, Some(Metric::Stock | Metric::Flow(FlowMetric::Closures | FlowMetric::Registrations)));
-        let islist = (cue(m, &cues.list) || wants_contacts || biggest || has(n, &["quais"]) && has(n, &["maior capital", "mais capital"]))
-            && !has(n, &["evolucao", "distribua", "distribuicao"])
-            && !cue(m, &cues.trend)
-            || records;
+        let islist =
+            (search_list || list_cue || wants_contacts || biggest || has(n, &["quais"]) && has(n, &["maior capital", "mais capital"]))
+                && !has(n, &["evolucao", "distribua", "distribuicao"])
+                && !cue(m, &cues.trend)
+                || records
+                || previous_list.is_some() && !analytical;
         if let Some((event_text, opened_text)) =
             ["com inicio de atividade", "com data de inicio de atividade"].iter().find_map(|phrase| temporal_raw.split_once(phrase))
         {
@@ -1135,15 +2135,28 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
         }
         let dim = dimension(n);
         if islist {
-            let explicit = list_limit(n);
+            let explicit = leading_limit
+                .as_ref()
+                .map(|(limit, _)| *limit)
+                .or_else(|| trailing_limit.as_ref().map(|(limit, _)| *limit))
+                .or_else(|| list_limit(n))
+                .or_else(|| {
+                    previous_list.and_then(|(_, limit)| {
+                        state
+                            .list_rows
+                            .or_else(|| state.export.as_ref().and_then(|file| file.rows))
+                            // Old context stored only the preview size for lists without an export.
+                            .or_else(|| (limit != 20).then_some(u32::from(limit)))
+                    })
+                });
             // An exported list shows one page and writes the requested rows to the file.
             // Above 100 rows a chat list is refused with a clamped option, never truncated.
             let limit = match explicit {
                 Some(rows) if export => rows.min(100) as u16,
                 Some(rows) => u16::try_from(rows).unwrap_or(u16::MAX),
-                None => 20,
+                None => previous_list.map_or(20, |(_, limit)| limit),
             };
-            rows = explicit.filter(|_| export);
+            rows = explicit;
             let order = if biggest || has(n, &["capital social", "capital"]) && has(n, &["maior", "mais", "ordenados"]) {
                 ListOrder::CapitalDesc
             } else if has(n, &["antigos para os mais novos", "mais antigos", "mais antigas"])
@@ -1153,7 +2166,7 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
             } else if has(n, &["mais novos", "mais recentes", "recentes primeiro", "mais novas"]) {
                 ListOrder::NewestFirst
             } else {
-                ListOrder::Cnpj
+                previous_list.map_or(ListOrder::Cnpj, |(order, _)| order)
             };
             let flow = if closed {
                 Some(FlowMetric::Closures)
@@ -1260,23 +2273,25 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
                 dim: dim.ok_or_else(|| clarify("Por qual dimensão você quer dividir: porte, situação, atividade ou local?"))?,
                 metric: if has(n, &["participacao", "percentual", "percentuais"]) { Metric::Share } else { metric },
             };
-        } else if !followup || full_query {
+        } else if !inherited {
             request.op = Op::Count { metric };
         }
         if matches!(request.op.metric(), Some(Metric::Flow(_))) {
             request.time.period =
                 temporal.or(if followup { request.time.period } else { None }).or_else(|| time::period("este ano", anchor));
-            request.scope.status = if matches!(request.op.metric(), Some(Metric::Flow(FlowMetric::Closures))) {
-                if has(n, &["ainda ativas", "ainda ativos", "somente ativas", "somente ativos", "so ativas", "so ativos"]) {
-                    Some(StatusSet::only(Status::Active))
+            if !inherited || request.scope.status.is_none() {
+                request.scope.status = if matches!(request.op.metric(), Some(Metric::Flow(FlowMetric::Closures))) {
+                    if has(n, &["ainda ativas", "ainda ativos", "somente ativas", "somente ativos", "so ativas", "so ativos"]) {
+                        Some(StatusSet::only(Status::Active))
+                    } else {
+                        Some(StatusSet::only(Status::Closed))
+                    }
+                } else if !has(n, &["continuam ativos", "continuam ativas", "ainda ativas", "ainda ativos", "ativas hoje", "ativos hoje"]) {
+                    Some(StatusSet::ALL)
                 } else {
-                    Some(StatusSet::only(Status::Closed))
-                }
-            } else if !has(n, &["continuam ativos", "continuam ativas", "ainda ativas", "ainda ativos", "ativas hoje", "ativos hoje"]) {
-                Some(StatusSet::ALL)
-            } else {
-                Some(StatusSet::only(Status::Active))
-            };
+                    Some(StatusSet::only(Status::Active))
+                };
+            }
         }
         if matches!(metric, Metric::ActiveChange { .. }) {
             let cs = time::competences(&raw);
@@ -1297,6 +2312,23 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
                 time::competences(&raw).first().copied().ok_or_else(|| clarify("Qual competência mensal você quer consultar?"))?;
         }
     }
+    if let Some((prefix, _)) = &name {
+        request.scope.name_prefix = Some(prefix.clone());
+    }
+    if name.is_none() && matches!(request.op, Op::Lookup { .. } | Op::Meta { .. }) {
+        request.scope.name_prefix = None;
+    }
+    if request.scope.name_prefix.is_some() {
+        if !matches!(request.scope.place, PlaceFilter::Municipalities(_)) {
+            return Err(clarify("Em qual município você quer pesquisar nomes que começam com essas letras?"));
+        }
+        if !matches!(request.op, Op::List { .. } | Op::Count { metric: Metric::Stock }) {
+            return Err(clarify("Use o começo do nome para listar ou contar os estabelecimentos de um município."));
+        }
+    }
+    if followup && !has(n, &["pagina"]) && state.last.as_ref().is_some_and(|last| last.scope != request.scope || last.op != request.op) {
+        request.output.page = 1;
+    }
     if assumed_stock && matches!(request.op, Op::Count { metric: Metric::Stock }) && request.scope.opened.is_none() {
         notes.insert(0, "Considerei o estoque de estabelecimentos ativos.".into());
     }
@@ -1309,19 +2341,22 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
     if !matches!(request.op, Op::Lookup { .. } | Op::Meta { .. }) {
         // A preamble closed by a comma or colon ("Para vender meu software, quantas…") sets
         // the scene and is not part of the question.
-        let question_start = preamble_end(text);
+        let question_start = preamble_end(text).max(opening);
         // An explicit CNAE code pins the activity; words after it describe the code.
         let coded = matches!(request.scope.activity, ActivityFilter::Cnae { .. });
         let unknown: Vec<&str> = words
             .iter()
             .enumerate()
-            .filter(|(i, word)| *i >= question_start && !covered(*i) && !vocabulary.knows(word))
+            .filter(|(i, word)| (question_start..closing).contains(i) && !covered(*i) && !vocabulary.knows(word))
             .map(|(_, word)| word.as_str())
             .collect();
         if !unknown.is_empty() && !coded {
             return Err(clarify(&unrecognized(&unknown)));
         }
-        if let Some(number) = unexplained_number(&normalize::tokens(text), &words, &hits) {
+        let is_list = matches!(request.op, Op::List { .. });
+        let leading = leading_limit.as_ref().map(|(_, span)| span).filter(|_| is_list);
+        let trailing = trailing_limit.as_ref().map(|(_, span)| span).filter(|_| is_list);
+        if let Some(number) = unexplained_number(&tokens, &words, &hits, leading, trailing) {
             return Err(clarify(&format!(
                 "Não consegui aplicar o número “{number}” a um filtro. Diga o que ele representa: ano, capital social ou quantidade de linhas."
             )));
@@ -1384,14 +2419,27 @@ fn preamble_end(text: &str) -> usize {
 
 /// A number no rule reads: neither a date, a row count, an amount, a population, a code nor
 /// part of a catalogue name. Like an unknown word, it must not be dropped.
-fn unexplained_number<'a>(tokens: &'a [String], words: &[String], hits: &[Hit]) -> Option<&'a str> {
+fn unexplained_number<'a>(
+    tokens: &'a [String],
+    words: &[String],
+    hits: &[Hit],
+    leading: Option<&std::ops::Range<usize>>,
+    trailing: Option<&std::ops::Range<usize>>,
+) -> Option<&'a str> {
     // Digits inside entity names ("Dois Irmãos", "4 de Julho") are part of the entity.
     let entity_words: Vec<&str> = hits.iter().flat_map(|h| words[h.start..h.end.min(words.len())].iter().map(String::as_str)).collect();
     let near = |at: usize, back: usize, ahead: usize, list: &[&str]| {
         tokens[at.saturating_sub(back)..(at + 1 + ahead).min(tokens.len())].iter().any(|t| list.contains(&t.as_str()))
     };
+    let mut word_offset = 0;
     for (at, token) in tokens.iter().enumerate() {
-        if !token.chars().any(|c| c.is_ascii_digit()) || entity_words.contains(&token.as_str()) {
+        let start = word_offset;
+        word_offset += normalize::word_parts(token).count();
+        if !token.chars().any(|c| c.is_ascii_digit())
+            || entity_words.contains(&token.as_str())
+            || leading.is_some_and(|span| span.contains(&start))
+            || trailing.is_some_and(|span| span.contains(&at))
+        {
             continue;
         }
         let digits: String = token.chars().filter(char::is_ascii_digit).collect();
@@ -1542,13 +2590,14 @@ fn known_descriptor(word: &str) -> bool {
 }
 
 /// Mask entities while keeping the separators needed to parse literal dates.
-fn temporal_text(text: &str, hits: &[Hit]) -> String {
+fn temporal_text(text: &str, hits: &[Hit], prefix: Option<&std::ops::Range<usize>>) -> String {
     let mut at = 0;
     normalize::tokens(text)
         .into_iter()
         .map(|token| {
             let end = at + normalize::words(&token).len();
-            let masked = hits.iter().any(|hit| hit.start < end && at < hit.end);
+            let masked =
+                prefix.is_some_and(|span| span.start < end && at < span.end) || hits.iter().any(|hit| hit.start < end && at < hit.end);
             at = end;
             if masked { "_entity_".to_owned() } else { token }
         })
@@ -1558,7 +2607,7 @@ fn temporal_text(text: &str, hits: &[Hit]) -> String {
 
 /// Replace entity words with a sentinel so command cues inside place or sector
 /// names ("Itaporanga d'Ajuda", "Contagem") do not change the intent.
-fn masked_text(words: &[String], hits: &[Hit]) -> String {
+fn masked_words(words: &[String], hits: &[Hit]) -> Vec<String> {
     let mut masked = words.to_vec();
     for hit in hits {
         let end = hit.end.min(masked.len());
@@ -1566,7 +2615,7 @@ fn masked_text(words: &[String], hits: &[Hit]) -> String {
             *word = "entidade".into();
         }
     }
-    masked.join(" ")
+    masked
 }
 
 fn hits_adjacent_place(pack: &LanguagePack, words: &[String], at: usize) -> bool {
@@ -1720,6 +2769,63 @@ fn explicit_cnae(n: &str, raw: &str, r: &mut Request) -> Result<(), Box<Interpre
         };
     }
     Ok(())
+}
+
+/// Read the amount from the capital clause itself. A later opening date or
+/// page number cannot supply a missing monetary value.
+fn read_social_capital(tokens: &[String]) -> Result<MoneyRange, Box<Interpretation>> {
+    enum Bound {
+        Minimum,
+        Above,
+        Maximum,
+        Below,
+        Equal,
+        Between,
+    }
+
+    let tokens = if tokens.first().is_some_and(|word| word == "de") { &tokens[1..] } else { tokens };
+    let (prefix, bound) = [
+        (&["entre"][..], Bound::Between),
+        (&["acima", "de"][..], Bound::Above),
+        (&["mais", "de"][..], Bound::Above),
+        (&["maior", "que"][..], Bound::Above),
+        (&["superior", "a"][..], Bound::Above),
+        (&["abaixo", "de"][..], Bound::Below),
+        (&["menos", "de"][..], Bound::Below),
+        (&["menor", "que"][..], Bound::Below),
+        (&["inferior", "a"][..], Bound::Below),
+        (&["a", "partir", "de"][..], Bound::Minimum),
+        (&["pelo", "menos"][..], Bound::Minimum),
+        (&["no", "minimo"][..], Bound::Minimum),
+        (&["ate"][..], Bound::Maximum),
+        (&["no", "maximo"][..], Bound::Maximum),
+        (&["igual", "a"][..], Bound::Equal),
+    ]
+    .into_iter()
+    .find(|(phrase, _)| tokens.get(..phrase.len()).is_some_and(|words| words.iter().zip(*phrase).all(|(word, part)| word == part)))
+    .unwrap_or((&[], Bound::Minimum));
+    let amount = |at: usize| {
+        // Folding leaves the currency symbol "R$" as the token "r".
+        let at = at + usize::from(tokens.get(at).is_some_and(|word| word == "r"));
+        time::money_quantity(tokens, at)
+            .filter(|(_, end)| tokens.get(*end).is_none_or(|next| !matches!(next.as_str(), "anos" | "meses" | "dias" | "habitantes")))
+    };
+    let (value, end) =
+        amount(prefix.len()).ok_or_else(|| clarify("Qual o valor ou intervalo de capital social? Informe o valor em reais."))?;
+    let (from, to) = match bound {
+        Bound::Minimum => (Some(value), None),
+        Bound::Above => (Some(value.saturating_add(1)), None),
+        Bound::Maximum => (None, Some(value)),
+        Bound::Below => (None, Some(value.saturating_sub(1))),
+        Bound::Equal => (Some(value), Some(value)),
+        Bound::Between => {
+            let end = end + usize::from(tokens.get(end).is_some_and(|word| matches!(word.as_str(), "real" | "reais")));
+            let upper = tokens.get(end).filter(|word| *word == "e").and_then(|_| amount(end + 1));
+            let (upper, _) = upper.ok_or_else(|| clarify("Informe os dois limites de capital social."))?;
+            (Some(value), Some(upper))
+        }
+    };
+    Ok(Range { from, to })
 }
 
 fn filters(
@@ -1885,16 +2991,7 @@ fn filters(
         // "sociedade anônima fechada" is a legal form (natureza 2054), not a closed status.
         let status_text = n.replace("anonimas fechadas", "anonimas").replace("anonima fechada", "anonima");
         let mut statuses = Vec::new();
-        for (phrases, status) in [
-            (&["ativos", "ativas", "ativa", "ativo", "funcionando", "em funcionamento"][..], Status::Active),
-            (&["suspensos", "suspensas", "suspensa"][..], Status::Suspended),
-            (&["inaptos", "inaptas", "inapta"][..], Status::Unfit),
-            (
-                &["baixados", "baixadas", "baixada", "fechadas", "fechados", "encerradas", "encerrados", "extintas", "extintos"][..],
-                Status::Closed,
-            ),
-            (&["situacao cadastral nula", "situacao nula"][..], Status::Null),
-        ] {
+        for (phrases, status) in STATUS_TERMS {
             if has(&status_text, phrases) {
                 statuses.push(status);
             }
@@ -1932,8 +3029,8 @@ fn filters(
         }
     }
     let t = normalize::tokens(raw);
-    let phone = has(n, &["telefone", "telefones", "fone", "celular", "whatsapp", "zap"]);
-    let email = has(n, &["email", "emails", "e mail", "e mails"]);
+    let phone = has(n, PHONE_WORDS);
+    let email = has(n, EMAIL_WORDS);
     if phone || email {
         r.scope.contact = match (phone, email) {
             (true, true) => ContactNeed::Both,
@@ -1989,43 +3086,12 @@ fn filters(
     if has(n, &["grupo de natureza juridica 2", "entidades empresariais"]) {
         r.scope.natureza = SmallSet::new([NaturezaCode::Group(2)]);
     }
-    if has(n, &["capital social"])
-        && let Some(at0) = (1..t.len()).find(|&i| {
-            t[i] == "social" && t[i - 1] == "capital" && i.checked_sub(2).is_none_or(|prev| !matches!(t[prev].as_str(), "maior" | "mais"))
-        })
-    {
-        let at = (at0..t.len())
-            .find(|&i| {
-                t[i] == "social" && t[i - 1] == "capital" && (i + 1..(i + 8).min(t.len())).any(|j| time::money_quantity(&t, j).is_some())
-            })
-            .unwrap_or(at0);
-        let window_end = (at + 8).min(t.len());
-        let nums: Vec<_> = (at + 1..window_end)
-            .filter_map(|i| time::money_quantity(&t, i))
-            .filter(|(_, end)| t.get(*end).is_none_or(|s| s != "habitantes"))
-            .map(|(n, _)| n)
-            .collect();
-        // Scale words are not parsed as independent quantities.
-        if let Some(&value) = nums.first() {
-            let cents = value;
-            let interval =
-                (at0..t.len()).any(|j| t[j] == "entre" && ((j + 1..t.len()).take(2).any(|k| time::money_quantity(&t, k).is_some())));
-            let (from, to) = if interval {
-                (Some(cents), Some(*nums.get(1).ok_or_else(|| clarify("Informe os dois limites de capital social."))?))
-            } else if has(n, &["ate", "no maximo"]) {
-                (None, Some(cents))
-            } else if has(n, &["igual a zero"]) {
-                (Some(0), Some(0))
-            } else if has(n, &["acima de", "mais de"]) {
-                (Some(cents.saturating_add(1)), None)
-            } else {
-                (Some(cents), None)
-            };
-            r.scope.capital = Some(Range { from, to });
-        }
-        if r.scope.capital.is_none() && !has(n, &["maior capital", "mais capital", "por capital"]) {
-            return Err(clarify("Qual o valor ou intervalo de capital social? Informe o valor em reais."));
-        }
+    if let Some(at) = (1..t.len()).find(|&i| {
+        t[i] == "social"
+            && t[i - 1] == "capital"
+            && i.checked_sub(2).is_none_or(|prev| !matches!(t[prev].as_str(), "maior" | "mais" | "por"))
+    }) {
+        r.scope.capital = Some(read_social_capital(&t[at + 1..])?);
     }
     // "capital acima de 100 mil": an amount right after "capital" bounds the declared capital.
     if r.scope.capital.is_none()

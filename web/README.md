@@ -56,13 +56,14 @@ come only from `tokens.css`; the session token is kept in `localStorage` and sen
 ```sh
 sh web/scripts/build.sh            # type-checks and compiles src/ to dist/js, copies public/
 cargo build --release -p opencnpj
-./target/release/opencnpj serve --data-dir "$DATA" --web web/dist \
+./target/release/opencnpj serve --data-dir "$DATA" --web web/dist --auth trial \
   --assistant-agg "$DATA/intelligence/agg/2026-10.ocagg" \
   --assistant-history "$DATA/intelligence/backfill/aggregates"
 ```
 
-Open `http://127.0.0.1:8080/` and sign in with a login key
-(`opencnpj accounts --data-dir "$DATA" create --username NAME --email ADDRESS`). The admin
+Open `http://127.0.0.1:8080/` to try three searches. Create a free account or sign in
+with an existing key to keep searching and save assistant conversations. The top bar
+switches between light and dark themes and remembers the selection. The admin
 listener (`http://127.0.0.1:8081/`) serves the same application with the administration
 page for staff accounts; the operations dashboard stays at `/admin`.
 

@@ -1,6 +1,6 @@
 /** Conversation with the assistant. Every answer keeps the context for follow-ups. */
 
-import { ApiError, errorMessage, request } from "../core/api.js";
+import { ApiError, errorMessage, getJson, request, sendJson } from "../core/api.js";
 import { h } from "../core/dom.js";
 import { href } from "../core/router.js";
 import { session } from "../core/session.js";
@@ -8,8 +8,22 @@ import { AnswerView } from "../features/chat/answer-view.js";
 import { EXAMPLE_GROUPS } from "../features/chat/examples.js";
 import type { AskReply, Context } from "../features/chat/types.js";
 import { Icon } from "../ui/icon.js";
-import { Button, Chip, EmptyState } from "../ui/kit.js";
+import { Button, Chip, EmptyState, Field, Input, busy, confirmAction, openModal, toast } from "../ui/kit.js";
 import type { Page } from "./page.js";
+
+interface SavedConversation {
+  id: number;
+  title: string;
+  updated_at: number;
+  turn_count: number;
+}
+
+interface SavedTurn {
+  question: string;
+  reply: AskReply;
+}
+
+const CONVERSATIONS = "/api/v1/conversations";
 
 export function AssistantPage(): Page {
   if (session().platform?.assistant === false) {
@@ -22,8 +36,18 @@ export function AssistantPage(): Page {
     };
   }
 
+  const signedIn = Boolean(session().token);
+  const preview = session().platform?.auth === "trial";
   let context: Context | null = null;
   let pending: AbortController | null = null;
+  let loading: AbortController | null = null;
+  let disposed = false;
+  let active: number | null = null;
+  let revision = 0;
+  let conversations: SavedConversation[] = [];
+
+  const history = h("ul", { class: "conversation-list", "aria-label": "Histórico de conversas" });
+  const historyStatus = h("p", { class: "conversation-status muted", role: "status" });
 
   const thread = h("ol", { class: "thread", "aria-live": "polite", "aria-label": "Conversa" });
   const textarea = h("textarea", {
@@ -42,57 +66,197 @@ export function AssistantPage(): Page {
   };
   const toEnd = (): void => thread.lastElementChild?.scrollIntoView({ behavior: "smooth", block: "start" });
   const assistantTurn = (...content: (HTMLElement | string)[]): HTMLElement => h("li", { class: "turn turn--assistant" }, content);
+  const userTurn = (question: string): HTMLElement => h("li", { class: "turn turn--user" }, h("p", null, question));
+  const answerTurn = (reply: AskReply, question: string): HTMLElement =>
+    assistantTurn(AnswerView(reply, question, { onFollowUp: (next) => void submit(next) }));
+
+  const renderHistory = (): void => {
+    history.replaceChildren(
+      ...conversations.map((item) =>
+        h(
+          "li",
+          { class: `conversation-item${item.id === active ? " conversation-item--active" : ""}` },
+          h(
+            "button",
+            {
+              class: "conversation-item__name",
+              type: "button",
+              title: item.title,
+              "aria-current": item.id === active ? "true" : undefined,
+              on: { click: () => void openSaved(item.id) },
+            },
+            item.title,
+          ),
+          Button({ icon: "pencil", title: `Renomear: ${item.title}`, size: "sm", variant: "ghost", onClick: () => rename(item) }),
+          Button({ icon: "trash", title: `Excluir: ${item.title}`, size: "sm", variant: "ghost", onClick: () => void remove(item) }),
+        ),
+      ),
+    );
+  };
+
+  const updateHistory = (item: SavedConversation): void => {
+    conversations = [item, ...conversations.filter((entry) => entry.id !== item.id)]
+      .sort((left, right) => right.updated_at - left.updated_at || right.id - left.id);
+    historyStatus.textContent = "";
+    renderHistory();
+  };
+
+  const refreshHistory = async (): Promise<void> => {
+    try {
+      const saved = await getJson<SavedConversation[]>(CONVERSATIONS);
+      if (disposed) return;
+      conversations = saved;
+      historyStatus.textContent = saved.length ? "" : "Suas conversas salvas aparecem aqui.";
+      renderHistory();
+    } catch (error) {
+      if (!disposed) historyStatus.textContent = errorMessage(error);
+    }
+  };
+  const initialHistory = signedIn ? refreshHistory() : Promise.resolve();
+
+  const openSaved = async (id: number): Promise<void> => {
+    reset(false);
+    const controller = new AbortController();
+    loading = controller;
+    send.disabled = true;
+    historyStatus.textContent = "Carregando conversa…";
+    try {
+      const turns = await getJson<SavedTurn[]>(`${CONVERSATIONS}/${id}`, controller.signal);
+      if (loading !== controller) return;
+      active = id;
+      revision = turns.length;
+      historyStatus.textContent = "";
+      root.classList.toggle("has-thread", turns.length > 0);
+      thread.replaceChildren(...turns.flatMap(({ question, reply }) => [userTurn(question), answerTurn(reply, question)]));
+      renderHistory();
+      toEnd();
+    } catch (error) {
+      if (loading === controller) historyStatus.textContent = errorMessage(error);
+    } finally {
+      if (loading === controller) {
+        loading = null;
+        send.disabled = false;
+        textarea.focus();
+      }
+    }
+  };
+
+  const rename = (item: SavedConversation): void => {
+    const title = Input({ required: true, maxlength: 120, value: item.title });
+    const save = Button({ label: "Salvar", variant: "primary", type: "submit" });
+    const form = h("form", {
+      class: "auth__form",
+      on: {
+        submit: (event) => {
+          event.preventDefault();
+          void busy(save, async () => {
+            try {
+              const updated = await sendJson<SavedConversation>("PATCH", `${CONVERSATIONS}/${item.id}`, { title: title.value.trim() });
+              if (!disposed) updateHistory(updated);
+              dialog.close();
+            } catch (error) {
+              toast(errorMessage(error), "error");
+            }
+          });
+        },
+      },
+    }, Field({ label: "Título", control: title }), save);
+    const dialog = openModal("Renomear conversa", form);
+    title.select();
+  };
+
+  const remove = async (item: SavedConversation): Promise<void> => {
+    if (!(await confirmAction("Excluir conversa?", `“${item.title}” e suas consultas serão excluídas.`, "Excluir", true))) return;
+    try {
+      await sendJson("DELETE", `${CONVERSATIONS}/${item.id}`);
+      if (disposed) return;
+      if (item.id === active || loading) reset();
+      conversations = conversations.filter((entry) => entry.id !== item.id);
+      historyStatus.textContent = conversations.length ? "" : "Suas conversas salvas aparecem aqui.";
+      renderHistory();
+    } catch (error) {
+      toast(errorMessage(error), "error");
+    }
+  };
 
   const submit = async (text: string): Promise<void> => {
     const question = text.trim();
-    if (!question || pending) return;
+    if (!question || pending || loading) return;
     textarea.value = "";
     grow();
     const controller = new AbortController();
     pending = controller;
     send.disabled = true;
     root.classList.add("has-thread");
-    thread.append(h("li", { class: "turn turn--user" }, h("p", null, question)));
+    thread.append(userTurn(question));
     const typing = assistantTurn(h("span", { class: "spinner", role: "status", "aria-label": "Consultando a base" }, h("i"), h("i"), h("i")));
     thread.append(typing);
     toEnd();
     try {
-      const body = context ? { question, context } : { question };
+      await initialHistory;
+      if (pending !== controller) return;
+      if (signedIn && active === null) {
+        const title = Array.from(question).slice(0, 120).join("");
+        const created = (await (await request(CONVERSATIONS, { method: "POST", body: { title }, signal: controller.signal })).json()) as SavedConversation;
+        if (pending !== controller) return;
+        active = created.id;
+        revision = 0;
+        updateHistory(created);
+      }
+      const id = active;
+      const body = id === null ? { question, context } : { question, conversation_id: id, conversation_revision: revision };
       const reply = (await (await request("/api/v1/assistant/ask", { method: "POST", body, signal: controller.signal })).json()) as AskReply;
+      if (pending !== controller) return;
       context = reply.context;
-      typing.replaceWith(assistantTurn(AnswerView(reply, question, { onFollowUp: (next) => void submit(next) })));
+      if (id !== null) {
+        revision += 1;
+        const item = conversations.find((entry) => entry.id === id);
+        if (item) updateHistory({ ...item, turn_count: revision, updated_at: Math.floor(Date.now() / 1_000) });
+      }
+      typing.replaceWith(answerTurn(reply, question));
     } catch (error) {
-      if (controller.signal.aborted) {
-        typing.remove();
-      } else {
-        const quota = error instanceof ApiError && error.code === "quota_exceeded";
+      if (pending === controller && !controller.signal.aborted) {
+        const code = error instanceof ApiError ? error.code : "";
+        const id = active;
         typing.replaceWith(
           assistantTurn(
             h(
               "div",
               { class: "answer" },
               h("p", { class: "note note--error", role: "alert" }, Icon({ name: "info", size: 15 }), h("span", null, errorMessage(error) || "Falha na consulta.")),
-              quota ? h("a", { href: href("conta") }, "Ver meu plano e uso") : null,
+              ["quota_exceeded", "free_access_limited"].includes(code) ? h("a", { href: href("conta") }, "Ver meu plano e uso") : null,
+              code === "conversation_changed" && id !== null
+                ? Button({ label: "Reabrir conversa", size: "sm", onClick: () => void openSaved(id) })
+                : null,
             ),
           ),
         );
       }
     } finally {
-      if (pending === controller) pending = null;
-      send.disabled = false;
-      toEnd();
-      textarea.focus();
+      if (pending === controller) {
+        pending = null;
+        send.disabled = false;
+        toEnd();
+        textarea.focus();
+      }
     }
   };
 
-  const reset = (): void => {
+  const reset = (focus = true): void => {
     pending?.abort();
-    pending = null;
+    loading?.abort();
+    pending = loading = null;
     context = null;
+    active = null;
+    revision = 0;
     send.disabled = false;
+    textarea.value = "";
+    grow();
     thread.replaceChildren();
     root.classList.remove("has-thread");
-    textarea.focus();
+    historyStatus.textContent = signedIn && !conversations.length ? "Suas conversas salvas aparecem aqui." : "";
+    renderHistory();
+    if (focus) textarea.focus();
   };
 
   textarea.addEventListener("input", grow);
@@ -144,16 +308,40 @@ export function AssistantPage(): Page {
     { class: "page page--chat" },
     welcome,
     thread,
-    h("div", { class: "dock" }, h("div", { class: "dock__bar" }, fresh), composer, h("p", { class: "dock__hint" }, "Enter envia · Shift+Enter quebra a linha")),
+    h("div", { class: "dock" }, signedIn || preview ? null : h("div", { class: "dock__bar" }, fresh), composer, h("p", { class: "dock__hint" }, "Enter envia · Shift+Enter quebra a linha")),
     examples,
   );
 
+  const workspace = signedIn || preview
+    ? h(
+        "div",
+        { class: "assistant-workspace" },
+        h(
+          "aside",
+          { class: "conversation-sidebar", "aria-label": "Conversas" },
+          h("details", { open: true },
+            h("summary", null, "Conversas"),
+            h("div", { class: "conversation-sidebar__body" },
+              fresh,
+              signedIn ? history : null,
+              signedIn
+                ? historyStatus
+                : h("p", { class: "conversation-status muted" }, h("a", { href: href("conta") }, "Entre com sua conta"), " para salvar e reabrir suas conversas."),
+            ),
+          ),
+        ),
+        root,
+      )
+    : root;
+
   return {
-    el: root,
+    el: workspace,
     resume: () => textarea.focus(),
     destroy: () => {
+      disposed = true;
       pending?.abort();
-      pending = null;
+      loading?.abort();
+      pending = loading = null;
     },
   };
 }

@@ -3,7 +3,7 @@
 [[sector]]
 id = "accounting"
 display = { sing = "escritório de contabilidade", plural = "escritórios de contabilidade", gender = "m" }
-aliases = ["contador", "contadora", "contadores", "contadoras", "contabilidade", "escritório de contabilidade", "escritórios de contabilidade", "contábil"]
+aliases = ["contador", "contadora", "contadores", "contadoras", "contabilidade", "escritório de contabilidade", "escritórios de contabilidade", "contábil", "escritório contábil", "escritórios contábeis", "serviço de contabilidade", "serviços de contabilidade"]
 cnae_core = ["6920601"]
 cnae_extended = []
 scope = "main"
@@ -39,7 +39,7 @@ since = "v1"
 [[sector]]
 id = "apparel_retail"
 display = { sing = "loja de roupas", plural = "lojas de roupas", gender = "f" }
-aliases = ["loja de vestuário", "lojas de vestuário"]
+aliases = ["loja de vestuário", "lojas de vestuário", "varejo de vestuário", "varejo de roupas", "comércio varejista de vestuário"]
 cnae_core = ["4781400"]
 cnae_extended = []
 scope = "main"
@@ -48,7 +48,7 @@ since = "v1"
 [[sector]]
 id = "apparel_wholesale"
 display = { sing = "atacado de roupas", plural = "atacados de roupas", gender = "m" }
-aliases = ["distribuidora de vestuário"]
+aliases = ["distribuidora de vestuário", "comércio atacadista de vestuário"]
 cnae_core = ["4642701"]
 cnae_extended = []
 scope = "main"
@@ -75,7 +75,7 @@ since = "v1"
 [[sector]]
 id = "architecture"
 display = { sing = "escritório de arquitetura", plural = "escritórios de arquitetura", gender = "m" }
-aliases = ["arquiteto", "arquiteta", "arquitetos", "arquitetas"]
+aliases = ["arquiteto", "arquiteta", "arquitetos", "arquitetas", "serviço de arquitetura", "serviços de arquitetura"]
 cnae_core = ["7111100"]
 cnae_extended = []
 scope = "main"
@@ -93,7 +93,7 @@ since = "v1"
 [[sector]]
 id = "auto_mechanic"
 display = { sing = "oficina mecânica", plural = "oficinas mecânicas", gender = "f" }
-aliases = ["mecânico de automóveis", "mecânica de automóveis", "oficina", "oficinas", "mecânica", "mecânicas", "retífica", "retíficas", "autocenter", "autocenters", "autocentro", "autocentros", "troca de óleo", "trocas de óleo", "oficina mecânica", "oficinas mecânicas"]
+aliases = ["mecânico de automóveis", "mecânica de automóveis", "oficina", "oficinas", "mecânica", "mecânicas", "retífica", "retíficas", "autocenter", "autocenters", "autocentro", "autocentros", "troca de óleo", "trocas de óleo", "oficina mecânica", "oficinas mecânicas", "mecânica automotiva", "oficina de mecânica automotiva", "oficinas de mecânica automotiva"]
 cnae_core = ["4520001"]
 cnae_extended = []
 scope = "main"
@@ -148,7 +148,7 @@ since = "v1"
 [[sector]]
 id = "beauty_care"
 display = { sing = "clínica de estética", plural = "clínicas de estética", gender = "f" }
-aliases = ["esteticista", "esteticistas", "estética"]
+aliases = ["esteticista", "esteticistas", "estética", "centro de estética", "centros de estética"]
 cnae_core = ["9602502", "9609201"]
 cnae_extended = []
 scope = "main"
@@ -157,7 +157,7 @@ since = "v1"
 [[sector]]
 id = "beauty_salon"
 display = { sing = "salão de beleza", plural = "salões de beleza", gender = "m" }
-aliases = ["cabeleireiro", "cabeleireira", "cabeleireiros", "cabeleireiras", "salão de beleza", "salões de beleza", "barbearia", "barbearias"]
+aliases = ["cabeleireiro", "cabeleireira", "cabeleireiros", "cabeleireiras", "salão de beleza", "salões de beleza", "barbearia", "barbearias", "salão de cabeleireiro", "salões de cabeleireiro"]
 cnae_core = ["9602501"]
 cnae_extended = ["9602502"]
 scope = "main"
@@ -175,7 +175,7 @@ since = "v1"
 [[sector]]
 id = "beverage_retail"
 display = { sing = "loja de bebidas", plural = "lojas de bebidas", gender = "f" }
-aliases = ["depósito de bebidas", "depósitos de bebidas", "adega", "adegas"]
+aliases = ["depósito de bebidas", "depósitos de bebidas", "adega", "adegas", "depósito varejista de cerveja", "depósitos varejistas de cerveja"]
 cnae_core = ["4723700"]
 cnae_extended = []
 scope = "main"
@@ -193,7 +193,7 @@ since = "v1"
 [[sector]]
 id = "body_shop"
 display = { sing = "oficina de funilaria", plural = "oficinas de funilaria", gender = "f" }
-aliases = ["lanternagem", "funilaria", "funilarias", "funilaria e pintura", "funileiro", "funileiros", "lanterneiro", "lanterneiros"]
+aliases = ["lanternagem", "funilaria", "funilarias", "funilaria e pintura", "funileiro", "funileiros", "lanterneiro", "lanterneiros", "oficina de lanternagem", "oficinas de lanternagem", "oficina de funilaria e pintura", "oficinas de funilaria e pintura"]
 cnae_core = ["4520002"]
 cnae_extended = []
 scope = "main"
@@ -283,7 +283,7 @@ since = "v1"
 [[sector]]
 id = "car_wash"
 display = { sing = "lava-jato", plural = "lava-jatos", gender = "m" }
-aliases = ["lava rápido", "lavagem de carros"]
+aliases = ["lava rápido", "lavagem de carros", "lava-carros"]
 cnae_core = ["4520005"]
 cnae_extended = []
 scope = "main"
@@ -319,7 +319,7 @@ since = "v1"
 [[sector]]
 id = "clinical_lab"
 display = { sing = "laboratório de análises clínicas", plural = "laboratórios de análises clínicas", gender = "m" }
-aliases = ["laboratório clínico", "laboratórios clínicos", "laboratório de análises clínicas", "laboratórios de análises clínicas"]
+aliases = ["laboratório clínico", "laboratórios clínicos", "laboratório de análises clínicas", "laboratórios de análises clínicas", "laboratório de exames clínicos", "laboratórios de exames clínicos"]
 cnae_core = ["8640202"]
 cnae_extended = []
 scope = "main"
@@ -355,7 +355,7 @@ since = "v1"
 [[sector]]
 id = "computer_repair"
 display = { sing = "assistência técnica de computadores", plural = "assistências técnicas de computadores", gender = "f" }
-aliases = ["conserto de computadores", "manutenção de computadores"]
+aliases = ["conserto de computadores", "manutenção de computadores", "assistência técnica de notebook", "assistência técnica de notebooks", "conserto de notebooks", "assistências técnicas de notebooks"]
 cnae_core = ["9511800"]
 cnae_extended = []
 scope = "main"
@@ -373,7 +373,7 @@ since = "v1"
 [[sector]]
 id = "computing_courses"
 display = { sing = "curso de informática", plural = "cursos de informática", gender = "m" }
-aliases = ["escola de informática", "escolas de informática"]
+aliases = ["escola de informática", "escolas de informática", "curso de informática básica", "cursos de informática básica"]
 cnae_core = ["8599603"]
 cnae_extended = []
 scope = "main"
@@ -391,7 +391,7 @@ since = "v1"
 [[sector]]
 id = "construction"
 display = { sing = "construtora", plural = "construtoras", gender = "f" }
-aliases = ["construção de edifícios", "construção predial", "construtora", "construtoras", "empreiteira", "empreiteiras"]
+aliases = ["construção de edifícios", "construção predial", "construtora", "construtoras", "empreiteira", "empreiteiras", "construção de prédios"]
 cnae_core = ["4120400"]
 cnae_extended = []
 scope = "main"
@@ -418,7 +418,7 @@ since = "v1"
 [[sector]]
 id = "corn"
 display = { sing = "fazenda de milho", plural = "fazendas de milho", gender = "f" }
-aliases = ["cultivo de milho", "plantio de milho"]
+aliases = ["cultivo de milho", "plantio de milho", "produtor de milho", "produtores de milho"]
 cnae_core = ["0111302"]
 cnae_extended = []
 scope = "main"
@@ -436,7 +436,7 @@ since = "v1"
 [[sector]]
 id = "cosmetics_retail"
 display = { sing = "loja de cosméticos", plural = "lojas de cosméticos", gender = "f" }
-aliases = ["perfumaria", "perfumarias"]
+aliases = ["perfumaria", "perfumarias", "loja de maquiagem e cosméticos", "lojas de maquiagem e cosméticos"]
 cnae_core = ["4772500"]
 cnae_extended = []
 scope = "main"
@@ -454,7 +454,7 @@ since = "v1"
 [[sector]]
 id = "custom_software"
 display = { sing = "empresa de software sob encomenda", plural = "empresas de software sob encomenda", gender = "f" }
-aliases = ["desenvolvimento de software sob encomenda", "programação sob encomenda", "empresa de software", "empresas de software", "software house", "desenvolvimento de software", "fábrica de software"]
+aliases = ["desenvolvimento de software sob encomenda", "programação sob encomenda", "empresa de software", "empresas de software", "software house", "desenvolvimento de software", "fábrica de software", "desenvolvimento de sistemas sob medida", "desenvolvimento de software sob medida"]
 cnae_core = ["6201501"]
 cnae_extended = []
 scope = "main"
@@ -508,7 +508,7 @@ since = "v1"
 [[sector]]
 id = "dental_clinic"
 display = { sing = "clínica odontológica", plural = "clínicas odontológicas", gender = "f" }
-aliases = ["dentista", "dentistas", "consultório odontológico", "clínica odontológica", "clínicas odontológicas", "clínica dentária", "clínicas dentárias"]
+aliases = ["dentista", "dentistas", "consultório odontológico", "clínica odontológica", "clínicas odontológicas", "clínica dentária", "clínicas dentárias", "consultório dentário", "consultórios dentários", "consultórios odontológicos", "odontologia"]
 cnae_core = ["8630504", "8630505"]
 cnae_extended = []
 scope = "main"
@@ -535,7 +535,7 @@ since = "v1"
 [[sector]]
 id = "electrical_installation"
 display = { sing = "serviço de instalação elétrica", plural = "serviços de instalação elétrica", gender = "m" }
-aliases = ["eletricista predial", "eletricistas prediais", "eletricista", "eletricistas"]
+aliases = ["eletricista predial", "eletricistas prediais", "eletricista", "eletricistas", "instalações elétricas prediais", "instalação elétrica predial", "serviços de instalações elétricas prediais"]
 cnae_core = ["4321500"]
 cnae_extended = []
 scope = "main"
@@ -602,7 +602,7 @@ since = "v1"
 [[sector]]
 id = "event_planning"
 display = { sing = "organizadora de eventos", plural = "organizadoras de eventos", gender = "f" }
-aliases = ["organizador de eventos", "produção de feiras"]
+aliases = ["organizador de eventos", "produção de feiras", "produtoras de feiras"]
 cnae_core = ["8230001"]
 cnae_extended = []
 scope = "main"
@@ -620,7 +620,7 @@ since = "v1"
 [[sector]]
 id = "exam_prep"
 display = { sing = "curso preparatório para concursos", plural = "cursos preparatórios para concursos", gender = "m" }
-aliases = ["cursinho para concurso", "cursinhos para concurso"]
+aliases = ["cursinho para concurso", "cursinhos para concurso", "cursinho preparatório para concursos", "cursinhos preparatórios para concursos"]
 cnae_core = ["8599605"]
 cnae_extended = []
 scope = "main"
@@ -629,7 +629,7 @@ since = "v1"
 [[sector]]
 id = "express_delivery"
 display = { sing = "serviço de entrega rápida", plural = "serviços de entrega rápida", gender = "m" }
-aliases = ["motofrete", "motoboy", "motogirl"]
+aliases = ["motofrete", "motoboy", "motogirl", "entrega expressa", "entregas expressas", "serviço de entrega expressa", "serviços de entrega expressa"]
 cnae_core = ["5320202"]
 cnae_extended = []
 scope = "main"
@@ -647,7 +647,7 @@ since = "v1"
 [[sector]]
 id = "farm_services"
 display = { sing = "serviço de preparação de terreno e colheita", plural = "serviços de preparação de terreno e colheita", gender = "m" }
-aliases = ["serviço de colheita", "preparo de solo agrícola"]
+aliases = ["serviço de colheita", "preparo de solo agrícola", "serviços de colheita"]
 cnae_core = ["0161003"]
 cnae_extended = []
 scope = "main"
@@ -945,7 +945,7 @@ notes = "Shared aliases require a clarification before selecting a sector."
 [[sector]]
 id = "it_support"
 display = { sing = "serviço de suporte de TI", plural = "serviços de suporte de TI", gender = "m" }
-aliases = ["suporte técnico em TI", "manutenção de TI"]
+aliases = ["suporte técnico em TI", "manutenção de TI", "suporte de informática", "prestador de suporte de informática", "prestadores de suporte de informática"]
 cnae_core = ["6209100"]
 cnae_extended = []
 scope = "main"
@@ -972,7 +972,7 @@ since = "v1"
 [[sector]]
 id = "language_school"
 display = { sing = "escola de idiomas", plural = "escolas de idiomas", gender = "f" }
-aliases = ["curso de línguas", "cursos de línguas", "escola de idiomas", "escolas de idiomas", "curso de idiomas", "cursos de idiomas"]
+aliases = ["curso de línguas", "cursos de línguas", "escola de idiomas", "escolas de idiomas", "curso de idiomas", "cursos de idiomas", "escola de línguas", "escolas de línguas"]
 cnae_core = ["8593700"]
 cnae_extended = []
 scope = "main"
@@ -990,7 +990,7 @@ since = "v1"
 [[sector]]
 id = "law_firm"
 display = { sing = "escritório de advocacia", plural = "escritórios de advocacia", gender = "m" }
-aliases = ["advogado", "advogada", "advogados", "advogadas", "advocacia", "escritório de advocacia", "escritórios de advocacia"]
+aliases = ["advogado", "advogada", "advogados", "advogadas", "advocacia", "escritório de advocacia", "escritórios de advocacia", "escritório de advogados", "escritórios de advogados", "serviço advocatício", "serviços advocatícios", "prestadores de serviços advocatícios"]
 cnae_core = ["6911701"]
 cnae_extended = []
 scope = "main"
@@ -1026,7 +1026,7 @@ since = "v1"
 [[sector]]
 id = "long_distance_freight"
 display = { sing = "frete rodoviário intermunicipal", plural = "fretes rodoviários intermunicipais", gender = "m" }
-aliases = ["transporte interestadual de cargas"]
+aliases = ["transporte interestadual de cargas", "transportadora de cargas interestaduais", "transportadoras de cargas interestaduais", "transporte rodoviário interestadual de cargas"]
 cnae_core = ["4930202"]
 cnae_extended = []
 scope = "main"
@@ -1053,7 +1053,7 @@ since = "v1"
 [[sector]]
 id = "management_consulting"
 display = { sing = "consultoria de gestão", plural = "consultorias de gestão", gender = "f" }
-aliases = ["consultoria empresarial", "consultoria em gestão empresarial"]
+aliases = ["consultoria empresarial", "consultoria em gestão empresarial", "consultorias de gestão empresarial", "consultorias empresariais"]
 cnae_core = ["7020400"]
 cnae_extended = []
 scope = "main"
@@ -1062,7 +1062,7 @@ since = "v1"
 [[sector]]
 id = "masonry"
 display = { sing = "serviço de alvenaria", plural = "serviços de alvenaria", gender = "m" }
-aliases = ["pedreiro", "pedreiros"]
+aliases = ["pedreiro", "pedreiros", "serviço de pedreiro", "serviços de pedreiros"]
 cnae_core = ["4399103"]
 cnae_extended = []
 scope = "main"
@@ -1080,7 +1080,7 @@ since = "v1"
 [[sector]]
 id = "meal_delivery"
 display = { sing = "empresa de refeições para entrega", plural = "empresas de refeições para entrega", gender = "f" }
-aliases = ["marmitaria", "marmitarias", "entrega de marmitas"]
+aliases = ["marmitaria", "marmitarias", "entrega de marmitas", "entrega de quentinhas", "delivery de marmitas"]
 cnae_core = ["5620104"]
 cnae_extended = []
 scope = "main"
@@ -1116,7 +1116,7 @@ since = "v1"
 [[sector]]
 id = "metal_frames"
 display = { sing = "fábrica de esquadrias metálicas", plural = "fábricas de esquadrias metálicas", gender = "f" }
-aliases = ["fabricação de esquadrias de metal"]
+aliases = ["fabricação de esquadrias de metal", "fábricas de esquadrias de metal", "fábrica de esquadrias de metal"]
 cnae_core = ["2512800"]
 cnae_extended = []
 scope = "main"
@@ -1161,7 +1161,7 @@ since = "v1"
 [[sector]]
 id = "motorcycle_repair"
 display = { sing = "oficina de motocicletas", plural = "oficinas de motocicletas", gender = "f" }
-aliases = ["oficina de motos", "mecânico de motos", "mecânica de motos"]
+aliases = ["oficina de motos", "oficinas de motos", "mecânico de motos", "mecânica de motos", "oficina de conserto de motos", "oficinas de conserto de motos", "conserto de motos"]
 cnae_core = ["4543900"]
 cnae_extended = []
 scope = "main"
@@ -1170,7 +1170,7 @@ since = "v1"
 [[sector]]
 id = "moving_company"
 display = { sing = "empresa de mudanças", plural = "empresas de mudanças", gender = "f" }
-aliases = ["transportadora de mudanças", "transportadoras de mudanças"]
+aliases = ["transportadora de mudanças", "transportadoras de mudanças", "transportadora de mudança residencial", "transportadoras de mudança residencial"]
 cnae_core = ["4930204"]
 cnae_extended = []
 scope = "main"
@@ -1278,7 +1278,7 @@ since = "v1"
 [[sector]]
 id = "pet_boarding"
 display = { sing = "hotel para animais domésticos", plural = "hotéis para animais domésticos", gender = "m" }
-aliases = ["hotel pet", "hospedagem de animais"]
+aliases = ["hotel pet", "hospedagem de animais", "hotel para cães", "hotéis para cães"]
 cnae_core = ["9609207"]
 cnae_extended = []
 scope = "main"
@@ -1287,7 +1287,7 @@ since = "v1"
 [[sector]]
 id = "pet_grooming"
 display = { sing = "serviço de banho e tosa", plural = "serviços de banho e tosa", gender = "m" }
-aliases = ["banho e tosa", "estética pet"]
+aliases = ["banho e tosa", "estética pet", "tosas e banhos para pets", "tosa e banho para pets"]
 cnae_core = ["9609208"]
 cnae_extended = []
 scope = "main"
@@ -1296,7 +1296,7 @@ since = "v1"
 [[sector]]
 id = "pet_shop"
 display = { sing = "pet shop", plural = "pet shops", gender = "m" }
-aliases = ["loja pet", "lojas pet", "pet", "pets"]
+aliases = ["loja pet", "lojas pet", "pet", "pets", "loja de produtos para pets", "lojas de produtos para pets"]
 cnae_core = ["4789004"]
 cnae_extended = ["9609207", "9609208"]
 scope = "main"
@@ -1332,7 +1332,7 @@ since = "v1"
 [[sector]]
 id = "physiotherapy"
 display = { sing = "clínica de fisioterapia", plural = "clínicas de fisioterapia", gender = "f" }
-aliases = ["fisioterapeuta", "fisioterapeutas", "clínica de fisioterapia", "clínicas de fisioterapia"]
+aliases = ["fisioterapeuta", "fisioterapeutas", "clínica de fisioterapia", "clínicas de fisioterapia", "consultório de fisioterapia", "consultórios de fisioterapia"]
 cnae_core = ["8650004"]
 cnae_extended = []
 scope = "main"
@@ -1350,7 +1350,7 @@ since = "v1"
 [[sector]]
 id = "plumbing"
 display = { sing = "serviço de instalação hidráulica", plural = "serviços de instalação hidráulica", gender = "m" }
-aliases = ["encanador", "encanadora", "encanadores", "encanadoras"]
+aliases = ["encanador", "encanadora", "encanadores", "encanadoras", "serviço hidráulico predial", "serviços hidráulicos prediais"]
 cnae_core = ["4322301"]
 cnae_extended = []
 scope = "main"
@@ -1413,7 +1413,7 @@ since = "v1"
 [[sector]]
 id = "property_management"
 display = { sing = "administradora de imóveis", plural = "administradoras de imóveis", gender = "f" }
-aliases = ["gestão imobiliária", "administração de imóveis"]
+aliases = ["gestão imobiliária", "administração de imóveis", "administração imobiliária"]
 cnae_core = ["6822600"]
 cnae_extended = []
 scope = "main"
@@ -1449,7 +1449,7 @@ since = "v1"
 [[sector]]
 id = "real_estate_broker"
 display = { sing = "corretor de imóveis", plural = "corretores de imóveis", gender = "m" }
-aliases = ["corretora de imóveis", "corretoras de imóveis", "corretagem imobiliária", "imobiliária", "imobiliárias"]
+aliases = ["corretora de imóveis", "corretoras de imóveis", "corretagem imobiliária", "imobiliária", "imobiliárias", "intermediação imobiliária"]
 cnae_core = ["6821801", "6821802"]
 cnae_extended = []
 scope = "main"
@@ -1539,7 +1539,7 @@ since = "v1"
 [[sector]]
 id = "school_transport"
 display = { sing = "serviço de transporte escolar", plural = "serviços de transporte escolar", gender = "m" }
-aliases = ["van escolar", "vans escolares"]
+aliases = ["van escolar", "vans escolares", "van de escola", "vans de escola", "transporte escolar", "empresas de transporte escolar"]
 cnae_core = ["4924800"]
 cnae_extended = []
 scope = "main"
@@ -1575,7 +1575,7 @@ since = "v1"
 [[sector]]
 id = "soybean"
 display = { sing = "fazenda de soja", plural = "fazendas de soja", gender = "f" }
-aliases = ["cultivo de soja", "plantio de soja"]
+aliases = ["cultivo de soja", "plantio de soja", "empresas de produção de soja"]
 cnae_core = ["0115600"]
 cnae_extended = []
 scope = "main"
@@ -1692,7 +1692,7 @@ since = "v1"
 [[sector]]
 id = "tire_store"
 display = { sing = "loja de pneus", plural = "lojas de pneus", gender = "f" }
-aliases = ["comércio de pneus", "revenda de pneus"]
+aliases = ["comércio de pneus", "revenda de pneus", "comércio varejista de pneus", "comércios varejistas de pneus"]
 cnae_core = ["4530705"]
 cnae_extended = []
 scope = "main"
@@ -1710,7 +1710,7 @@ since = "v1"
 [[sector]]
 id = "towing"
 display = { sing = "serviço de guincho", plural = "serviços de guincho", gender = "m" }
-aliases = ["reboque de veículos", "guincho automotivo"]
+aliases = ["reboque de veículos", "guincho automotivo", "reboque automotivo", "serviço de reboque automotivo", "serviços de reboque automotivo"]
 cnae_core = ["5229002"]
 cnae_extended = []
 scope = "main"
@@ -1768,7 +1768,7 @@ since = "v1"
 [[sector]]
 id = "truck_freight"
 display = { sing = "transportadora rodoviária de cargas", plural = "transportadoras rodoviárias de cargas", gender = "f" }
-aliases = ["transporte rodoviário de carga", "frete rodoviário", "transportadora", "transportadoras", "transporte de carga", "transporte de cargas"]
+aliases = ["transporte rodoviário de carga", "frete rodoviário", "transportadora", "transportadoras", "transporte de carga", "transporte de cargas", "frete de caminhão", "frete por caminhão"]
 cnae_core = ["4930201", "4930202"]
 cnae_extended = ["4930203", "4930204"]
 scope = "main"
@@ -1796,7 +1796,7 @@ since = "v1"
 [[sector]]
 id = "used_auto_parts"
 display = { sing = "loja de autopeças usadas", plural = "lojas de autopeças usadas", gender = "f" }
-aliases = ["venda de peças usadas de automóveis"]
+aliases = ["venda de peças usadas de automóveis", "autopeças usadas", "loja de autopeças usadas", "lojas de autopeças usadas"]
 cnae_core = ["4530704"]
 cnae_extended = []
 scope = "main"
@@ -1805,7 +1805,7 @@ since = "v1"
 [[sector]]
 id = "used_car_dealer"
 display = { sing = "revenda de carros usados", plural = "revendas de carros usados", gender = "f" }
-aliases = ["loja de veículos usados", "lojas de carros usados"]
+aliases = ["loja de veículos usados", "lojas de carros usados", "revenda de carros seminovos", "revendas de carros seminovos"]
 cnae_core = ["4511102"]
 cnae_extended = []
 scope = "main"
@@ -1841,7 +1841,7 @@ since = "v1"
 [[sector]]
 id = "veterinary_clinic"
 display = { sing = "clínica veterinária", plural = "clínicas veterinárias", gender = "f" }
-aliases = ["veterinário", "veterinária", "veterinários", "veterinárias", "clínica veterinária", "clínicas veterinárias"]
+aliases = ["veterinário", "veterinária", "veterinários", "veterinárias", "clínica veterinária", "clínicas veterinárias", "consultório veterinário", "consultórios veterinários"]
 cnae_core = ["7500100"]
 cnae_extended = []
 scope = "main"
@@ -1922,7 +1922,7 @@ since = "v1"
 [[sector]]
 id = "civil_construction"
 display = { sing = "empresa de construção civil", plural = "empresas de construção civil", gender = "f" }
-aliases = ["construção", "construção civil"]
+aliases = ["construção", "construção civil", "obras civis"]
 cnae_core = [
     "4110700", "4120400", "4211101", "4211102", "4212000", "4213800", "4221901", "4221902",
     "4221903", "4221904", "4221905", "4222701", "4222702", "4223500", "4291000", "4292801",
@@ -1956,17 +1956,17 @@ since = "v1"
 [[sector]]
 id = "agriculture_livestock"
 display = { sing = "atividade agropecuária", plural = "atividades agropecuárias", gender = "f" }
-aliases = ["agrícola", "agrícolas", "empresa agrícola", "empresas agrícolas", "agricultura", "agropecuária", "agropecuárias", "agropecuário", "agropecuários", "fazenda", "fazendas", "lavoura", "lavouras", "produtor rural", "produtores rurais", "propriedade rural", "propriedades rurais", "pecuária", "agricultor", "agricultores", "fazendeiro", "fazendeiros"]
+aliases = ["setor do agro", "agrícola", "agrícolas", "empresa agrícola", "empresas agrícolas", "agricultura", "agropecuária", "agropecuárias", "agropecuário", "agropecuários", "fazenda", "fazendas", "lavoura", "lavouras", "produtor rural", "produtores rurais", "propriedade rural", "propriedades rurais", "pecuária", "agricultor", "agricultores", "fazendeiro", "fazendeiros", "estabelecimentos de produção agropecuária", "empresas de produção agropecuária", "ramo agropecuário"]
 cnae_core = ["0111301", "0111302", "0111303", "0111399", "0112101", "0112102", "0112199", "0113000", "0114800", "0115600", "0116401", "0116402", "0116403", "0116499", "0119901", "0119902", "0119903", "0119904", "0119905", "0119906", "0119907", "0119908", "0119909", "0119999", "0121101", "0121102", "0122900", "0131800", "0132600", "0133401", "0133402", "0133403", "0133404", "0133405", "0133406", "0133407", "0133408", "0133409", "0133410", "0133411", "0133499", "0134200", "0135100", "0139301", "0139302", "0139303", "0139304", "0139305", "0139306", "0139399", "0141501", "0141502", "0142300", "0151201", "0151202", "0151203", "0152101", "0152102", "0152103", "0153901", "0153902", "0154700", "0155501", "0155502", "0155503", "0155504", "0155505", "0159801", "0159802", "0159803", "0159804", "0159899", "0161001", "0161002", "0161003", "0161099", "0162801", "0162802", "0162803", "0162899", "0163600", "0170900"]
 cnae_extended = []
 scope = "main"
 since = "v1"
-notes = "Every subclass of CNAE division 01 (agriculture, livestock and related services). Broad agro words map here; agronegócio and empresas do agro still ask for an activity."
+notes = "Every subclass of CNAE division 01 (agriculture, livestock and related services). The phrase setor do agro refers to this division. Agronegócio and empresas do agro still ask for an activity."
 
 [[sector]]
 id = "driving_school"
 display = { sing = "autoescola", plural = "autoescolas", gender = "f" }
-aliases = ["auto escola", "auto escolas", "centro de formação de condutores", "cfc"]
+aliases = ["auto escola", "auto escolas", "centro de formação de condutores", "cfc", "centro de formação de motoristas", "centros de formação de motoristas", "centros de formação de condutores"]
 cnae_core = ["8599601"]
 cnae_extended = []
 scope = "main"
@@ -1994,7 +1994,7 @@ since = "v1"
 [[sector]]
 id = "internet_provider"
 display = { sing = "provedor de internet", plural = "provedores de internet", gender = "m" }
-aliases = ["provedor de acesso à internet", "provedores de acesso à internet"]
+aliases = ["provedor de acesso à internet", "provedores de acesso à internet", "provedor de banda larga", "provedores de banda larga"]
 cnae_core = ["6110803", "6190601"]
 cnae_extended = []
 scope = "main"

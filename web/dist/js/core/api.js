@@ -21,6 +21,14 @@ const MESSAGES = {
     account_suspended: "Esta conta está suspensa. Fale com o administrador.",
     account_banned: "Esta conta foi bloqueada.",
     rate_limited: "Muitas consultas em pouco tempo. Aguarde alguns segundos.",
+    trial_exhausted: "Sua amostra grátis terminou. Crie uma conta ou entre para continuar.",
+    trial_network_blocked: "O acesso gratuito está indisponível nesta rede. Se estiver usando VPN ou proxy, tente pela sua conexão habitual.",
+    free_access_limited: "O limite de acesso gratuito deste navegador ou rede foi atingido.",
+    registration_limited: "Você atingiu o limite de cadastros neste navegador ou rede. Tente amanhã ou entre com sua conta.",
+    conversation_not_found: "Esta conversa não está mais disponível.",
+    conversation_limit: "Você atingiu o limite de conversas. Exclua uma antes de criar outra.",
+    conversation_full: "Esta conversa atingiu o limite de consultas. Abra uma nova para continuar.",
+    conversation_changed: "Esta conversa foi atualizada. Abra-a novamente antes de continuar.",
     quota_exceeded: "Você usou todas as consultas do seu plano neste período.",
     plan_forbids_export: "Seu plano não inclui exportação de arquivos.",
     plan_forbids_downloads: "Seu plano não inclui downloads.",
@@ -84,11 +92,28 @@ export async function request(path, options = {}) {
     if (options.signal)
         init.signal = options.signal;
     const response = await fetch(apiUrl(path), init);
-    quotaFrom(response.headers);
+    if (session().token === token) {
+        const limit = response.headers.get("x-trial-limit");
+        const remaining = response.headers.get("x-trial-remaining");
+        if (token) {
+            if (response.ok && session().upgradeNeeded && response.headers.has("x-quota-daily-limit"))
+                updateSession({ upgradeNeeded: false });
+            quotaFrom(response.headers);
+        }
+        else if (limit !== null && remaining !== null) {
+            updateSession({ trialQuota: { limit: Number(limit), remaining: Number(remaining) } });
+        }
+    }
     if (!response.ok) {
         const error = await failure(response);
-        if (response.status === 401 && token && error.code !== "invalid_key") {
-            updateSession({ token: null, account: null, quota: null, staff: false });
+        if (session().token === token) {
+            if (response.status === 401 && token && error.code !== "invalid_key") {
+                updateSession({ token: null, account: null, quota: null, upgradeNeeded: false, staff: false });
+                void loadTrial();
+            }
+            else if (token && session().account?.plan.name === "free" && ["quota_exceeded", "free_access_limited"].includes(error.code)) {
+                updateSession({ upgradeNeeded: true });
+            }
         }
         throw error;
     }
@@ -134,6 +159,16 @@ export async function loadPlatform() {
     updateSession({ platform });
     return platform;
 }
+export async function loadTrial() {
+    if (session().platform?.auth !== "trial" || session().token)
+        return;
+    try {
+        await getJson("/api/v1/trial");
+    }
+    catch {
+        // The server will provide the applicable restriction on the first attempted search.
+    }
+}
 /** Refreshes the profile, plan and usage of the logged-in user. */
 export async function loadAccount() {
     if (!session().token)
@@ -163,7 +198,7 @@ export async function loadAccount() {
 }
 export async function login(key) {
     const reply = await sendJson("POST", "/api/v1/auth/login", { key: key.trim() });
-    updateSession({ token: reply.token });
+    updateSession({ token: reply.token, quota: null, upgradeNeeded: false });
     await loadAccount();
 }
 export async function logout() {
@@ -173,6 +208,7 @@ export async function logout() {
     catch {
         /* The session is dropped locally either way. */
     }
-    updateSession({ token: null, account: null, quota: null, staff: false });
+    updateSession({ token: null, account: null, quota: null, upgradeNeeded: false, staff: false });
+    await loadTrial();
 }
 //# sourceMappingURL=api.js.map

@@ -14,6 +14,7 @@ limit, daily and monthly quotas, page size, export, downloads). Registration, lo
 recovery by e-mail, roles, moderation and the admin API are in
 [ACCOUNTS.md](ACCOUNTS.md); production setup and capacity in [DEPLOYMENT.md](DEPLOYMENT.md).
 `--auth optional` serves anonymous callers under the `anonymous` plan (per IP);
+`--auth trial` adds a small browser preview and shared free-tier limits.
 `--auth off` restores the open, unmetered behaviour.
 
 JSON endpoints return JSON; `/healthz` and `/health` return `ok`, `/metrics` Prometheus
@@ -50,7 +51,13 @@ reference table or the RFB layout defines them.
 | `GET /api/v1/dominios/municipios/{uf}` | Municipalities of one state with their RFB codes, by name (the national table has no state column) |
 | `POST /api/v1/assistant/ask` | One turn of the Portuguese assistant (requires `--assistant-agg`): body `{"question", "context"?}`, see [Assistant](#assistant) |
 | `POST /api/v1/assistant/export` | The Excel, CSV or TXT file offered by an assistant turn: body `{"request", "export", "question"?}` |
-| `GET /api/v1/platform` | What a client needs before logging in: auth mode, registration, whether the assistant, export and contacts are served, competence |
+| `GET /api/v1/platform` | Auth mode, registration, trial configuration, upgrade URL, capabilities and competence |
+| `GET /api/v1/trial` | Preview limit and remaining queries, with the browser cookie when needed (trial mode only) |
+| `GET /api/v1/conversations` | List the authenticated user's assistant conversations |
+| `POST /api/v1/conversations` | Create a conversation with `{"title"}` |
+| `GET /api/v1/conversations/{id}` | Read the ordered `{question, reply}` turns |
+| `PATCH /api/v1/conversations/{id}` | Rename a conversation with `{"title"}` |
+| `DELETE /api/v1/conversations/{id}` | Delete a conversation and its saved turns |
 | `GET /api/v1/official/sources` | Official source/dataset registry states and locally imported `.ocind` manifests |
 | `GET /api/v1/official/query` | Typed official-indicator lookup, compare, rank, trend or ratio (requires `--official-dir`) |
 | `GET /api/v1` (and `GET /` without `--web`) | Service name, version and endpoint list |
@@ -81,8 +88,15 @@ returns `{interpretation, answer, extras, export, context, timing_us}`:
   `answer.blocks` are typed (`text`, `kpi`, `chart`, `table`, `records`, `company`,
   `notice`, `clarify`, `reject`, `methodology`, `sources`, `caveats`); `answer.filters`
   lists the filters applied besides place and activity; `answer.suggestions` are follow-ups.
-* `context` is the conversation state: send it back with the next question for follow-ups
-  ("e só as matrizes?", "agora em CSV"). The server keeps no conversation.
+* `context` is the conversation state for stateless clients. Send it with the next question
+  to support follow-ups ("e só as matrizes?", "agora em CSV").
+
+For a saved conversation, send `conversation_id` and `conversation_revision` (the
+number of saved turns) instead of `context`. The server uses the conversation's saved
+context and appends the answer. A stale revision returns `409 conversation_changed`.
+Conversation CRUD requires authentication and does not consume search quota. Accounts
+can keep up to 100 conversations with 100 turns each. Deleting a conversation removes
+its saved turns and context. Search logs, when enabled by the operator, are independent.
 * `export`, when the question asked for a file, describes it (`format`, `filename`, `rows`,
   `columns`, `notes`) and carries the `request` and `export` to post to
   `/api/v1/assistant/export`. That route canonicalizes and validates the request again,

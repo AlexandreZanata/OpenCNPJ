@@ -2,7 +2,8 @@ use opencnpj_core::varint::{self, Reader};
 
 use crate::ir::*;
 
-pub const IR_VERSION: u8 = 1;
+pub const IR_VERSION: u8 = 2;
+const BASE_VERSION: u8 = 1;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, thiserror::Error)]
 pub enum DecodeError {
@@ -20,18 +21,27 @@ impl From<varint::Malformed> for DecodeError {
 
 /// Encode the request losslessly. Canonicalize first when comparing meanings.
 pub fn encode(request: &Request) -> Vec<u8> {
-    let mut bytes = vec![IR_VERSION];
+    let mut bytes = vec![if request.scope.name_prefix.is_some() { IR_VERSION } else { BASE_VERSION }];
     request.write(&mut bytes);
+    if let Some(name) = &request.scope.name_prefix {
+        name.field.write(&mut bytes);
+        varint::put_lp(&mut bytes, name.prefix.as_bytes());
+    }
     bytes
 }
 
 pub fn decode(bytes: &[u8]) -> Result<Request, DecodeError> {
     let mut cursor = Cursor { reader: Reader::new(bytes), len: bytes.len() };
     let version = cursor.reader.u8()?;
-    if version != IR_VERSION {
+    if !matches!(version, BASE_VERSION | IR_VERSION) {
         return Err(DecodeError::Version(version));
     }
-    let request = Request::read(&mut cursor)?;
+    let mut request = Request::read(&mut cursor)?;
+    if version == IR_VERSION {
+        let field = NameField::read(&mut cursor)?;
+        let prefix = std::str::from_utf8(cursor.reader.lp_bytes()?).map_err(|_| DecodeError::Malformed)?;
+        request.scope.name_prefix = Some(NamePrefix { field, prefix: prefix.to_owned() });
+    }
     // Re-encoding also rejects non-minimal and overflowing varints and
     // noncanonical set encodings. There is one byte sequence per value.
     if !cursor.reader.is_empty() || encode(&request) != bytes {
@@ -188,11 +198,11 @@ macro_rules! set_wire {
 set_wire!(StatusSet, PorteSet);
 
 macro_rules! record {
-    ($type:ty { $($field:ident),+ $(,)? }) => {
+    ($type:ty { $($field:ident),+ $(,)? } $(defaults {$($default:ident),+})?) => {
         impl Wire for $type {
             fn write(&self, out: &mut Vec<u8>) { $(self.$field.write(out);)+ }
             fn read(input: &mut Cursor<'_>) -> Result<Self, DecodeError> {
-                Ok(Self { $($field: Wire::read(input)?),+ })
+                Ok(Self { $($field: Wire::read(input)?,)+ $($($default: Default::default(),)+)? })
             }
         }
     };
@@ -235,6 +245,7 @@ tagged!(MetaTopic {0 => DataDate, 1 => Sources, 2 => Methodology, 3 => Help, 4 =
 tagged!(CnaeScope {0 => Main, 1 => Any});
 tagged!(Tri {0 => Any, 1 => Yes, 2 => No});
 tagged!(ContactNeed {0 => Any, 1 => Phone, 2 => Email, 3 => Both});
+tagged!(NameField {0 => Any, 1 => Legal, 2 => Trade});
 tagged!(CnaeCode {0 => Section(code), 1 => Division(code), 2 => Group(code), 3 => Class(code), 4 => Subclass(code)});
 tagged!(PopulationRef {0 => IbgeCensus(year), 1 => IbgeEstimate(year)});
 tagged!(Metric {0 => Stock, 1 => Flow(flow), 2 => ActiveChange {pct}, 3 => Per10k(population), 4 => InhabitantsPer(population), 5 => Share});
@@ -268,7 +279,7 @@ record!(Filters {
     capital,
     exclude,
     contact,
-});
+} defaults {name_prefix});
 record!(TimeSpec { competence, period, anchor });
 record!(Output { page, with_methodology, display_order });
 record!(CatalogueVersions { municipalities, sectors });

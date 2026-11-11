@@ -18,6 +18,7 @@ pub(crate) struct Delivery {
     pub notes: Vec<String>,
     /// A format the service cannot write (PDF, Word…) was asked for.
     pub unsupported: Option<String>,
+    pub conflicting_formats: bool,
 }
 
 type Phrase = Vec<String>;
@@ -28,6 +29,8 @@ pub(crate) struct Vocabulary {
     formats: Vec<(Phrase, ExportFormat)>,
     unsupported: Vec<Phrase>,
     request: Vec<Phrase>,
+    record_openers: Vec<Phrase>,
+    record_commands: Vec<Phrase>,
     actions: Vec<Phrase>,
     export_verbs: Vec<Phrase>,
     file_nouns: Vec<Phrase>,
@@ -130,6 +133,8 @@ impl Vocabulary {
             formats,
             unsupported: section(&file.formats, "unsupported")?,
             request: section(&file.roles, "request")?,
+            record_openers: section(&file.roles, "record_openers")?,
+            record_commands: section(&file.roles, "record_commands")?,
             actions: section(&file.roles, "actions")?,
             export_verbs: section(&file.roles, "export_verbs")?,
             file_nouns: section(&file.roles, "file_nouns")?,
@@ -189,6 +194,31 @@ struct FieldList {
 }
 
 impl Vocabulary {
+    /// Words before a record request, stopping at the first catalogue entity.
+    pub(crate) fn record_opening(&self, words: &[String]) -> (usize, bool) {
+        let mut end = 0;
+        let mut commands = false;
+        while end < words.len() {
+            let rest = &words[end..];
+            let opener = self.record_openers.iter().find(|phrase| rest.starts_with(phrase)).map_or(0, Vec::len);
+            let command = self.record_commands.iter().find(|phrase| rest.starts_with(phrase)).map_or(0, Vec::len);
+            if opener == 0 && command == 0 {
+                break;
+            }
+            commands |= command >= opener;
+            end += opener.max(command);
+        }
+        (end, commands)
+    }
+
+    /// Ignore only a complete courtesy tag at the end, outside catalogue entities.
+    pub(crate) fn record_closing(&self, words: &[String], mut end: usize) -> usize {
+        while let Some(phrase) = self.tail.iter().find(|phrase| words[..end].ends_with(phrase)) {
+            end -= phrase.len();
+        }
+        end
+    }
+
     fn field_at(&self, words: &[Word], start: usize) -> Option<(usize, &[ExportField], bool)> {
         self.fields
             .iter()
@@ -259,7 +289,30 @@ impl Vocabulary {
     /// column list ("só o nome e o CNPJ") refines.
     pub(crate) fn delivery(&self, text: &str, previous: Option<&Export>) -> Option<Delivery> {
         let words = words(text);
-        let format = (0..words.len()).find_map(|start| self.format_at(&words, start).map(|(end, format)| (start, end, format)));
+        let mut conflicting_formats = false;
+        let format = (0..words.len()).find_map(|start| {
+            let (mut end, format) = self.format_at(&words, start)?;
+            loop {
+                let separator = match &words[end..] {
+                    [a, b, ..] if a.key == "isto" && b.key == "e" || a.key == "ou" && b.key == "seja" => 2,
+                    [a, ..] if matches!(a.key.as_str(), "e" | "ou") => 1,
+                    [a, b, ..] if matches!(a.key.as_str(), "em" | "no") && b.key == "formato" => 0,
+                    _ if words[end - 1].comma => 0,
+                    _ => break,
+                };
+                let mut next = end + separator;
+                while let Some(after_glue) = at(&self.left_glue, &words, next) {
+                    next = after_glue;
+                }
+                let Some((after_format, other)) = self.format_at(&words, next) else { break };
+                if other != format {
+                    conflicting_formats = true;
+                    break;
+                }
+                end = after_format;
+            }
+            Some((start, end, format))
+        });
         let unsupported = (0..words.len()).find_map(|start| at(&self.unsupported, &words, start).map(|end| (start, end)));
         let noun = if format.is_none() { self.requested_file(&words) } else { None };
         let verb = (0..words.len()).find_map(|start| at(&self.export_verbs, &words, start).map(|end| (start, end)));
@@ -319,6 +372,24 @@ impl Vocabulary {
                 }
             }
             self.cut_left(&words, start, &mut removed);
+        }
+        // An explicit format at the very end can restate the first delivery ("em TXT …, em arquivo de texto").
+        if let Some((_, end, first)) = format {
+            let mut last = words.len();
+            while let Some(from) = ending(&self.tail, &words, last) {
+                last = from;
+            }
+            for at in end..last {
+                if let Some((after, other)) = self.format_at(&words, at)
+                    && after == last
+                    && let Some(from) = ending(&self.left_glue, &words, at)
+                    && matches!(words[from].key.as_str(), "em" | "no")
+                {
+                    conflicting_formats |= other != first;
+                    removed[from..after].fill(true);
+                    break;
+                }
+            }
         }
         if let Some((start, end)) = verb {
             // "Exporte as farmácias…": the verb and the request words before it.
@@ -390,7 +461,7 @@ impl Vocabulary {
         };
         let unsupported =
             unsupported.map(|(start, end)| words[start..end].iter().map(|w| w.key.to_uppercase()).collect::<Vec<_>>().join(" "));
-        Some(Delivery { export: Export { format, fields, rows: None }, rest, notes, unsupported })
+        Some(Delivery { export: Export { format, fields, rows: None }, rest, notes, unsupported, conflicting_formats })
     }
 
     /// Cut the glue and request words that lead to a file phrase starting at `start`.
@@ -516,7 +587,7 @@ mod tests {
     fn lists_include_each_other_and_cycles_fail() {
         let text = |lists: &str| {
             format!(
-                "[lists]\n{lists}\n[formats]\nxlsx=[\"excel\"]\ncsv=[\"csv\"]\ntxt=[\"txt\"]\nunsupported=[\"pdf\"]\n[roles]\nrequest=[\"@a\"]\nactions=[\"manda\"]\nexport_verbs=[\"exporte\"]\nfile_nouns=[\"arquivo\"]\nleft_glue=[\"um\"]\nright_glue=[\"com\"]\nintros=[\"apenas\"]\narticles=[\"o\"]\nprevious=[\"isso\"]\ntail=[\"valeu\"]\ncompany=[\"encontre\"]\ncompany_nouns=[\"a empresa\"]\n[fields]\ncnpj=[\"cnpj\"]\n"
+                "[lists]\n{lists}\n[formats]\nxlsx=[\"excel\"]\ncsv=[\"csv\"]\ntxt=[\"txt\"]\nunsupported=[\"pdf\"]\n[roles]\nrequest=[\"@a\"]\nrecord_openers=[\"@a\"]\nrecord_commands=[\"manda\"]\nactions=[\"manda\"]\nexport_verbs=[\"exporte\"]\nfile_nouns=[\"arquivo\"]\nleft_glue=[\"um\"]\nright_glue=[\"com\"]\nintros=[\"apenas\"]\narticles=[\"o\"]\nprevious=[\"isso\"]\ntail=[\"valeu\"]\ncompany=[\"encontre\"]\ncompany_nouns=[\"a empresa\"]\n[fields]\ncnpj=[\"cnpj\"]\n"
             )
         };
         let nested = Vocabulary::parse(&text("a=[\"@b\", \"Por Favor\"]\nb=[\"@c\", \"me\"]\nc=[\"Tchê\"]")).unwrap();

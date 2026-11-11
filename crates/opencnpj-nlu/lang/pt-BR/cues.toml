@@ -6,5 +6,7 @@ rank = ["top", "quais os", "quais cidades", "quais municipios", "quais estados",
 trend = ["evolucao mensal", "evolucao anual", "mes a mes", "por mes", "por ano", "serie", "ao longo", "evoluiu"]
 breakdown = ["distribua", "distribuicao", "distribuidas", "separadas por", "separados por", "divididas por", "por porte", "por situacao", "por matriz", "por opcao pelo mei"]
 registrations = ["registrados com inicio", "registradas com inicio", "foram registrados", "registros de inicio", "registros", "registro", "registradas", "registrados", "abriram", "abriu", "surgiram", "comecaram", "criadas", "criados", "cadastradas", "cadastrados", "novas empresas", "novos cnpjs", "abertura de", "aberturas de"]
-closures = ["tiveram baixa", "baixas cadastrais", "fecharam", "baixaram", "faliram", "baixas", "encerraram", "deram baixa", "foram baixadas", "foram baixados", "encerradas em", "baixadas em", "baixados em", "encerrados em", "fechou", "encerrou", "faliu"]
+closures = ["tiveram baixa", "baixas cadastrais", "fecharam", "baixaram", "faliram", "baixas", "encerraram", "deram baixa", "foram baixadas", "foram baixados", "fechou", "encerrou", "faliu"]
+# A participle before a place describes status. With a period it describes an event.
+dated_closures = ["encerradas em", "baixadas em", "baixados em", "encerrados em"]
 growth = ["variacao", "crescimento", "crescendo", "cresceram", "ganharam mais", "aumentou", "aumentando", "expandindo", "cresceu", "a mais existem", "ganhou", "perdeu"]

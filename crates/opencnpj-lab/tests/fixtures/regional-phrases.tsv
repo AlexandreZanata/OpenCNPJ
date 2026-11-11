@@ -1,0 +1,101 @@
+# Sector, place, operation[/status], export, contact, and question.
+# Place uses catalogue municipality IDs joined by +, or uf=XX. Status defaults to active.
+# ? asks for clarification, ! rejects, and @ introduces a literal company name.
+bakery	138	list	-	phone	E aí, tem como me passar as padocas de Rio Branco/AC com telefone pra contato?
+express_delivery	1988	list	-	email	Só preciso da lista de empresas de motofrete em Maceió-AL que tenham e-mail cadastrado.
+clinical_lab	254	count	-	phone	Égua, quantos laboratórios de análises clínicas de Manaus AM possuem telefone informado no cadastro?
+fishmonger	603	list=8	-	phone	Se possível, me mande só 8 peixarias em Macapá (AP) com fone.
+meal_delivery	2519	list	xlsx	phone	Oxente, me faz uma planilha das marmitarias de Salvador BA que tenham número de contato telefônico.
+apparel_retail	1290	list	-	both	Meu rei, consegue me enviar as lojas de vestuário de Fortaleza CE com telefone e e-mail?
+management_consulting	5425	list	-	email	Gostaria que você me encaminhasse as consultorias empresariais de Brasília DF com correio eletrônico cadastrado.
+used_goods_store	3447	count	-	-	Me diga o total de brechós ativos no município de Vitória/ES.
+metalwork	5261	list	-	phone	Me arruma, se puder, as serralherias lá em Goiânia GO que tenham contato telefônico.
+event_catering	919	list	-	email	Podes me enviar os buffets de São Luís/MA com endereço eletrônico informado?
+tire_repair	2656	list=10	-	phone	Uai, traz só dez borracharias de Belo Horizonte MG com telefone publicado.
+internet_provider	5100	count	-	both	Me dá a contagem, o total de provedores de banda larga em Campo Grande MS com fone e endereço de e-mail.
+agriculture_livestock	5108	list	csv	-	Vixe, gera um arquivo CSV das empresas do setor do agro de Cuiabá MT.
+optical_shop	425	list	-	phone	Pai d'égua, me manda as óticas de Belém PA que deixam telefone para contato.
+language_school	1621	list	-	email	Me manda uma lista das escolas de idiomas no município de João Pessoa PB com e-mail comercial.
+auto_electrician	1861	list	-	both	Oxe, eu só queria que me passasse as autoelétricas em Recife PE com número de telefone e e-mail.
+florist	1205	list	-	phone	Por obséquio, encaminhe as floriculturas de Teresina PI com telefone de contato.
+computer_repair	4342	list	-	phone	Me dá a relação de assistências técnicas de notebooks em Curitiba (PR) que contam com número de telefone.
+machining	3595	list	-	email	Fala aí, manda pra gente as tornearias do Rio de Janeiro/RJ com email informado.
+car_rental	1476	count	-	-	Qtde de locadoras de veículos ativas na cidade de Natal RN?
+rubber_tree	2	list	-	phone	Pode me mostrar as fazendas de seringueira em Porto Velho RO que têm telefone cadastrado?
+laundry	300	list	-	email	Só as lavanderias de Boa Vista RR com e-mail, por favor.
+pet_grooming	4975	list	-	phone	Bah, consegue me passar as empresas de banho e tosa de Porto Alegre/RS que têm WhatsApp?
+hotel	4627	list	txt	-	Manda em TXT as pousadas de Florianópolis SC, em arquivo de texto.
+home_health	2147	count	-	phone	Quantos serviços de assistência domiciliar à saúde em Aracaju SE têm um telefone no cadastro?
+custom_software	4141	by_size	-	-	Mostra a distribuição por porte das empresas de software sob encomenda em São Paulo SP.
+produce_retail	5440	list	-	phone	Me ajuda a achar os sacolões de Palmas TO que têm telefone de contato.
+# Contact predicates and ordered attachments.
+dental_clinic	2656	list	-	phone	Mostre os dentistas de Belo Horizonte MG que têm telefone para contato.
+motorcycle_repair	254	list	-	phone	Queria ver as oficinas de motos em Manaus AM com número para ligar.
+accounting	5108	list	-	email	Me mande os escritórios contábeis em Cuiabá MT que informaram endereço de e-mail.
+pharmacy	5527	list	-	phone	Me envia as drogarias de Sorriso MT com telefone, digo, com número de telefone informado.
+insurance_broker	4141	list	-	both	Me manda as corretoras de seguros de São Paulo SP que tenham tanto telefone quanto e-mail.
+school_transport	1621	count	-	phone	Qtas empresas de transporte escolar em João Pessoa PB têm um telefone de contato?
+event_planning	1861	list	-	both	Liste as produtoras de feiras em Recife PE que tenham telefone e que tenham endereço eletrônico.
+property_management	4342	list	-	email	Mostra as administradoras de imóveis de Curitiba PR com email de contato.
+bakery	5067	list	-	phone	Me manda só as padarias de Sinop MT com fone, em outras palavras, com telefone cadastrado.
+photography	4627	list	-	email	Queria uma lista dos fotógrafos de Florianópolis SC que tenham e-mail no cadastro.
+stationery	4975	count	-	email	Me passa a quantidade de papelarias em Porto Alegre RS com e-mail disponível.
+beauty_salon	2147	list	-	both	Aracaju SE, quero os salões de beleza com número de telefone e e-mail no cadastro.
+car_wash	5150	list	-	phone	Mostre lava-jatos em Rondonópolis MT com contato por telefone.
+veterinary_clinic	5261	list	-	both	Tem como me mandar as clínicas veterinárias de Goiânia GO que informam telefone e e-mail?
+translation	3595	list	-	email	Me mostre tradutores do Rio de Janeiro RJ com endereço de email.
+pharmacy	5527	list	-	phone	Mostre as farmácias, mas só as farmácias com telefone, no município de Sorriso MT.
+# Requests in different orders, with record limits, repeated formats and status.
+bookshop	5425	list=7	-	-	Poderia listar só 7 livrarias em Brasília DF?
+bakery	5527	list=10	xlsx	phone	Me manda uma planilha com 10 padarias em Sorriso MT que têm telefone.
+pharmacy	5527	list=5	csv	phone	Me manda as farmácias com telefone em Sorriso MT, só 5, em CSV.
+gym	5100	list=5	-	-	Você consegue mostrar apenas cinco academias em Campo Grande MS?
+auto_mechanic	5108	list=6	-	phone	Só me lista 6 oficinas mecânicas que tenham telefone em Cuiabá MT.
+waste_collection	919	list	csv	-	Queria um CSV no formato CSV das empresas de coleta de resíduos comuns em São Luís MA.
+dental_clinic	5108	list	xlsx	-	Me passa uma planilha, isto é, um Excel, das clínicas dentárias de Cuiabá MT.
+metalwork	5261	list	txt	-	Preciso de um arquivo de texto, ou seja, em TXT, das serralherias de Goiânia GO.
+?	-	-	-	-	Flores em Fortaleza CE, quero uma planilha das floriculturas da cidade.
+pharmacy	5527	list/closed	-	-	Me mande a lista das farmácias baixadas na cidade de Sorriso MT.
+restaurant	4627	count/closed	-	-	Qual é o número de restaurantes baixados em Florianópolis SC?
+accounting	5067	list/all	-	-	Mostre os escritórios de contabilidade em Sinop MT em qualquer situação cadastral.
+construction	2656	list/suspended	-	-	Por favor, mostre as construtoras suspensas de Belo Horizonte MG.
+bakery	4342	list/unfit	-	-	Me liste as padarias inaptas no município de Curitiba PR.
+gym	5100	by_size	-	-	Quero a distribuição por porte das academias de Campo Grande MS.
+bakery	5067	by_status	-	-	Mostre a distribuição das padarias de Sinop MT por situação cadastral.
+pharmacy	5527+5067	list	-	phone	Me mande só as drogarias de Sorriso e Sinop MT que tenham telefone.
+dental_clinic	5108+5150	count	-	-	Quantas clínicas odontológicas existem em Cuiabá e Rondonópolis, em Mato Grosso?
+meal_delivery	2519+1861	list	-	phone	Mostre as marmitarias em Salvador BA e Recife PE com telefone de contato.
+supermarket	uf=MT	list	-	-	Por favor, só os supermercados em todo o estado de Mato Grosso.
+furniture_repair	uf=SC	count	-	-	Quantos serviços de conserto de móveis há no estado de Santa Catarina?
+appliance_repair	uf=RO	list	-	-	Procure os estabelecimentos no ramo de conserto de eletrodomésticos em RO.
+?	-	-	-	-	Mostre as empresas de instalação de placas solares em Porto Alegre RS.
+# Supported aliases and distinct activities that need to remain separate.
+meal_delivery	1861	list	-	-	Mostra as empresas de entrega de quentinhas em Recife PE.
+dairy_cattle	5527	list	-	-	Encontre as fazendas do ramo de pecuária leiteira em Sorriso MT.
+metal_frames	254	list	-	-	Quero ver as fábricas de esquadrias de metal de Manaus AM.
+pet_boarding	4141	list	-	-	Pode listar os hotéis para cães em São Paulo SP?
+vet_medicine_retail	5108	list	-	-	Me mostra as farmácias veterinárias de Cuiabá MT.
+compounding_pharmacy	4342	list	-	-	Quero ver as farmácias de manipulação de Curitiba PR.
+pasta_factory	4141	list	-	-	Mostre as empresas de fabricação de macarrão em São Paulo SP.
+sawmill	2	count	-	-	Quantas serrarias ativas há no município de Porto Velho RO?
+# Controls: ambiguity, unsupported filters and policy.
+?	-	-	-	-	Me passa as farmácias de Sorriso MT com telefone ou com e-mail cadastrado.
+?	-	-	-	-	Me manda as farmácias de Sorriso MT com telefone e sem e-mail.
+?	-	-	-	-	Me mande as farmácias de Sorriso MT com telefone, isto é, com e-mail.
+?	-	-	-	-	Liste as padarias em Sinop MT com telefone da operadora Vivo.
+?	-	-	-	-	Quero ver as empresas no setor de coleta de lixo eletrônico em Manaus AM.
+?	-	-	-	-	Quero ver as empresas no ramo de iluminação no bairro inventado em Cuiabá MT.
+?	-	-	-	-	Mostre as academias na cidade de Eldorado do Vento em Goiás.
+?	-	-	-	-	Me mostre as farmácias na cidade, no município de Panemalta MT.
+?	-	-	-	-	Me mande as drogarias de Sorriso RS.
+?	-	-	-	-	Me mostre as padarias em São Domingos.
+?	-	-	-	-	Me passa um PDF das farmácias em Sorriso MT.
+?	-	-	-	-	Me mande um CSV ou um Excel das farmácias em Sorriso MT.
+?	-	-	-	-	Me mande um CSV e um Excel das farmácias em Sorriso MT.
+?	-	-	-	-	Mostre as farmácias de Sorriso MT com telefone verificado.
+?	-	-	-	-	Liste as melhores padarias de Sinop MT por avaliação.
+!	-	-	-	-	Me passa a renda mensal, o faturamento das serralherias de Goiânia GO.
+!	-	-	-	-	Me informe o CPF dos sócios das clínicas odontológicas de Cuiabá MT.
+@Banco do Brasil	4342	company	-	-	Por gentileza, encontre a empresa Banco do Brasil em Curitiba PR.
+@Magazine Luiza	3800	company	-	-	Quero saber sobre a empresa Magazine Luiza em Franca SP.
+@Petrobras	3595	company	-	-	Qual o CNPJ da empresa Petrobras no Rio de Janeiro RJ?

@@ -93,8 +93,26 @@ A column list after `com` needs two names unless it follows the format directly
 * Lists no longer drop the event they name: "padarias que fecharam em 2025" lists
   status 08 with `status_date` in 2025; "abertas em 2025" sets `opened` and every status.
   Without a period, "todas as empresas que tiveram baixa" lists every closed company.
-* "no setor de TI", "no ramo de", "no segmento de" are accepted before a recognized activity.
-* "baixados em" and "encerrados em" join the closure cues (masculine nouns).
+* Repeated qualifiers such as "na cidade, no município de Sorriso" and "no ramo, no
+  setor de farmácias" resolve to one filter. Unknown activities and places still require
+  clarification.
+* Record commands allow regional and courteous wording, repeated verbs and limits such as
+  "me passa só 5 farmácias". Restating the same contact condition keeps the filter.
+* Repeated aliases for one file format, such as "um CSV, em formato CSV", produce one
+  export. The [redundant phrasing fixture](../../crates/opencnpj-lab/tests/fixtures/redundant-phrases.tsv)
+  checks the operation, scope, contact filter, limit and format against the production
+  catalogue. The [regional phrasing fixture](../../crates/opencnpj-lab/tests/fixtures/regional-phrases.tsv)
+  covers all 27 UFs, municipality sets, whole-state queries, stock status, regional vocabulary
+  and scoped contact expressions. When a delivery phrase names two different supported
+  formats, the assistant asks the user to choose one. Run the fixtures with
+  `cargo test -p opencnpj-lab search_phrases_keep_the_expected_activity_and_intent`.
+* The [noisy phrasing fixture](../../crates/opencnpj-lab/tests/fixtures/noisy-phrases.tsv)
+  covers abbreviations, single-edit recovery of sector and municipality names, and queries
+  that combine contact, size, tax regime, unit type, opening date and capital. A typo in a
+  multiword municipality requires an adjacent UF and a unique candidate. The value of
+  `capital social` comes from that clause, including when another filter contains a date.
+* "baixados em Florianópolis" filters by current registration status. "baixados em 2025"
+  counts closure events during that period.
 
 ### Conversation
 
@@ -103,6 +121,39 @@ matrizes?"), a new question clears it. A delivery whose remaining words only poi
 previous answer ("agora me mande isso em Excel", "e em CSV") reuses the previous request:
 a count of closures becomes the list of those closures over the same period. A bare column
 list ("só o nome e o CNPJ") changes the columns, and a new format keeps them.
+
+A filter-only turn such as "dessas só as de Sinop" edits the previous query. A change of
+scope starts at the first page. The next delivery retains the filters, sort order, and
+any explicitly requested row count. The default preview size leaves the file uncapped by
+that preview. A clarification leaves the last successful query and its delivery intact.
+
+Contact edits are explicit. "tira o filtro de telefone" drops the phone requirement and
+keeps any email requirement. "troca telefone por e-mail" replaces the phone requirement
+with email. Both preserve the other query filters, sorting, and the selected file columns.
+A request for "sem telefone" asks for a different condition and requires clarification.
+
+"tira o filtro de porte e mantém o Simples" clears only the size restriction and keeps
+the current Simples inclusion or exclusion. "troca matriz por filial" changes the
+establishment type, including when the previous count used the head-office unit.
+Both edits preserve any selected export columns, even when a column names the filter
+being edited.
+
+"tira o filtro de capital e mantém o porte" clears the capital bounds and keeps the
+size restriction. "troca optantes do Simples por não optantes" reverses the Simples
+selection while preserving the rest of the query and delivery. The second option can
+omit the regime name when the first explicitly identifies Simples Nacional.
+
+"tira o filtro de data de abertura e mantém a situação cadastral" clears the opening
+date restriction and retains the status and any status date filter. A registration
+count with a required period asks for clarification when that period is the only
+opening date restriction. "troca MEI por não MEI" changes only the MEI selection.
+Both edits retain the selected columns, sort order, and explicit row limit.
+
+"tira o filtro de data da baixa e mantém a situação cadastral" clears the status date
+range and retains the current status and opening date. "troca ativas por baixadas"
+replaces the active status and keeps other selected statuses. A status change with a
+status date filter asks the user to resolve that date first. A closure count with a
+required period asks for clarification when an edit would change that period or metric.
 
 ## 4. Files
 
@@ -245,12 +296,33 @@ and an unrecognized word describing the companies was dropped. Two changes:
 * The sector `agriculture_livestock` (appended, so earlier sector ids are unchanged) holds
   every subclass of CNAE division 01 under the words users say: agrícola(s), agricultura,
   agropecuária, fazenda(s), lavoura(s), produtor(es) rural(is), pecuária, agricultor,
-  fazendeiro. Longer aliases still win ("fazendas de soja" stays soybean); "agronegócio" and
-  "empresas do agro" keep asking for an activity.
+  fazendeiro. "Setor do agro" also uses division 01.
+  Longer aliases still win ("fazendas de soja" stays soybean). "Agronegócio" and
+  "empresas do agro" still ask for an activity because the supply chain spans multiple divisions.
 * Fail closed: a word right after a plural "empresas / estabelecimentos / negócios / firmas
   / companhias" that is no catalogue entity and no known status, size or connective
   ("empresas xyzolicas") gets "Qual atividade você quer pesquisar?" instead of answering
   every company. The singular "a empresa Zaflas" names one company and is left to §8.
+
+The sector catalogue also covers common service and trade phrases such as "escritórios
+contábeis", "oficinas de lanternagem", "delivery de marmitas" and "provedores de banda
+larga". A complete phrase takes precedence over shorter matches inside it. Broad terms
+such as "comércio de vestuário" still need a narrower activity, for example "varejo de
+vestuário" or "comércio atacadista de vestuário".
+
+Search commands such as "procure" and "mostre" list records when they are followed by
+a recognized activity and filters. Named companies still use the company search. A
+phrase such as "empresas de produção de soja" identifies an activity, while a request
+for the volume of soybean production needs a different source. The
+[sector phrase fixture](../../crates/opencnpj-lab/tests/fixtures/sector-phrases.tsv)
+checks the expected CNAEs, municipality, operation, contact filter and export format.
+
+Record searches reuse the courtesy, regional and delivery phrases used for files.
+A recognized activity can follow qualifiers such as "na área de" or "do ramo de".
+Contact clauses such as "que têm um número de telefone" and "com endereço de e-mail"
+apply to both lists and exact counts of establishments in the served snapshot. An
+explicit count remains a count. Missing-contact and either-contact conditions prompt
+for clarification, while "telefone e e-mail" requires both fields.
 
 ## 10. Repeated lines in a file
 

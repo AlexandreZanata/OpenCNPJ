@@ -61,10 +61,11 @@ struct AskBody {
     question: String,
     #[serde(default)]
     context: Option<Conversation>,
+    conversation_id: Option<i64>,
+    conversation_revision: Option<i64>,
 }
 
-/// One conversation turn. The reply carries the conversation state to send with the next
-/// question; the server keeps none.
+/// One turn of a saved conversation, or a stateless turn with client-supplied context.
 async fn ask(State(st): State<Shared>, caller: Option<Extension<Caller>>, body: Result<Json<AskBody>, JsonRejection>) -> ApiResult {
     let assistant = assistant(&st)?;
     let Json(body) = body.map_err(|_| ApiError::bad("send {\"question\": \"…\", \"context\": …} as JSON"))?;
@@ -73,9 +74,32 @@ async fn ask(State(st): State<Shared>, caller: Option<Extension<Caller>>, body: 
         return Err(ApiError::bad("question must have between 1 and 1000 characters"));
     }
     let rows = export_rows(&st, caller.as_ref().map(|c| &c.0));
-    let mut state = body.context.unwrap_or_default();
+    let saved = match (body.conversation_id, body.conversation_revision) {
+        (None, None) => None,
+        (Some(id), Some(revision)) if body.context.is_none() => {
+            let user = caller.as_ref().map(|caller| caller.principal.id).filter(|id| *id > 0);
+            let (Some(user), Some(accounts)) = (user, st.gate.accounts.clone()) else {
+                return Err(ApiError::new(StatusCode::UNAUTHORIZED, "unauthenticated", "sign in to use a saved conversation"));
+            };
+            Some((accounts, user, id, revision))
+        }
+        _ => return Err(ApiError::bad("send conversation_id and conversation_revision together, or send context alone")),
+    };
     let logged = question.clone();
-    let reply = blocking(&st, move |_| Ok(assistant.ask_capped(&question, &mut state, rows))).await?;
+    let reply = blocking(&st, move |_| {
+        if let Some((accounts, user, id, revision)) = saved {
+            let (current, mut context) = accounts.conversation_context(user, id)?;
+            if current != revision {
+                return Err(crate::conversations::changed());
+            }
+            let reply = assistant.ask_capped(&question, &mut context, rows);
+            accounts.append_turn(user, id, revision, &question, &reply)?;
+            Ok(reply)
+        } else {
+            Ok(assistant.ask_capped(&question, &mut body.context.unwrap_or_default(), rows))
+        }
+    })
+    .await?;
     let mut response = Json(reply).into_response();
     response.headers_mut().insert(header::CACHE_CONTROL, HeaderValue::from_static("no-store"));
     response.extensions_mut().insert(LoggedQuery(logged));
@@ -129,6 +153,11 @@ pub async fn platform(State(st): State<Shared>) -> Response {
         "version": env!("CARGO_PKG_VERSION"),
         "auth": st.gate.mode.name(),
         "registration": registration,
+        "trial": st.trial.as_ref().map(|_| json!({
+            "limit": crate::trial::TRIAL_LIMIT,
+            "max_page_size": st.gate.accounts.as_ref().and_then(|accounts| accounts.plan("anonymous")).map(|plan| plan.max_page_size)
+        })),
+        "upgrade_url": st.args.upgrade_url,
         "assistant": st.assistant.is_some(),
         "search": true,
         "export": !st.args.disable_export,

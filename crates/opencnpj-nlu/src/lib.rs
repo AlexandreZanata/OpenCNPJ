@@ -69,15 +69,25 @@ impl Interpreter {
         // A delivery phrase is cut before the grammar; a bare column list refines the
         // export of the current thread.
         let Some(delivery) = self.delivery.delivery(text, state.export.as_ref().filter(|_| state.last.is_some())) else {
-            let (result, _) = self.answer(text, state, false);
+            let (result, rows) = self.answer(text, state, false);
             if let Some(company) = self.company(text, &result, state) {
                 return company;
             }
+            if result.request.is_none() {
+                return result;
+            }
             // Refinements and clarification answers keep the file of the thread; a new
             // question starts without one.
-            state.export = if matches!(result.act.as_str(), "new_query" | "meta_question") { None } else { state.export.take() };
+            if matches!(result.act.as_str(), "new_query" | "meta_question") {
+                state.export = None;
+            } else if let Some(export) = &mut state.export {
+                export.rows = rows;
+            }
             return Interpretation { export: state.export.clone(), ..result };
         };
+        if delivery.conflicting_formats {
+            return Interpretation::stop(Decision::Clarify, "Qual formato você prefere para este arquivo: Excel, CSV ou TXT?");
+        }
         if let Some(format) = &delivery.unsupported {
             return Interpretation::stop(
                 Decision::Clarify,
@@ -96,20 +106,27 @@ impl Interpreter {
         if previous && result.request.is_some() {
             result.act = "export".into();
         }
+        let Some(request) = &result.request else {
+            return result;
+        };
+        if matches!(request.op, Op::Meta { .. }) {
+            result.notes.push("Essa resposta não gera arquivo.".into());
+            state.export = None;
+            return result;
+        }
         let mut export = delivery.export;
-        if let Some(request) = &result.request {
-            if matches!(request.op, Op::Meta { .. }) {
-                result.notes.push("Essa resposta não gera arquivo.".into());
-                state.export = None;
-                return result;
-            }
-            if matches!(request.op, Op::List { .. }) {
-                export.rows = rows;
-            }
-            result.notes.extend(delivery.notes);
-            if result.decision == Decision::Execute && !result.notes.is_empty() {
-                result.decision = Decision::ExecuteWithNote;
-            }
+        if result.act != "new_query"
+            && export.fields.is_empty()
+            && let Some(last) = &state.export
+        {
+            export.fields.clone_from(&last.fields);
+        }
+        if matches!(request.op, Op::List { .. }) {
+            export.rows = rows;
+        }
+        result.notes.extend(delivery.notes);
+        if result.decision == Decision::Execute && !result.notes.is_empty() {
+            result.decision = Decision::ExecuteWithNote;
         }
         state.export = Some(export.clone());
         result.export = Some(export);
@@ -127,6 +144,9 @@ impl Interpreter {
         let unrecognized = result.decision == Decision::Clarify
             && ["Não reconheci", "Qual atividade", "Que tipo de loja"].iter().any(|start| result.reason.starts_with(start));
         if result.request.is_some() || !result.options.is_empty() || !(result.decision == Decision::Reject || unrecognized) {
+            return None;
+        }
+        if !matches!(grammar::read_name_prefix(text), Ok(None)) {
             return None;
         }
         let n = normalize::words(text).join(" ");
@@ -176,6 +196,17 @@ impl Interpreter {
             return None;
         }
         let words = normalize::words(&name);
+        // A plural activity request must not fall back to a company name. An explicit
+        // name qualifier still allows a legal name such as "Empresas de Transporte União".
+        if !time::has(&n, &["a empresa", "a firma", "razao social", "nome fantasia", "com o nome"])
+            && matches!(words.as_slice(), [noun, link, ..]
+                if matches!(noun.as_str(), "empresas" | "estabelecimentos" | "negocios" | "cnpjs" | "firmas" | "companhias")
+                    && (matches!(link.as_str(), "de" | "do" | "da" | "dos" | "das" | "com" | "sem")
+                        || matches!(link.as_str(), "no" | "na" | "em")
+                            && words.get(2).is_some_and(|w| grammar::SECTOR_QUALIFIERS.contains(&w.as_str()))))
+        {
+            return None;
+        }
         let hits = self.pack.lexicon.scan(&words);
         let only_sectors = !hits.is_empty()
             && hits.iter().map(|h| h.end - h.start).sum::<usize>() == words.len()
@@ -252,13 +283,17 @@ impl Interpreter {
             if !covered || hits.iter().any(|h| h.values.iter().any(|e| matches!(e, Entity::Sector(_)))) {
                 continue;
             }
-            let ufs: Vec<UfId> =
+            let mut ufs: Vec<UfId> =
                 hits.iter().flat_map(|h| &h.values).filter_map(|e| if let Entity::Uf(id) = e { Some(*id) } else { None }).collect();
+            ufs.sort_unstable();
+            ufs.dedup();
+            let explicit_uf =
+                hits.last().is_some_and(|h| h.end - h.start == 1 && lang::UFS.iter().any(|uf| uf.eq_ignore_ascii_case(&words[h.start])));
             // A name that is both a state and a city ("Goiás", "São Paulo") reads as the state,
-            // as in the cadastral grammar.
+            // unless a separate UF acronym pins the municipality.
             let municipalities: Vec<MunicipalityId> = hits
                 .iter()
-                .filter(|h| !h.values.iter().any(|e| matches!(e, Entity::Uf(_))))
+                .filter(|h| explicit_uf || !h.values.iter().any(|e| matches!(e, Entity::Uf(_))))
                 .flat_map(|h| &h.values)
                 .filter_map(|e| match e {
                     Entity::Municipality { id, uf } if ufs.is_empty() || ufs.contains(uf) => Some(*id),
@@ -295,6 +330,7 @@ impl Interpreter {
             versions: self.capabilities.catalogue_versions,
             population,
             vocabulary: &self.vocabulary,
+            delivery: &self.delivery,
         };
         if !state.pending.is_empty() {
             let reply = normalize::words(text).join(" ");
@@ -324,7 +360,7 @@ impl Interpreter {
             if let Some(i) = matched
                 && let Ok(valid) = validate::validate(state.pending[i].clone(), &self.capabilities)
             {
-                state.remember(valid.as_request());
+                state.remember(valid.as_request(), None);
                 let result = Interpretation {
                     decision: Decision::Execute,
                     request: Some(valid),
@@ -385,7 +421,7 @@ impl Interpreter {
         };
         let result = match validate::validate(request, &self.capabilities) {
             Ok(valid) => {
-                state.remember(valid.as_request());
+                state.remember(valid.as_request(), frame.rows);
                 Interpretation {
                     decision: if frame.notes.is_empty() { Decision::Execute } else { Decision::ExecuteWithNote },
                     request: Some(valid),

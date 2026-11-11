@@ -367,6 +367,171 @@ mod tests {
         assert_eq!(decisions, BTreeMap::from([("execute".into(), 895), ("clarify".into(), 50), ("reject".into(), 55)]));
     }
 
+    #[test]
+    fn search_phrases_keep_the_expected_activity_and_intent() {
+        use opencnpj_nlu::policy::Decision;
+
+        #[derive(serde::Deserialize)]
+        struct SectorIds {
+            sector: Vec<SectorEntry>,
+        }
+
+        #[derive(serde::Deserialize)]
+        struct SectorEntry {
+            id: String,
+        }
+
+        let catalogue = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../opencnpj-insights/catalog");
+        let data = DataArgs {
+            catalog: catalogue.join("municipalities.tsv"),
+            sectors: catalogue.join("sectors.toml"),
+            anchor: "2026-10-11".into(),
+            agg: None,
+            history: None,
+            snapshot: None,
+        };
+        let assets = Assets::open(&data).unwrap();
+        let sector_ids: SectorIds = toml::from_str(&std::fs::read_to_string(&data.sectors).unwrap()).unwrap();
+        let sectors: BTreeMap<_, _> =
+            sector_ids.sector.iter().enumerate().map(|(id, entry)| (entry.id.as_str(), u16::try_from(id).unwrap())).collect();
+
+        let cases = include_str!("../tests/fixtures/sector-phrases.tsv")
+            .lines()
+            .chain(include_str!("../tests/fixtures/redundant-phrases.tsv").lines())
+            .chain(include_str!("../tests/fixtures/regional-phrases.tsv").lines())
+            .chain(include_str!("../tests/fixtures/noisy-phrases.tsv").lines());
+        for line in cases.filter(|line| !line.starts_with('#') && !line.is_empty()) {
+            let columns: Vec<_> = line.splitn(7, '\t').collect();
+            let [expected, place, op, format, contact, rest @ ..] = columns.as_slice() else {
+                panic!("invalid search test fixture: {line}");
+            };
+            let (extra, question) = match rest {
+                [question] => (None, *question),
+                [extra, question] => (Some(*extra), *question),
+                _ => panic!("invalid search test fixture: {line}"),
+            };
+            let result = assets.interpreter.interpret(question, &mut Conversation::default());
+
+            if matches!(*expected, "?" | "!") {
+                let decision = if *expected == "?" { Decision::Clarify } else { Decision::Reject };
+                assert_eq!(result.decision, decision, "{question}: {result:?}");
+                assert!(result.request.is_none() && result.company.is_none(), "{question}: {result:?}");
+                if let Some(reason) = extra.and_then(|value| value.strip_prefix("reason=")) {
+                    assert!(result.reason.contains(reason), "{question}: {result:?}");
+                }
+                continue;
+            }
+            let expected_place = if let Some(uf) = place.strip_prefix("uf=") {
+                let id = opencnpj_nlu::lang::UFS.iter().position(|code| *code == uf).unwrap();
+                PlaceFilter::Ufs(SmallSet::new([UfId(u8::try_from(id).unwrap())]))
+            } else {
+                PlaceFilter::Municipalities(SmallSet::new(place.split('+').map(|id| MunicipalityId(id.parse().unwrap()))))
+            };
+            let (op, status) = op.split_once('/').unwrap_or((op, "active"));
+            let expected_status = match status {
+                "active" => StatusSet::only(Status::Active),
+                "closed" => StatusSet::only(Status::Closed),
+                "suspended" => StatusSet::only(Status::Suspended),
+                "unfit" => StatusSet::only(Status::Unfit),
+                "all" => StatusSet::ALL,
+                _ => panic!("unknown status: {status}"),
+            };
+            assert!(matches!(result.decision, Decision::Execute | Decision::ExecuteWithNote), "{question}: {result:?}");
+            if let Some(expected_name) = expected.strip_prefix('@') {
+                let company = result.company.unwrap_or_else(|| panic!("expected a company search: {question}"));
+                assert_eq!(company.name, expected_name, "{question}");
+                assert_eq!(PlaceFilter::Municipalities(SmallSet::new(company.municipalities)), expected_place, "{question}");
+                assert!(company.ufs.is_empty(), "{question}");
+                continue;
+            }
+            let request = result.request.unwrap_or_else(|| panic!("missing cadastral request: {question}"));
+            let sector = sectors[expected];
+            let cnaes = SmallSet::new(assets.sectors[&sector].iter().copied().map(CnaeCode::Subclass));
+            assert_eq!(
+                request.scope.activity,
+                ActivityFilter::Sectors { ids: SmallSet::new([SectorId(sector)]), cnaes, scope: CnaeScope::Main },
+                "{question}"
+            );
+            assert_eq!(request.scope.place, expected_place, "{question}");
+            assert_eq!(request.scope.status, Some(expected_status), "{question}");
+            let contact = match *contact {
+                "phone" => ContactNeed::Phone,
+                "email" => ContactNeed::Email,
+                "both" => ContactNeed::Both,
+                "-" => ContactNeed::Any,
+                _ => panic!("invalid contact in fixture: {contact}"),
+            };
+            assert_eq!(request.scope.contact, contact, "{question}");
+            if let Some(extra) = extra {
+                let mut expected = Filters::default();
+                let tri = |value| match value {
+                    "yes" => Tri::Yes,
+                    "no" => Tri::No,
+                    _ => panic!("invalid tri-state filter: {value}"),
+                };
+                for pair in extra.split(';').filter(|part| *part != "-") {
+                    let (field, value) = pair.split_once('=').unwrap();
+                    match field {
+                        "head" => expected.head_office = tri(value),
+                        "mei" => expected.mei = tri(value),
+                        "simples" => expected.simples = tri(value),
+                        "porte" => {
+                            expected.porte = PorteSet::only(match value {
+                                "micro" => Porte::Micro,
+                                "small" => Porte::Small,
+                                _ => panic!("invalid size: {value}"),
+                            })
+                        }
+                        "capital_min" => expected.capital.get_or_insert(Range { from: None, to: None }).from = Some(value.parse().unwrap()),
+                        "capital_max" => expected.capital.get_or_insert(Range { from: None, to: None }).to = Some(value.parse().unwrap()),
+                        "opened" => {
+                            let year = value.parse().unwrap();
+                            expected.opened = Some(Range { from: Day::from_ymd(year, 1, 1), to: Day::from_ymd(year, 12, 31) });
+                        }
+                        _ => panic!("invalid fixture filter: {field}"),
+                    }
+                }
+                assert_eq!(request.scope.head_office, expected.head_office, "{question}");
+                assert_eq!(request.scope.mei, expected.mei, "{question}");
+                assert_eq!(request.scope.simples, expected.simples, "{question}");
+                assert_eq!(request.scope.porte, expected.porte, "{question}");
+                assert_eq!(request.scope.capital, expected.capital, "{question}");
+                assert_eq!(request.scope.opened, expected.opened, "{question}");
+                assert_eq!(request.scope.status_date, None, "{question}");
+            }
+            let requested_rows = op.strip_prefix("list=").map(|limit| limit.parse::<u16>().unwrap());
+            match op {
+                "list" => assert!(matches!(request.op, Op::List { .. }), "{question}: {:?}", request.op),
+                "count" => {
+                    assert_eq!(request.op, Op::Count { metric: Metric::Stock }, "{question}");
+                    assert_eq!(request.time.period, None, "{question}");
+                }
+                "by_size" => assert!(matches!(request.op, Op::Breakdown { dim: Dim::Porte, .. }), "{question}: {:?}", request.op),
+                "by_status" => assert!(matches!(request.op, Op::Breakdown { dim: Dim::Status, .. }), "{question}: {:?}", request.op),
+                _ if requested_rows.is_some() => {
+                    assert!(matches!(request.op, Op::List { limit, .. } if Some(limit) == requested_rows), "{question}: {:?}", request.op);
+                }
+                _ => panic!("unknown operation: {op}"),
+            }
+            if *format == "-" {
+                assert!(result.export.is_none(), "{question}");
+            } else {
+                let export = result.export.unwrap_or_else(|| panic!("missing export: {question}"));
+                assert_eq!(export.format.extension(), *format, "{question}");
+                assert_eq!(export.rows, requested_rows.map(u32::from), "{question}");
+            }
+        }
+
+        let mut conversation = Conversation::default();
+        let original = assets.interpreter.interpret("Me passe as farmácias de Sorriso MT", &mut conversation).request.unwrap();
+        let followup =
+            assets.interpreter.interpret("Dessas, só as que têm um endereço de e-mail cadastrado", &mut conversation).request.unwrap();
+        assert_eq!(followup.op, original.op);
+        assert_eq!(followup.scope.place, original.scope.place);
+        assert_eq!(followup.scope.activity, original.scope.activity);
+        assert_eq!(followup.scope.contact, ContactNeed::Email);
+    }
+
     /// Every file request of the skills round, dialogues included, is interpreted to its
     /// gold request and gold export.
     #[test]

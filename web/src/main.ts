@@ -1,4 +1,4 @@
-import { loadAccount, loadPlatform } from "./core/api.js";
+import { loadAccount, loadPlatform, loadTrial } from "./core/api.js";
 import { h } from "./core/dom.js";
 import { currentRoute, onRouteChange, type Route } from "./core/router.js";
 import { needsLogin, onSession, session } from "./core/session.js";
@@ -23,6 +23,7 @@ async function bootstrap(): Promise<void> {
     return;
   }
   if (session().token) await loadAccount();
+  else await loadTrial();
 
   let shell: Shell | null = null;
   let page: Page | null = null;
@@ -47,7 +48,7 @@ async function bootstrap(): Promise<void> {
         page = CnpjPage(route.param);
         break;
       case "conta":
-        page = session().token ? AccountPage() : LoginPage();
+        page = session().token ? AccountPage() : LoginPage(route.param === "criar" ? "criar" : "entrar");
         break;
       case "admin":
         page = AdminPage();
@@ -65,7 +66,7 @@ async function bootstrap(): Promise<void> {
     shell?.destroy();
     if (needsLogin()) {
       shell = null;
-      root.replaceChildren(LoginPage().el);
+      root.replaceChildren(LoginPage(currentRoute().param === "criar" ? "criar" : "entrar", true).el);
       return;
     }
     shell = AppShell();

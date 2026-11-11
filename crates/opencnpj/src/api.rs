@@ -89,9 +89,15 @@ pub struct ServeArgs {
     #[arg(long, default_value_t = 30)]
     pub reload_secs: u64,
     /// Accounts: `required` (a key or session on every data route), `optional` (anonymous
-    /// callers get the `anonymous` plan per IP) or `off` (no accounts, no limits).
+    /// callers get the `anonymous` plan per IP), `trial` (browser preview) or `off`.
     #[arg(long, value_enum, default_value_t = AuthMode::Required)]
     pub auth: AuthMode,
+    /// File of denied VPN/proxy CIDRs for the trial and free tier (one per line).
+    #[arg(long)]
+    pub trial_deny_networks: Option<PathBuf>,
+    /// HTTPS page or mailto address for users to request a plan upgrade.
+    #[arg(long, env = "OPENCNPJ_UPGRADE_URL", value_parser = parse_upgrade_url)]
+    pub upgrade_url: Option<String>,
     /// Accounts database (default `<data-dir>/accounts.sqlite`, or next to `--snapshot`).
     #[arg(long)]
     pub accounts_db: Option<PathBuf>,
@@ -157,6 +163,15 @@ pub struct ServeArgs {
     pub assistant_export_rows: u32,
 }
 
+fn parse_upgrade_url(value: &str) -> Result<String, String> {
+    let url = reqwest::Url::parse(value).map_err(|e| e.to_string())?;
+    match url.scheme() {
+        "https" if url.host().is_some() => Ok(url.into()),
+        "mailto" if !url.path().is_empty() => Ok(url.into()),
+        _ => Err("expected an https or mailto URL".into()),
+    }
+}
+
 impl ServeArgs {
     /// Parses `serve` flags as written on the command line (tests and embedding).
     pub fn from_flags<S: AsRef<str>>(flags: &[S]) -> Result<Self> {
@@ -190,6 +205,7 @@ pub struct AppState {
     /// Conversational assistant over the snapshot served at start (`--assistant-agg`).
     pub assistant: Option<Arc<crate::assistant::Assistant>>,
     pub gate: Arc<Gate>,
+    pub(crate) trial: Option<Arc<crate::trial::Trial>>,
     pub mailer: Option<Arc<crate::mail::Mailer>>,
     pub updater: crate::autoupdate::Updater,
     /// Identity of the served snapshot (path, size, mtime): part of the response cache key,
@@ -377,7 +393,16 @@ pub fn parse_query(pairs: &[(String, String)], args: &ServeArgs, default_field: 
     Ok(q)
 }
 
-async fn get_cnpj(State(st): State<Shared>, UrlPath(id): UrlPath<String>, UrlQuery(p): UrlQuery<Vec<(String, String)>>) -> ApiResult {
+fn page_limit(st: &Shared, caller: Option<axum::Extension<Caller>>) -> usize {
+    caller.map_or(st.args.max_limit, |caller| st.args.max_limit.min(caller.principal.plan.max_page_size as usize))
+}
+
+async fn get_cnpj(
+    State(st): State<Shared>,
+    UrlPath(id): UrlPath<String>,
+    UrlQuery(p): UrlQuery<Vec<(String, String)>>,
+    caller: Option<axum::Extension<Caller>>,
+) -> ApiResult {
     if id.len() > 32 {
         return Err(ApiError::new(StatusCode::BAD_REQUEST, "invalid_document", "invalid cnpj"));
     }
@@ -385,7 +410,7 @@ async fn get_cnpj(State(st): State<Shared>, UrlPath(id): UrlPath<String>, UrlQue
         p.iter().find(|(a, _)| a == k).map_or(Ok(d), |(_, v)| v.parse::<usize>().map_err(|_| ApiError::bad(format!("bad {k}"))))
     };
     let offset = num("estab_offset", 0)?;
-    let limit = num("estab_limit", output::DEFAULT_ESTAB_PAGE)?;
+    let limit = num("estab_limit", output::DEFAULT_ESTAB_PAGE.min(page_limit(&st, caller)))?;
     if limit == 0 || limit > st.args.max_limit {
         return Err(ApiError::bad(format!("estab_limit must be between 1 and {}", st.args.max_limit)));
     }
@@ -397,17 +422,28 @@ async fn get_cnpj(State(st): State<Shared>, UrlPath(id): UrlPath<String>, UrlQue
     }
 }
 
-async fn get_cpf(State(st): State<Shared>, UrlPath(cpf): UrlPath<String>, UrlQuery(p): UrlQuery<Vec<(String, String)>>) -> ApiResult {
+async fn get_cpf(
+    State(st): State<Shared>,
+    UrlPath(cpf): UrlPath<String>,
+    UrlQuery(p): UrlQuery<Vec<(String, String)>>,
+    caller: Option<axum::Extension<Caller>>,
+) -> ApiResult {
     let limit =
         p.iter().find(|(k, _)| k == "limit").map_or(Ok(100), |(_, v)| v.parse::<usize>().map_err(|_| ApiError::bad("bad limit")))?;
-    let limit = limit.clamp(1, st.args.max_limit);
+    let limit = limit.clamp(1, page_limit(&st, caller));
     let privacy = st.privacy;
     let v = blocking(&st, move |s| output::cpf_lookup(&s, &cpf, limit, privacy)).await?;
     Ok(json_response(v))
 }
 
-async fn search_handler(st: Shared, pairs: Vec<(String, String)>, default_field: TextField) -> ApiResult {
-    let q = parse_query(&pairs, &st.args, default_field, true)?;
+async fn search_handler(
+    st: Shared,
+    pairs: Vec<(String, String)>,
+    default_field: TextField,
+    caller: Option<axum::Extension<Caller>>,
+) -> ApiResult {
+    let mut q = parse_query(&pairs, &st.args, default_field, true)?;
+    q.limit = q.limit.min(page_limit(&st, caller));
     let v = blocking(&st, move |s| {
         let t0 = Instant::now();
         let r = search::search(&s, &q, &Limits::DEFAULT)?;
@@ -421,12 +457,20 @@ async fn search_handler(st: Shared, pairs: Vec<(String, String)>, default_field:
     Ok(json_response(v))
 }
 
-async fn search_route(State(st): State<Shared>, UrlQuery(p): UrlQuery<Vec<(String, String)>>) -> ApiResult {
-    search_handler(st, p, TextField::Any).await
+async fn search_route(
+    State(st): State<Shared>,
+    UrlQuery(p): UrlQuery<Vec<(String, String)>>,
+    caller: Option<axum::Extension<Caller>>,
+) -> ApiResult {
+    search_handler(st, p, TextField::Any, caller).await
 }
 
-async fn legacy_empresas_search(State(st): State<Shared>, UrlQuery(p): UrlQuery<Vec<(String, String)>>) -> ApiResult {
-    search_handler(st, p, TextField::Razao).await
+async fn legacy_empresas_search(
+    State(st): State<Shared>,
+    UrlQuery(p): UrlQuery<Vec<(String, String)>>,
+    caller: Option<axum::Extension<Caller>>,
+) -> ApiResult {
+    search_handler(st, p, TextField::Razao, caller).await
 }
 
 /// `group_by`: any filter field, or `ano_<date column>` for a yearly histogram.
@@ -924,6 +968,7 @@ pub fn router(st: Shared) -> Router {
     let mut public = Router::new()
         .route("/api/v1", get(root))
         .route("/api/v1/platform", get(crate::assistant::http::platform))
+        .route("/api/v1/trial", get(crate::trial::status))
         .route("/api/v1/campos", get(campos))
         .route("/api/v1/snapshot", get(snapshot_info))
         .route("/api/v1/distribution", get(distribution))
@@ -934,7 +979,8 @@ pub fn router(st: Shared) -> Router {
         .route("/healthz", get(healthz))
         .route("/health", get(healthz))
         .route("/readyz", get(readyz))
-        .merge(crate::auth_api::router());
+        .merge(crate::auth_api::router())
+        .merge(crate::conversations::router());
     if !st.gate.enabled() {
         // With accounts, Prometheus metrics move to the admin listener.
         public = public.route("/metrics", get(prometheus));
@@ -945,6 +991,10 @@ pub fn router(st: Shared) -> Router {
 }
 
 pub fn state(args: ServeArgs) -> Result<Shared> {
+    if args.auth == AuthMode::Trial && args.trust_proxy {
+        let admin_is_local = args.admin_bind.is_empty() || args.admin_bind.parse::<SocketAddr>().is_ok_and(|addr| addr.ip().is_loopback());
+        anyhow::ensure!(args.bind.ip().is_loopback() && admin_is_local, "trial proxy mode requires loopback listeners");
+    }
     let path = match (&args.snapshot, &args.data_dir) {
         (Some(p), _) => p.clone(),
         (None, Some(d)) => resolve_current(d)?,
@@ -960,15 +1010,21 @@ pub fn state(args: ServeArgs) -> Result<Shared> {
     };
     let jobs_dir = args.data_dir.as_ref().map_or_else(|| snapshots_dir.join("jobs"), |d| d.join("jobs"));
     let base = args.data_dir.clone().unwrap_or_else(|| snapshots_dir.clone());
-    let (accounts, mailer) = if args.auth == AuthMode::Off {
-        (None, None)
+    let (accounts, mailer, trial) = if args.auth == AuthMode::Off {
+        (None, None, None)
     } else {
         let db = args.accounts_db.clone().unwrap_or_else(|| base.join("accounts.sqlite"));
         let acc = crate::accounts::Accounts::open(&db, args.session_hours)?;
         let public_url = args.public_url.clone().unwrap_or_else(|| format!("http://{}", args.bind));
         let mailer = crate::mail::Mailer::new(args.smtp_url.as_deref(), &args.mail_from, base.join("outbox"), &public_url)?;
         eprintln!("accounts in {} (auth {}), mail via {}", db.display(), args.auth.name(), mailer.describe());
-        (Some(Arc::new(acc)), Some(Arc::new(mailer)))
+        let trial = if args.auth == AuthMode::Trial {
+            let secure = reqwest::Url::parse(&public_url).is_ok_and(|url| url.scheme() == "https");
+            Some(Arc::new(crate::trial::Trial::open(&db, args.trial_deny_networks.as_deref(), secure)?))
+        } else {
+            None
+        };
+        (Some(Arc::new(acc)), Some(Arc::new(mailer)), trial)
     };
     let cache = (args.response_cache_mib > 0).then(|| ResponseCache::new(args.response_cache_mib, args.response_cache_ttl_secs));
     let mut gate = Gate::new(args.auth, accounts, cache, args.trust_proxy);
@@ -988,6 +1044,7 @@ pub fn state(args: ServeArgs) -> Result<Shared> {
         official_dir: args.official_dir.clone(),
         assistant: crate::assistant::http::open(&args, &path)?,
         gate,
+        trial,
         mailer,
         updater: crate::autoupdate::Updater::default(),
         generation: AtomicU64::new(snapshot_identity(&path)),

@@ -5,26 +5,26 @@
 # Every list is a set of word-bounded phrases, compared after accent folding and the
 # colloquial rewrites of `normalize` ("pra" -> "para", "vc" -> "voce"). An item "@name"
 # includes the list `name` from [lists], recursively; an unknown name or a cycle is an
-# error when the interpreter starts. Regional words are only cut next to a file request:
-# they never change how a data question is read.
+# error when the interpreter starts. Regional openers are accepted before an explicit
+# request for records or a file.
 
 [lists]
 # Courtesy and hedges around a request.
 cortesia = [
-    "por favor", "por gentileza", "faz favor", "faz o favor", "fazendo favor", "se possivel", "se puder", "se der",
+    "por favor", "por gentileza", "por obsequio", "faz favor", "faz o favor", "fazendo favor", "se possivel", "se puder", "se der",
     "pf", "pfv", "pfvr", "obrigado", "obrigada", "obg", "valeu", "agradeco", "desde ja", "grato", "grata",
 ]
-pronome = ["me", "mim", "para mim", "nos", "a gente", "para a gente", "para nos", "voce", "ocê", "tu"]
+pronome = ["me", "mim", "para mim", "nos", "eu", "a gente", "para gente", "para a gente", "para nos", "voce", "ocê", "tu"]
 # Modal openers: "dá pra", "tem como", "consegue", "você pode".
 modal = [
-    "pode", "poderia", "podes", "consegue", "conseguiria", "da para", "daria para", "tem como", "teria como", "seria possivel",
-    "e possivel", "gostaria", "gostaria de", "queria", "quero", "quero que", "preciso", "preciso de", "precisava", "precisava de",
+    "pode", "poderia", "podes", "consegue", "me ajuda a", "me ajude a", "conseguiria", "da para", "daria para", "tem como", "teria como", "seria possivel",
+    "e possivel", "gostaria", "gostaria de", "gostaria que", "queria", "queria que", "quero", "quero que", "preciso", "preciso de", "precisava", "precisava de",
     "necessito", "to precisando", "estou precisando", "to querendo", "estou querendo", "manda ver", "manda bala",
 ]
 # Verbs that hand something over.
 envio = [
-    "mande", "manda", "mandar", "mandem", "manda ai", "manda para", "envie", "envia", "enviar", "enviem", "encaminhe", "encaminha",
-    "passe", "passa", "passar", "repasse", "repassa", "joga", "joga ai", "jogue", "bota", "bote", "botar", "coloque", "coloca",
+    "mande", "manda", "mandar", "mandem", "mandasse", "manda ai", "envie", "envia", "enviar", "enviem", "encaminhe", "encaminha", "encaminhasse",
+    "passe", "passa", "passar", "passasse", "repasse", "repassa", "joga", "joga ai", "jogue", "bota", "bote", "botar", "coloque", "coloca",
     "colocar", "solta", "solte", "solta ai", "devolva", "devolve", "retorne", "retorna", "entregue", "entrega", "me alcanca",
     "alcanca", "arruma", "arrume", "arranja", "arranje", "descola", "providencia", "providencie",
 ]
@@ -34,7 +34,7 @@ geracao = [
     "faz", "fazer", "faz ai", "tira", "tire", "puxa", "puxe", "puxar", "extraia", "extrai", "extrair", "baixe", "baixa", "baixar",
     "salve", "salva", "salvar", "exporte", "exporta", "exportar", "exportem", "exportacao", "download", "da um download",
 ]
-# Regional and informal openers, interjections and tags (cut only around a file request).
+# Regional and informal openers, interjections and tags.
 regional_centro_oeste = ["vote", "tcha por deus", "ixi", "la ele", "vixe", "eita"]
 regional_mineiro = ["uai so", "uai", "o trem bao", "nossa", "nossa senhora", "ce pode", "ce consegue", "ocê pode"]
 regional_nordeste = ["oxe", "oxente", "eita", "vixe", "visse", "arretado", "massa", "ave maria", "meu rei", "minha filha", "meu filho", "painho", "mainha"]
@@ -46,7 +46,7 @@ interjeicao = ["ola", "oi", "opa", "e ai", "bom dia", "boa tarde", "boa noite", 
 pedido = ["@cortesia", "@pronome", "@modal", "@envio", "@geracao", "@regional", "@interjeicao"]
 
 excel = [
-    "excel", "exel", "excell", "ecxel", "escel", "exsel", "eccel", "xlsx", "xls", "planilha", "planilhas", "planilhinha", "panilha",
+    "excel", "exel", "excell", "ecxel", "escel", "exsel", "eccel", "xlsx", "xls", "planilha", "planilhas", "planilhinha", "panilha", "planila",
     "planilia", "planiha", "planilha do excel", "planilha excel", "planilha eletronica", "google sheets", "sheets", "planilha do google",
 ]
 csv = ["csv", "cvs", "arquivo csv", "separado por virgula", "separado por ponto e virgula", "valores separados por virgula"]
@@ -80,6 +80,14 @@ unsupported = ["pdf", "word", "docx", "doc", "powerpoint", "pptx", "ppt", "json"
 [roles]
 # Words cut around a delivery phrase.
 request = ["@pedido"]
+# Openers and commands shared by structured record requests.
+record_openers = ["@cortesia", "@pronome", "@modal", "@regional", "@interjeicao", "o", "so", "apenas", "somente"]
+record_commands = [
+    "@envio", "procure", "procura", "procurar", "busque", "busca", "buscar", "mostre", "mostra", "mostrar", "pesquise",
+    "encontre", "encontrar", "ache", "achar", "puxe", "puxa", "liste", "listar", "lista", "traz", "traga",
+    "so os", "so as", "apenas os", "apenas as", "somente os", "somente as",
+    "quero ver", "queria ver", "quero saber as", "quero saber os",
+]
 # Verbs that hand over or make something: with one before "uma tabela", "um relatório" or
 # "um arquivo", the question asks for a file.
 actions = ["@envio", "@geracao"]

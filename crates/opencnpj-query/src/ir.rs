@@ -444,6 +444,35 @@ pub struct Exclusions {
     pub sector_cnaes: SmallSet<CnaeCode>,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum NameField {
+    Any,
+    Legal,
+    Trade,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct NamePrefix {
+    pub field: NameField,
+    pub prefix: String,
+}
+
+impl NamePrefix {
+    pub fn valid_text(prefix: &str) -> bool {
+        (1..=opencnpj_core::text::MAX_TOKEN).contains(&prefix.len()) && prefix.bytes().all(|byte| byte.is_ascii_alphabetic())
+    }
+
+    pub fn label_pt_br(&self) -> &'static str {
+        match self.field {
+            NameField::Any => "razão social ou nome fantasia",
+            NameField::Legal => "razão social",
+            NameField::Trade => "nome fantasia",
+        }
+    }
+}
+
 #[derive(Debug, Clone, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(default, deny_unknown_fields)]
 pub struct Filters {
@@ -464,6 +493,8 @@ pub struct Filters {
     pub capital: Option<MoneyRange>,
     pub exclude: Exclusions,
     pub contact: ContactNeed,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name_prefix: Option<NamePrefix>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -537,6 +568,9 @@ impl Request {
         let mut request = self.clone();
         let scope = &mut request.scope;
         scope.status.get_or_insert_with(|| self.op.default_status());
+        if let Some(name) = &mut scope.name_prefix {
+            name.prefix.make_ascii_uppercase();
+        }
         if let ActivityFilter::Sectors { ids, cnaes, .. } = &mut scope.activity {
             *cnaes = expand_sectors(ids, context)?;
         }

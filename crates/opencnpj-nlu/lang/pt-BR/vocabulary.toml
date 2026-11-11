@@ -14,7 +14,7 @@
 [search]
 function = [
     "tao", "faliu", "encerrou", "abertura", "aberturas", "qtde",
-    "a", "ainda", "ao", "aos", "apenas", "as", "com", "como", "da", "das", "de", "dessa", "desse", "desta", "deste",
+    "a", "ainda", "ao", "aos", "apenas", "fora", "as", "com", "como", "da", "das", "de", "dessa", "desse", "desta", "deste",
     "do", "dos", "e", "em", "essa", "essas", "esse", "esses", "esta", "estao", "estas", "este", "estejam", "estes",
     "existe", "existem", "foi", "foram", "ha", "ja", "na", "nao", "nas", "nessa", "nesse", "nesta", "neste", "no",
     "nos", "num", "numa", "o", "onde", "os", "ou", "para", "pela", "pelas", "pelo", "pelos", "por", "possuem",
@@ -53,7 +53,7 @@ amounts = [
 ]
 contacts = [
     "celular", "contato", "contatos", "email", "emails", "fone", "leads", "mail", "mailing", "prospects", "telefone",
-    "telefones", "whatsapp", "zap",
+    "telefones", "whatsapp", "zap", "informado", "informada", "publicado", "publicada", "cadastro", "mails",
 ]
 time = [
     "abril", "agosto", "ano", "anos", "atual", "desde", "dezembro", "dia", "dias", "fevereiro", "hoje", "janeiro",

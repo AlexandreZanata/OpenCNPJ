@@ -2,9 +2,10 @@
 import { errorMessage, login, sendJson } from "../core/api.js";
 import { h } from "../core/dom.js";
 import { session } from "../core/session.js";
+import { ThemeToggle } from "../layout/theme-toggle.js";
 import { Logo } from "../layout/logo.js";
 import { Button, Field, Input, busy } from "../ui/kit.js";
-export function LoginPage() {
+export function LoginPage(initial = "entrar", standalone = false) {
     const card = h("div", { class: "auth__card card" });
     const registration = session().platform?.registration !== "closed";
     const message = (text, tone) => h("p", { class: `note note--${tone}`, role: tone === "error" ? "alert" : "status" }, text);
@@ -38,7 +39,7 @@ export function LoginPage() {
             const username = Input({ placeholder: "seu.nome", autocomplete: "username", required: true, maxlength: 32 });
             const email = Input({ type: "email", placeholder: "voce@empresa.com.br", autocomplete: "email", required: true });
             const submit = Button({ label: "Criar conta", variant: "primary", type: "submit", class: "btn--block" });
-            card.replaceChildren(h("h1", null, "Criar conta"), h("p", { class: "muted" }, "Enviamos a sua chave de acesso para o e-mail informado. Não há senha para lembrar."), h("form", {
+            card.replaceChildren(h("h1", null, "Criar conta"), h("p", { class: "muted" }, "Sua conta começa no plano gratuito. Enviamos a chave de acesso para o seu e-mail."), h("form", {
                 class: "auth__form",
                 on: {
                     submit: (event) => {
@@ -79,9 +80,9 @@ export function LoginPage() {
         }, Field({ label: "E-mail da conta", control: email }), feedback, submit), h("div", { class: "auth__links" }, link("Voltar para entrar", "entrar")));
         email.focus();
     };
-    render("entrar");
+    render(initial === "criar" && !registration ? "entrar" : initial);
     return {
-        el: h("div", { class: "auth" }, h("div", { class: "auth__brand" }, Logo(), h("p", { class: "muted" }, "Pesquisa comercial sobre os dados oficiais do CNPJ.")), card),
+        el: h("div", { class: "auth" }, standalone ? h("div", { class: "auth__theme" }, ThemeToggle()) : null, h("div", { class: "auth__brand" }, Logo(), h("p", { class: "muted" }, "Pesquisa comercial sobre os dados oficiais do CNPJ.")), card),
     };
 }
 //# sourceMappingURL=login-page.js.map
