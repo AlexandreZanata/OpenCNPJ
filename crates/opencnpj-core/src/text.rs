@@ -31,6 +31,12 @@ fn fold(c: char) -> Option<char> {
     })
 }
 
+/// Tests the start of a registered name without skipping any words or punctuation.
+pub fn name_starts_with(name: &str, ascii_prefix: &str) -> bool {
+    let mut name = name.trim_start().chars();
+    ascii_prefix.bytes().all(|expected| name.next().and_then(fold) == Some(char::from(expected.to_ascii_uppercase())))
+}
+
 /// Words that carry no search value in company names and would create huge postings.
 pub const STOPWORDS: &[&str] = &["DA", "DAS", "DE", "DI", "DO", "DOS", "E"];
 
@@ -85,6 +91,16 @@ mod tests {
         let mut s = String::new();
         latin1_to_string(b"S\xc3O PAULO \xe7", &mut s);
         assert_eq!(s, "SÃO PAULO ç");
+    }
+
+    #[test]
+    fn name_prefix_matches_only_the_start_of_the_registered_name() {
+        assert!(name_starts_with("  ZAF-LAS LTDA", "za"));
+        assert!(name_starts_with("ÓTICA", "OT"));
+        assert!(!name_starts_with("CASA ZAF-LAS", "ZA"));
+        assert!(!name_starts_with("DE ZAF-LAS", "ZA"));
+        assert!(!name_starts_with("-ZAF-LAS", "ZA"));
+        assert!(!name_starts_with("", "Z"));
     }
 
     #[test]

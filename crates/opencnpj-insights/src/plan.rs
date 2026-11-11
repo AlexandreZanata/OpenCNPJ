@@ -77,7 +77,8 @@ fn aggregate_metric(metric: &Metric) -> bool {
 
 fn aggregate_scope(request: &ValidRequest) -> bool {
     let scope = &request.scope;
-    if scope.capital.is_some()
+    if scope.name_prefix.is_some()
+        || scope.capital.is_some()
         || !scope.natureza.is_empty()
         || scope.opened.is_some()
         || scope.status_date.is_some()

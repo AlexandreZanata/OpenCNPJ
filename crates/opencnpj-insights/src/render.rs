@@ -1029,6 +1029,9 @@ fn methodology(request: &opencnpj_query::ir::Request, input: &RenderInput<'_>) -
     if let Some(names) = excluded.strip_prefix(", exceto ") {
         items.push(format!("Excluídos: {names}"));
     }
+    if let Some(name) = &scope.name_prefix {
+        items.push(format!("Início de {}: {}", name.label_pt_br(), name.prefix));
+    }
     match scope.contact {
         opencnpj_query::ir::ContactNeed::Phone => items.push("Com telefone publicado".into()),
         opencnpj_query::ir::ContactNeed::Email => items.push("Com e-mail publicado".into()),

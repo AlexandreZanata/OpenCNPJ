@@ -254,6 +254,12 @@ pub struct Answer {
 
 * `IR_VERSION` constant; the binary encoding starts with it. A change that alters meaning
   or encoding bumps it; old context tokens (06-CONTEXT.md) are then rejected gracefully
-  ("vamos recomeçar a conversa").
+  ("vamos recomeçar a conversa"). The version 2 reader also accepts version 1 requests.
+  Version 2 adds an optional alphabetic name prefix to municipal lists and stock counts,
+  checked against the beginning of the legal name, trade name, or either field.
+  Requests without a name prefix retain their version 1 binary encoding and cache keys.
+  Prefix requests append the field tag and a length-prefixed UTF-8 string after the base
+  request. The assistant reads at most 25,000 scoped candidates before asking for a
+  narrower query. Filtering precedes totals, ordering, pagination, and file generation.
 * Catalogue versions (`sector@v1`, `municipalities@2026-10`, `population@ibge-2025`) are
   data versions and do not bump `IR_VERSION`.

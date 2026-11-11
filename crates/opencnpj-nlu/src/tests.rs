@@ -821,6 +821,62 @@ fn companies_are_found_by_name() {
 }
 
 #[test]
+fn name_prefix_lists_companies_and_survives_refinement_and_export() {
+    let engine = interpreter_with(&[(&["desenvolvimento de software"], 6201501)]);
+    let mut state = Conversation::default();
+    let question = "empresa de desenvolvimento de software que começa com Z em Sorriso mt";
+    let found = engine.interpret(question, &mut state);
+    assert!(found.company.is_none());
+    let mut request = found.request.as_ref().unwrap_or_else(|| panic!("{found:?}")).as_request().clone();
+    assert!(matches!(request.op, Op::List { .. }));
+    assert_eq!(request.scope.name_prefix, Some(NamePrefix { field: NameField::Any, prefix: "Z".into() }));
+    assert_eq!(request.scope.place, PlaceFilter::Municipalities(SmallSet::new([MunicipalityId(1)])));
+    assert!(matches!(request.scope.activity, ActivityFilter::Sectors { ref cnaes, scope: CnaeScope::Main, .. }
+        if cnaes.iter().copied().eq([CnaeCode::Subclass(6201501)])));
+
+    let in_sinop = engine.interpret("dessas só as de Sinop", &mut state);
+    request.scope.place = PlaceFilter::Municipalities(SmallSet::new([MunicipalityId(2)]));
+    assert_eq!(in_sinop.request.unwrap().into_request(), request);
+    let excel = engine.interpret("me manda em Excel", &mut state);
+    assert_eq!(excel.request.unwrap().into_request(), request);
+    assert_eq!(excel.export.unwrap().format, opencnpj_query::export::ExportFormat::Xlsx);
+
+    let fresh = engine.interpret("liste farmácias em Sorriso", &mut state);
+    assert!(fresh.request.unwrap().scope.name_prefix.is_none());
+}
+
+#[test]
+fn name_prefix_distinguishes_name_fields_and_preserves_other_filters() {
+    let legal = req("Quantas farmácias em Sorriso MT cuja razão social começa com a letra Ó?");
+    assert!(matches!(legal.op, Op::Count { metric: Metric::Stock }));
+    assert_eq!(legal.scope.name_prefix, Some(NamePrefix { field: NameField::Legal, prefix: "O".into() }));
+
+    let trade = req("Liste padarias cujo nome fantasia começa com SP em Sinop MT e com telefone");
+    assert_eq!(trade.scope.name_prefix, Some(NamePrefix { field: NameField::Trade, prefix: "SP".into() }));
+    assert_eq!(trade.scope.place, PlaceFilter::Municipalities(SmallSet::new([MunicipalityId(2)])));
+    assert!(trade.scope.within_ufs.is_empty());
+    assert_eq!(trade.scope.contact, ContactNeed::Phone);
+
+    for prefix in ["PRO", "VC", "HJ", "MEIS"] {
+        let request = req(&format!("Liste padarias cujo nome comece com {prefix} em Sorriso MT"));
+        assert_eq!(request.scope.name_prefix.unwrap().prefix, prefix);
+    }
+
+    for question in [
+        "liste padarias que começam com em Sorriso",
+        "liste padarias que começam com 123 em Sorriso",
+        "liste padarias que começam com Z ou A em Sorriso",
+        "liste padarias que começam com Z e ZA em Sorriso",
+        "liste padarias que não começam com Z em Sorriso",
+        "liste padarias que começam com Z em MT",
+        "liste empresas de xyzolicas que começam com Z em Sorriso",
+    ] {
+        let answer = parse(question);
+        assert!(answer.request.is_none() && answer.company.is_none(), "{question}: {answer:?}");
+    }
+}
+
+#[test]
 fn company_search_keeps_refusals_and_activity_lists() {
     // An activity is listed, not looked up as a name.
     assert!(matches!(req("busque padarias em Sorriso").op, Op::List { .. }));

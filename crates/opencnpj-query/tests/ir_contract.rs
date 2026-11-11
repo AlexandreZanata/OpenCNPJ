@@ -99,6 +99,23 @@ fn print_golden_rows() {
 }
 
 #[test]
+fn name_prefix_roundtrips_without_changing_legacy_requests() {
+    let mut request = serde_json::from_str::<Case>(INPUTS.lines().next().unwrap()).unwrap().request;
+    let legacy = encode(&request);
+    assert_eq!(legacy[0], 1);
+    assert_eq!(decode(&legacy).unwrap(), request);
+    let original = cache_key(&request, b"first");
+
+    request.scope.name_prefix = Some(NamePrefix { field: NameField::Trade, prefix: "ZA".into() });
+    let bytes = encode(&request);
+    assert_eq!(bytes[0], IR_VERSION);
+    assert_eq!(decode(&bytes).unwrap(), request);
+    assert!(decode(&bytes[..bytes.len() - 1]).is_err());
+    assert_eq!(serde_json::from_slice::<Request>(&serde_json::to_vec(&request).unwrap()).unwrap(), request);
+    assert_ne!(cache_key(&request, b"first"), original);
+}
+
+#[test]
 fn cache_keys_use_aggregate_and_catalogue_versions() {
     let case: Case = serde_json::from_str(INPUTS.lines().nth(2).unwrap()).unwrap();
     let (municipality_ufs, sector_cnaes) = case_context();

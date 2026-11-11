@@ -146,6 +146,9 @@ impl Interpreter {
         if result.request.is_some() || !result.options.is_empty() || !(result.decision == Decision::Reject || unrecognized) {
             return None;
         }
+        if !matches!(grammar::read_name_prefix(text), Ok(None)) {
+            return None;
+        }
         let n = normalize::words(text).join(" ");
         if grammar::cue(&n, &self.policy.privacy) || grammar::cue(&n, &self.policy.unavailable) {
             return None;

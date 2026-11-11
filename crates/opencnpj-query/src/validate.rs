@@ -64,6 +64,7 @@ pub enum IssueCode {
     ClosedFlowStatus,
     MeiPorteContradiction,
     ContactOnlyForList,
+    InvalidNamePrefix,
     ListLimit,
     InvalidPage,
     InvalidRange,
@@ -94,6 +95,7 @@ impl IssueCode {
             Self::ClosedFlowStatus => "closure flows require status closed",
             Self::MeiPorteContradiction => "MEI contradicts the selected porte",
             Self::ContactOnlyForList => "contact filters require a list or a count of establishments",
+            Self::InvalidNamePrefix => "a name prefix needs letters and a municipal list or stock count",
             Self::ListLimit => "list limit exceeds the caller plan",
             Self::InvalidPage => "page is not valid for this operation",
             Self::InvalidRange => "range is empty",
@@ -239,6 +241,13 @@ fn check_scope(request: &Request, capabilities: &Capabilities, issues: &mut Vec<
             }
         }
         _ => {}
+    }
+    if let Some(name) = &scope.name_prefix
+        && (!NamePrefix::valid_text(&name.prefix)
+            || !matches!(&scope.place, PlaceFilter::Municipalities(_))
+            || !matches!(request.op, Op::List { .. } | Op::Count { metric: Metric::Stock }))
+    {
+        push_issue(issues, Issue::impossible(IssueCode::InvalidNamePrefix));
     }
     match &scope.activity {
         ActivityFilter::Sectors { ids, cnaes, .. } if ids.is_empty() || cnaes.is_empty() => {

@@ -4,6 +4,7 @@ use std::{collections::BTreeMap, path::Path};
 
 use crate::{params, params::Caps};
 use anyhow::{Context, Result, bail, ensure};
+use opencnpj_core::{schema::col, text::name_starts_with};
 use opencnpj_insights::{
     agg,
     catalog::municipalities::MunicipalityCatalogue,
@@ -27,6 +28,13 @@ pub fn parse(pairs: &[(String, String)]) -> Result<Query> {
 
 /// Lower a request to the HTTP/CLI parameter grammar.
 pub fn lower(request: &Request, catalogue: &MunicipalityCatalogue) -> Result<Vec<(String, String)>> {
+    ensure!(request.scope.name_prefix.is_none(), "name prefixes require the in-process record matcher");
+    lower_indexed(request, catalogue)
+}
+
+/// Index-backed criteria only. The executor applies remaining predicates to the
+/// complete candidate set before counting, ordering, paging or exporting.
+fn lower_indexed(request: &Request, catalogue: &MunicipalityCatalogue) -> Result<Vec<(String, String)>> {
     let scope = &request.scope;
     let mut pairs = Vec::new();
     let head = match request.unit {
@@ -236,7 +244,7 @@ impl EngineExecutor<'_> {
     /// Lists use the same complete filter set as counts before sorting or pagination.
     /// Lowering alone cannot express exclusions or population predicates.
     pub fn records(&self, request: &ValidRequest) -> Result<search::SearchResult> {
-        let query = parse(&lower(request, self.context.municipalities)?)?;
+        let query = parse(&lower_indexed(request, self.context.municipalities)?)?;
         self.records_window(request, query.offset, query.limit)
     }
 
@@ -261,7 +269,7 @@ impl EngineExecutor<'_> {
             }
             set = allowed;
         }
-        let query = parse(&lower(request, self.context.municipalities)?)?;
+        let query = parse(&lower_indexed(request, self.context.municipalities)?)?;
         let total = set.len();
         let docs = if let Some((field, desc)) = query.sort {
             let column = self.snapshot.numeric(field).context("missing sort column")?;
@@ -463,7 +471,7 @@ impl EngineExecutor<'_> {
         let mut placeless = request.clone();
         placeless.scope.place = PlaceFilter::Any;
         placeless.scope.within_ufs = SmallSet::default();
-        let mut pairs = lower(&placeless, self.context.municipalities)?;
+        let mut pairs = lower_indexed(&placeless, self.context.municipalities)?;
         let place = super::geo::place(self.context.municipalities, &request.scope.place, &request.scope.within_ufs)?;
         if place.is_empty() {
             return Ok(RoaringBitmap::new());
@@ -482,7 +490,39 @@ impl EngineExecutor<'_> {
         if let Some(excluded) = self.exclusions(request)? {
             set -= excluded;
         }
+        if let Some(prefix) = &request.scope.name_prefix {
+            set = self.name_matches(&set, prefix)?;
+        }
         Ok(set)
+    }
+
+    fn name_matches(&self, candidates: &RoaringBitmap, name: &NamePrefix) -> Result<RoaringBitmap> {
+        // The token index expands prefixes at any position and may truncate them.
+        // Read only the already scoped records to check the full name exactly.
+        ensure!(
+            candidates.len() <= 25_000,
+            "a busca pelo início do nome precisa de um recorte menor. Informe a atividade ou outro filtro cadastral"
+        );
+        let mut matches = RoaringBitmap::new();
+        let mut ids = candidates.iter();
+        loop {
+            let batch: Vec<_> = ids.by_ref().take(4096).collect();
+            if batch.is_empty() {
+                break;
+            }
+            for record in self.snapshot.docs(&batch)? {
+                let legal = name.field != NameField::Trade
+                    && record.company.empresas.first().is_some_and(|row| name_starts_with(&row[col::emp::RAZAO_SOCIAL], &name.prefix));
+                let trade = name.field != NameField::Legal
+                    && record
+                        .estab
+                        .is_some_and(|i| name_starts_with(&record.company.estabelecimentos[i][col::est::NOME_FANTASIA], &name.prefix));
+                if legal || trade {
+                    matches.insert(record.doc);
+                }
+            }
+        }
+        Ok(matches)
     }
 
     pub fn exclusions(&self, request: &Request) -> Result<Option<RoaringBitmap>> {

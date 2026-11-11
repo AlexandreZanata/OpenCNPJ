@@ -852,6 +852,70 @@ fn recover_places(words: &[String], hits: &mut Vec<Hit>, env: &ResolveContext<'_
     }
 }
 
+/// Read a name predicate before spotting entities. A prefix such as "MT" is a
+/// literal in this clause, even when the same word is a state elsewhere.
+pub(crate) fn read_name_prefix(text: &str) -> Result<Option<(NamePrefix, std::ops::Range<usize>)>, Box<Interpretation>> {
+    // Literal name fragments bypass colloquial rewrites such as "pro" -> "para".
+    let literal = normalize::fold(text);
+    let words: Vec<&str> = literal.split(|c: char| !c.is_alphanumeric()).filter(|word| !word.is_empty()).collect();
+    let mut found = None;
+    for (at, pair) in words.windows(2).enumerate() {
+        if !matches!(pair, ["comeca" | "comecam" | "comece" | "comecem" | "inicia" | "iniciam" | "inicie" | "iniciem", "com"]) {
+            continue;
+        }
+        let mut before = &words[..at];
+        let negated = before.last() == Some(&"nao");
+        if negated {
+            before = &before[..before.len() - 1];
+        }
+        let relative = before.last() == Some(&"que");
+        if relative {
+            before = &before[..before.len() - 1];
+        }
+        let (field, width) = match before {
+            [.., "razao", "social"] => (NameField::Legal, 2),
+            [.., "nome", "fantasia"] => (NameField::Trade, 2),
+            [.., "nome" | "nomes"] => (NameField::Any, 1),
+            _ if relative => (NameField::Any, 0),
+            _ => continue,
+        };
+        let mut start = before.len() - width;
+        if width > 0 {
+            if matches!(words[..start].last(), Some(&("o" | "a" | "os" | "as"))) {
+                start -= 1;
+            }
+            if matches!(words[..start].last(), Some(&("cujo" | "cuja" | "cujos" | "cujas" | "que" | "com"))) {
+                start -= 1;
+            }
+        }
+        let mut value = at + 2;
+        match &words[value..] {
+            ["a", "letra", ..] | ["as", "letras", ..] => value += 2,
+            ["letra" | "letras", ..] => value += 1,
+            _ => {}
+        }
+        let Some(&prefix) = words.get(value).filter(|word| NamePrefix::valid_text(word)) else {
+            return Err(clarify("Com quais letras o nome deve começar? Informe um prefixo, como “Z” ou “ZA”."));
+        };
+        let end = value + 1;
+        let rest = &words[end..];
+        let next_is_filter = match rest.strip_prefix(&["e"]).unwrap_or(rest) {
+            [] => rest.is_empty(),
+            [
+                "em" | "no" | "na" | "nos" | "nas" | "com" | "sem" | "ativa" | "ativas" | "ativos" | "ativo" | "baixada" | "baixadas"
+                | "baixados" | "baixado" | "me" | "mande" | "manda" | "existem" | "existe" | "ha" | "tem",
+                ..,
+            ] => true,
+            _ => false,
+        };
+        if negated || found.is_some() || !next_is_filter {
+            return Err(clarify("Informe um único prefixo para o começo do nome, como “começa com Z”."));
+        }
+        found = Some((NamePrefix { field, prefix: prefix.to_ascii_uppercase() }, start..end));
+    }
+    Ok(found)
+}
+
 /// `export` marks a question whose answer is delivered as a file: a count of companies
 /// becomes the list of those companies.
 pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation, export: bool) -> Result<Frame, Box<Interpretation>> {
@@ -876,6 +940,12 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
         return Err(reject(
             "A pesquisa de pessoas, CPFs e sócios não está disponível no chat. Posso pesquisar estabelecimentos por município e atividade.",
         ));
+    }
+    let name = read_name_prefix(text)?;
+    let prefix_span = name.as_ref().map(|(_, span)| span);
+    if let Some(span) = prefix_span {
+        words[span.clone()].fill(String::new());
+        normalized = words.join(" ");
     }
     let mut preliminary = pack.lexicon.scan(&words);
     // A complete sector alias can contain the name of an unavailable metric.
@@ -1093,7 +1163,7 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
     });
     // Mask entity spans, retaining date punctuation. Short UF hits must not
     // erase matching substrings elsewhere ("es" once turned "meses" into "m  ").
-    let temporal_raw = temporal_text(text, &hits);
+    let temporal_raw = temporal_text(text, &hits, prefix_span);
     if time::invalid_dates(&temporal_raw) {
         return Err(clarify("Informe datas válidas no formato DD/MM/AAAA ou AAAA-MM-DD."));
     }
@@ -1617,7 +1687,7 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
         ],
     );
     let named_place = !municipalities.is_empty() || !ufs.is_empty() || !regions.is_empty();
-    let covered = |at: usize| hits.iter().any(|h| h.start <= at && at < h.end);
+    let covered = |at: usize| prefix_span.is_some_and(|span| span.contains(&at)) || hits.iter().any(|h| h.start <= at && at < h.end);
     let plural_noun = |w: &str| {
         matches!(
             w,
@@ -1709,7 +1779,10 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
     let headed_by_sector =
         head.is_some_and(|at| hits.iter().any(|h| h.start == at && h.values.iter().any(|e| matches!(e, Entity::Sector(_)))));
     let headed_by_companies = head.is_some_and(|at| {
-        plural_noun(&words[at]) || words[at] == "mei" || list_command && matches!(words[at].as_str(), "matrizes" | "filiais")
+        plural_noun(&words[at])
+            || words[at] == "mei"
+            || list_command && matches!(words[at].as_str(), "matrizes" | "filiais")
+            || name.is_some() && matches!(words[at].as_str(), "empresa" | "estabelecimento")
     });
     // Words before the head are the request itself; the rest must be read by a filter.
     let foreign: Vec<&str> = words
@@ -1728,7 +1801,7 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
     // Imperatives select a list only when no explicit analytical operation was requested.
     let search_list = search_style
         && !analytical_intent
-        && (list_command || has(n, &["quero todos", "quero todas"]) || headed_by_sector && has(m, &["quais"]));
+        && (name.is_some() || list_command || has(n, &["quero todos", "quero todas"]) || headed_by_sector && has(m, &["quais"]));
     // Contacts and leads are asked for as a list of companies.
     let wants_contacts = (has(n, &["contatos", "telefones", "emails", "e mails", "leads", "prospects", "mailing"])
         || search_style && has(n, &["telefone", "fone", "celular", "whatsapp", "zap", "email", "e mail", "contato"]))
@@ -2239,6 +2312,20 @@ pub(crate) fn resolve(env: &ResolveContext<'_>, text: &str, state: &Conversation
                 time::competences(&raw).first().copied().ok_or_else(|| clarify("Qual competência mensal você quer consultar?"))?;
         }
     }
+    if let Some((prefix, _)) = &name {
+        request.scope.name_prefix = Some(prefix.clone());
+    }
+    if name.is_none() && matches!(request.op, Op::Lookup { .. } | Op::Meta { .. }) {
+        request.scope.name_prefix = None;
+    }
+    if request.scope.name_prefix.is_some() {
+        if !matches!(request.scope.place, PlaceFilter::Municipalities(_)) {
+            return Err(clarify("Em qual município você quer pesquisar nomes que começam com essas letras?"));
+        }
+        if !matches!(request.op, Op::List { .. } | Op::Count { metric: Metric::Stock }) {
+            return Err(clarify("Use o começo do nome para listar ou contar os estabelecimentos de um município."));
+        }
+    }
     if followup && !has(n, &["pagina"]) && state.last.as_ref().is_some_and(|last| last.scope != request.scope || last.op != request.op) {
         request.output.page = 1;
     }
@@ -2503,13 +2590,14 @@ fn known_descriptor(word: &str) -> bool {
 }
 
 /// Mask entities while keeping the separators needed to parse literal dates.
-fn temporal_text(text: &str, hits: &[Hit]) -> String {
+fn temporal_text(text: &str, hits: &[Hit], prefix: Option<&std::ops::Range<usize>>) -> String {
     let mut at = 0;
     normalize::tokens(text)
         .into_iter()
         .map(|token| {
             let end = at + normalize::words(&token).len();
-            let masked = hits.iter().any(|hit| hit.start < end && at < hit.end);
+            let masked =
+                prefix.is_some_and(|span| span.start < end && at < span.end) || hits.iter().any(|hit| hit.start < end && at < hit.end);
             at = end;
             if masked { "_entity_".to_owned() } else { token }
         })

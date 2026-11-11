@@ -26,6 +26,66 @@ use axum::http::StatusCode;
 use common::*;
 use serde_json::Value;
 
+#[test]
+fn assistant_name_prefix_filters_records_and_the_followup_file() {
+    use opencnpj::assistant::{Assistant, Options, assets::DataArgs};
+    use opencnpj_nlu::context::Conversation;
+    use std::path::Path;
+
+    let catalogue = Path::new(env!("CARGO_MANIFEST_DIR")).join("../opencnpj-insights/catalog");
+    let assistant = Assistant::open(
+        &DataArgs {
+            catalog: catalogue.join("municipalities.tsv"),
+            sectors: catalogue.join("sectors.toml"),
+            anchor: "2026-10-11".into(),
+            agg: None,
+            history: None,
+            snapshot: Some(snapshot_path().into()),
+        },
+        Options { hide_contacts: true, export_max_rows: 100 },
+    )
+    .unwrap();
+    let mut state = Conversation::default();
+    let question = "empresa de desenvolvimento de software que começa com Ém no Rio de Janeiro RJ";
+    let result = assistant.ask(question, &mut state);
+    let records = |answer: &Value| {
+        answer["answer"]["blocks"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|block| block["type"] == "records")
+            .unwrap_or_else(|| panic!("{answer}"))
+            .clone()
+    };
+    let block = records(&result);
+    assert_eq!(block["total"], 1);
+    assert_eq!(block["rows"][0][1], "EMPRESA ALFANUMÉRICA LTDA");
+
+    let count = assistant.ask(
+        "Quantas empresas de desenvolvimento de software que começam com EM existem no Rio de Janeiro RJ?",
+        &mut Conversation::default(),
+    );
+    assert!(count["answer"]["blocks"].as_array().unwrap().iter().any(|block| block["type"] == "kpi" && block["value"] == "1"), "{count}");
+
+    let file = assistant.ask("me manda em Excel", &mut state);
+    assert_eq!(records(&file), block);
+    let export = serde_json::from_value(file["interpretation"]["export"].clone()).unwrap();
+    let workbook = assistant.export(state.last.clone().unwrap(), &export, Some(question)).unwrap();
+    assert_eq!(workbook.rows, 1);
+    assert!(workbook.filename.ends_with(".xlsx"));
+    assert!(workbook.bytes.starts_with(b"PK"));
+
+    for (question, total) in [
+        ("desenvolvimento de software em Rio de Janeiro RJ cuja razão social começa com EM", 1),
+        ("desenvolvimento de software em Rio de Janeiro RJ cujo nome fantasia começa com EM", 0),
+        ("desenvolvimento de software em Rio de Janeiro RJ que começa com ALFANUMÉRICA", 0),
+        ("desenvolvimento de software em São Paulo SP que começa com EM", 0),
+        ("padarias em São Paulo SP cujo nome fantasia começa com PA", 1),
+    ] {
+        assert_eq!(records(&assistant.ask(question, &mut Conversation::default()))["total"], total, "{question}");
+    }
+}
+
 // ---------------------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------------------

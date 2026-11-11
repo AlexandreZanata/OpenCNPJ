@@ -67,6 +67,9 @@ impl Display for Request {
         if let Some(capital) = scope.capital {
             filters.push(format!("capital cents={capital}"));
         }
+        if let Some(name) = &scope.name_prefix {
+            filters.push(format!("name prefix {:?}={}", name.field, name.prefix));
+        }
         let exclude = &scope.exclude;
         if !exclude.municipalities.is_empty() {
             filters.push(format!("exclude municipality={}", List(&exclude.municipalities)));

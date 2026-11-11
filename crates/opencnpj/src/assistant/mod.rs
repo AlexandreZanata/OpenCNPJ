@@ -964,6 +964,9 @@ fn reais(cents: u64) -> String {
 fn filter_tags(request: &Request) -> Vec<String> {
     let scope = &request.scope;
     let mut tags = Vec::new();
+    if let Some(name) = &scope.name_prefix {
+        tags.push(format!("{} começa com {}", name.label_pt_br(), name.prefix));
+    }
     if let Some(status) = scope.status
         && status != request.op.default_status()
     {
